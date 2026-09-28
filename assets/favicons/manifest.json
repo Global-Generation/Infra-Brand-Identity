@@ -1,0 +1,85 @@
+[
+ {
+  "key": "akb",
+  "name": "АКБ",
+  "favicon": "assets/favicons/akb.svg",
+  "icon": "lucide/users",
+  "contour": "mentor"
+ },
+ {
+  "key": "pulse",
+  "name": "Пульс",
+  "favicon": "assets/favicons/pulse.svg",
+  "icon": "lucide/activity",
+  "contour": "mentor"
+ },
+ {
+  "key": "cabinet",
+  "name": "Кабинет ментора",
+  "favicon": "assets/favicons/cabinet.svg",
+  "icon": "lucide/briefcase-business",
+  "contour": "mentor"
+ },
+ {
+  "key": "portal",
+  "name": "Студенческий портал",
+  "favicon": "assets/favicons/portal.svg",
+  "icon": "lucide/graduation-cap",
+  "contour": "student"
+ },
+ {
+  "key": "mayak",
+  "name": "Маяк · Джи-джи",
+  "favicon": "assets/gigi/gigi-mascot.png",
+  "note": "свой визуал Джи-джи, не менять"
+ },
+ {
+  "key": "legal",
+  "name": "Юротдел",
+  "favicon": "assets/favicons/legal.svg",
+  "icon": "lucide/scale",
+  "contour": "ops"
+ },
+ {
+  "key": "accounting",
+  "name": "Бухгалтерия",
+  "favicon": "assets/favicons/accounting.svg",
+  "icon": "lucide/calculator",
+  "contour": "ops"
+ },
+ {
+  "key": "reporter",
+  "name": "Репортер",
+  "favicon": "assets/favicons/reporter.svg",
+  "icon": "lucide/chart-column",
+  "contour": "ops"
+ },
+ {
+  "key": "onboarding",
+  "name": "Онбординг",
+  "favicon": "assets/favicons/onboarding.svg",
+  "icon": "lucide/signpost",
+  "contour": "ops"
+ },
+ {
+  "key": "levauth",
+  "name": "Сервисы",
+  "favicon": "assets/favicons/levauth.svg",
+  "icon": "lucide/key-round",
+  "contour": "core"
+ },
+ {
+  "key": "strategy",
+  "name": "Стратегия",
+  "favicon": "assets/favicons/strategy.svg",
+  "icon": "lucide/compass",
+  "contour": "core"
+ },
+ {
+  "key": "llm",
+  "name": "LLM-расходы",
+  "favicon": "assets/favicons/llm.svg",
+  "icon": "lucide/coins",
+  "contour": "core"
+ }
+]

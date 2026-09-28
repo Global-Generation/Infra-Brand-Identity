@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GG · Дизайн-код сервисов</title>
+<meta name="description" content="Дизайн-код внутренних сервисов Global Generation: navy и голубой, знак GG, Montserrat, знаки сервисов, фавиконы, компоненты АКБ, голос и токены.">
+<link rel="icon" href="@FAVICON_URI@">
+<style>
+/*@FONTS@*/
+:root{
+  --navy:#13445d; --navy-hi:#1a5a7a; --navy-deep:#0d2f42;
+  --sky:#009CDC; --sky-ink:#0077a8; --sky-soft:#e6f5fc; --sky-light:#5cc3ec; --sky-ring:rgba(0,156,220,.22);
+  --bg-top:#e7eff8; --bg:#eef3f9; --card:#ffffff; --surface:#f8fafc; --soft:#f1f5f9;
+  --fg:#0f172a; --sfg:#334155; --mfg:#64748b; --lfg:#94a3b8;
+  --border:#e2e8f0; --border-hi:#cbd5e1; --track:rgba(19,68,93,.07);
+  --success:#16a34a; --success-ink:#15803d; --warn:#f59e0b; --warn-ink:#b45309;
+  --danger:#ef4444; --danger-hi:#dc2626; --danger-ink:#b91c1c; --advance:#0f766e; --wait:#075985;
+  --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
+  --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r-xs:6px; --r-sm:8px; --r:10px; --r-md:12px; --r-lg:14px; --r-xl:20px; --r-pill:999px;
+  --sh-sm:0 1px 2px rgba(15,23,42,.06);
+  --sh-md:0 8px 24px -14px rgba(19,68,93,.30);
+  --sh-lg:0 18px 44px -26px rgba(19,68,93,.38);
+  --grad-navy:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  --grad-sky:linear-gradient(150deg,#5cc3ec 0%,#009CDC 55%,#0077a8 100%);
+  --grad-page:linear-gradient(180deg,#e7eff8 0%,#eef3f9 100%);
+  --ease-out:cubic-bezier(.22,.61,.36,1); --ease-pop:cubic-bezier(.34,1.3,.64,1);
+  --gm-main:#13445d; --gm-sec:#009CDC;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font-family:var(--font);font-weight:500;line-height:1.55;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(120% 560px at 50% 0%,#ffffff 0%,rgba(255,255,255,0) 62%) no-repeat,var(--grad-page) no-repeat,var(--bg);background-size:100% 100%,100% 1100px,auto}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{margin:0;font-weight:700}
+a{color:inherit}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--sfg);word-break:break-word}
+svg.i{width:16px;height:16px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gt{background:linear-gradient(180deg,#0d2f42 0%,#13445d 52%,#3a86ad 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nb{white-space:nowrap}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---- logo lockup ---- */
+.gm{display:block;height:28px;width:42px}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.logo .wm{font-weight:700;font-size:21px;letter-spacing:-.02em;color:var(--fg);line-height:1;white-space:nowrap}
+.logo .wm .lt{font-weight:500}
+.logo .wm .sub{display:block;font-weight:700;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mfg);margin-top:6px}
+.logo.sm .gm{height:22px;width:33px}.logo.sm .wm{font-size:17px}.logo.sm .wm .sub{font-size:9px;margin-top:5px}
+.logo.lg .gm{height:32px;width:48px}.logo.lg .wm{font-size:24px}
+.logo.on-dark{--gm-main:#ffffff;--gm-sec:#5cc3ec}
+.logo.on-dark .wm{color:#fff}.logo.on-dark .wm .sub{color:#8fb6ca}
+
+/* ---- header ---- */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.72);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:74px;gap:12px}
+.hdom{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mfg);text-decoration:none;white-space:nowrap}
+@media(max-width:720px){.hdom{display:none}}
+
+/* ---- hero ---- */
+.hero{text-align:center;padding:64px 0 34px}
+.kick{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mfg);font-weight:700}
+h1{font-size:52px;line-height:1.06;letter-spacing:-.035em;margin:14px auto 16px;max-width:860px}
+.hero .sub{font-size:18px;color:var(--sfg);max-width:700px;margin:0 auto;font-weight:500}
+.hero .sub b{color:var(--fg);font-weight:700}
+.hero .docs{margin-top:20px;font-size:13px;color:var(--mfg);font-weight:600}
+.hero .docs a{color:var(--sky-ink);text-decoration:none;border-bottom:1.5px solid var(--sky-ring)}
+.toc{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:28px auto 0;max-width:820px}
+.toc a{font-size:12.5px;font-weight:600;color:var(--sfg);text-decoration:none;background:rgba(255,255,255,.7);border:1px solid var(--border);border-radius:var(--r-pill);padding:6px 13px;transition:.12s}
+.toc a:hover{color:var(--navy);border-color:var(--border-hi);background:#fff}
+@media(max-width:720px){h1{font-size:34px}.hero{padding:42px 0 26px}.hero .sub{font-size:16px}}
+
+/* ---- sections ---- */
+section.blk{padding:48px 0;border-top:1px solid var(--border);scroll-margin-top:74px}
+.lead{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mfg);font-weight:700}
+.stit{font-size:32px;letter-spacing:-.028em;margin:10px 0 8px;line-height:1.15}
+.sint{font-size:16px;color:var(--sfg);max-width:760px;margin:0 0 4px;font-weight:500}
+.sint b{color:var(--fg)}
+.minor{font-size:13px;color:var(--mfg);font-weight:600;margin:22px 0 0}
+@media(max-width:720px){.stit{font-size:26px}.sint{font-size:15px}}
+.grid{display:grid;gap:16px;margin-top:26px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:860px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.g2,.g3{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm)}
+
+/* ---- swatches ---- */
+.swatch{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--card)}
+.swatch .chip{height:76px}
+.swatch .chip.ln{border-bottom:1px solid var(--border)}
+.swatch .meta{padding:11px 13px}
+.swatch .nm{font-weight:700;font-size:13.5px}
+.swatch .hx{font-family:var(--mono);font-size:11.5px;color:var(--mfg);margin-top:2px;word-break:break-word}
+.swatch .use{font-size:11.5px;color:var(--sfg);margin-top:5px;font-weight:500;line-height:1.4}
+
+/* ---- typography ---- */
+.typegrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:16px;margin-top:26px}
+@media(max-width:860px){.typegrid{grid-template-columns:minmax(0,1fr)}}
+.specimen{padding:26px 26px 22px;display:flex;flex-direction:column;gap:18px}
+.specimen .aa{font-size:156px;line-height:.9;font-weight:700;letter-spacing:-.04em;color:var(--navy)}
+.specimen .fam{font-weight:700;font-size:18px}
+.specimen .fam span{display:block;font-size:12.5px;color:var(--mfg);font-weight:500;margin-top:4px}
+.weights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.weights div{border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:15px}
+.weights small{display:block;font-size:11px;color:var(--mfg);font-weight:600;margin-top:2px}
+.scale{padding:8px 0}
+.tr{display:grid;grid-template-columns:128px minmax(0,1fr);gap:16px;align-items:baseline;padding:13px 24px;border-bottom:1px solid var(--border)}
+.tr:last-child{border-bottom:0}
+.tr .k{font-size:11.5px;color:var(--mfg);font-weight:600;line-height:1.35}
+.tr .k b{display:block;color:var(--fg);font-size:12.5px}
+.tr .v{min-width:0;overflow-wrap:anywhere}
+@media(max-width:560px){.tr{grid-template-columns:minmax(0,1fr);gap:4px;padding:12px 16px}}
+
+/* ---- motion + loader ---- */
+@keyframes ggFadeUp{0%{opacity:0;transform:translateY(8px)}22%{opacity:1;transform:none}100%{opacity:1;transform:none}}
+@keyframes ggPop{0%{opacity:0;transform:scale(.94)}18%{opacity:1;transform:scale(1.02)}26%{transform:scale(1)}100%{opacity:1;transform:scale(1)}}
+.demo-fade{animation:ggFadeUp 2.6s var(--ease-out) infinite}
+.demo-pop{animation:ggPop 2.6s var(--ease-pop) infinite}
+.loader{position:relative;height:300px;border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-top:26px;
+  background:radial-gradient(120% 400px at 50% 0%,#fff 0%,rgba(255,255,255,0) 62%) no-repeat,var(--bg);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px}
+.loader svg{width:120px;height:80px;overflow:visible}
+.loader .ld-letters{width:auto;height:64px;overflow:visible}
+@media (max-width:560px){.loader svg{width:84px;height:56px}.loader .ld-letters{height:44px}}
+.ld-main{fill:var(--navy);transform-box:fill-box;transform-origin:center;animation:ldMain 3.4s var(--ease-pop) infinite}
+.ld-arc{fill:var(--navy);animation:ldLeft 3.4s var(--ease-out) infinite}
+.ld-right{fill:var(--navy);animation:ldRight 3.4s var(--ease-out) infinite}
+.ld-word{color:var(--navy);line-height:0;clip-path:inset(0 100% 0 0);animation:ldWipe 3.4s cubic-bezier(.22,.9,.24,1) infinite}
+.ld-word .lt{font-weight:500;color:var(--mfg)}
+@keyframes ldMain{0%,6%{opacity:0;transform:scale(.8)}22%{opacity:1;transform:scale(1)}86%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes ldLeft{0%,16%{opacity:0;transform:translateX(3px)}34%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes ldRight{0%,20%{opacity:0;transform:translateX(-3px)}38%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes ldWipe{0%,30%{clip-path:inset(0 100% 0 0)}52%{clip-path:inset(0 0 0 0)}86%{clip-path:inset(0 0 0 0);opacity:1}100%{clip-path:inset(0 0 0 0);opacity:0}}
+@media(prefers-reduced-motion:reduce){.demo-fade,.demo-pop,.ld-main,.ld-arc,.ld-right,.ld-word{animation:none}.ld-word{clip-path:none}}
+
+/* ---- logo section ---- */
+.markrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}
+@media(max-width:900px){.markrow{grid-template-columns:minmax(0,1fr)}}
+.markspec{display:flex;flex-direction:column;gap:16px;padding:20px 22px}
+.markspec .art{height:104px;display:flex;align-items:center;justify-content:flex-start}
+.markspec .t{font-size:13px;color:var(--sfg);line-height:1.5}
+.markspec .t b{color:var(--fg);display:block;margin-bottom:4px;font-size:14px}
+.fulllogo{height:52px;width:auto;color:var(--navy);display:block}
+.gl{display:block;height:26px;width:auto;color:var(--navy);flex:0 0 auto}
+.logo .svcname{align-self:stretch;display:flex;align-items:center;font-weight:600;font-size:15px;color:var(--navy);white-space:nowrap;line-height:1.1;padding:0 0 0 14px;border-left:1px solid rgba(19,68,93,.2)}
+.logo.sm .gl{height:20px}.logo.sm .svcname{font-size:13px}
+.logo.lg .gl{height:34px}.logo.lg .svcname{font-size:18px}
+.logo.on-dark .gl{color:#fff}.logo.on-dark .svcname{color:#fff;border-left-color:rgba(255,255,255,.35)}
+.fulllogo.inv{color:#fff}
+.svc.gigi img{object-fit:cover;background:#e6f2fb}
+@media (max-width:560px){.logo{gap:10px}.logo.lg .gl{height:26px}.logo.lg .svcname{font-size:15px}.logo .svcname{padding-left:10px}}
+.logolab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.lightbox,.darkbox{border-radius:var(--r-lg);padding:30px 32px;display:flex;flex-direction:column;gap:24px;justify-content:center;min-height:230px;min-width:0}
+.lightbox{background:var(--card);border:1px solid var(--border)}
+.darkbox{background:var(--grad-navy);border:1px solid var(--navy-deep)}
+@media(max-width:820px){.logolab{grid-template-columns:minmax(0,1fr)}.lightbox,.darkbox{padding:24px 20px}}
+
+/* ---- service switcher ---- */
+.switchbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:24px}
+.switchbar .pl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mfg);margin-right:4px}
+.pchip{font:600 12.5px/1 var(--font);color:var(--sfg);background:#fff;border:1px solid var(--border);border-radius:var(--r-pill);padding:8px 13px;cursor:pointer;transition:.12s;display:inline-flex;align-items:center;gap:7px}
+.pchip .dot{width:8px;height:8px;border-radius:3px}
+.pchip:hover{border-color:var(--border-hi);color:var(--fg)}
+.pchip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pchip.on .dot{box-shadow:0 0 0 1.5px #fff}
+.stage{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--sh-lg);overflow:hidden}
+.stagehead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stagehead .hdom{letter-spacing:.12em;text-transform:none;font-size:12px;font-weight:600;font-family:var(--mono);color:var(--mfg)}
+.stagebody{padding:26px 24px 28px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center}
+.stagebody .big{font-weight:700;font-size:30px;letter-spacing:-.03em;line-height:1.1}
+.stagebody p{font-size:14.5px;color:var(--sfg);margin:8px 0 0;max-width:560px}
+.stagefav{display:flex;flex-direction:column;align-items:center;gap:8px}
+.stagefav img{width:76px;height:76px;border-radius:17px;box-shadow:0 12px 26px -14px rgba(13,47,66,.55)}
+.stagefav .cap{font-size:10.5px;color:var(--mfg);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px}
+.facts div{font-size:12px;color:var(--mfg);font-weight:600}
+.facts b{display:block;color:var(--fg);font-size:13px;margin-top:1px}
+@media(max-width:640px){.stagebody{grid-template-columns:minmax(0,1fr);text-align:center}.facts{justify-content:center}.stagebody p{margin-left:auto;margin-right:auto}.stagebody .big{font-size:24px}.stagehead{padding:16px}}
+@media(max-width:640px){.stagehead .hdom{display:block}}
+
+/* ---- contours + service marks ---- */
+.contour{padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.contour .sw{width:40px;height:40px;border-radius:10px;flex:0 0 auto}
+.contour h4{font-size:14px}
+.contour .hx{font-family:var(--mono);font-size:11.5px;color:var(--mfg)}
+.contour p{margin:6px 0 0;font-size:12.5px;color:var(--sfg);line-height:1.45}
+.svc{display:flex;gap:14px;align-items:center;padding:14px 16px;min-width:0}
+.svc img{width:52px;height:52px;flex:0 0 auto;border-radius:12px}
+.svc .tx{min-width:0;flex:1}
+.svc .n{font-weight:700;font-size:14px;line-height:1.25}
+.svc .d{font-family:var(--mono);font-size:11px;color:var(--mfg);margin-top:3px;overflow-wrap:anywhere}
+.svc .r{font-size:12px;color:var(--sfg);margin-top:4px;line-height:1.4;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dlb{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--sfg);font:600 11.5px/1 var(--font);cursor:pointer}
+.dlb:hover{border-color:var(--navy);color:var(--navy)}
+.dlb svg.i{width:13px;height:13px}
+.invrow{display:flex;flex-wrap:wrap;gap:18px 20px;margin-top:16px;padding:26px 28px;border-radius:var(--r-lg);background:var(--grad-navy)}
+.inv{display:flex;flex-direction:column;align-items:center;gap:8px;width:76px}
+.inv img{width:52px;height:52px;border-radius:12px}
+.inv span{font-size:10.5px;color:#a9c6d6;font-weight:600;text-align:center;line-height:1.25}
+.favline{display:flex;gap:34px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
+.favsizes{display:flex;align-items:flex-end;gap:16px}
+.favsizes .u{display:flex;flex-direction:column;align-items:center;gap:6px}
+.favsizes .u span{font-size:10.5px;color:var(--mfg);font-weight:600}
+.favsizes img{display:block}
+.browser{flex:1;min-width:0;max-width:640px;background:#dde6ef;border-radius:12px 12px 0 0;padding:8px 8px 0;display:flex;gap:2px;overflow:hidden}
+.btab{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 0;padding:8px 12px 10px;border-radius:10px 10px 0 0;font-size:12px;font-weight:600;color:var(--sfg)}
+.btab img{width:16px;height:16px;flex:0 0 auto}
+.btab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btab.on{background:#fff;color:var(--fg)}
+.minis{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center}
+.minis img{width:16px;height:16px}
+
+/* ---- AKB components (canon 28.09) ---- */
+.demo{margin-top:26px;padding:16px 18px;border-radius:var(--r-xl);background:var(--grad-page);border:1px solid var(--border)}
+.demo-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demo-logo{display:flex;flex-direction:column;gap:2px;margin-right:6px}
+.demo-logo .t1{font-size:15px;font-weight:500;color:#000;line-height:1.2;white-space:nowrap}
+.demo-logo .t2{font-size:12px;color:var(--mfg);white-space:nowrap}
+.seg{display:flex;align-items:center;gap:2px;padding:4px;border-radius:12px;background:var(--track);box-shadow:inset 0 0 0 1px rgba(19,68,93,.05);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.tab{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 11px;border-radius:9px;font-size:13.5px;font-weight:600;color:#475569;white-space:nowrap;cursor:pointer;border:0;background:transparent;font-family:inherit;transition:background .15s,color .15s}
+.tab:hover{color:var(--navy);background:rgba(255,255,255,.55)}
+.tab.on{color:var(--navy);background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.10),0 0 0 1px rgba(15,23,42,.06)}
+.tab .chev{width:14px;height:14px;opacity:.75}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;font-size:11px;font-weight:700;line-height:1;background:#e2e8f0;color:#334155}
+.pill.hot{background:var(--danger-hi);color:#fff}
+.grow{flex:1 1 auto;min-width:8px}
+.fchip{position:relative;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 30px 0 12px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:0 1px 2px rgba(15,23,42,.05);font-size:13px;cursor:pointer;white-space:nowrap}
+.fchip:hover{border-color:var(--border-hi)}
+.fchip .k{color:var(--mfg);font-weight:500}
+.fchip b{font-weight:600;color:var(--fg)}
+.fchip .chev{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mfg);width:14px;height:14px}
+.create{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 12px 0 13px;border-radius:10px;background:var(--navy);color:#fff;font:700 13.5px/1 var(--font);border:0;cursor:pointer;box-shadow:0 1px 2px rgba(19,68,93,.25);white-space:nowrap}
+.create:hover{background:var(--navy-hi)}
+.create .chev{width:14px;height:14px;opacity:.8}
+@media(max-width:720px){.demo-bar .grow{display:none}}
+.comp{padding:20px 22px;min-width:0}
+.comp h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mfg);margin:0 0 14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row + .row{margin-top:10px}
+.cap{font-size:11.5px;color:var(--mfg);font-weight:600}
+.gg-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 14px;border-radius:8px;border:1px solid transparent;font:600 12.5px/1 var(--font);white-space:nowrap;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+.gg-btn svg.i{width:14px;height:14px}
+.gg-btn--primary{background:var(--navy);color:#fff}.gg-btn--primary:hover{background:var(--navy-hi)}
+.gg-btn--secondary{background:#fff;color:var(--navy);border-color:#d3dce6}.gg-btn--secondary:hover{border-color:var(--navy);background:var(--surface)}
+.gg-btn--accent{background:var(--sky);color:#fff;font-weight:700}.gg-btn--accent:hover{background:var(--sky-ink)}
+.gg-btn--ghost{background:transparent;color:#475569}.gg-btn--ghost:hover{background:var(--soft);color:var(--fg)}
+.gg-btn--danger{background:#fff;color:var(--danger-ink);border-color:#f5c2c2}.gg-btn--danger:hover{background:#fef2f2;border-color:var(--danger-ink)}
+.gg-btn--missing{background:transparent;color:var(--lfg);border:1px dashed var(--border-hi);cursor:default;font-weight:500}
+.gg-btn:focus-visible,.inp:focus,.fchip:focus-within{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-ring)}
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px 0 8px;border-radius:7px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.b-paid{color:var(--success-ink);background:rgba(22,163,74,.09)}
+.b-adv{color:var(--advance);background:rgba(15,118,110,.09)}
+.b-wait{color:var(--wait);background:rgba(7,89,133,.08)}
+.b-stuck{color:var(--warn-ink);background:rgba(245,158,11,.13)}
+.b-gone{color:var(--danger-ink);background:rgba(239,68,68,.09)}
+.b-new{color:var(--sky-ink);background:rgba(0,156,220,.10)}
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld > label{font-size:12px;font-weight:600;color:var(--sfg)}
+.inp{height:38px;border:1px solid var(--border);border-radius:10px;background:#fff;padding:0 12px;font:500 13.5px var(--font);color:var(--fg);width:100%;min-width:0;box-shadow:var(--sh-sm)}
+.inp::placeholder{color:var(--lfg)}
+.inp.focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-ring)}
+.inp.err{border-color:#f5a3a3}
+.hint{font-size:11.5px;color:var(--mfg)}.hint.err{color:var(--danger-ink)}
+.search{position:relative}.search svg.i{position:absolute;left:11px;top:11px;color:var(--lfg)}.search .inp{padding-left:34px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:520px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.ccard{border:1px solid var(--border);border-radius:var(--r-lg);background:#fff;box-shadow:var(--sh-md);overflow:hidden}
+.ccard .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.ccard .nm{font-weight:700;font-size:15px}
+.ccard .nm span{display:block;font-size:12px;color:var(--mfg);font-weight:500;margin-top:2px}
+.ccard .bd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;padding:14px 16px}
+.ccard .bd span{display:block;font-size:11px;color:var(--mfg);margin-bottom:2px}
+.ccard .bd b{font-size:14px;font-weight:600}
+.ccard .ft{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--surface);border-top:1px solid var(--border)}
+.attn{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-md);background:#fff}
+.attn .ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(220,38,38,.08);color:var(--danger-hi);flex:0 0 auto}
+.attn .ic.sky{background:var(--sky-soft);color:var(--sky-ink)}
+.attn .tt{font-weight:700;font-size:13.5px}
+.attn .ds{font-size:12.5px;color:var(--sfg);margin-top:2px}
+.attn + .attn{margin-top:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--lfg);text-align:left;font-weight:700;padding:0 10px 8px}
+.tbl td{padding:10px;border-top:1px solid var(--border);white-space:nowrap}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl tr:hover td{background:var(--surface)}
+.tblwrap{overflow-x:auto}
+
+/* ---- voice ---- */
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
+@media(max-width:820px){.vgrid{grid-template-columns:minmax(0,1fr)}}
+.voice{padding:22px 22px 20px;min-width:0}
+.voice h3{font-size:17px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.voice h3 .tag{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mfg);font-weight:700;margin-left:auto}
+.voice > p{margin:6px 0 14px;font-size:13.5px;color:var(--sfg)}
+.say{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 12px;padding:9px 0;border-top:1px solid var(--border);font-size:13.5px;align-items:baseline}
+.say .w{font-size:11.5px;color:var(--mfg);font-weight:600}
+.say .s{font-weight:600;color:var(--fg)}
+@media(max-width:420px){.say{grid-template-columns:minmax(0,1fr)}}
+.tg{background:#dfe9f2;border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:9px;align-items:flex-end}
+.msg img{width:30px;height:30px;border-radius:50%;flex:0 0 auto}
+.bub{background:#fff;border-radius:14px 14px 14px 4px;padding:9px 12px 7px;font-size:13.5px;line-height:1.45;max-width:100%;box-shadow:0 1px 1px rgba(15,23,42,.06);min-width:0}
+.bub .who{font-size:12px;font-weight:700;color:var(--sky-ink);margin-bottom:2px}
+.bub .tm{display:block;text-align:right;font-size:10.5px;color:var(--lfg);margin-top:2px}
+.bub p{margin:0 0 6px}
+.bub .btns{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.bub .btns span{flex:1;text-align:center;font-size:12px;font-weight:600;color:var(--sky-ink);background:var(--sky-soft);border-radius:8px;padding:6px 8px;white-space:nowrap}
+.lex{width:100%;border-collapse:collapse;font-size:13.5px}
+.lex th{text-align:left;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mfg);padding:0 12px 10px 0;font-weight:700}
+.lex td{padding:10px 12px 10px 0;border-top:1px solid var(--border);vertical-align:top}
+.lex td:first-child{font-weight:700}
+.lex .no{color:var(--mfg);text-decoration:line-through;text-decoration-color:rgba(100,116,139,.5)}
+.lex .why{color:var(--sfg);font-size:12.5px}
+.fmt td:nth-child(2){font-weight:700;white-space:nowrap}
+
+/* ---- grid & shape ---- */
+.space{display:flex;flex-direction:column;justify-content:center;gap:14px;padding:22px}
+.sp{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:12px;font-size:12px;color:var(--mfg);font-weight:600}
+.sp i{display:block;height:12px;border-radius:3px;background:var(--sky)}
+.radii{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:20px 22px}
+.radii div{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:11px;color:var(--mfg);font-weight:600;text-align:center;line-height:1.3}
+.radii i{display:block;width:56px;height:44px;background:var(--soft);border:1.5px solid var(--navy)}
+.radii b{color:var(--fg);font-size:12px}
+.shadows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:22px;background:var(--bg);border-radius:0 0 var(--r-lg) var(--r-lg)}
+.shadows div{background:#fff;border:1px solid var(--border);border-radius:12px;height:74px;display:flex;align-items:flex-end;padding:9px 11px;font-size:11.5px;font-weight:700;color:var(--sfg)}
+
+/* ---- gradients + tokens ---- */
+.gradcard{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--card)}
+.gradcard .bar{height:88px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px}
+.gradcard .meta{padding:11px 14px;font-family:var(--mono);font-size:11px;color:var(--sfg);word-break:break-word}
+.gradcard .meta b{font-family:var(--font);font-size:13px;color:var(--fg);display:block;margin-bottom:4px}
+.tokencode{margin-top:24px;background:var(--navy-deep);border-radius:var(--r-lg);overflow:hidden}
+.tokenbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px 12px 22px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.tokenbar span{font-family:var(--mono);font-size:12px;color:#8fb6ca}
+.tokenbar .acts{display:flex;gap:8px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font:600 12.5px/1 var(--font);cursor:pointer}
+.tbtn:hover{background:rgba(255,255,255,.12)}
+.tbtn svg.i{width:14px;height:14px}
+.tokencode pre{margin:0;padding:18px 22px 22px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#dbe7ef;white-space:pre;overflow:auto;max-height:520px}
+.tokencode .c{color:#6f97ad}
+
+/* ---- rules ---- */
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}
+.rulebox{border-radius:var(--r-lg);padding:20px 22px;background:var(--card);border:1px solid var(--border);min-width:0}
+.rulebox h4{font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.rulebox.yes h4{color:var(--navy)}.rulebox.no h4{color:var(--danger-ink)}
+.rulebox ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.rulebox li{font-size:13.5px;color:var(--sfg);display:flex;gap:10px;line-height:1.45}
+.rulebox li svg.i{margin-top:2px;width:15px;height:15px}
+.rulebox.yes li svg.i{color:var(--success)}.rulebox.no li svg.i{color:var(--danger)}
+@media(max-width:760px){.rules{grid-template-columns:minmax(0,1fr)}}
+.dd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}
+@media(max-width:860px){.dd{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ddc{border:1px solid var(--border);border-radius:var(--r-md);background:#fff;overflow:hidden;min-width:0}
+.ddc .art{height:110px;display:flex;align-items:center;justify-content:center;background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden}
+.ddc .cp{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;font-size:12px;font-weight:600;color:var(--sfg);line-height:1.35}
+.ddc .cp svg.i{width:15px;height:15px;margin-top:1px}
+.ddc.ok .cp svg.i{color:var(--success)}.ddc.bad .cp svg.i{color:var(--danger)}
+
+footer{background:var(--grad-navy);color:#a9c6d6;margin-top:24px;padding:34px 0;font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+footer b{color:#fff;font-weight:700}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;background:var(--navy-deep);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;box-shadow:var(--sh-lg);transition:.25s var(--ease-out);pointer-events:none;z-index:99}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.glyphs{margin-top:auto;font-size:13px;color:var(--sfg);line-height:1.75;letter-spacing:.02em;word-break:break-all;border-top:1px solid var(--border);padding-top:14px}
+.clear{position:relative;padding:24px;border:1.5px dashed #9cc7dc;border-radius:8px;background:repeating-linear-gradient(45deg,rgba(0,156,220,.07) 0 6px,transparent 6px 12px)}
+.clear .gm{height:48px;width:72px;background:#fff}
+.clear i{position:absolute;font-style:normal;font-size:9.5px;font-weight:700;color:var(--sky-ink);line-height:1}
+.clear .ct{left:50%;top:7px;transform:translateX(-50%)}
+.clear .cl{left:4px;top:50%;transform:translateY(-50%)}
+@media(max-width:560px){.cgrid{grid-template-columns:minmax(0,1fr)}}
+.svc.root{grid-column:1/-1;padding:18px 20px}
+.svc.root img{width:64px;height:64px;border-radius:14px}
+.svc .nb{white-space:nowrap}
+.invrow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:20px 12px}
+.inv{width:auto}
+@media(max-width:860px){.invrow{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:480px){.invrow{grid-template-columns:repeat(3,minmax(0,1fr));padding:22px 16px}}
+.browser{flex:1 1 360px;max-width:700px}
+@media(min-width:1180px){.demo{width:min(1240px,calc(100vw - 48px));margin-left:calc(50% - min(620px,50vw - 24px))}}
+.flab{font-size:12px;font-weight:600;color:var(--sfg)}
+.chk,.tgl{position:relative;display:inline-flex;align-items:center;gap:8px;height:38px;font-size:13px;font-weight:600;color:var(--sfg);cursor:pointer;white-space:nowrap}
+.chk input,.tgl input{position:absolute;opacity:0;width:1px;height:1px}
+.chk .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-hi);display:flex;align-items:center;justify-content:center;background:#fff;color:#fff;transition:.12s}
+.chk .box svg.i{width:12px;height:12px;stroke-width:3;opacity:0}
+.chk input:checked + .box{background:var(--navy);border-color:var(--navy)}
+.chk input:checked + .box svg{opacity:1}
+.tgl .trk{position:relative;width:34px;height:20px;border-radius:999px;background:var(--border-hi);transition:.15s}
+.tgl .trk::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.25);transition:.15s var(--ease-out)}
+.tgl input:checked + .trk{background:var(--navy)}
+.tgl input:checked + .trk::after{transform:translateX(14px)}
+.chk input:focus-visible + .box,.tgl input:focus-visible + .trk{box-shadow:0 0 0 3px var(--sky-ring)}
+.redo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.redo div{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.4}
+.redo span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+.redo .was{color:var(--mfg)}
+.redo .was span{color:var(--danger-ink)}
+.redo .now span{color:var(--success-ink)}
+@media(max-width:420px){.redo{grid-template-columns:minmax(0,1fr)}}
+.sp{grid-template-columns:28px 72px minmax(0,1fr)}
+.sp em{font-style:normal;font-weight:500;color:var(--sfg);font-size:12.5px}
+.lex td:first-child{white-space:nowrap}
+@media(max-width:600px){.svc .r{flex-wrap:wrap}}
+@media(max-width:600px){.wrap{padding:0 16px}}
+</style>
+</head>
+<body id="top">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="gg-logo" viewBox="0 0 777 196">@FULLLOGO@</symbol>
+    <symbol id="gg-mark" viewBox="3.6 8.6 31.3 20.95"><path d="@MARK_SEC@" style="fill:var(--gm-sec)"/><path d="@MARK_MAIN@" style="fill:var(--gm-main)"/></symbol>
+    <!--@SPRITE@-->
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="Global Generation, дизайн-код сервисов">
+      <svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg>
+      <span class="svcname">Дизайн-код сервисов</span>
+    </a>
+    <span class="hdom">Внутренние сервисы · 28.09.2026</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="kick">Источник правды по бренду внутренних сервисов</div>
+    <h1 class="gt">Дизайн-код внутренних сервисов</h1>
+    <p class="sub">Один костяк на АКБ, Пульс, Джи-джи, порталы и опс-инструменты. <b>Navy всегда</b>, <b>голубой акцент один</b>, <b>один логотип</b> global-logo.svg, шрифт Montserrat. Сервис отличается только названием рядом с логотипом, цветом контура и своей иконкой. Канон = интерфейс АКБ на 28 сентября 2026.</p>
+    <div class="docs">Токены: <a href="#tokens">блок ниже, копируется и скачивается</a> · Канон: <a href="#components">hub.global-generations-edu.com</a></div>
+    <nav class="toc" aria-label="Разделы">
+      <a href="#palette">Палитра</a><a href="#color">Цвет</a><a href="#type">Шрифт</a><a href="#motion">Движение</a><a href="#logo">Логотип</a><a href="#services">Сервисы</a><a href="#marks">Знаки и фавиконы</a><a href="#components">Компоненты</a><a href="#voice">Голос и форматы</a><a href="#shape">Сетка</a><a href="#tokens">Токены</a><a href="#rules">Правила</a>
+    </nav>
+  </div>
+</div>
+
+<!-- 01 PALETTE -->
+<section class="blk" id="palette">
+  <div class="wrap">
+    <div class="lead">01 · Палитра</div>
+    <h2 class="stit">Navy, белый и холодные серые</h2>
+    <p class="sint">Шасси любого внутреннего сервиса: светло-голубой фон страницы, белые карточки, тонкие серо-голубые границы и navy как главный цвет действия. Одинаково в АКБ, Пульсе, кабинетах, порталах и опс-сервисах.</p>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip ln" style="background:var(--grad-page)"></div><div class="meta"><div class="nm">--bg-top · --bg</div><div class="hx">#e7eff8 · #eef3f9</div><div class="use">Фон страницы: сверху чуть голубее, книзу светлее</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:#fff"></div><div class="meta"><div class="nm">--card</div><div class="hx">#ffffff</div><div class="use">Карточки, таблицы, поповеры, активная вкладка</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:#f8fafc"></div><div class="meta"><div class="nm">--surface</div><div class="hx">#f8fafc</div><div class="use">Раскрытые строки, подвалы карточек, hover</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:#f1f5f9"></div><div class="meta"><div class="nm">--soft</div><div class="hx">#f1f5f9</div><div class="use">Мягкие блоки, ghost-hover, код</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0f172a"></div><div class="meta"><div class="nm">--fg</div><div class="hx">#0f172a</div><div class="use">Основной текст и цифры</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#334155"></div><div class="meta"><div class="nm">--sfg</div><div class="hx">#334155</div><div class="use">Вторичный текст, описания</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="nm">--mfg</div><div class="hx">#64748b</div><div class="use">Мета, подписи полей, название сервиса у логотипа</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:#e2e8f0"></div><div class="meta"><div class="nm">--border</div><div class="hx">#e2e8f0 · hover #cbd5e1</div><div class="use">Тонкие границы 1 px</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#13445d"></div><div class="meta"><div class="nm">--navy</div><div class="hx">#13445d</div><div class="use">Главный цвет: кнопка действия, активная вкладка, знак GG</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1a5a7a"></div><div class="meta"><div class="nm">--navy-hi</div><div class="hx">#1a5a7a</div><div class="use">Hover главной кнопки</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0d2f42"></div><div class="meta"><div class="nm">--navy-deep</div><div class="hx">#0d2f42</div><div class="use">Тёмные блоки, футер, код, тосты</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:linear-gradient(rgba(19,68,93,.07),rgba(19,68,93,.07)),#fff"></div><div class="meta"><div class="nm">--track</div><div class="hx">rgba(19,68,93,.07)</div><div class="use">Трек сегментных вкладок, мягкие подложки</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 01B COLOR -->
+<section class="blk" id="color">
+  <div class="wrap">
+    <div class="lead">01Б · Цвет</div>
+    <h2 class="stit">Navy - база, голубой - акцент, цвет - смысл</h2>
+    <p class="sint">Акцент один: фирменный голубой <b>#009CDC</b> (письма, счета, портал, Юротдел, Бухгалтерия). Он для ссылок, фокуса, графиков и CTA студенту. Текстом на белом голубой слишком светлый, поэтому ссылки пишем тёмным голубым <code>--sky-ink</code>. Синий <code>#2563eb</code> из фокус-рингов АКБ выводим: вместо него голубой. Статусы - только для смысла, не для украшения.</p>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip" style="background:#009CDC"></div><div class="meta"><div class="nm">--sky</div><div class="hx">#009CDC</div><div class="use">Акцент: CTA студенту, фокус, графики, иконки-активы</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0077a8"></div><div class="meta"><div class="nm">--sky-ink</div><div class="hx">#0077a8 · контраст 5:1</div><div class="use">Ссылки и голубой текст на белом</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--grad-sky)"></div><div class="meta"><div class="nm">--grad-sky</div><div class="hx">150°, #5cc3ec · #009CDC · #0077a8</div><div class="use">Линии графиков, hero-акценты</div></div></div>
+      <div class="swatch"><div class="chip ln" style="background:#e6f5fc"></div><div class="meta"><div class="nm">--sky-soft</div><div class="hx">#e6f5fc · кольцо rgba(0,156,220,.22)</div><div class="use">Выбранная строка, кнопки в сообщениях, фокус-кольцо</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#16a34a"></div><div class="meta"><div class="nm">--success</div><div class="hx">#16a34a · текст #15803d</div><div class="use">Оплатили, чек загружен, рост</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f59e0b"></div><div class="meta"><div class="nm">--warn</div><div class="hx">#f59e0b · текст #b45309</div><div class="use">Застряли, дедлайн близко</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="nm">--danger</div><div class="hx">#ef4444 · текст #b91c1c</div><div class="use">Ушли, ошибка, нет чека</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#dc2626"></div><div class="meta"><div class="nm">--danger-hi</div><div class="hx">#dc2626</div><div class="use">Счётчик «Требуют внимания», сплошная заливка</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 01C TYPE -->
+<section class="blk" id="type">
+  <div class="wrap">
+    <div class="lead">01В · Шрифт</div>
+    <h2 class="stit">Montserrat, заголовки жирные</h2>
+    <p class="sint">Один шрифт на всё: Montserrat 400/500/600/700, самохост из <code>hub/frontend/static/css/admin.css</code> (кириллица + латиница). Никаких шрифтовых CDN. Цифры в таблицах - табличные (<code>tabular-nums</code>), чтобы суммы вставали в столбик.</p>
+    <div class="typegrid">
+      <div class="card specimen">
+        <div class="aa">Аа</div>
+        <div class="fam">Montserrat<span>Заголовки 700, интерфейс 600, текст 500, длинный текст 400</span></div>
+        <div class="weights">
+          <div style="font-weight:400">Ментор<small>400 Regular</small></div>
+          <div style="font-weight:500">Ментор<small>500 Medium</small></div>
+          <div style="font-weight:600">Ментор<small>600 SemiBold</small></div>
+          <div style="font-weight:700">Ментор<small>700 Bold</small></div>
+        </div>
+        <div class="glyphs">АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ<br>абвгдеёжзийклмнопрстуфхцчшщъыьэюя<br>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>0123456789 «» № % $ +</div>
+      </div>
+      <div class="card scale">
+        <div class="tr"><div class="k"><b>Display</b>44 / 700 / -0.035em</div><div class="v" style="font-size:44px;font-weight:700;letter-spacing:-.035em;line-height:1.05">Порталы</div></div>
+        <div class="tr"><div class="k"><b>H1</b>30 / 700 / -0.03em</div><div class="v" style="font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1.12">Выплаты за сентябрь</div></div>
+        <div class="tr"><div class="k"><b>H2</b>20 / 700</div><div class="v" style="font-size:20px;font-weight:700;letter-spacing:-.015em">Требуют внимания</div></div>
+        <div class="tr"><div class="k"><b>H3</b>15 / 700</div><div class="v" style="font-size:15px;font-weight:700">Онлайн-оплата Т-Банк</div></div>
+        <div class="tr"><div class="k"><b>Текст</b>14 / 500 / 1.55</div><div class="v" style="font-size:14px">Студент оплатил сентябрь картой, чек приложен автоматически.</div></div>
+        <div class="tr"><div class="k"><b>Интерфейс</b>13.5 / 600</div><div class="v" style="font-size:13.5px;font-weight:600;color:#475569">Клиенты · Порталы · Выплаты · Пульс</div></div>
+        <div class="tr"><div class="k"><b>Подпись</b>12 / 500</div><div class="v" style="font-size:12px;color:var(--mfg)">Обновлено 28 сентября в 10:00</div></div>
+        <div class="tr"><div class="k"><b>Лейбл</b>11 / 700 / caps .08em</div><div class="v" style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--lfg)">Оплачено до</div></div>
+        <div class="tr"><div class="k"><b>Цифры</b>22 / 700 / tabular</div><div class="v tnum" style="font-size:22px;font-weight:700;letter-spacing:-.01em">4&nbsp;791&nbsp;215&nbsp;₽</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 01D MOTION + LOADER -->
+<section class="blk" id="motion">
+  <div class="wrap">
+    <div class="lead">01Г · Движение и загрузка</div>
+    <h2 class="stit">Спокойно и быстро</h2>
+    <p class="sint">Только opacity и transform. Появление карточек - <code>fade-up</code> 0.3 с, поповеры и модалки - <code>pop</code> 0.22 с с лёгким перелётом. Easing: out <code>cubic-bezier(.22,.61,.36,1)</code>, pop <code>cubic-bezier(.34,1.3,.64,1)</code>. Анимированный фон с «пятнами» в АКБ оставляем только голубым.</p>
+    <div class="grid g4">
+      <div class="swatch"><div class="chip demo-fade" style="background:var(--grad-navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">fade-up</div><div class="meta"><div class="nm">.animate-fade-up</div><div class="hx">.3s ease-out</div><div class="use">Появление карточек и строк</div></div></div>
+      <div class="swatch"><div class="chip demo-pop" style="background:var(--grad-navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">pop</div><div class="meta"><div class="nm">.animate-pop</div><div class="hx">.22s overshoot</div><div class="use">Поповеры, модалки, меню «Создать»</div></div></div>
+    </div>
+    <div class="loader" aria-label="Фирменная загрузка">
+      <svg viewBox="3.6 8.6 31.3 20.95" aria-hidden="true"><path class="ld-arc" d="M7.63372 28.4054V9.78161C5.21273 12.1914 4 15.2866 4 19.0713C4 22.8558 5.2119 25.9666 7.63372 28.4054Z"/><path class="ld-right" id="ldRight"/><path class="ld-main" d="@MARK_MAIN@"/></svg>
+      <div class="ld-word"><svg class="ld-letters" viewBox="336 89 444 110" fill="currentColor" aria-hidden="true">@LOGO_LETTERS@</svg></div>
+    </div>
+    <p class="minor">Прелоудер: знак из логотипа собирается, надпись GLOBAL GENERATION открывается шторкой. Показывается на входе в сервис и на долгих загрузках.</p>
+  </div>
+</section>
+
+<!-- 02 LOGO -->
+<section class="blk" id="logo">
+  <div class="wrap">
+    <div class="lead">02 · Логотип</div>
+    <h2 class="stit">Один логотип на всё</h2>
+    <p class="sint">Логотип у Global Generation <b>один</b>: знак + GLOBAL GENERATION широким гротеском, <b>одним цветом</b>. Файл <code>global-logo.svg</code> в репо Ops-Legal. Он стоит везде: экран входа, шапки сервисов, письма, счета и PDF. Название сервиса пишется рядом через тонкую вертикальную линию на всю высоту логотипа, полужирным navy, и в логотип не входит. Других логотипов, вордмарков и локапов нет.</p>
+    <div class="markrow">
+      <div class="card markspec">
+        <div class="art"><svg class="fulllogo" viewBox="0 0 777 196" fill="currentColor" aria-label="Global Generation"><use href="#gg-logo"/></svg></div>
+        <div class="t"><b>На светлом</b>Логотип целиком в navy <code>#13445d</code>. Белый фон, фон страницы или светлая карточка.</div>
+      </div>
+      <div class="card markspec">
+        <div class="art" style="background:var(--grad-navy);border-radius:12px"><svg class="fulllogo inv" viewBox="0 0 777 196" fill="currentColor" aria-label="Global Generation"><use href="#gg-logo"/></svg></div>
+        <div class="t"><b>На тёмном</b>Логотип целиком белый на navy-градиенте. Других цветов у логотипа нет.</div>
+      </div>
+      <div class="card markspec">
+        <div class="art"><div class="clear"><svg class="fulllogo" style="height:40px" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><i class="ct">½h</i><i class="cl">½h</i></div></div>
+        <div class="t"><b>Охранное поле и размеры</b>Вокруг логотипа пусто на половину высоты знака. Минимум 110 px шириной. Меньше - только фавикон со знаком.</div>
+      </div>
+    </div>
+    <div class="logolab">
+      <div class="lightbox">
+        <span class="logo lg"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg></span>
+        <span class="logo lg"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">АКБ</span></span>
+        <span class="logo lg"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">Кабинет ментора</span></span>
+        <span class="logo lg"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">Студенческий портал</span></span>
+      </div>
+      <div class="darkbox">
+        <span class="logo lg on-dark"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg></span>
+        <span class="logo lg on-dark"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">Пульс</span></span>
+        <span class="logo lg on-dark"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">Юротдел</span></span>
+        <span class="logo lg on-dark"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname">Сервисы</span></span>
+      </div>
+    </div>
+    <p class="minor">АКБ пока держит текстовый заголовок «АКБ Global Generation» (решение 28.09, «лого старое верни»). При переходе на систему слева встаёт global-logo.svg, а «АКБ» идёт рядом через тонкую линию.</p>
+  </div>
+</section>
+
+<!-- 03 SERVICES -->
+<section class="blk" id="services">
+  <div class="wrap">
+    <div class="lead">03 · Сервисы на одной базе</div>
+    <h2 class="stit">Один костяк, своё название и фавикон</h2>
+    <p class="sint">Все внутренние сервисы собраны на одном шасси: тот же логотип global-logo.svg, шрифт, navy и голубой. Отличаются <b>название сервиса</b> рядом с логотипом, <b>цвет контура</b> и <b>иконка фавикона</b>. Жми сервис:</p>
+    <div class="switchbar" id="switch"><span class="pl">Сервис</span></div>
+    <div class="stage">
+      <div class="stagehead">
+        <span class="logo sm"><svg class="gl" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg><span class="svcname" id="head-sub">АКБ</span></span>
+        <span class="hdom" id="head-dom">hub.global-generations-edu.com</span>
+      </div>
+      <div class="stagebody">
+        <div class="stagefav"><img id="stage-fav" alt="Фавикон сервиса" src="@FAVICON_URI@"><div class="cap" id="stage-cap">фавикон сервиса</div></div>
+        <div>
+          <div class="big"><span class="gt" id="stage-title">Global Generation · АКБ</span></div>
+          <p id="stage-desc"></p>
+          <div class="facts">
+            <div>Кто пользуется<b id="f-who"></b></div>
+            <div>Репозиторий<b id="f-repo"></b></div>
+            <div>Контур<b id="f-contour"></b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 MARKS -->
+<section class="blk" id="marks">
+  <div class="wrap">
+    <div class="lead">04 · Знаки сервисов и фавиконы</div>
+    <h2 class="stit">Одна плитка, цвет контура, своя иконка</h2>
+    <p class="sint">Знак сервиса = скруглённый квадрат (радиус 22%) цвета контура + белая иконка lucide, линия 2 px. Цвет говорит, чей это сервис, иконка - какой именно. Корень (экран входа, levauth-каталог) = navy-плитка со знаком GG. Файлы SVG скачиваются кнопкой.</p>
+    <div class="grid g4 cgrid" id="contours"></div>
+    <div class="grid g3" id="svcgrid"></div>
+    <p class="minor">Инверсия: на тёмном плитка белая, иконка цвета контура.</p>
+    <div class="invrow" id="invrow"></div>
+    <p class="minor">Размеры 64 / 32 / 16 и вид во вкладке браузера (сервис идёт первым, потому что вкладки обрезаются справа):</p>
+    <div class="favline">
+      <div class="favsizes" id="favsizes"></div>
+      <div class="browser" id="browser"></div>
+    </div>
+    <p class="minor">Все фавиконы в 16 px подряд, как в закладках: каждый читается без подписи.</p>
+    <div class="minis" id="minis" aria-label="Все фавиконы в 16 px"></div>
+  </div>
+</section>
+
+<!-- 05 COMPONENTS -->
+<section class="blk" id="components">
+  <div class="wrap">
+    <div class="lead">05 · Компоненты</div>
+    <h2 class="stit">Живые детали интерфейса</h2>
+    <p class="sint">Канон - шапка АКБ, утверждённая 28.09: заголовок, сегментные вкладки в мягком треке, фильтр-чип и navy-кнопка «Создать». Всё ниже - живой HTML/CSS, можно наводить и жать.</p>
+    <div class="demo">
+      <div class="demo-bar">
+        <div class="demo-logo"><span class="t1">АКБ Global Generation</span><span class="t2">АКБ - Активная клиентская база</span></div>
+        <nav class="seg" aria-label="Пример вкладок">
+          <button class="tab on" type="button"><svg class="i"><use href="#i-users"/></svg>Клиенты<span class="pill hot">3</span></button>
+          <button class="tab" type="button"><svg class="i"><use href="#i-monitor"/></svg>Порталы<span class="pill">2</span></button>
+          <button class="tab" type="button"><svg class="i"><use href="#i-wallet"/></svg>Выплаты</button>
+          <button class="tab" type="button"><svg class="i"><use href="#i-activity"/></svg>Пульс</button>
+          <button class="tab" type="button">Ещё<svg class="i chev"><use href="#i-chevron-down"/></svg></button>
+        </nav>
+        <span class="grow"></span>
+        <label class="fchip"><span class="k">Ответственный:</span><b>Все</b><svg class="i chev"><use href="#i-chevron-down"/></svg></label>
+        <button class="create" type="button"><svg class="i"><use href="#i-plus"/></svg>Создать<svg class="i chev"><use href="#i-chevron-down"/></svg></button>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card comp">
+        <h4>Кнопки</h4>
+        <div class="row"><button class="gg-btn gg-btn--primary" type="button"><svg class="i"><use href="#i-check"/></svg>Засчитать месяц</button><button class="gg-btn gg-btn--secondary" type="button">Открыть карточку</button><button class="gg-btn gg-btn--ghost" type="button">Отмена</button></div>
+        <div class="row"><button class="gg-btn gg-btn--accent" type="button">Продлить подписку</button><button class="gg-btn gg-btn--danger" type="button">Удалить платёж</button><span class="gg-btn gg-btn--missing">нет чека</span></div>
+        <div class="row"><span class="cap">primary 34 px, radius 8 · accent только для студента · одна primary на экран</span></div>
+      </div>
+      <div class="card comp">
+        <h4>Счётчики и статусы</h4>
+        <div class="row"><span class="pill hot">3</span><span class="cap">внимание, сплошной #dc2626</span><span class="pill">12</span><span class="cap">нейтральный</span></div>
+        <div class="row"><span class="badge b-paid">Оплатили</span><span class="badge b-adv">Аванс</span><span class="badge b-wait">Ждём</span><span class="badge b-stuck">Застряли</span><span class="badge b-gone">Ушли</span><span class="badge b-new">Новый</span></div>
+        <div class="row"><span class="cap">точка + текст цвета статуса на тинте 8-13%, без больших пастельных заливок</span></div>
+      </div>
+      <div class="card comp">
+        <h4>Поля</h4>
+        <div class="fgrid">
+          <div class="fld"><label for="f1">Имя клиента</label><input class="inp" id="f1" value="Анна Петрова"></div>
+          <div class="fld"><label for="f2">Сумма, ₽</label><input class="inp focus tnum" id="f2" value="185 000"><span class="hint">Цена месяца из АКБ</span></div>
+          <div class="fld"><label for="f3">Оплачено до</label><input class="inp err" id="f3" value="31.02.2026"><span class="hint err">Такой даты нет</span></div>
+          <div class="fld"><label for="f4">Поиск</label><div class="search"><svg class="i"><use href="#i-search"/></svg><input class="inp" id="f4" placeholder="Имя, телефон или ментор"></div></div>
+          <div class="fld" style="grid-column:1/-1"><span class="flab">Фильтр и переключатели</span><div class="row"><label class="fchip"><span class="k">Месяц:</span><b>Сентябрь 2026</b><svg class="i chev"><use href="#i-chevron-down"/></svg></label><label class="chk"><input type="checkbox" checked><span class="box"><svg class="i"><use href="#i-check"/></svg></span>Чек загружен</label><label class="tgl"><input type="checkbox" checked><span class="trk"></span>Пинги</label></div></div>
+        </div>
+      </div>
+      <div class="card comp">
+        <h4>Карточка</h4>
+        <div class="ccard">
+          <div class="hd"><div class="nm">Анна Петрова<span>Премиум · ментор Ярослава</span></div><span class="badge b-paid">Оплатили</span></div>
+          <div class="bd">
+            <div><span>Оплачено до</span><b>31 октября</b></div>
+            <div><span>Месяц</span><b>3-й оплаченный</b></div>
+            <div><span>Сумма</span><b class="tnum">185&nbsp;000&nbsp;₽</b></div>
+            <div><span>Чек</span><b style="color:var(--success-ink)">Загружен</b></div>
+          </div>
+          <div class="ft"><button class="gg-btn gg-btn--secondary" type="button"><svg class="i"><use href="#i-external-link"/></svg>Портал</button><button class="gg-btn gg-btn--ghost" type="button">История платежей</button></div>
+        </div>
+      </div>
+      <div class="card comp">
+        <h4>Требуют внимания</h4>
+        <div class="attn"><div class="ic"><svg class="i"><use href="#i-circle-alert"/></svg></div><div style="flex:1;min-width:0"><div class="tt">Онлайн-платёж ждёт зачёта</div><div class="ds">Т-Банк подтвердил 185&nbsp;000&nbsp;₽ за октябрь. Засчитайте месяц в карточке клиента.</div></div></div>
+        <div class="attn"><div class="ic sky"><svg class="i"><use href="#i-message-circle"/></svg></div><div style="flex:1;min-width:0"><div class="tt">Нет рабочего чата в Пульсе</div><div class="ds">Чат не привязан, аналитика по клиенту не считается.</div></div></div>
+        <div class="row" style="margin-top:12px"><span class="cap">иконка в квадрате 32 px, никаких полос слева</span></div>
+      </div>
+      <div class="card comp">
+        <h4>Таблица</h4>
+        <div class="tblwrap"><table class="tbl">
+          <thead><tr><th>Клиент</th><th>Статус</th><th class="num">Сумма</th><th class="num">До</th></tr></thead>
+          <tbody>
+            <tr><td>Анна Петрова</td><td><span class="badge b-paid">Оплатили</span></td><td class="num">185&nbsp;000&nbsp;₽</td><td class="num">31 окт</td></tr>
+            <tr><td>Илья Орлов</td><td><span class="badge b-wait">Ждём</span></td><td class="num">120&nbsp;000&nbsp;₽</td><td class="num">4 окт</td></tr>
+            <tr><td>Мария Ким</td><td><span class="badge b-stuck">Застряли</span></td><td class="num">0&nbsp;₽</td><td class="num">28 сен</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 VOICE -->
+<section class="blk" id="voice">
+  <div class="wrap">
+    <div class="lead">06 · Голос и форматы</div>
+    <h2 class="stit">Стаффу чётко, студенту тепло</h2>
+    <p class="sint">Два регистра. В стафф-инструментах - коротко, по-деловому, глагол в кнопке. В текстах студенту от Джи-джи - тепло и поддерживающе, как Duolingo: без давления, с понятным следующим шагом. Строки ниже - настоящие, из АКБ и Маяка.</p>
+    <div class="vgrid">
+      <div class="card voice">
+        <h3><svg class="i" style="width:18px;height:18px;color:var(--navy)"><use href="#i-briefcase-business"/></svg>Стафф: АКБ, Пульс, кабинеты<span class="tag">чётко</span></h3>
+        <p>Глагол в кнопке, факт в статусе, причина в подсказке. Без восклицаний.</p>
+        <div class="say"><span class="w">Кнопка</span><span class="s">Засчитать месяц</span></div>
+        <div class="say"><span class="w">Блок</span><span class="s">Требуют внимания</span></div>
+        <div class="say"><span class="w">Причина</span><span class="s">Онлайн-платёж ждёт зачёта</span></div>
+        <div class="say"><span class="w">Ячейка</span><span class="s">нет чека · нет задач</span></div>
+        <div class="say"><span class="w">Подсказка</span><span class="s">Студент уже оплатил - напоминания не нужны</span></div>
+        <div class="say"><span class="w">Действие</span><span class="s">Отменить все пинги</span></div>
+        <div class="say"><span class="w">Тост</span><span class="s">Клиент создан · Задача выполнена</span></div>
+        <div class="say"><span class="w">Проверка</span><span class="s">Укажите причину ухода клиента</span></div>
+        <div class="redo"><div class="was"><span>Было</span>Ошибка: undefined</div><div class="now"><span>Стало</span>Не удалось выгрузить Excel: нет связи с сервером. Повторите через минуту.</div></div>
+      </div>
+      <div class="card voice">
+        <h3><svg class="i" style="width:18px;height:18px;color:var(--sky-ink)"><use href="#i-graduation-cap"/></svg>Студенту: Джи-джи и портал<span class="tag">тепло</span></h3>
+        <p>Приветствие, одна мысль, следующий шаг, поддержка. Подпись «Джи-джи».</p>
+        <div class="tg">
+          <div class="msg"><img id="gigi1" alt="Джи-джи"><div class="bub"><div class="who">Джи-джи</div><p>Привет! Вам добавили новое домашнее задание: эссе «Why this college». Срок: до 3 октября. От ментора: Ярослава.</p>Если нужно больше времени или что-то непонятно, просто напишите ментору, разберёмся вместе.<div class="btns"><span>Открыть в карте студента</span></div><span class="tm">10:00</span></div></div>
+          <div class="msg"><img id="gigi2" alt="Джи-джи"><div class="bub"><div class="who">Джи-джи</div>Сделай одну задачу сегодня, дальше пойдёт само. Я рядом, если что.<div class="btns"><span>Да, давай</span><span>Не сейчас</span></div><span class="tm">10:02</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="vgrid">
+      <div class="card voice">
+        <h3>Словарь</h3>
+        <table class="lex">
+          <thead><tr><th>Говорим</th><th>Не говорим</th><th>Где</th></tr></thead>
+          <tbody>
+            <tr><td>ментор</td><td class="no">наставник</td><td class="why">везде</td></tr>
+            <tr><td>Джи-джи</td><td class="no">ИИ, нейросеть, бот</td><td class="why">всё, что пишет студенту ассистент</td></tr>
+            <tr><td>клиент</td><td class="no">лид, юзер</td><td class="why">стафф-интерфейсы АКБ</td></tr>
+            <tr><td>студент</td><td class="no">клиент</td><td class="why">тексты студенту и порталы</td></tr>
+            <tr><td>АКБ</td><td class="no">ВКБ, ОКБ</td><td class="why">расшифровки митингов путают</td></tr>
+            <tr><td>дефис -</td><td class="no">длинное тире</td><td class="why">везде, включая письма и бота</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card voice">
+        <h3>Числа, даты, время</h3>
+        <table class="lex fmt">
+          <thead><tr><th>Что</th><th>Как</th><th>Правило</th></tr></thead>
+          <tbody>
+            <tr><td>Рубли</td><td class="tnum">4&nbsp;791&nbsp;215&nbsp;₽</td><td class="why">неразрывные пробелы по три знака и перед ₽</td></tr>
+            <tr><td>Доллары</td><td class="tnum">$1&nbsp;250</td><td class="why">знак слева, без копеек, если их нет</td></tr>
+            <tr><td>Дата</td><td>28 сентября</td><td class="why">год только если не текущий: 3 января 2027</td></tr>
+            <tr><td>Коротко</td><td>28 сен</td><td class="why">в таблицах и чипах</td></tr>
+            <tr><td>Время</td><td>10:00 МСК</td><td class="why">24 часа, зона для студентов и рассылок</td></tr>
+            <tr><td>Диапазон</td><td>1-3 октября</td><td class="why">дефис без пробелов</td></tr>
+            <tr><td>Проценты</td><td>+12,5%</td><td class="why">запятая, знак роста явно</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 SHAPE -->
+<section class="blk" id="shape">
+  <div class="wrap">
+    <div class="lead">07 · Сетка, радиусы, тени</div>
+    <h2 class="stit">Шаг 4 px, мягкие углы</h2>
+    <p class="sint">Отступы кратны 4. Контролы 34-38 px высотой. Радиусы растут с размером элемента: бейдж 6, кнопка 8, чип и поле 10, трек вкладок и карточка 12-14, модалка и письмо 20. Тени холодные, с оттенком navy.</p>
+    <div class="grid g2">
+      <div class="card space">
+        <div class="sp"><span>4</span><i style="width:4px"></i><em>точка и текст в бейдже, строки подписи</em></div>
+        <div class="sp"><span>8</span><i style="width:8px"></i><em>между кнопками, иконка и текст</em></div>
+        <div class="sp"><span>12</span><i style="width:12px"></i><em>между полями формы, вкладки в треке</em></div>
+        <div class="sp"><span>16</span><i style="width:16px"></i><em>между карточками в сетке</em></div>
+        <div class="sp"><span>24</span><i style="width:24px"></i><em>внутри карточки, отступ страницы</em></div>
+        <div class="sp"><span>32</span><i style="width:32px"></i><em>между группами на экране</em></div>
+        <div class="sp"><span>48</span><i style="width:48px"></i><em>между секциями страницы</em></div>
+        <div class="sp"><span>64</span><i style="width:64px"></i><em>воздух над заголовком экрана</em></div>
+      </div>
+      <div class="card">
+        <div class="radii">
+          <div><i style="border-radius:6px"></i><b>6</b>бейдж</div>
+          <div><i style="border-radius:8px"></i><b>8</b>кнопка</div>
+          <div><i style="border-radius:10px"></i><b>10</b>чип, поле</div>
+          <div><i style="border-radius:12px"></i><b>12</b>трек, карточка</div>
+          <div><i style="border-radius:14px"></i><b>14</b>большая карточка</div>
+          <div><i style="border-radius:20px"></i><b>20</b>модалка, письмо</div>
+          <div><i style="border-radius:22%"></i><b>22%</b>плитка сервиса</div>
+          <div><i style="border-radius:999px"></i><b>999</b>пилюля</div>
+        </div>
+        <div class="shadows">
+          <div style="box-shadow:var(--sh-sm)">sm</div>
+          <div style="box-shadow:var(--sh-md)">md</div>
+          <div style="box-shadow:var(--sh-lg)">lg</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 GRADIENTS + TOKENS -->
+<section class="blk" id="tokens">
+  <div class="wrap">
+    <div class="lead">08 · Градиенты и токены</div>
+    <h2 class="stit">Только сине-голубые градиенты</h2>
+    <p class="sint">Четыре градиента, все из палитры: тёмные блоки, голубой акцент, фон страницы и клип заголовков. Других градиентов нет. Токены ниже - готовый <code>:root</code> для любого сервиса: копируй или скачай файлом.</p>
+    <div class="grid g4">
+      <div class="gradcard"><div class="bar" style="background:var(--grad-navy);color:#fff">--grad-navy</div><div class="meta"><b>Тёмные блоки, футер, инверсия</b>150°, #1a5a7a 0% · #0d2f42 90%</div></div>
+      <div class="gradcard"><div class="bar" style="background:var(--grad-sky);color:#fff">--grad-sky</div><div class="meta"><b>Графики, hero-акценты</b>150°, #5cc3ec · #009CDC · #0077a8</div></div>
+      <div class="gradcard"><div class="bar" style="background:var(--grad-page);color:var(--navy);border-bottom:1px solid var(--border)">--grad-page</div><div class="meta"><b>Фон страницы</b>180°, #e7eff8 · #eef3f9</div></div>
+      <div class="gradcard"><div class="bar" style="background:#fff;border-bottom:1px solid var(--border)"><span class="gt" style="font-size:24px">Заголовок .gt</span></div><div class="meta"><b>Клип больших заголовков</b>180°, #0d2f42 · #13445d · #3a86ad</div></div>
+    </div>
+    <div class="tokencode">
+      <div class="tokenbar"><span>gg-tokens.css</span><div class="acts"><button class="tbtn" type="button" id="copyTokens"><svg class="i"><use href="#i-copy"/></svg>Копировать</button><button class="tbtn" type="button" id="dlTokens"><svg class="i"><use href="#i-download"/></svg>Скачать</button></div></div>
+<pre id="tokenText"><span class="c">/* Global Generation: дизайн-код внутренних сервисов, 2026-09-28 */</span>
+<span class="c">/* Montserrat 400-700 самохостом: @font-face из АКБ hub/frontend/static/css/admin.css */</span>
+:root{
+  <span class="c">/* главный цвет */</span>
+  --navy:#13445d; --navy-hi:#1a5a7a; --navy-deep:#0d2f42;
+  <span class="c">/* единственный акцент */</span>
+  --sky:#009CDC; --sky-ink:#0077a8; --sky-soft:#e6f5fc; --sky-light:#5cc3ec;
+  --sky-ring:rgba(0,156,220,.22);
+  <span class="c">/* поверхности */</span>
+  --bg-top:#e7eff8; --bg:#eef3f9; --card:#ffffff; --surface:#f8fafc; --soft:#f1f5f9;
+  --track:rgba(19,68,93,.07);
+  <span class="c">/* текст и линии */</span>
+  --fg:#0f172a; --sfg:#334155; --mfg:#64748b; --lfg:#94a3b8;
+  --border:#e2e8f0; --border-hi:#cbd5e1;
+  <span class="c">/* статусы: только для смысла */</span>
+  --success:#16a34a; --success-ink:#15803d;
+  --warn:#f59e0b;    --warn-ink:#b45309;
+  --danger:#ef4444;  --danger-hi:#dc2626; --danger-ink:#b91c1c;
+  --advance:#0f766e; --wait:#075985;
+  <span class="c">/* контуры сервисов (цвет плитки-фавикона) */</span>
+  --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
+  <span class="c">/* шрифт */</span>
+  --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  <span class="c">/* радиусы */</span>
+  --r-xs:6px; --r-sm:8px; --r:10px; --r-md:12px; --r-lg:14px; --r-xl:20px; --r-pill:999px;
+  <span class="c">/* тени */</span>
+  --sh-sm:0 1px 2px rgba(15,23,42,.06);
+  --sh-md:0 8px 24px -14px rgba(19,68,93,.30);
+  --sh-lg:0 18px 44px -26px rgba(19,68,93,.38);
+  <span class="c">/* градиенты */</span>
+  --grad-navy:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  --grad-sky:linear-gradient(150deg,#5cc3ec 0%,#009CDC 55%,#0077a8 100%);
+  --grad-page:linear-gradient(180deg,#e7eff8 0%,#eef3f9 100%);
+  <span class="c">/* движение */</span>
+  --ease-out:cubic-bezier(.22,.61,.36,1); --ease-pop:cubic-bezier(.34,1.3,.64,1);
+}
+body{background:var(--grad-page) no-repeat,var(--bg);color:var(--fg);font-family:var(--font);font-weight:500}
+h1,h2,h3{font-weight:700;letter-spacing:-.02em}
+a{color:var(--sky-ink)}
+:focus-visible{outline:none;box-shadow:0 0 0 3px var(--sky-ring)}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 09 RULES -->
+<section class="blk" id="rules">
+  <div class="wrap">
+    <div class="lead">09 · Правила</div>
+    <h2 class="stit">Что зафиксировано навсегда</h2>
+    <div class="rules">
+      <div class="rulebox yes">
+        <h4><svg class="i"><use href="#i-circle-check"/></svg>Всегда</h4>
+        <ul>
+          <li><svg class="i"><use href="#i-check"/></svg>Один логотип global-logo.svg везде: вход, шапки, письма, счета, PDF</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Navy #13445d для главного действия, активной вкладки и знака</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Один акцент - голубой #009CDC; ссылки текстом #0077a8</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Montserrat самохостом, заголовки 700</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Логотип одним цветом; название сервиса полужирным через тонкую линию на всю высоту логотипа</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон: плитка с градиентом контура + белая иконка lucide</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Джи-джи всегда в своём визуале: маскот как есть, без плиток, градиентов и перекраски</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Иконки только lucide, линия 2 px, инлайн SVG</li>
+          <li><svg class="i"><use href="#i-check"/></svg>«Ментор», «Джи-джи»; суммы с неразрывными пробелами</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Стаффу чётко и корпоративно, студенту тепло и поддерживающе</li>
+        </ul>
+      </div>
+      <div class="rulebox no">
+        <h4><svg class="i"><use href="#i-circle-x"/></svg>Никогда</h4>
+        <ul>
+          <li><svg class="i"><use href="#i-x"/></svg>Эмодзи в интерфейсе, письмах и сообщениях бота</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Длинное тире: только дефис или другая фраза</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Фиолетовый и сиреневый: ни в UI, ни в фоне, ни в графиках</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Декоративные полосы слева у карточек и полосы сверху</li>
+          <li><svg class="i"><use href="#i-x"/></svg>«Больничные» пастельные заливки больших блоков</li>
+          <li><svg class="i"><use href="#i-x"/></svg>«Наставник» и «ИИ» в текстах студенту и в интерфейсе</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Второй синий акцент (#2563eb, #3b82f6) рядом с голубым</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Шрифты с CDN, Google Fonts и системные замены Montserrat</li>
+          <li><svg class="i"><use href="#i-x"/></svg>Перекрашивать, растягивать и обводить знак</li>
+        </ul>
+      </div>
+    </div>
+    <div class="dd">
+      <div class="ddc ok"><div class="art" style="background:#fff"><svg class="gl" style="height:34px" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg></div><div class="cp"><svg class="i"><use href="#i-circle-check"/></svg>Логотип navy на белом или фоне страницы</div></div>
+      <div class="ddc ok"><div class="art" style="background:var(--grad-navy)"><span class="logo on-dark"><svg class="gl" style="height:34px" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg></span></div><div class="cp"><svg class="i"><use href="#i-circle-check"/></svg>Белый логотип на navy-градиенте</div></div>
+      <div class="ddc bad"><div class="art"><svg class="gl" style="height:34px;transform:scaleX(1.5)" viewBox="0 0 777 196" fill="currentColor" aria-hidden="true"><use href="#gg-logo"/></svg></div><div class="cp"><svg class="i"><use href="#i-circle-x"/></svg>Растягивать, перекрашивать в два цвета, собирать свой вордмарк</div></div>
+      <div class="ddc bad"><div class="art"><div style="width:120px;height:62px;background:#fff;border:1px solid var(--border);border-left:5px solid var(--sky);border-radius:10px;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:var(--sfg)">Карточка</div></div><div class="cp"><svg class="i"><use href="#i-circle-x"/></svg>Цветная полоса слева как «акцент»</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span><b>Global Generation</b> дизайн-код внутренних сервисов · navy всегда · один голубой акцент · знак GG всегда</span>
+    <span>Канон: АКБ, 28.09.2026</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var ICONS = /*@ICONS_JSON@*/;
+  var MAIN = '@MARK_MAIN@';
+  var SEC = '@MARK_SEC@';
+  var RIGHT_TOP = 'M29.7005 15.6575H34.1767C33.8466 14.143 33.1982 12.8721 32.231 11.8449C31.2638 10.818 30.1652 10.0869 28.9358 9.65181C28.506 9.49985 28.0626 9.37613 27.6074 9.27736V13.4786C27.7029 13.5275 27.7975 13.5781 27.8899 13.6331C28.7222 14.1279 29.3256 14.8027 29.7005 15.6575Z';
+  var RIGHT_BOTTOM = 'M34.4688 18.5365V29.1537H31.6574L31.612 25.464C30.9232 26.5739 29.9784 27.4667 28.7779 28.141C28.4128 28.3474 28.0197 28.5181 27.6079 28.6606V24.6992C27.8159 24.5979 28.0197 24.4886 28.2156 24.3621C29.1749 23.7478 29.7985 22.8177 30.0824 21.5732H27.6079V18.5365H34.4688Z';
+  var ld = document.getElementById('ldRight'); if (ld) ld.setAttribute('d', RIGHT_TOP + ' ' + RIGHT_BOTTOM);
+
+  var CONTOURS = {
+    mentor:  {name:'Менторский',  color:'#13445d', grad:['#2a7aa3', '#0d2f42'], note:'Стафф, который ведёт клиентов менторства'},
+    student: {name:'Студенческий', color:'#009CDC', grad:['#6fd0f5', '#0086c2'], note:'Всё, что видит и получает студент'},
+    ops:     {name:'Операционный', color:'#0077a8', grad:['#35a6d6', '#085a80'], note:'Юристы, бухгалтерия, отчёты, онбординг'},
+    core:    {name:'Ядро',         color:'#1e293b', grad:['#4b5b73', '#0f172a'], note:'Вход, стратегия и инфраструктура'}
+  };
+  var SERVICES = [
+    {key:'akb', name:'АКБ', icon:'users', contour:'mentor', dom:'hub.global-generations-edu.com', repo:'GG-Product-Mentorship-AKB', who:'Админы, продажи, менторы', desc:'CRM активной базы менторства: клиенты, оплаты, задачи, чеки и выплаты менторам. Канон всей системы.'},
+    {key:'pulse', name:'Пульс', icon:'activity', contour:'mentor', dom:'pulse.global-generations-edu.com', repo:'GG-Product-Mentorship-Pulse-Analytics', who:'Менторы и руководители', desc:'Аналитика рабочих чатов ментор-студент в Telegram: активность, зона риска, настроение. В интерфейсе живёт вкладкой АКБ.'},
+    {key:'cabinet', name:'Кабинет ментора', icon:'briefcase-business', contour:'mentor', dom:'cabinet.global-generations-edu.com', repo:'GG-Product-Mentorship-Mentor-Cabinet', who:'Менторы', desc:'Свои клиенты, выплаты и правила ЗП. Цифры приходят из АКБ, кабинет их только показывает.'},
+    {key:'portal', name:'Студенческий портал', icon:'graduation-cap', contour:'student', dom:'students.global-generations-edu.com', repo:'GG-Product-Mentorship-Portal', who:'Студенты менторства', desc:'Кабинет студента: роадмап, эссе, вузы, домашка и оплата картой.'},
+    {key:'mayak', name:'Маяк · Джи-джи', icon:'lighthouse', contour:'student', dom:'t.me/GGenbot_bot', repo:'GG-Product-Mentorship-Mayak', who:'Студенты в Telegram', desc:'Джи-джи пишет студенту первым: план недели, новая домашка, напоминание об оплате. Своего сайта нет, живёт в боте.'},
+    {key:'legal', name:'Юротдел', icon:'scale', contour:'ops', dom:'legal.global-generations-edu.com', repo:'Ops-Legal', who:'Лёв, юрист', desc:'Договоры, реестр, база права и юридические сроки.'},
+    {key:'accounting', name:'Бухгалтерия', icon:'calculator', contour:'ops', dom:'accounting.global-generations-edu.com', repo:'Ops-Accounting', who:'Бухгалтер', desc:'Начисления из SAT и АКБ, P&L и выгрузки в XLSX.'},
+    {key:'reporter', name:'Репортер', icon:'chart-column', contour:'ops', dom:'reporter.global-generations-edu.com', repo:'Ops-Notion-Reporter', who:'Менеджеры направлений', desc:'Мост Notion и Telegram: отчёты картинками в рабочие чаты, тикеты из чата в Notion.'},
+    {key:'onboarding', name:'Онбординг', icon:'signpost', contour:'ops', dom:'onboarding.global-generations-edu.com', repo:'Ops-Onboarding', who:'Новые сотрудники', desc:'Вход в команду по ролям: стандарты, чаты, дни рождения.'},
+    {key:'levauth', name:'Сервисы', icon:'key-round', contour:'core', dom:'levauth.global-generations-edu.com', repo:'Infra-Services-Portal · Infra-AWS', who:'Лёв и команда', desc:'Вход и каталог всех сервисов GG с живыми статусами. Корень системы: фавикон со знаком GG.', root:true},
+    {key:'strategy', name:'Стратегия', icon:'compass', contour:'core', dom:'visa.global-generations-edu.com', repo:'GG-Strategy-Roadmap', who:'Лёв', desc:'Стратегия и роадмап GG с версиями и заметками.'},
+    {key:'llm', name:'LLM-расходы', icon:'coins', contour:'core', dom:'openrouter.global-generations-edu.com', repo:'Infra-OpenRouter-Costs', who:'Лёв', desc:'Траты на модели по направлениям и динамика месяца.'}
+  ];
+
+  // Tiles are gradients, not flat fills (Лёв 28.09): light top-left to dark bottom-right.
+  function paint(bg){
+    if (!Array.isArray(bg)) return {defs: '', fill: bg};
+    return {defs: '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + bg[0] + '"/><stop offset="1" stop-color="' + bg[1] + '"/></linearGradient></defs>', fill: 'url(#g)'};
+  }
+  function tileSVG(icon, bg, fg){
+    var p = paint(bg);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' + p.defs + '<rect width="64" height="64" rx="14" fill="' + p.fill + '"/>' +
+      '<g transform="translate(14 14) scale(1.5)" fill="none" stroke="' + fg + '" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">' + ICONS[icon] + '</g></svg>';
+  }
+  function rootSVG(bg, main, sec){
+    var p = paint(bg);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39">' + p.defs + '<rect width="39" height="39" rx="8.6" fill="' + p.fill + '"/>' +
+      '<path d="' + SEC + '" fill="' + sec + '"/><path d="' + MAIN + '" fill="' + main + '"/></svg>';
+  }
+  function uri(svg){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+  function color(s){ return CONTOURS[s.contour].color; }
+  function grad(s){ return CONTOURS[s.contour].grad; }
+  function favSVG(s){ return tileSVG(s.icon, grad(s), '#ffffff'); }
+  // Джи-джи keeps its own mascot: never a tile, gradient or recolor (Лёв 28.09).
+  var GIGI = '@GIGI_URI@';
+  function favSrc(s){ return s.key === 'mayak' ? GIGI : uri(favSVG(s)); }
+  function invSrc(s){ return s.key === 'mayak' ? GIGI : uri(invSVG(s)); }
+  function invSVG(s){ return tileSVG(s.icon, '#ffffff', color(s)); }
+  // The mark is one color, like the logo it comes from.
+  var ROOT = rootSVG(['#1f6a90', '#0d2f42'], '#ffffff', '#ffffff');
+  var ROOT_INV = rootSVG('#ffffff', '#13445d', '#13445d');
+
+  function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function dom(d){ var i = d.indexOf('.'); if (d.indexOf('/') > -1 || i < 0) return esc(d); return esc(d.slice(0, i + 1)) + '<wbr><span class="nb">' + esc(d.slice(i + 1)) + '</span>'; }
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  var toastT;
+  function toast(msg){ var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('on'); }, 1800); }
+  function download(name, text, type){
+    try {
+      var b = new Blob([text], {type: type}); var a = document.createElement('a');
+      a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 600); toast('Скачан ' + name);
+    } catch (e) { toast('Не получилось скачать'); }
+  }
+
+  /* contours */
+  var cBox = document.getElementById('contours');
+  Object.keys(CONTOURS).forEach(function(k){
+    var c = CONTOURS[k];
+    var list = SERVICES.filter(function(s){ return s.contour === k; }).map(function(s){ return s.name; }).join(', ');
+    var d = el('div', 'card contour', '<span class="sw" style="background:linear-gradient(135deg,' + c.grad[0] + ',' + c.grad[1] + ')"></span><div style="min-width:0"><h4>' + c.name + '</h4><div class="hx">' + c.color + '</div><p>' + esc(c.note) + '. ' + esc(list) + '.</p></div>');
+    cBox.appendChild(d);
+  });
+
+  /* service grid + inverse row + minis */
+  var grid = document.getElementById('svcgrid'), inv = document.getElementById('invrow'), minis = document.getElementById('minis');
+  var rootInv = el('div', 'inv', '<img alt="" src="' + uri(ROOT_INV) + '"><span>Корень GG</span>'); inv.appendChild(rootInv);
+  var rootMini = el('img'); rootMini.src = uri(ROOT); rootMini.alt = 'GG'; rootMini.title = 'Корень GG'; minis.appendChild(rootMini);
+  SERVICES.forEach(function(s){
+    var svg = favSVG(s), isGigi = s.key === 'mayak';
+    var card = el('div', 'card svc' + (isGigi ? ' gigi' : ''), '<img alt="" src="' + favSrc(s) + '"><div class="tx"><div class="n">' + esc(s.name) + '</div><div class="d">' + dom(s.dom) + '</div><div class="r">' + (isGigi ? 'свой визуал: маскот Джи-джи, не меняем' : 'lucide/' + s.icon) + '</div></div>');
+    var btn = el('button', 'dlb', '<svg class="i"><use href="#i-download"/></svg>SVG'); btn.type = 'button'; btn.title = 'Скачать фавикон ' + s.name;
+    btn.addEventListener('click', function(){ download('gg-favicon-' + s.key + '.svg', svg, 'image/svg+xml'); });
+    if (!isGigi) card.querySelector('.r').appendChild(btn);
+    grid.appendChild(card);
+    inv.appendChild(el('div', 'inv', '<img alt="" src="' + invSrc(s) + '"><span>' + esc(s.name) + '</span>'));
+    var m = el('img'); m.src = favSrc(s); m.alt = s.name; m.title = s.name; minis.appendChild(m);
+  });
+  var rootCard = el('div', 'card svc root', '<img alt="" src="' + uri(ROOT) + '"><div class="tx"><div class="n">Корень GG</div><div class="d">экран входа · каталог levauth · письма и счета</div><div class="r">Знак GG из логотипа, белым на navy-градиенте. Фавикон всего, что не относится к одному сервису.</div></div>');
+  var rb = el('button', 'dlb', '<svg class="i"><use href="#i-download"/></svg>SVG'); rb.type = 'button';
+  rb.addEventListener('click', function(){ download('gg-favicon-root.svg', ROOT, 'image/svg+xml'); });
+  rootCard.querySelector('.r').appendChild(rb); grid.insertBefore(rootCard, grid.firstChild);
+
+  /* Джи-джи avatars in the voice section */
+  var mayak = SERVICES.filter(function(s){ return s.key === 'mayak'; })[0];
+  ['gigi1','gigi2'].forEach(function(id){ var i = document.getElementById(id); if (i) i.src = GIGI; });
+
+  /* browser tabs */
+  var br = document.getElementById('browser');
+  [['akb','АКБ · Global Generation'],['portal','Студенческий портал · Global Generation'],['pulse','Пульс · Global Generation'],['legal','Юротдел · Global Generation']].forEach(function(p, i){
+    var s = SERVICES.filter(function(x){ return x.key === p[0]; })[0];
+    br.appendChild(el('div', 'btab' + (i === 0 ? ' on' : ''), '<img alt="" src="' + uri(favSVG(s)) + '"><span>' + esc(p[1]) + '</span>'));
+  });
+
+  /* switcher + stage + sizes */
+  var chips = document.getElementById('switch');
+  var q = function(id){ return document.getElementById(id); };
+  var sizes = q('favsizes');
+  function pick(s, chip){
+    q('head-sub').textContent = s.name;
+    q('head-dom').textContent = s.dom;
+    q('stage-title').textContent = 'Global Generation · ' + s.name;
+    q('stage-desc').textContent = s.desc;
+    q('f-who').textContent = s.who;
+    q('f-repo').textContent = s.repo;
+    q('f-contour').textContent = CONTOURS[s.contour].name + ' · ' + CONTOURS[s.contour].color;
+    var src = favSrc(s);
+    q('stage-fav').src = src;
+    q('stage-cap').textContent = s.key === 'mayak' ? 'маскот Джи-джи, как есть' : 'фавикон: lucide/' + s.icon;
+    sizes.innerHTML = '';
+    [64, 32, 16].forEach(function(px){
+      var u = el('div', 'u', '<img alt="" width="' + px + '" height="' + px + '" style="border-radius:' + Math.round(px * 0.22) + 'px" src="' + src + '"><span>' + px + '</span>');
+      sizes.appendChild(u);
+    });
+    Array.prototype.forEach.call(chips.querySelectorAll('.pchip'), function(c){ c.classList.remove('on'); });
+    if (chip) chip.classList.add('on');
+  }
+  SERVICES.forEach(function(s, i){
+    var c = el('button', 'pchip', '<span class="dot" style="background:' + color(s) + '"></span>' + esc(s.name)); c.type = 'button';
+    c.addEventListener('click', function(){ pick(s, c); });
+    chips.appendChild(c);
+    if (i === 0) pick(s, c);
+  });
+
+  /* tokens */
+  var tokenText = function(){ return q('tokenText').textContent; };
+  q('copyTokens').addEventListener('click', function(){
+    var t = tokenText();
+    function fallback(){
+      try { var r = document.createRange(); r.selectNodeContents(q('tokenText')); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges(); toast('Токены скопированы'); }
+      catch (e) { toast('Выделите блок и скопируйте вручную'); }
+    }
+    try { navigator.clipboard.writeText(t).then(function(){ toast('Токены скопированы'); }, fallback); } catch (e) { fallback(); }
+  });
+  q('dlTokens').addEventListener('click', function(){ download('gg-tokens.css', tokenText(), 'text/css'); });
+})();
+</script>
+</body>
+</html>

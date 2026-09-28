@@ -1,0 +1,40 @@
+/* Global Generation: дизайн-код внутренних сервисов, 2026-09-28 */
+/* Montserrat 400-700 самохостом: @font-face из АКБ hub/frontend/static/css/admin.css */
+:root{
+  /* главный цвет */
+  --navy:#13445d; --navy-hi:#1a5a7a; --navy-deep:#0d2f42;
+  /* единственный акцент */
+  --sky:#009CDC; --sky-ink:#0077a8; --sky-soft:#e6f5fc; --sky-light:#5cc3ec;
+  --sky-ring:rgba(0,156,220,.22);
+  /* поверхности */
+  --bg-top:#e7eff8; --bg:#eef3f9; --card:#ffffff; --surface:#f8fafc; --soft:#f1f5f9;
+  --track:rgba(19,68,93,.07);
+  /* текст и линии */
+  --fg:#0f172a; --sfg:#334155; --mfg:#64748b; --lfg:#94a3b8;
+  --border:#e2e8f0; --border-hi:#cbd5e1;
+  /* статусы: только для смысла */
+  --success:#16a34a; --success-ink:#15803d;
+  --warn:#f59e0b;    --warn-ink:#b45309;
+  --danger:#ef4444;  --danger-hi:#dc2626; --danger-ink:#b91c1c;
+  --advance:#0f766e; --wait:#075985;
+  /* контуры сервисов (цвет плитки-фавикона) */
+  --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
+  /* шрифт */
+  --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* радиусы */
+  --r-xs:6px; --r-sm:8px; --r:10px; --r-md:12px; --r-lg:14px; --r-xl:20px; --r-pill:999px;
+  /* тени */
+  --sh-sm:0 1px 2px rgba(15,23,42,.06);
+  --sh-md:0 8px 24px -14px rgba(19,68,93,.30);
+  --sh-lg:0 18px 44px -26px rgba(19,68,93,.38);
+  /* градиенты */
+  --grad-navy:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  --grad-sky:linear-gradient(150deg,#5cc3ec 0%,#009CDC 55%,#0077a8 100%);
+  --grad-page:linear-gradient(180deg,#e7eff8 0%,#eef3f9 100%);
+  /* движение */
+  --ease-out:cubic-bezier(.22,.61,.36,1); --ease-pop:cubic-bezier(.34,1.3,.64,1);
+}
+body{background:var(--grad-page) no-repeat,var(--bg);color:var(--fg);font-family:var(--font);font-weight:500}
+h1,h2,h3{font-weight:700;letter-spacing:-.02em}
+a{color:var(--sky-ink)}
+:focus-visible{outline:none;box-shadow:0 0 0 3px var(--sky-ring)}
