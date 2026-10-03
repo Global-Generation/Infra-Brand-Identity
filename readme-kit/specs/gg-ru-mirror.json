@@ -1,0 +1,9 @@
+{"title": "RU-зеркало global-generations.com",
+ "tagline": "Зеркало сайта на российских IP для пользователей, до которых не доходит CloudFront: nginx, гео-DNS и скрипты выката.",
+ "badges": [
+  {"label": "nginx", "message": "njs", "color": "009639", "logo": "nginx"},
+  {"label": "Shell", "message": "Bash", "color": "4EAA25", "logo": "gnubash"},
+  {"label": "AWS", "message": "Route 53 + S3", "color": "232F3E", "logo": "amazonaws"},
+  {"label": "CloudFront", "message": "прод-сайт", "color": "8C4FFF", "logo": "amazoncloudwatch"}
+ ],
+ "body": "keep"}

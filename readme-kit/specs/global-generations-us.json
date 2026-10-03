@@ -1,0 +1,10 @@
+{"title": "Global Generations US",
+ "tagline": "Заготовка американского сайта Global Generation на Next.js 16: пока стартовый шаблон без контента.",
+ "badges": [
+  {"label": "Next.js", "message": "16", "color": "000000", "logo": "nextdotjs"},
+  {"label": "React", "message": "19", "color": "20232A", "logo": "react"},
+  {"label": "TypeScript", "message": "5", "color": "3178C6", "logo": "typescript"},
+  {"label": "Tailwind CSS", "message": "4", "color": "06B6D4", "logo": "tailwindcss"}
+ ],
+ "body": "replace",
+ "body_md": "Репозиторий под американский сайт Global Generation. Сейчас в нём стартовый шаблон `create-next-app`: главная страница и метаданные ещё не заменены, прод-домена и деплоя в репо нет.\n\n## Что внутри\n\n- [`src/app/layout.tsx`](src/app/layout.tsx) - корневой layout (шрифты Geist, `lang=\"en\"`), метаданные пока стандартные.\n- [`src/app/page.tsx`](src/app/page.tsx) - главная страница, шаблон Next.js.\n- [`src/app/globals.css`](src/app/globals.css) - глобальные стили Tailwind.\n- [`public/`](public) - стандартные иконки шаблона.\n\n## Стек\n\n- Next.js 16.2 (App Router), React 19, TypeScript 5.\n- Tailwind CSS 4 через `@tailwindcss/postcss`, ESLint 9 с `eslint-config-next`.\n- Имя пакета: `gg-us`.\n\n## Деплой\n\nНастроенного деплоя и CI в репо нет (`.github/` отсутствует), домен не задан.\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev\n```\n\nПриложение откроется на [http://localhost:3000](http://localhost:3000). Проверки: `npm run lint`, `npm run build`.\n\n## Документация\n\n- [`AGENTS.md`](AGENTS.md) и [`CLAUDE.md`](CLAUDE.md) - правила для AI-агентов: в этой версии Next.js есть ломающие изменения, документация лежит в `node_modules/next/dist/docs/`.\n"}
