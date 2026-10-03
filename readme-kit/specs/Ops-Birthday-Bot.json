@@ -1,0 +1,26 @@
+{
+ "title": "Birthday Bot",
+ "tagline": "Ежедневные поздравления с днём рождения в рабочем чате Global Generation.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Telegram",
+   "message": "Bot API",
+   "color": "2CA5E0",
+   "logo": "telegram"
+  },
+  {
+   "label": "GitHub",
+   "message": "Actions",
+   "color": "2088FF",
+   "logo": "githubactions"
+  }
+ ],
+ "body": "replace",
+ "body_md": "Бот ежедневных поздравлений с днём рождения для рабочего чата Global Generation в Telegram. Читает даты из Google Sheets и самостоятельно добавленные записи, отправляет в чат поздравление, а при наличии обработанного фото именинника - фото с подписью.\n\n## Как работает\n\n- Запуск раз в день в 13:00 UTC через GitHub Actions (`.github/workflows/birthday-bot.yml`), ручной запуск доступен через `workflow_dispatch`.\n- Список именинников: лист Google Sheets (колонки `Name`, `Date`) плюс записи, добавленные сотрудниками самостоятельно (`meta/entries.json` в S3-бакете с фото). Записи из таблицы в приоритете.\n- Фото: обработанные портреты лежат в S3 по пути `processed/<handle>.png|jpg`; нет фото - уходит обычное текстовое поздравление.\n- Дата сравнивается в часовом поясе `America/New_York` (настраивается), окно упреждения задаётся `DAYS_WINDOW`.\n- Ручное разовое поздравление: запуск workflow с полем `force_name` (@handle), проверка даты пропускается.\n\n## Стек\n\n- Python 3.11, `python-telegram-bot`, `gspread` + `google-auth`, `pytz`.\n- Планировщик: GitHub Actions cron.\n\n## Настройка\n\nПараметры передаются через секреты репозитория и переменные окружения:\n\n| Переменная | Назначение |\n|---|---|\n| `TELEGRAM_BOT_TOKEN` | токен бота |\n| `TARGET_CHAT_ID` | чат, куда уходят поздравления |\n| `GOOGLE_SHEET_ID` | таблица с днями рождения |\n| `GOOGLE_CREDENTIALS_JSON` | ключ сервисного аккаунта Google (в workflow пишется во временный файл) |\n| `DEFAULT_MESSAGE` | шаблон текста, `{name}` подставляется именем |\n| `TIMEZONE`, `DAYS_WINDOW` | часовой пояс и окно в днях |\n\n## Локальный запуск\n\n```bash\npip install -r requirements.txt\nexport TELEGRAM_BOT_TOKEN=... TARGET_CHAT_ID=... GOOGLE_SHEET_ID=...\nexport GOOGLE_CREDENTIALS_PATH=./credentials.json\npython bot.py\n```\n"
+}

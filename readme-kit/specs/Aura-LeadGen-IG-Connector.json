@@ -1,0 +1,37 @@
+{
+ "title": "IG-Connector",
+ "tagline": "Автоматизация Instagram Direct: comment-to-DM, кодовые слова и диалоговый квиз в директе через официальный Meta Graph API.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "0.141",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "Python",
+   "message": "3.11",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "ig.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://ig.aura-ecosystem.com"
+  }
+ ]
+}

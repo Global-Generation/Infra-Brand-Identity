@@ -1,0 +1,31 @@
+{
+ "title": "Поступление в Италию",
+ "tagline": "Самостоятельный продукт: продающий лендинг и платный портал студента.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "React",
+   "message": "19",
+   "color": "61DAFB",
+   "logo": "react"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "italy.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://italy.global-generations-edu.com"
+  }
+ ]
+}

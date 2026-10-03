@@ -1,0 +1,31 @@
+{
+ "title": "Sales Engine + Sales Machine",
+ "tagline": "Мульти-партнёрская машина квалификации и продаж GG: квиз, скоринг, квал-код, персональная преза и deep link в CRM.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11+",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Telegram",
+   "message": "bots",
+   "color": "26A5E4",
+   "logo": "telegram"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "links.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://links.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

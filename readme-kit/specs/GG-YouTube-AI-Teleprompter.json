@@ -1,0 +1,31 @@
+{
+ "title": "AI Teleprompter",
+ "tagline": "Телесуфлёр с AI-режимом: десктопное приложение и веб-версия.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.13",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Next.js",
+   "message": "web",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "teleprompter.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://teleprompter.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

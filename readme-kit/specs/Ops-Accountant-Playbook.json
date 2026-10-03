@@ -1,0 +1,32 @@
+{
+ "title": "Accountant Playbook",
+ "tagline": "Бухгалтерский плейбук ИП Авдошин Л.В. / Global Generation: регламенты, расчёты с партнёрами, закрытие месяца.",
+ "body": "keep",
+ "drop_lead_lines": 1,
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "статика",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Python",
+   "message": "build.py",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2 + nginx",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "levauth.global-generations-edu.com/accounting/",
+   "color": "13445d",
+   "href": "https://levauth.global-generations-edu.com/accounting/"
+  }
+ ]
+}

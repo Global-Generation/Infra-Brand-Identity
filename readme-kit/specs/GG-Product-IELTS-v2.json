@@ -1,0 +1,36 @@
+{
+ "title": "IELTS Portal v2",
+ "tagline": "Платформа подготовки к IELTS Academic: банк заданий, обучение, ИИ-репетитор и оплата.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "NestJS",
+   "message": "11",
+   "color": "E0234E",
+   "logo": "nestjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "ielts-v2.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://ielts-v2.global-generations-edu.com"
+  }
+ ]
+}

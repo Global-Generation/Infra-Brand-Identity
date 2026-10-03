@@ -1,0 +1,30 @@
+{
+ "title": "AmoCRM Analytics",
+ "tagline": "Read-only аналитика воронок, лидов и заметок в amoCRM: дашборд, отчёты и MCP-коннектор.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "MCP",
+   "message": "server",
+   "color": "13445d"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "amocrm.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://amocrm.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

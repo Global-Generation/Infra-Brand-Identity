@@ -1,0 +1,25 @@
+{
+ "title": "Kate Collab Deck",
+ "tagline": "Дека партнёрского формата 50/50 с Кейт Парр: курс про портфолио и поступление на творческие направления.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "collab.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://collab.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

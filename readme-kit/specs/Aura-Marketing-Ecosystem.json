@@ -1,0 +1,24 @@
+{
+ "title": "Aura Ecosystem",
+ "tagline": "Корпоративный лендинг и дизайн-система экосистемы Aura.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "CSS",
+   "message": "design tokens",
+   "color": "1572B6",
+   "logo": "css3"
+  },
+  {
+   "label": "Prod",
+   "message": "aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://aura-ecosystem.com"
+  }
+ ]
+}

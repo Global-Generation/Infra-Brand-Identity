@@ -1,0 +1,31 @@
+{
+ "title": "Aura Launch Studio",
+ "tagline": "Внутренняя B2B-платформа Aura: блогер с ИИ и ментором собирает и проводит прогрев-запуск своего продукта.",
+ "badges": [
+  {
+   "label": "NestJS",
+   "message": "11",
+   "color": "E0234E",
+   "logo": "nestjs"
+  },
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body": "keep"
+}

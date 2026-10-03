@@ -1,0 +1,32 @@
+{
+ "title": "GG Strategy",
+ "tagline": "Стратегический документ Global Generation и Aura: роудмеп, мнение, исходные мысли и созвоны.",
+ "body": "keep",
+ "drop_lead_lines": 0,
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "статика",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "nginx",
+   "message": "EC2",
+   "color": "009639",
+   "logo": "nginx"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "strategy.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://strategy.global-generations-edu.com"
+  }
+ ]
+}

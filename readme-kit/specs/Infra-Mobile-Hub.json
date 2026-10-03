@@ -1,0 +1,24 @@
+{
+ "title": "GG Hub",
+ "tagline": "Мобильное приложение владельца Global Generation: выручка, лиды и платежи в телефоне.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "AWS",
+   "message": "Lambda",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "levauth.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://levauth.global-generations-edu.com"
+  }
+ ]
+}

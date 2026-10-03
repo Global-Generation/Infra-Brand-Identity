@@ -1,0 +1,31 @@
+{
+ "title": "Каталог сервисов GG",
+ "tagline": "Внутренний портал-каталог продуктов, репозиториев и документации Global Generation.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "nginx",
+   "message": "auth_request",
+   "color": "009639",
+   "logo": "nginx"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "levauth.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://levauth.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

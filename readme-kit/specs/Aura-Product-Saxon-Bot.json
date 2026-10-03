@@ -1,0 +1,25 @@
+{
+ "title": "Saxon-Bot",
+ "tagline": "Telegram-бот входа в воронку «Оцени свои шансы поступить в США»: приветствие, чек-лист и передача помощнику.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11+",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "aiogram",
+   "message": "3.x",
+   "color": "2CA5E0",
+   "logo": "telegram"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body": "keep"
+}

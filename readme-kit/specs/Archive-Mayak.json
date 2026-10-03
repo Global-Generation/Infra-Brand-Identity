@@ -1,0 +1,19 @@
+{
+ "title": "Маяк (концепт)",
+ "tagline": "Архив концепта движка ре-энгейджмента студентов: HTML-макеты, каталог касаний, симуляторы и A/B-раскатка.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "макеты",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Telegram",
+   "message": "касания",
+   "color": "26A5E4",
+   "logo": "telegram"
+  }
+ ]
+}

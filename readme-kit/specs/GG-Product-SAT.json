@@ -1,0 +1,10 @@
+{"title": "SAT Prep Platform",
+ "tagline": "Full-stack SAT preparation: question bank, lessons, practice tests, progress tracking, gamification, AI tutor and consultation booking.",
+ "drop_lead_lines": 1,
+ "badges": [
+  {"label": "Next.js", "message": "16", "color": "000000", "logo": "nextdotjs"},
+  {"label": "NestJS", "message": "11", "color": "E0234E", "logo": "nestjs"},
+  {"label": "PostgreSQL", "message": "15", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "sat.global-generations-edu.com", "color": "13445d", "href": "https://sat.global-generations-edu.com"}
+ ]}

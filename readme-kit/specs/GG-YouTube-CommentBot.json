@@ -1,0 +1,25 @@
+{
+ "title": "YouTube CommentBot",
+ "tagline": "Ежедневный автоответчик на комментарии двух каналов Global Generation: классификация, ревью и публикация ответов.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Claude",
+   "message": "Haiku + Sonnet",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "AWS",
+   "message": "Lambda",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body": "keep"
+}

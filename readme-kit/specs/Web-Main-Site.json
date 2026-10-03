@@ -1,0 +1,30 @@
+{
+ "title": "Основной сайт Global Generation",
+ "tagline": "B2C-сайт global-generations.com: менторство, поступление в вузы США и Италии, SAT, блог и SEO-фабрика.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "static export",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "AWS",
+   "message": "S3 + CloudFront",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "GitHub",
+   "message": "Actions",
+   "color": "2088FF",
+   "logo": "githubactions"
+  },
+  {
+   "label": "Prod",
+   "message": "global-generations.com",
+   "color": "13445d",
+   "href": "https://global-generations.com"
+  }
+ ]
+}

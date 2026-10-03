@@ -1,0 +1,32 @@
+{
+ "title": "Mentorship Retention",
+ "body": "replace",
+ "tagline": "Дашборд удержания клиентов менторства: платежи по месяцам, ретеншн по менторам и AI-сводка.",
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "0.115",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "Python",
+   "message": "3.13",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "SQLAlchemy 2",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Docker",
+   "message": "Compose",
+   "color": "2496ED",
+   "logo": "docker"
+  }
+ ],
+ "body_md": "Внутренний дашборд удержания клиентов менторства Global Generation: платежи клиентов по месяцам, ретеншн и отток по менторам, интерактивные графики и AI-сводка по разделам. Доступ по PIN.\n\n## Что внутри\n\n| Часть | Что делает | Где |\n|---|---|---|\n| Дашборд | Одностраничный интерфейс с графиками Plotly: таблица клиентов, удержание, отток | `frontend/index.html` |\n| API | Клиенты, платежи по месяцам, настройки, переименование менторов, вход по PIN | `backend/app/main.py` |\n| AI-сводка | Резюме по разделам дашборда через LLM (`/api/ai-summary`) | `backend/app/main.py` |\n| Синхронизация YouTube | Подтягивает данные из YouTube-трекера (`/api/youtube/sync`) | `backend/app/main.py` |\n| Сид данных | Первичная загрузка клиентов и платежей | `backend/app/seed.py` |\n| Статичный отчёт | Генератор HTML-отчёта по удержанию 2025 и Q1 2026 | `generate-report.py` |\n\n## Стек и данные\n\n- FastAPI, SQLAlchemy 2 (async), Pydantic 2, Python 3.13.\n- PostgreSQL в проде и SQLite локально (`DATABASE_URL`), таблицы `clients`, `payments`, `settings`.\n- Фронтенд без сборки: один HTML с Plotly.\n\n## Деплой\n\nКонтейнер из [`Dockerfile`](Dockerfile), запуск через [`docker-compose.yml`](docker-compose.yml): порт `8092`, сеть `app_default`, общая с АКБ, база `retention`. Хост и домен в репозитории не указаны.\n\n## Локальный запуск\n\n```bash\ncp .env.example .env\ncd backend\npip install -r requirements.txt\npython -m app.seed\nuvicorn app.main:app --reload\n```\n\nПеременные окружения: `DATABASE_URL`, `PIN`, `SESSION_SECRET`, `APP_ENV` (см. [`.env.example`](.env.example)). Без `DATABASE_URL` используется SQLite.\n"
+}

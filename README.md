@@ -1,6 +1,30 @@
-# Infra-Brand-Identity
+<!-- gg-readme-header:start -->
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/global-generation-white.svg">
+    <img src=".github/assets/global-generation-navy.svg" alt="Global Generation" width="115">
+  </picture>
 
-Айдентика внутренних сервисов Global Generation: АКБ, Пульс, Маяк (Джи-джи), студенческий портал, кабинет ментора, Юротдел, Бухгалтерия, Репортер, Онбординг, levauth, Стратегия, LLM-расходы.
+  <h1>Infra Brand Identity</h1>
+
+  <p>Айдентика внутренних сервисов Global Generation: логотип, цвета, шрифт, фавиконы и правила.</p>
+
+  <p>
+    <img src="https://img.shields.io/badge/HTML-%D1%81%D1%82%D0%B0%D1%82%D0%B8%D0%BA%D0%B0-E34F26?logo=html5&logoColor=white" alt="HTML статика">
+    <img src="https://img.shields.io/badge/Python-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-3776AB?logo=python&logoColor=white" alt="Python сборка">
+    <img src="https://img.shields.io/badge/%D0%A8%D1%80%D0%B8%D1%84%D1%82-Montserrat-13445d" alt="Шрифт Montserrat">
+  </p>
+
+  <p>
+    <a href="#правила-утверждены-лёвом-28092026">Правила (утверждены Лёвом 28.09.2026)</a> ·
+    <a href="#контуры-и-цвета-плиток">Контуры и цвета плиток</a> ·
+    <a href="#пересобрать">Пересобрать</a> ·
+    <a href="#где-уже-применено">Где уже применено</a>
+  </p>
+</div>
+<!-- gg-readme-header:end -->
+
+---
 
 - `index.html` - страница айдентики (формат как у aura-ecosystem.com/brand.html, палитра GG): логотип, цвета, шрифт, компоненты, голос, сетка, токены, правила. Открыть в браузере.
 - `lockups.html` - 10 вариантов подписи «логотип | сервис». Утверждён **вариант 2 «Во всю высоту»** (28.09.2026).

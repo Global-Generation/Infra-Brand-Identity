@@ -1,0 +1,31 @@
+{
+ "title": "Consultation Prep",
+ "tagline": "Подготовка к консультациям GG: разбор анкеты кандидата, отчёт с графиками и аналитика встреч.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "FastAPI",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Claude",
+   "message": "Opus",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "apply.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://apply.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

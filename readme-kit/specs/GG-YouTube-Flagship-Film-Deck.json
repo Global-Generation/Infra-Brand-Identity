@@ -1,0 +1,25 @@
+{
+ "title": "GG Flagship Film",
+ "tagline": "Концепт, ресёрч и презентация флагманского документального фильма «Поколение, которое уехало».",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "дека",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "film.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://film.global-generations-edu.com"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "title": "GG Long Script",
+ "tagline": "Скилл для long-form сценариев канала Global Generation: фактчек, метрики и голос на данных хитов.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Claude",
+   "message": "skill",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "Perplexity",
+   "message": "fact-check",
+   "color": "20808D",
+   "logo": "perplexity"
+  }
+ ],
+ "body": "replace",
+ "body_md": "Скилл для написания long-form (25-35 минут) talking-head сценариев на русском для канала Global Generation. Все пороги и структура выведены из анализа реальных хитов канала, а не из теории.\n\n## Как это работает\n\nПять стадий с жёсткими гейтами:\n\n| Стадия | Что происходит |\n|---|---|\n| 0. Intake | Тема, персона, целевой продукт, контрарианский угол |\n| 1. Fact-check | `tools/fact_check.py`: Perplexity x3 плюс первоисточники, результат в `fact-packs/` |\n| 2. Outline | Хук (одна из 5 формул), 4-6 глав, цели по цифрам и вузам |\n| 3. Writing | По одной главе, после каждой `tools/check_metrics.py` |\n| 4. Voice QA | Проверка голоса и антипаттернов (`tools/check_antipatterns.py`) |\n| 5. Final gate | Метрики и антипаттерны на полном тексте, затем сохранение |\n\nОркестратор: `tools/orchestrate.py`.\n\n```bash\npython tools/orchestrate.py --topic \"...\" --persona lev --product mentorship\n```\n\n## Что внутри\n\n| Путь | Что |\n|---|---|\n| [`SKILL.md`](SKILL.md) | Главное описание скилла и триггеры |\n| [`STRUCTURE.md`](STRUCTURE.md) | Структура сценария, выведенная из данных |\n| [`METRICS.md`](METRICS.md) | Пороги, регексы и лексиконы |\n| [`HOOKS.md`](HOOKS.md) | 5 формул хука и антипаттерны |\n| [`MASTER_FLOW.md`](MASTER_FLOW.md) | Детальный flow |\n| [`minaev-voice-anchor.md`](minaev-voice-anchor.md) | Опорный голос |\n| [`fact-check.md`](fact-check.md), [`fact-check-cis-gotchas.md`](fact-check-cis-gotchas.md), [`editorial-standards.md`](editorial-standards.md) | Фактчек и редстандарты |\n| `mentors/` | Профили персон (Лев, Алиса, Кристина, Саша, Ярослава) |\n| `examples/` | Три транскрипта хитов канала как эталон |\n| `fact-packs/` | Готовые фактологические паки |\n| `tools/` | Скрипты проверки и оркестрации |\n\n## Документация\n\n- [`CHANGELOG.md`](CHANGELOG.md): история версий.\n- [`integration-points.md`](integration-points.md) и [`integration-pipeline.md`](integration-pipeline.md): связка с другими скиллами и продуктами GG.\n- [`gg-products.md`](gg-products.md): продукты, которые упоминаются в сценариях.\n"
+}

@@ -1,0 +1,30 @@
+{
+ "title": "B2B Analytics",
+ "tagline": "Read-only аналитика amoCRM и лид-боты для Saxon и SWUSA-воронки Паши.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "amoCRM",
+   "message": "API",
+   "color": "1E6FEB"
+  },
+  {
+   "label": "Telegram",
+   "message": "боты",
+   "color": "26A5E4",
+   "logo": "telegram"
+  },
+  {
+   "label": "Prod",
+   "message": "b2b.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://b2b.global-generations-edu.com"
+  }
+ ]
+}

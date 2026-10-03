@@ -1,0 +1,31 @@
+{
+ "title": "Mentorship Portal",
+ "tagline": "Личный портал для платящих клиентов менторства GG: заменяет Google-Sheets-флоу.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Tailwind",
+   "message": "v4",
+   "color": "06B6D4",
+   "logo": "tailwindcss"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "students.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://students.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

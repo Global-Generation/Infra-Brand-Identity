@@ -1,0 +1,37 @@
+{
+ "title": "SportWay USA",
+ "tagline": "Платформа для студентов-атлетов: самостоятельное поступление в университеты США по спортивной стипендии.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "NestJS",
+   "message": "11",
+   "color": "E0234E",
+   "logo": "nestjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Prisma 5",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "sportway-usa.com",
+   "color": "13445d",
+   "href": "https://sportway-usa.com"
+  }
+ ]
+}
