@@ -1,0 +1,37 @@
+{
+ "title": "АКБ Global Generation",
+ "tagline": "Активная клиентская база менторства: CRM команды, оплаты, задачи, выплаты менторам и бэкенд для соседних продуктов.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "API",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "15",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Docker",
+   "message": "Compose",
+   "color": "2496ED",
+   "logo": "docker"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "hub.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://hub.global-generations-edu.com"
+  }
+ ]
+}

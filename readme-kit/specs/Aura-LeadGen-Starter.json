@@ -1,0 +1,37 @@
+{
+ "title": "Aura Product Starter",
+ "tagline": "Fork-ready эталон, из которого штампуются образовательные продукты GG: оплаты, доступ, уроки, админка.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "15",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Drizzle",
+   "message": "ORM",
+   "color": "C5F74F",
+   "logo": "drizzle"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "product.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://product.aura-ecosystem.com"
+  }
+ ],
+ "body": "keep"
+}

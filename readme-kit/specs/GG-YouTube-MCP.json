@@ -1,0 +1,24 @@
+{
+ "title": "YouTube MCP",
+ "tagline": "MCP-сервер для доступа Claude Code к каналу Global Generation через YouTube Data, Analytics и Reporting API.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11+",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "MCP",
+   "message": "40 tools",
+   "color": "6E56CF"
+  },
+  {
+   "label": "YouTube",
+   "message": "API",
+   "color": "FF0000",
+   "logo": "youtube"
+  }
+ ],
+ "body": "keep"
+}

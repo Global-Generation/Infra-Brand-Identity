@@ -1,0 +1,24 @@
+{
+ "title": "Ops Scheduled Jobs",
+ "tagline": "Единый реестр всех регулярных задач GG: расписание живёт в облаке, не на маке.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "GitHub Actions",
+   "message": "cron",
+   "color": "2088FF",
+   "logo": "githubactions"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "cron",
+   "message": "EC2",
+   "color": "555555"
+  }
+ ]
+}

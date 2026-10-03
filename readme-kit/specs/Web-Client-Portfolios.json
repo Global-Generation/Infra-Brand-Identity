@@ -1,0 +1,32 @@
+{
+ "title": "Artemiy Portfolio",
+ "tagline": "Fashion-editorial портфолио Артемия Иванова: одностраничный сайт с галереей, резюме и контактами.",
+ "body": "replace",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "React",
+   "message": "19",
+   "color": "61DAFB",
+   "logo": "react"
+  },
+  {
+   "label": "Tailwind",
+   "message": "4",
+   "color": "06B6D4",
+   "logo": "tailwindcss"
+  },
+  {
+   "label": "Prod",
+   "message": "artemiy.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://artemiy.global-generations-edu.com"
+  }
+ ],
+ "body_md": "Одностраничный fashion-editorial сайт-портфолио: фотогалерея с лайтбоксом, карьера, театр, лидерство, спорт, навыки, образование и контакты.\n\n## Секции сайта\n\n| Секция | Файл |\n|---|---|\n| Hero | `src/components/HeroSection.tsx` |\n| Обо мне | `src/components/AboutSection.tsx` |\n| Портфолио (галерея, лайтбокс) | `src/components/PortfolioSection.tsx`, `LightboxModal.tsx` |\n| Карьера | `src/components/CareerSection.tsx` |\n| Театр | `src/components/TheaterSection.tsx` |\n| Лидерство | `src/components/LeadershipSection.tsx` |\n| Спорт | `src/components/SportSection.tsx` |\n| Навыки | `src/components/SkillsSection.tsx` |\n| Образование | `src/components/EducationSection.tsx` |\n| Контакты | `src/components/ContactSection.tsx` |\n\nТексты и данные лежат в `src/lib/content.ts`, типы в `src/lib/types.ts`, фото в `public/images/`.\n\n## Стек\n\n- Next.js 16 (App Router), React 19, TypeScript.\n- Tailwind CSS 4, анимации на Framer Motion.\n- Шрифт Playfair Display (Google Fonts).\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev      # http://localhost:3000\nnpm run build && npm start\n```\n"
+}

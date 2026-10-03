@@ -1,0 +1,25 @@
+{
+ "title": "OpenRouter Cost Tracker",
+ "tagline": "Живой дашборд расходов OpenRouter по направлениям и помесячная динамика.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "gen.py",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "openrouter.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://openrouter.global-generations-edu.com"
+  }
+ ]
+}

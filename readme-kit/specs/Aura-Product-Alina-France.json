@@ -1,0 +1,25 @@
+{
+ "title": "Alina France",
+ "tagline": "Менторская программа «Поступление во Францию с ментором»: портал студента и админка под брендом Alina.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ]
+}

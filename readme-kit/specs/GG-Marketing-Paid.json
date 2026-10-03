@@ -1,0 +1,32 @@
+{
+ "title": "Paid Acquisition",
+ "tagline": "Платный трафик global-generations.us: лендинги, Google Ads, Яндекс Директ и единый слой конверсий.",
+ "body": "keep",
+ "drop_lead_lines": 0,
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Google Ads",
+   "message": "campaigns",
+   "color": "4285F4",
+   "logo": "googleads"
+  },
+  {
+   "label": "Яндекс",
+   "message": "Директ",
+   "color": "FC3F1D",
+   "logo": "yandex"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ]
+}

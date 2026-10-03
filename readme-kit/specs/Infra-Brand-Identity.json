@@ -1,0 +1,25 @@
+{
+ "title": "Infra Brand Identity",
+ "tagline": "Айдентика внутренних сервисов Global Generation: логотип, цвета, шрифт, фавиконы и правила.",
+ "body": "keep",
+ "drop_lead_lines": 1,
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "статика",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Python",
+   "message": "сборка",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Шрифт",
+   "message": "Montserrat",
+   "color": "13445d"
+  }
+ ]
+}

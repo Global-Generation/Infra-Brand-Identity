@@ -1,0 +1,24 @@
+{
+ "title": "Saxon Newbot",
+ "tagline": "Логика лид-бота @saxonnewbot для продукта Saxon.",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "aiogram",
+   "message": "3",
+   "color": "2CA5E0",
+   "logo": "telegram"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ]
+}

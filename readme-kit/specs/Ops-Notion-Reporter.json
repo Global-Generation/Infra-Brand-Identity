@@ -1,0 +1,32 @@
+{
+ "title": "Notion-Reporter",
+ "tagline": "Двусторонний мост Notion и Telegram: PNG-отчёты по задачам в рабочие чаты и тикеты из чата в Notion.",
+ "drop_lead_lines": 0,
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11+",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "FastAPI",
+   "message": "",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "Chromium",
+   "message": "render",
+   "color": "4285F4",
+   "logo": "googlechrome"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body": "keep"
+}

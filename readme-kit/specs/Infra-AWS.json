@@ -1,0 +1,25 @@
+{
+ "title": "AWS Infrastructure",
+ "tagline": "Карта AWS-инфраструктуры Global Generation: проекты, домены, сервисы, репозитории, риски и ежемесячные расходы.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "AWS",
+   "message": "us-east-1",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "GitHub Actions",
+   "message": "costs",
+   "color": "2088FF",
+   "logo": "githubactions"
+  },
+  {
+   "label": "Python",
+   "message": "scripts",
+   "color": "3776AB",
+   "logo": "python"
+  }
+ ]
+}

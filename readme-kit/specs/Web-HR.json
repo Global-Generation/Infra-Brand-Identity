@@ -1,0 +1,30 @@
+{
+ "title": "HR-платформа",
+ "tagline": "Платформа найма Global Generation: вакансии, анкеты с тестовыми заданиями, канбан кандидатов и HR-репорты в Telegram.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Prisma",
+   "message": "6",
+   "color": "2D3748",
+   "logo": "prisma"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ]
+}

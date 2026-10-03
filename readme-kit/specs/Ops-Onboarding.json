@@ -1,0 +1,18 @@
+{
+ "title": "Онбординг в Global Generation",
+ "tagline": "Страницы онбординга сотрудников по ролям на бренд-системе GG.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "CSS",
+   "message": "brand v2",
+   "color": "1572B6",
+   "logo": "css3"
+  }
+ ]
+}

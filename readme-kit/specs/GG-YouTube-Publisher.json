@@ -1,0 +1,31 @@
+{
+ "title": "YouTube Publisher",
+ "tagline": "Claude Code skill: описание, таймкоды, теги и хэштеги для горизонтальных роликов канала Global Generation.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Claude Code",
+   "message": "skill",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "Python",
+   "message": "tools",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "FastAPI",
+   "message": "UI",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "YouTube",
+   "message": "Data API",
+   "color": "FF0000",
+   "logo": "youtube"
+  }
+ ]
+}

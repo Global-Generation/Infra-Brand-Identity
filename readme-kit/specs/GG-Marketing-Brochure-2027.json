@@ -1,0 +1,26 @@
+{
+ "title": "GG Brochure 2027",
+ "tagline": "Цифровая брошюра-флипбук Global Generation «Поступления»: самодостаточный HTML, 56 страниц.",
+ "body": "keep",
+ "drop_lead_lines": 0,
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "статика",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "AWS",
+   "message": "S3 + CloudFront",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "global-generations.com/brochure",
+   "color": "13445d",
+   "href": "https://global-generations.com/brochure"
+  }
+ ]
+}

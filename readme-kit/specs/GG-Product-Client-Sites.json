@@ -1,0 +1,19 @@
+{
+ "title": "Client Sites",
+ "tagline": "Монорепо клиентских и разовых сайтов Global Generation.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Vite",
+   "message": "React",
+   "color": "646CFF",
+   "logo": "vite"
+  }
+ ],
+ "body": "keep"
+}

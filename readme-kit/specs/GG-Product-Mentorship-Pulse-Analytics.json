@@ -1,0 +1,38 @@
+{
+ "title": "Mentorship Pulse Analytics",
+ "tagline": "TG-чаты между менторами и клиентами Global Generation как datalayer для АКБ и Mentorship-Portal.",
+ "body": "keep",
+ "drop_lead_lines": 1,
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "0.119",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "aiogram",
+   "message": "3",
+   "color": "26A5E4",
+   "logo": "telegram"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "pulse.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://pulse.global-generations-edu.com"
+  }
+ ]
+}

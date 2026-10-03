@@ -1,0 +1,30 @@
+{
+ "title": "GG Merch Store",
+ "tagline": "Магазин мерча Global Generation: витрина, корзина, оплата картой и админка заказов.",
+ "badges": [
+  {
+   "label": "Flask",
+   "message": "",
+   "color": "000000",
+   "logo": "flask"
+  },
+  {
+   "label": "SQLite",
+   "message": "",
+   "color": "003B57",
+   "logo": "sqlite"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "merch.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://merch.global-generations-edu.com"
+  }
+ ]
+}

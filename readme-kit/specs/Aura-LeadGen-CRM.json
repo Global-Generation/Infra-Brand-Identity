@@ -1,0 +1,38 @@
+{
+ "title": "Aura CRM",
+ "tagline": "CRM продаж Aura: сделки и воронки, единый инбокс WhatsApp и Telegram, телефония Mango, задачи, автоматизации и аналитика.",
+ "body": "replace",
+ "body_md": "CRM отдела продаж Aura: сделки и воронки, единый инбокс по мессенджерам, телефония, задачи, автоматизации касаний и аналитика. Заменяет amoCRM для партнёрских продуктов.\n\n## Разделы приложения\n\n| Раздел | Что внутри | Путь |\n|---|---|---|\n| Дашборд | Сводка по сделкам, задачам и активности | `/dashboard` |\n| Сделки | Воронки и этапы, карточка сделки с лентой, примечаниями и композером | `/deals` |\n| Инбокс | Единая переписка по WhatsApp и Telegram, карточка контакта справа | `/inbox` |\n| Задачи | Задачи менеджеров по сделкам | `/tasks` |\n| Списки | Контакты и сегменты | `/lists` |\n| Скрипты | Шаблоны сообщений и сценарии продаж | `/scripts` |\n| Автоматизации | Отложенные касания и сценарии по этапам | `/automations` |\n| Почта | Email-переписка по сделкам | `/email` |\n| Аналитика | Отчёты по воронке, ежедневный дайджест | `/analytics` |\n| Настройки | Пользователи, воронки, коннекторы | `/settings` |\n\n## Интеграции\n\n- **Лиды на входе:** API приёма лидов из Sales Engine и форм, контракт в [`docs/INGEST-API.md`](docs/INGEST-API.md).\n- **Мессенджеры:** WhatsApp (`/api/wa`, `/api/wazzup`) и Telegram в общем инбоксе.\n- **Телефония:** Mango Office, звонки в карточке сделки, настройка в [`docs/TELEPHONY-MANGO.md`](docs/TELEPHONY-MANGO.md).\n- **Шаблоны amoCRM:** импорт шаблонов сообщений (`/api/amo-templates`).\n- **Вход сотрудников:** через Aura Platform (`auth.aura-ecosystem.com`), описание в [`docs/AURA-AUTH.md`](docs/AURA-AUTH.md) и [`docs/aura-platform/`](docs/aura-platform).\n\n## Стек и данные\n\n- Next.js 16 (App Router), React 19, Prisma 6, PostgreSQL на Neon.\n- Схема: [`prisma/schema.prisma`](prisma/schema.prisma), 19 моделей: пользователи, воронки и этапы, контакты, сделки, активность, задачи, шаблоны, сообщения, звонки, автоматизации, коннекторы.\n- Сиды для локальной разработки: `prisma/seed*.mjs`.\n\n## Деплой и регламент\n\n- Прод: AWS App Runner в `us-east-2`, домен [crm.aura-ecosystem.com](https://crm.aura-ecosystem.com).\n- Регулярные задачи: [`.github/workflows/cron.yml`](.github/workflows/cron.yml), тик автоматизаций каждые 5 минут и дайджест в 06:00 UTC.\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev\n```\n\nПриложение откроется на [http://localhost:3000](http://localhost:3000). Переменные окружения берутся из `.env` (не коммитится).\n\n## Документация\n\n- [`docs/ROADMAP.md`](docs/ROADMAP.md) - план доработок по фидбеку Лёва\n- [`docs/MOBILE-PLAN.md`](docs/MOBILE-PLAN.md) - мобильная версия\n- [`docs/INGEST-API.md`](docs/INGEST-API.md), [`docs/TELEPHONY-MANGO.md`](docs/TELEPHONY-MANGO.md), [`docs/AURA-AUTH.md`](docs/AURA-AUTH.md)\n",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Prisma",
+   "message": "6",
+   "color": "2D3748",
+   "logo": "prisma"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner us-east-2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "crm.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://crm.aura-ecosystem.com"
+  }
+ ]
+}

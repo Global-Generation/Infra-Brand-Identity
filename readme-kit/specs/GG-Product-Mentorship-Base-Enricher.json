@@ -1,0 +1,25 @@
+{
+ "title": "Mentorship Portal Enricher",
+ "tagline": "Автономный агент на Claude Code: ночью дополняет и проверяет базу университетов портала менторов и открывает PR с источниками.",
+ "badges": [
+  {
+   "label": "Node.js",
+   "message": "scripts",
+   "color": "339933",
+   "logo": "nodedotjs"
+  },
+  {
+   "label": "Claude Code",
+   "message": "agent",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "GitHub",
+   "message": "PR bot",
+   "color": "181717",
+   "logo": "github"
+  }
+ ],
+ "body": "keep"
+}

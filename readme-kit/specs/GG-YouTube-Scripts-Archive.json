@@ -1,0 +1,24 @@
+{
+ "title": "Архив сценариев YouTube",
+ "tagline": "Архив сценариев и транскриптов канала Global Generation в одном HTML-файле.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "single file",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "scripts.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://scripts.global-generations-edu.com"
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "title": "Shorts Generator",
+ "tagline": "Генератор YouTube Shorts из длинных роликов: сценарии через LLM, пакетная обработка, ревью и календарь публикаций.",
+ "body": "replace",
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "0.115",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "SQLAlchemy 2",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Docker",
+   "message": "ECR",
+   "color": "2496ED",
+   "logo": "docker"
+  },
+  {
+   "label": "FFmpeg",
+   "message": "",
+   "color": "007808",
+   "logo": "ffmpeg"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body_md": "Сервис нарезки идей для Shorts из длинных роликов: берёт транскрипт видео, генерирует сценарии шортсов по шаблонам промптов, ведёт ревью, очередь и календарь публикаций.\n\n## Что внутри\n\n| Раздел | Что делает |\n|---|---|\n| Видео | Добавление роликов, метаданные и транскрипты через yt-dlp и youtube-transcript-api (`routers/videos.py`) |\n| Шортсы | Сценарии, хуки, заголовки, оверлеи; карточка шорта (`routers/shorts.py`, `templates/short_detail.html`) |\n| Батчи | Пакетная генерация с восстановлением зависших батчей (`routers/batches.py`, `services/batch_processor.py`) |\n| Промпты | Шаблоны промптов и дефолтные сиды (`routers/prompts.py`, `seeds/default_prompts.py`) |\n| Ревью | Комментарии и статусы ревью (`routers/reviews.py`) |\n| Задачи | Задачи редакторов и прогресс (`routers/tasks.py`) |\n| Календарь | Очередь публикаций (`routers/calendar.py`) |\n| Экспорт | Выгрузка результатов (`routers/export.py`) |\n\n## Стек\n\n- FastAPI, SQLAlchemy 2, Jinja2, PostgreSQL (psycopg2), JWT-авторизация, bcrypt.\n- LLM: Anthropic и OpenAI SDK; при заданном `OPENROUTER_API_KEY` запросы идут через OpenRouter (`services/ai_provider.py`).\n- FFmpeg и yt-dlp в Docker-образе.\n\n## Деплой\n\nPush в `main` запускает GitHub Actions (`.github/workflows/deploy.yml`): сборка образа, push в ECR `shorts-generator`, запуск контейнера на EC2 (порт 8090).\n\n## Локальный запуск\n\n```bash\npip install -r requirements.txt\ncp .env.example .env\nuvicorn main:app --port 8090\n```\n\n## Служебные скрипты\n\nРазовые скрипты для аудита и пересборки сценариев лежат в `scripts/` (`audit_scenarios.py`, `regenerate_scenarios.py`, `update_overlays.py` и др.).\n"
+}

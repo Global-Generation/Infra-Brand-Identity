@@ -1,0 +1,24 @@
+{
+ "title": "Финмодель расходов",
+ "tagline": "Скрипты и runbook финмодели расходов Global Generation в Google Sheets.",
+ "badges": [
+  {
+   "label": "Google Sheets",
+   "message": "API",
+   "color": "34A853",
+   "logo": "googlesheets"
+  },
+  {
+   "label": "Shell",
+   "message": "bash",
+   "color": "4EAA25",
+   "logo": "gnubash"
+  },
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  }
+ ]
+}

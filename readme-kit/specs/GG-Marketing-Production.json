@@ -1,0 +1,44 @@
+{
+ "title": "Продакшн",
+ "tagline": "Внутренний сервис видеопродакшна двух YouTube-каналов: доска роликов, шортсы, публикация, расчёты и аналитика.",
+ "body": "replace",
+ "badges": [
+  {
+   "label": "FastAPI",
+   "message": "0.115",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "React",
+   "message": "18",
+   "color": "61DAFB",
+   "logo": "react"
+  },
+  {
+   "label": "Vite",
+   "message": "5",
+   "color": "646CFF",
+   "logo": "vite"
+  },
+  {
+   "label": "Docker",
+   "message": "Compose",
+   "color": "2496ED",
+   "logo": "docker"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "production.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://production.global-generations-edu.com"
+  }
+ ],
+ "body_md": "Внутренний сервис Global Generation для видеопродакшна двух YouTube-каналов (Америка, Европа): доска длинных роликов, шортсы, публикация, расчёты с командой и аналитика. Роли: admin, publisher, bookkeeper, host, editor.\n\n## Что внутри\n\n| Раздел | Что делает |\n|---|---|\n| Доска | Длинные ролики по этапам, карточка ролика (`frontend/src/pages/Board.jsx`, `VideoDetail.jsx`) |\n| Шортсы | Дашборд, задачи, видео и календарь публикаций (`ShortsDashboard.jsx`, `ShortsTasks.jsx`, `ShortsCalendar.jsx`) |\n| Публикация | Вкладка Publisher: поиск ролика на YouTube по названию (`routers/publisher.py`) |\n| Расчёты | Тарифы, калькулятор, чеки, способы оплаты, курсы валют (`Calc.jsx`, `routers/tariffs.py`, `receipts.py`, `fx.py`) |\n| Настройки | Команда, роли, параметры (`Settings.jsx`, `routers/settings.py`) |\n| Telegram-бот | Дайджесты и напоминания о просрочках (`bots/production_bot/`) |\n\n## Стек\n\n- Бэкенд: FastAPI, SQLAlchemy 2, Jinja2, JWT-авторизация, slowapi (лимиты запросов).\n- Фронтенд: React 18 + Vite (`frontend/`), иконки lucide, шрифт Montserrat самохостом.\n- Данные: SQLite в `data/` (в `docker-compose.yml`), бэкапы в S3.\n- Бот: отдельный контейнер `production_bot`, читает ту же БД.\n\n## Интеграции\n\n- YouTube Data API v3 (серверный поиск роликов по названию для вкладки Publisher).\n- AWS S3 (миниатюры и бэкапы БД), boto3.\n- Telegram (бот `bots/production_bot`).\n\n## Деплой\n\nСервис живёт на EC2 в Docker Compose (`app` и `production_bot`), домен `production.global-generations-edu.com`. Выкладка: `bash deploy/deploy.sh` с локальной машины (rsync без `data/`, бэкап до и после, проверка HTTP 200 и целостности БД). Бэкапы каждые 3 часа, восстановление через `deploy/restore.sh`. Подробности: [deploy/README.md](deploy/README.md).\n\n## Локальный запуск\n\n```bash\npip install -r requirements.txt\nuvicorn main:app --port 8091\ncd frontend && npm install && npm run dev\n```\n\n## Документация\n\n- [docs/PLATFORM.md](docs/PLATFORM.md): вопросы и ответы, бэкенд-роудмап\n- [docs/SECURITY.md](docs/SECURITY.md): безопасность\n- [docs/RU-ACCESS.md](docs/RU-ACCESS.md): доступ из РФ\n- [DESIGN-BRIEF.md](DESIGN-BRIEF.md): дизайн-код по Infra-Brand-Identity\n- [deploy/YOUTUBE-OAUTH.md](deploy/YOUTUBE-OAUTH.md): OAuth для YouTube\n"
+}

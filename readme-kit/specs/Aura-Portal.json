@@ -1,0 +1,38 @@
+{
+ "title": "Aura Portal",
+ "body": "replace",
+ "tagline": "Операционный портал Aura: партнёры, запуски (прогрев), задачи, выплаты, лиды и Instagram-коннектор.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "React",
+   "message": "19",
+   "color": "61DAFB",
+   "logo": "react"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "portal.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://portal.aura-ecosystem.com"
+  }
+ ],
+ "body_md": "Операционный портал Aura для команды, партнёров и блогеров: ведение партнёров и запусков, движок прогрева, задачи, выплаты, лиды и подключение Instagram. Сервис в AWS называется `aura-ops`.\n\n## Разделы приложения\n\n| Раздел | Что внутри | Путь |\n|---|---|---|\n| Обзор | Партнёры и их состояние, доска партнёров | `/`, `/partners` |\n| Задачи | Задачи команды по партнёрам | `/tasks` |\n| Мои запуски, Мой запуск | Прогрев (wizard, доска, монетизация) для блогера и партнёра | `/progrev`, `/cabinet` |\n| Выплаты | Таблица выплат партнёра | `/payouts` |\n| Лиды | Лиды партнёра | `/leads` |\n| Инстаграм-коннектор | Запросы доступа и подключение аккаунтов | `/instagram` |\n| Аналитика, Gantt | Активность и сроки запусков | `/analytics`, `/gantt` |\n| Договор | Раздел договора (закрыт) | `/contract` |\n| Инструкции | Обучающие материалы | `/docs` |\n| Админка | Управление персонами и партнёрами | `/admin` |\n\nСостав меню зависит от роли: команда, партнёр или блогер.\n\n## Интеграции\n\n- **Вход команды:** через Aura Platform (`auth.aura-ecosystem.com`), включается переменными окружения, описание в [`docs/aura-platform-auth.md`](docs/aura-platform-auth.md). Партнёры и блогеры входят паролем.\n- **Instagram:** сервис IG-Connector (`/api/instagram`), общий секрет с коннектором.\n- **Telegram:** ежедневный дайджест в рабочий чат (`src/lib/notify`).\n- **S3:** ежедневный снимок данных портала.\n\n## Стек и данные\n\n- Next.js 16 (App Router, standalone), React 19, Tailwind CSS 4, TypeScript.\n- PostgreSQL на Neon через `pg`: состояние портала хранится JSONB-записью, данные прогрева в отдельных таблицах (`src/lib/db.ts`, `src/lib/launch`).\n- Движок прогрева живёт в коде портала (`src/lib/launch`, `src/components/progrev`) и держит состояние в памяти процесса, поэтому сервис работает ровно в одном экземпляре.\n\n## Деплой и регламент\n\n- Прод: AWS App Runner (`aura-ops`, us-east-1), домен [portal.aura-ecosystem.com](https://portal.aura-ecosystem.com).\n- Push в `main`: [`deploy.yml`](.github/workflows/deploy.yml) прогоняет проверки, собирает образ в ECR, переключает App Runner и запускает смоук. Подробности: [`deploy/README.md`](deploy/README.md).\n- Проверки PR: [`ci.yml`](.github/workflows/ci.yml) (tsc, lint, test, next build).\n- Регулярные задачи GitHub Actions: [`smoke.yml`](.github/workflows/smoke.yml) раз в час, [`snapshot.yml`](.github/workflows/snapshot.yml) в 02:30 UTC, [`tg-digest.yml`](.github/workflows/tg-digest.yml) в 07:00 UTC.\n\n## Локальный запуск\n\n```bash\nnpm ci\nnpm run dev\n```\n\nПриложение откроется на [http://localhost:3000](http://localhost:3000). Нужны переменные окружения (`DATABASE_URL` и др.), `.env` не коммитится. Тесты: `npm test`, линтер: `npm run lint`.\n\n## Документация\n\n- [`deploy/README.md`](deploy/README.md) - как устроен деплой\n- [`docs/aura-platform-auth.md`](docs/aura-platform-auth.md) - вход команды через Aura Platform\n"
+}

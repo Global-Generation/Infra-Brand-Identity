@@ -1,0 +1,31 @@
+{
+ "title": "Kate Portfolio",
+ "tagline": "Клиентский портал курса Kate Portfolio (Кейт Парр): портфолио и поступление на творческие направления в вузы США и Европы.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "15",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "kate-portfolio.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://kate-portfolio.global-generations-edu.com"
+  }
+ ]
+}

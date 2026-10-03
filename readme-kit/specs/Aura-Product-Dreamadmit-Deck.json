@@ -1,0 +1,31 @@
+{
+ "title": "Dreamadmit Deck",
+ "tagline": "Дека и рабочие документы партнёрства Global Generation и Дарьи (Dream Admit).",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "deck",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "nginx",
+   "message": "static",
+   "color": "009639",
+   "logo": "nginx"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "dreamadmit.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://dreamadmit.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

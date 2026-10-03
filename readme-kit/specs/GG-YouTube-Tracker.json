@@ -1,0 +1,31 @@
+{
+ "title": "YouTube Tracker",
+ "tagline": "Трекер позиций и удержания видео канала Global Generation в YouTube.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "SQLite",
+   "message": "Prisma 7",
+   "color": "003B57",
+   "logo": "sqlite"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "youtube.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://youtube.global-generations-edu.com"
+  }
+ ],
+ "body": "keep"
+}

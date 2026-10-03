@@ -1,0 +1,31 @@
+{
+ "title": "Aura Product Engine",
+ "tagline": "Джорни-движок сборки продуктов экосистемы Aura: 43 шага от груминга до запуска нового образовательного продукта.",
+ "badges": [
+  {
+   "label": "Node.js",
+   "message": "node:http",
+   "color": "339933",
+   "logo": "nodedotjs"
+  },
+  {
+   "label": "HTML",
+   "message": "single-file",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "engine.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://engine.aura-ecosystem.com"
+  }
+ ],
+ "body": "keep"
+}

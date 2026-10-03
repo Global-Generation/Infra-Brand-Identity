@@ -1,0 +1,32 @@
+{
+ "title": "Manuscript AI",
+ "body": "replace",
+ "tagline": "ИИ-инструмент для эссе, статей и cover letter: рассказ, библиотека идей, заходы, сборка и полишинг.",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "15",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Drizzle",
+   "message": "ORM",
+   "color": "C5F74F",
+   "logo": "drizzle"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  }
+ ],
+ "body_md": "Manuscript AI помогает написать эссе, статью или cover letter: от рассказа о себе до отполированного текста. Продукт вынесен из вкладки «Манускрипт» портала Essay-UK-Anna и собран на форке эталона Aura (Next.js, Neon, Drizzle). Сейчас закрытая бета.\n\n## Этапы работы с текстом\n\n| Этап | Что происходит | Путь |\n|---|---|---|\n| Хранилище | Список работ пользователя | `/works` |\n| Что пишем | Создание работы | `/works/new` |\n| Рассказ | Свободный рассказ, из которого ИИ достаёт материал | `/talk?work=` |\n| Библиотека | Идеи и приоритеты | `/library?work=` |\n| Заходы | Варианты подачи | `/angles?work=` |\n| Сборка | Сборка текста по разделам | `/assemble?work=` |\n| Полишинг | Финальная доработка | `/polish?work=` |\n\nВся логика продукта лежит в модуле [`src/modules/manuscript`](src/modules/manuscript/README.md), чтобы фиксы эталона доезжали без конфликтов.\n\n## Из эталона\n\n- Вход и сессии, админка с аудит-логом, лендинг, email-кампании и аналитика.\n- Оплаты T-Bank и Prodamus, промокоды, подписки, Telegram-обвязка: заложены в эталоне, в бете выключены.\n- LLM-обвязка через OpenRouter, суточный лимит запросов на пользователя.\n\n## Стек\n\n- Next.js 15 (App Router, standalone), React 19, TypeScript.\n- Neon PostgreSQL, Drizzle ORM, миграции в [`drizzle/`](drizzle).\n- Дизайн-система Aura, проверка токенов `npm run check:design` входит в сборку.\n\n## Деплой\n\n- AWS App Runner (один экземпляр: лимиты ИИ живут в памяти процесса), образ в ECR.\n- Выкатка: GitHub Actions [`deploy.yml`](.github/workflows/deploy.yml) вручную (`workflow_dispatch`, окружение `prod`). Проверки PR: [`ci.yml`](.github/workflows/ci.yml).\n- Собственный домен пока не подключён. Карта инфраструктуры: [`docs/DEPLOY.md`](docs/DEPLOY.md).\n\n## Локальный запуск\n\n```bash\nnode scripts/local-neon.mjs      # терминал 1: локальный Postgres (PGlite) со схемой из drizzle/\nexport DATABASE_URL=postgresql://local:local@localhost/local\nexport NODE_OPTIONS=\"--import ./scripts/local-neon-fetch.mjs\"\nnpm run dev                      # терминал 2\n```\n\nТесты: `npm test`. Переменные окружения: [`.env.example`](.env.example) и [`docs/SECRETS.md`](docs/SECRETS.md).\n\n## Документация\n\n- [`docs/DEPLOY.md`](docs/DEPLOY.md) - инфраструктура и выкатка\n- [`docs/SECRETS.md`](docs/SECRETS.md) - переменные и секреты\n- [`docs/BILLING-LOGIC.md`](docs/BILLING-LOGIC.md), [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md), [`docs/ANTIPATTERNS.md`](docs/ANTIPATTERNS.md)\n- [`CHANGELOG.md`](CHANGELOG.md) - история изменений\n"
+}

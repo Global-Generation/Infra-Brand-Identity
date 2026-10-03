@@ -1,0 +1,19 @@
+{
+ "title": "Асхат и Анель",
+ "tagline": "Рабочий контекст по VIP-клиенту Global Generation: профиль, обещания, стратегия поступления и дека.",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "deck",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Markdown",
+   "message": "docs",
+   "color": "083FA1",
+   "logo": "markdown"
+  }
+ ],
+ "body": "keep"
+}
