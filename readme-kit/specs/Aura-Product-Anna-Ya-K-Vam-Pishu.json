@@ -1,6 +1,6 @@
 {
- "title": "Personal Statement Platform",
- "tagline": "Full-stack platform for Personal Statement preparation: AI tutor, achievement bank, editor, lessons, community and payments.",
+ "title": "Я к вам пишу",
+ "tagline": "Авторский курс Анны по мотивационным письмам и Personal Statement для вузов Великобритании: ИИ-репетитор, банк достижений, редактор, уроки, комьюнити и оплаты.",
  "badges": [
   {
    "label": "Next.js",
@@ -34,5 +34,5 @@
   }
  ],
  "body": "keep",
- "card_tagline": "Платформа подготовки Personal Statement: ИИ-тьютор, банк достижений, редактор, уроки, комьюнити и оплаты."
+ "card_tagline": "Курс Анны «Я к вам пишу»: мотивационные письма и Personal Statement для вузов Великобритании, ИИ-репетитор, редактор, уроки и оплаты."
 }
