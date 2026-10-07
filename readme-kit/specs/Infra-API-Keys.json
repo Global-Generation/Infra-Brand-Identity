@@ -1,0 +1,26 @@
+{
+ "title": "Ключи API",
+ "tagline": "Ключи API организации GG (OpenRouter и др.): правило «1 потребитель = 1 ключ с капом», карта ключей, история, инструкции и скрипты. Значения ключей только в AWS Secrets Manager.",
+ "body": "replace",
+ "body_md": "Всё про ключи API организации GG в одном месте: правила, какой ключ кому положен и как его выбирать, карта «ключ -> кто его реально использует», история (откуда взялся хаос и как его убрали 07.10.2026), инструкции и скрипты для создания, замены и вывода ключей. Сейчас здесь OpenRouter (все ИИ-функции продуктов); другие провайдеры добавляются сюда же.\n\n> [!IMPORTANT]\n> Значений ключей в репо нет и не будет. Они лежат в AWS Secrets Manager (`gg/<сервис>/openrouter-api-key`, us-east-1). Здесь только имена, метки вида `sk-or-v1-9ce...f32`, капы и места использования.\n\n## Главное правило\n\n**1 потребитель = 1 ключ с месячным капом.** Сервис, CI-пайплайн и задача агента получают свой ключ; прод и дев разные. Агент (Claude) берёт только свои ключи: сценарии YouTube = `gg-yt-scripts`, всё остальное = `gg-claude-agents`. Ключ чужого сервиса не брать никогда; не ясно, какой брать = спросить Лёва. Подробно: [`docs/RULES.md`](docs/RULES.md).\n\n## Что внутри\n\n| Путь | Что это |\n|---|---|\n| [`docs/KEY-MAP.md`](docs/KEY-MAP.md) | Карта: каждый живой ключ, его кап, расход за месяц, секрет и все места, где он реально прописан (собирается скриптом) |\n| [`docs/RULES.md`](docs/RULES.md) | Правила: один ключ на потребителя, капы, какой ключ брать агенту, где ключ может лежать |\n| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | Инструкции: новый ключ, переключение по типам (EC2, App Runner, Lambda, GitHub, Notetaker), вывод из оборота, ловушки |\n| [`docs/HISTORY.md`](docs/HISTORY.md) | История ключей с июня 2026: инциденты с капами, массовая смерть ключей 13.07, аудит и ротация 07.10, откат |\n| [`scripts/orkeys.py`](scripts/orkeys.py) | Ключи через ключ управления: список с расходом, создание с капом и секретом, переименование, кап, выключение |\n| [`scripts/scan_consumers.py`](scripts/scan_consumers.py) | Скан всей инфраструктуры (Secrets Manager, App Runner, Lambda, EC2, инстансы через SSM, мак, GitHub) и пересборка карты |\n| [`scripts/apprunner_switch.py`](scripts/apprunner_switch.py), [`scripts/env_switch_remote.py`](scripts/env_switch_remote.py) | Переключение сервиса App Runner и env-файлов на сервере на новый ключ с проверкой |\n| [`config/`](config) | Потребители, которых не видно сканом (секреты GitHub), и известные копии ключей |\n\n## Быстрые команды\n\n```bash\npython3 scripts/orkeys.py list                                    # ключи и расход\npython3 scripts/scan_consumers.py --md docs/KEY-MAP.md            # пересобрать карту (~4 мин)\npython3 scripts/orkeys.py create gg-<service> 20 --secret gg/<service>/openrouter-api-key\npython3 scripts/orkeys.py set <key> --disable                     # вывести из оборота (обратимо)\n```\n\nНужны root-креды AWS (мак), SSH к EC2 `18.211.149.64`. Ключ управления: `gg/_master/openrouter-provisioning-key`.\n\n## Связи\n\n- Дашборд расходов по направлениям: репо [Infra-OpenRouter-Costs](https://github.com/Global-Generation/Infra-OpenRouter-Costs).\n- Правило для Claude: глобальный `CLAUDE.md` в репо LevAvdoshin/Claude-Config.\n- Алерты о сбоях ключей (403 кап, 401 ключ удалён): [Infra-Alerts](https://github.com/Global-Generation/Infra-Alerts).\n",
+ "badges": [
+  {
+   "label": "OpenRouter",
+   "message": "1 сервис = 1 ключ",
+   "color": "6566F1",
+   "logo": "openai"
+  },
+  {
+   "label": "AWS",
+   "message": "Secrets Manager",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  }
+ ]
+}
