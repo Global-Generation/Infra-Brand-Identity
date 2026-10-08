@@ -1,7 +1,7 @@
 [
  {
   "key": "root",
-  "name": "Global Generation: сайт, вход, PIN-ворота, SSO, письма",
+  "name": "Global Generation: сайт, каталог, письма",
   "host": "-",
   "repo": "-",
   "family": "root",
@@ -549,5 +549,23 @@
   "family": "client",
   "favicon": "assets/gigi/gigi-mascot.png",
   "note": "свой визуал Джи-джи, не менять"
+ },
+ {
+  "key": "gg-id",
+  "name": "GG ID: экраны входа, PIN-ворота и SSO, витрина, кнопка и окно в сервисах, презентации",
+  "host": "levauth.* (экраны входа)",
+  "repo": "Infra-Brand-Identity (gg-id/)",
+  "family": "internal",
+  "favicon": "assets/favicons/gg-id.svg",
+  "png": {
+   "32": "assets/favicons/png/gg-id-32.png",
+   "180": "assets/favicons/png/gg-id-180.png",
+   "192": "assets/favicons/png/gg-id-192.png",
+   "512": "assets/favicons/png/gg-id-512.png"
+  },
+  "ico": "assets/favicons/ico/gg-id.ico",
+  "icon": "gg/key",
+  "bg": "#8FBADD > #4B8FD6",
+  "note": "копия levauth.svg: ключ на светлом градиенте (--grad-tile)"
  }
 ]

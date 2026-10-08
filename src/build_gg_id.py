@@ -1,7 +1,7 @@
 """Build GG ID (единый вход): gg-id/fonts/*.woff2, gg-id/screens/*.html and the showcase gg-id.html.
 
 Sources: gg-id/gg-id.css + gg-id/gg-id.js (the kit, edited by hand), src/gg_id/screens.html (screens),
-src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/root.svg,
+src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/gg-id.svg,
 gg-id/email-card.html + gg-id/email/gg-id-lockup-2x.png (the e-mail card, checked here, PNG from src/rasterize_gg_id_email.py).
 
 Run: python3 src/build_gg_id.py
@@ -52,6 +52,7 @@ for subset, b64 in woff.items():
 
 kit_css = read(KIT, 'gg-id.css')
 kit_js = read(KIT, 'gg-id.js')
+service_js = read(KIT, 'gg-id-service.js')   # поведение компонентов в сервисах: меню аккаунта, окно, 401
 for subset in woff:
     assert f'url(fonts/montserrat-{subset}.woff2)' in kit_css, f'gg-id.css must load fonts/montserrat-{subset}.woff2'
 inline_css = kit_css
@@ -66,12 +67,23 @@ LETTERS = ''.join(f'<path d="{d}"/>' for d in logo_paths[:16])  # 0-15 = GLOBAL 
 mark = re.findall(r'<path d="([^"]+)"', read(HERE, 'gg-icon.svg'))
 assert len(mark) == 4, len(mark)
 ARC, RIGHT_TOP, MAIN, RIGHT_BOTTOM = mark
-root_svg = read(ROOT, 'assets', 'favicons', 'root.svg').strip()
-root_inner = re.sub(r'^<svg[^>]*>|</svg>$', '', root_svg).strip()
-# unique ids so the tile can sit next to other inline SVGs on a service page
-root_inner = root_inner.replace('id="ggr"', 'id="gid-tile-clip"').replace('url(#ggr)', 'url(#gid-tile-clip)')
-root_inner = root_inner.replace('paint0_radial_184_3', 'gid-tile-grad')
-FAVICON_URI = 'data:image/svg+xml,' + urllib.parse.quote(root_svg, safe='')
+# иконка GG ID (08.10.2026): белый ключ на светлом градиенте #8FBADD -> #4B8FD6 (--grad-tile), файл assets/favicons/gg-id.svg
+# (копия levauth.svg). Значок кнопки «Войти через GG ID», окна «Сессия истекла» и фавикон всех экранов GG ID и витрины.
+# Тёмная плитка корня GG (root.svg) в ките больше не стоит: правило 4a, тёмные градиентные плитки в интерфейсе запрещены.
+ID_ICON_SVG = read(ROOT, 'assets', 'favicons', 'gg-id.svg').strip()
+assert '#8FBADD' in ID_ICON_SVG and '#4B8FD6' in ID_ICON_SVG, 'gg-id.svg: the GG ID icon is the key on the light tile gradient'
+_id_inner = re.sub(r'^<svg[^>]*>|</svg>$', '', ID_ICON_SVG).strip()
+
+
+def id_icon_inner(prefix):
+    """The icon body with ids unique per copy, so it can sit next to other inline SVGs (and next to its own alias)."""
+    return _id_inner.replace('id="sg"', f'id="{prefix}-g"').replace('url(#sg)', f'url(#{prefix}-g)')
+
+
+# inline variant for services (their own origin cannot <use> the hub sprite): one <svg>, no sprite needed
+ID_ICON_INLINE = (f'<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+                  f'{id_icon_inner("gid-id-icon-inline")}</svg>')
+FAVICON_URI = 'data:image/svg+xml,' + urllib.parse.quote(ID_ICON_SVG, safe='')
 
 AURA = ('<circle cx="21" cy="21" r="19" fill="none" stroke="currentColor" stroke-width="2.4" opacity=".3"/>'
         '<circle cx="21" cy="21" r="12" fill="none" stroke="currentColor" stroke-width="2.6" opacity=".6"/>'
@@ -237,8 +249,10 @@ def sprite(text):
             parts.append(f'<symbol id="gi-{n}" viewBox="0 0 24 24">{icon_inner(n)}</symbol>')
     if '#gid-logo' in text:
         parts.append(f'<symbol id="gid-logo" viewBox="0 0 777 196">{LOGO}</symbol>')
-    if '#gid-tile' in text:
-        parts.append(f'<symbol id="gid-tile" viewBox="0 0 39 39">{root_inner}</symbol>')
+    if '#gid-id-icon' in text:
+        parts.append(f'<symbol id="gid-id-icon" viewBox="0 0 64 64">{id_icon_inner("gid-id-icon")}</symbol>')
+    if '#gid-tile' in text:   # старое имя: та же иконка GG ID, чтобы старая разметка <use href="#gid-tile"> показала ключ
+        parts.append(f'<symbol id="gid-tile" viewBox="0 0 64 64">{id_icon_inner("gid-tile")}</symbol>')
     return '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + ''.join(parts) + '</svg>'
 
 
@@ -270,8 +284,27 @@ def brand_check(name, text):
         sys.exit(1)
 
 
+DARK_TILE = ('#1F3053', '#3D6488', 'paint0_radial_184_3', 'favicons/root.', 'ico/root.')
+
+
+def kit_rules_check(name, text):
+    """Rule 4a (08.10.2026): no dark gradient tiles in the kit UI; the GG ID icon (key on the light tile) wherever a tile stands."""
+    problems = [f'dark tile of the GG root (rule 4a): {bad}' for bad in DARK_TILE if bad.lower() in text.lower()]
+    if 'href="#gid-tile"' in text:
+        problems.append('#gid-tile is the old name of the GG ID icon: use #gid-id-icon')
+    for m in re.finditer(r'<a class="gid-sso[^"]*"[^>]*>(.*?)</a>', text, flags=re.S):
+        if 'gid-id-icon' not in m.group(1):
+            problems.append(f'.gid-sso without the GG ID icon: {m.group(0)[:90]}')
+    if problems:
+        print('KIT RULES FAILED in', name)
+        for p in problems:
+            print(' -', p)
+        sys.exit(1)
+
+
 brand_check('gg-id.css', kit_css)
 brand_check('gg-id.js', kit_js)
+brand_check('gg-id-service.js', service_js)
 
 # ---- standalone screens: gg-id/screens/<key>.html (reference for the hub, demo navigation only) ----
 DEMO_NAV = """<script>
@@ -307,8 +340,8 @@ for s in SCREENS:
 <meta name="theme-color" content="#13445d" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#081b26" media="(prefers-color-scheme: dark)">
 <title>{htmlmod.escape(s['title'])} · GG ID</title>
-<link rel="icon" href="../../assets/favicons/root.svg" type="image/svg+xml">
-<link rel="icon" href="../../assets/favicons/ico/root.ico" sizes="any">
+<link rel="icon" href="../../assets/favicons/gg-id.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/favicons/ico/gg-id.ico" sizes="any">
 <link rel="stylesheet" href="../gg-id.css">
 </head>
 <body class="gid-body">
@@ -321,16 +354,20 @@ for s in SCREENS:
 </html>
 """
     brand_check(f'screens/{s["key"]}.html', page)
+    kit_rules_check(f'screens/{s["key"]}.html', page)
     write_if_changed(os.path.join(KIT, 'screens', s['key'] + '.html'), page)
 
 # full sprite for the hub: every symbol any screen or service component uses (<use href="/assets/gg-id/sprite.svg#gi-eye">)
 all_text = (''.join(s['body'] for s in SCREENS) + LOCKUP + IDCARD + idrow(DEMO) + read(HERE, 'gg_id', 'showcase.html') +
-            ' data-gid-passkey-icon ')
+            ' data-gid-passkey-icon #gid-id-icon #gid-tile ')   # gid-tile = старое имя иконки GG ID, для старой разметки
 full = sprite(all_text).replace('<svg width="0" height="0" style="position:absolute" aria-hidden="true">',
                                 '<svg xmlns="http://www.w3.org/2000/svg">', 1)
 full = '<!-- GG ID: logo, root favicon tile and kit icons. Generated by src/build_gg_id.py -->\n' + full + '\n'
 brand_check('gg-id/sprite.svg', full)
+kit_rules_check('gg-id/sprite.svg', full)
 write_if_changed(os.path.join(KIT, 'sprite.svg'), full)
+# иконка GG ID отдельным файлом в ките: хаб отдаёт её из /assets/gg-id/ (img, презентации), источник assets/favicons/gg-id.svg
+write_if_changed(os.path.join(KIT, 'gg-id-icon.svg'), ID_ICON_SVG + '\n')
 
 # drop screens that no longer exist in the source
 for fn in os.listdir(os.path.join(KIT, 'screens')):
@@ -414,6 +451,7 @@ api_rows = ''.join(
 page = (tpl
         .replace('/*@GID_CSS@*/', inline_css)
         .replace('/*@GID_JS@*/', kit_js.replace('</script', '<\\/script'))
+        .replace('/*@GID_SERVICE_JS@*/', service_js.replace('</script', '<\\/script'))
         .replace('/*@META@*/', json.dumps(meta, ensure_ascii=False).replace('</', '<\\/'))
         .replace('<!--@TEMPLATES@-->', templates)
         .replace('<!--@API_ROWS@-->', api_rows)
@@ -427,6 +465,7 @@ page = (tpl
         .replace('@N_SCREENS@', str(len(SCREENS))))
 page = page.replace('<!--@SPRITE@-->', sprite(page))
 brand_check('gg-id.html', page)
+kit_rules_check('gg-id.html', page)
 write_if_changed(os.path.join(ROOT, 'gg-id.html'), page)
 
 # ---- gg-id/README.md: the screens table between markers, from the same INFO ----
@@ -439,8 +478,16 @@ readme = re.sub(r'<!-- screens:start -->.*?<!-- screens:end -->',
 # the card markup in the README is the same string the screens and the showcase use
 card_md = '```html\n' + IDCARD + '\n\n<!-- компактная строка -->\n' + idrow(DEMO) + '\n```'
 assert '<!-- idcard:start -->' in readme, 'gg-id/README.md: add <!-- idcard:start --><!-- idcard:end --> markers'
+icon_md = '```html\n<!-- кнопка в сервисе (свой origin): иконка инлайном, спрайт хаба не нужен -->\n' + \
+    '<a class="gid-sso" href="https://levauth.global-generations-edu.com/api/auth/authorize?...">' + ID_ICON_INLINE + \
+    '<span>Войти через GG&nbsp;ID</span></a>\n\n<!-- на хабе (тот же origin): символ спрайта -->\n' + \
+    '<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gid-id-icon"/></svg>\n```'
+assert '<!-- idicon:start -->' in readme, 'gg-id/README.md: add <!-- idicon:start --><!-- idicon:end --> markers'
+readme = re.sub(r'<!-- idicon:start -->.*?<!-- idicon:end -->',
+                lambda _: '<!-- idicon:start -->\n' + icon_md + '\n<!-- idicon:end -->', readme, flags=re.S)
 readme = re.sub(r'<!-- idcard:start -->.*?<!-- idcard:end -->',
                 lambda _: '<!-- idcard:start -->\n' + card_md + '\n<!-- idcard:end -->', readme, flags=re.S)
 brand_check('gg-id/README.md', readme)
+kit_rules_check('gg-id/README.md', readme)
 write_if_changed(readme_path, readme)
 print('ok gg-id.html', f'{len(page) / 1024:.0f} KB', '| screens:', len(SCREENS), '| fonts:', ', '.join(sorted(woff)))
