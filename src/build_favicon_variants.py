@@ -112,7 +112,8 @@ class Type:
 
 # ---------- примитивы ----------
 
-MARK_PATHS = re.findall(r'<path d="([^"]+)"', (ROOT / "assets/favicons/root.svg").read_text())
+MARK_PATHS = re.findall(r'<path d="([^"]+)"', (ROOT / "assets/logo/gg-mark.svg").read_text())
+LEGACY = ROOT / "src/legacy-favicons"  # фавиконы до 07.10 (градиент + lucide), для вкладки «Сейчас»
 
 
 def mark(cx, cy, w, color):
@@ -229,8 +230,7 @@ def build_variants(T):
     c9 = caps(9.5, 19)
 
     def v_now(s, m):
-        name = "root" if s["key"] == "root" else s["key"]
-        return (ROOT / f"assets/favicons/{name}.svg").read_text().strip()
+        return (LEGACY / f"{s['key']}.svg").read_text().strip()
 
     def v1(s, m):
         body = mark(32, 32, 44, WHITE) if s["key"] == "root" else letters(s["code"], WHITE, c1)

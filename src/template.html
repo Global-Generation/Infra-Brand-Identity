@@ -602,11 +602,11 @@ footer b{color:#fff;font-weight:700}
 <section class="blk" id="marks">
   <div class="wrap">
     <div class="lead">04 · Знаки сервисов и фавиконы</div>
-    <h2 class="stit">Одна плитка, цвет контура, своя иконка</h2>
-    <p class="sint">Знак сервиса = скруглённый квадрат (радиус 22%) цвета контура + белая иконка lucide, линия 2 px. Цвет говорит, чей это сервис, иконка - какой именно. Корень (экран входа, levauth-каталог) = navy-плитка со знаком GG. Файлы SVG скачиваются кнопкой.</p>
+    <h2 class="stit">Знак GG и метка сервиса</h2>
+    <p class="sint">Фавикон сервиса = белая плитка, знак GG графитом слева сверху и круглая метка справа снизу. <b>Цвет метки говорит, чей это сервис</b> (контур), белая иконка в ней - какой именно. Иконки свои, толстые и залитые, не lucide. Корень (вход, levauth-каталог) = только знак GG. Готовые SVG, PNG 180 и ICO лежат в <code>assets/favicons</code>, SVG скачивается кнопкой.</p>
     <div class="grid g4 cgrid" id="contours"></div>
     <div class="grid g3" id="svcgrid"></div>
-    <p class="minor">Инверсия: на тёмном плитка белая, иконка цвета контура.</p>
+    <p class="minor">На тёмном фоне плитка остаётся белой, отдельной инверсии нет.</p>
     <div class="invrow" id="invrow"></div>
     <p class="minor">Размеры 64 / 32 / 16 и вид во вкладке браузера (сервис идёт первым, потому что вкладки обрезаются справа):</p>
     <div class="favline">
@@ -830,8 +830,10 @@ footer b{color:#fff;font-weight:700}
   --warn:#f59e0b;    --warn-ink:#b45309;
   --danger:#ef4444;  --danger-hi:#dc2626; --danger-ink:#b91c1c;
   --advance:#0f766e; --wait:#075985;
-  <span class="c">/* контуры сервисов (цвет плитки-фавикона) */</span>
+  <span class="c">/* контуры сервисов в интерфейсе */</span>
   --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
+  <span class="c">/* метка фавикона по контуру */</span>
+  --fav-mentor:#F76B15; --fav-student:#2F9E62; --fav-ops:#3E63DD; --fav-core:#27272A;
   <span class="c">/* шрифт */</span>
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   <span class="c">/* радиусы */</span>
@@ -869,9 +871,10 @@ a{color:var(--sky-ink)}
           <li><svg class="i"><use href="#i-check"/></svg>Один акцент - голубой #009CDC; ссылки текстом #0077a8</li>
           <li><svg class="i"><use href="#i-check"/></svg>Montserrat самохостом, заголовки 700</li>
           <li><svg class="i"><use href="#i-check"/></svg>Логотип одним цветом; название сервиса полужирным через тонкую линию на всю высоту логотипа</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон: плитка с градиентом контура + белая иконка lucide</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон из assets/favicons: белая плитка, знак GG, метка цвета контура со своей иконкой</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Экран входа без значка над заголовком: ни замка, ни плашки</li>
           <li><svg class="i"><use href="#i-check"/></svg>Джи-джи всегда в своём визуале: маскот как есть, без плиток, градиентов и перекраски</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Иконки только lucide, линия 2 px, инлайн SVG</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Иконки интерфейса только lucide, линия 2 px, инлайн SVG</li>
           <li><svg class="i"><use href="#i-check"/></svg>«Ментор», «Джи-джи»; суммы с неразрывными пробелами</li>
           <li><svg class="i"><use href="#i-check"/></svg>Стаффу чётко и корпоративно, студенту тепло и поддерживающе</li>
         </ul>
@@ -912,6 +915,7 @@ a{color:var(--sky-ink)}
 <script>
 (function(){
   var ICONS = /*@ICONS_JSON@*/;
+  var FAVS = /*@FAVS_JSON@*/;
   var MAIN = '@MARK_MAIN@';
   var SEC = '@MARK_SEC@';
   var RIGHT_TOP = 'M29.7005 15.6575H34.1767C33.8466 14.143 33.1982 12.8721 32.231 11.8449C31.2638 10.818 30.1652 10.0869 28.9358 9.65181C28.506 9.49985 28.0626 9.37613 27.6074 9.27736V13.4786C27.7029 13.5275 27.7975 13.5781 27.8899 13.6331C28.7222 14.1279 29.3256 14.8027 29.7005 15.6575Z';
@@ -919,10 +923,10 @@ a{color:var(--sky-ink)}
   var ld = document.getElementById('ldRight'); if (ld) ld.setAttribute('d', RIGHT_TOP + ' ' + RIGHT_BOTTOM);
 
   var CONTOURS = {
-    mentor:  {name:'Менторский',  color:'#13445d', grad:['#2a7aa3', '#0d2f42'], note:'Стафф, который ведёт клиентов менторства'},
-    student: {name:'Студенческий', color:'#009CDC', grad:['#6fd0f5', '#0086c2'], note:'Всё, что видит и получает студент'},
-    ops:     {name:'Операционный', color:'#0077a8', grad:['#35a6d6', '#085a80'], note:'Юристы, бухгалтерия, отчёты, онбординг'},
-    core:    {name:'Ядро',         color:'#1e293b', grad:['#4b5b73', '#0f172a'], note:'Вход, стратегия и инфраструктура'}
+    mentor:  {name:'Менторский',  color:'#13445d', badge:'#F76B15', note:'Стафф, который ведёт клиентов менторства'},
+    student: {name:'Студенческий', color:'#009CDC', badge:'#2F9E62', note:'Всё, что видит и получает студент'},
+    ops:     {name:'Операционный', color:'#0077a8', badge:'#3E63DD', note:'Юристы, бухгалтерия, отчёты, онбординг'},
+    core:    {name:'Ядро',         color:'#1e293b', badge:'#27272A', note:'Вход, стратегия и инфраструктура'}
   };
   var SERVICES = [
     {key:'akb', name:'АКБ', icon:'users', contour:'mentor', dom:'hub.global-generations-edu.com', repo:'GG-Product-Mentorship-AKB', who:'Админы, продажи, менторы', desc:'CRM активной базы менторства: клиенты, оплаты, задачи, чеки и выплаты менторам. Канон всей системы.'},
@@ -939,33 +943,18 @@ a{color:var(--sky-ink)}
     {key:'llm', name:'LLM-расходы', icon:'coins', contour:'core', dom:'openrouter.global-generations-edu.com', repo:'Infra-OpenRouter-Costs', who:'Лёв', desc:'Траты на модели по направлениям и динамика месяца.'}
   ];
 
-  // Tiles are gradients, not flat fills (Лёв 28.09): light top-left to dark bottom-right.
-  function paint(bg){
-    if (!Array.isArray(bg)) return {defs: '', fill: bg};
-    return {defs: '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + bg[0] + '"/><stop offset="1" stop-color="' + bg[1] + '"/></linearGradient></defs>', fill: 'url(#g)'};
-  }
-  function tileSVG(icon, bg, fg){
-    var p = paint(bg);
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' + p.defs + '<rect width="64" height="64" rx="14" fill="' + p.fill + '"/>' +
-      '<g transform="translate(14 14) scale(1.5)" fill="none" stroke="' + fg + '" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">' + ICONS[icon] + '</g></svg>';
-  }
-  function rootSVG(bg, main, sec){
-    var p = paint(bg);
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39">' + p.defs + '<rect width="39" height="39" rx="8.6" fill="' + p.fill + '"/>' +
-      '<path d="' + SEC + '" fill="' + sec + '"/><path d="' + MAIN + '" fill="' + main + '"/></svg>';
-  }
+  // Favicons are the ready files from assets/favicons (Лёв 07.10): white tile, GG mark, contour-colored badge with an icon.
+  // Gradient tiles with lucide icons are gone for good.
   function uri(svg){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
-  function color(s){ return CONTOURS[s.contour].color; }
-  function grad(s){ return CONTOURS[s.contour].grad; }
-  function favSVG(s){ return tileSVG(s.icon, grad(s), '#ffffff'); }
+  function favSVG(s){ return FAVS[s.key] ? FAVS[s.key].svg : ''; }
+  function iconName(s){ return ((FAVS[s.key] || {}).icon || '').replace('gg/', ''); }
+  function favNote(s){ return 'метка ' + CONTOURS[s.contour].badge + ' · иконка ' + iconName(s); }
   // Джи-джи keeps its own mascot: never a tile, gradient or recolor (Лёв 28.09).
   var GIGI = '@GIGI_URI@';
   function favSrc(s){ return s.key === 'mayak' ? GIGI : uri(favSVG(s)); }
-  function invSrc(s){ return s.key === 'mayak' ? GIGI : uri(invSVG(s)); }
-  function invSVG(s){ return tileSVG(s.icon, '#ffffff', color(s)); }
-  // The mark is one color, like the logo it comes from.
-  var ROOT = rootSVG(['#1f6a90', '#0d2f42'], '#ffffff', '#ffffff');
-  var ROOT_INV = rootSVG('#ffffff', '#13445d', '#13445d');
+  function invSrc(s){ return favSrc(s); }
+  var ROOT = FAVS.root.svg;
+  var ROOT_INV = ROOT;
 
   function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function dom(d){ var i = d.indexOf('.'); if (d.indexOf('/') > -1 || i < 0) return esc(d); return esc(d.slice(0, i + 1)) + '<wbr><span class="nb">' + esc(d.slice(i + 1)) + '</span>'; }
@@ -986,7 +975,7 @@ a{color:var(--sky-ink)}
   Object.keys(CONTOURS).forEach(function(k){
     var c = CONTOURS[k];
     var list = SERVICES.filter(function(s){ return s.contour === k; }).map(function(s){ return s.name; }).join(', ');
-    var d = el('div', 'card contour', '<span class="sw" style="background:linear-gradient(135deg,' + c.grad[0] + ',' + c.grad[1] + ')"></span><div style="min-width:0"><h4>' + c.name + '</h4><div class="hx">' + c.color + '</div><p>' + esc(c.note) + '. ' + esc(list) + '.</p></div>');
+    var d = el('div', 'card contour', '<span class="sw" style="background:' + c.badge + '"></span><div style="min-width:0"><h4>' + c.name + '</h4><div class="hx">метка ' + c.badge + '</div><p>' + esc(c.note) + '. ' + esc(list) + '.</p></div>');
     cBox.appendChild(d);
   });
 
@@ -996,7 +985,7 @@ a{color:var(--sky-ink)}
   var rootMini = el('img'); rootMini.src = uri(ROOT); rootMini.alt = 'GG'; rootMini.title = 'Корень GG'; minis.appendChild(rootMini);
   SERVICES.forEach(function(s){
     var svg = favSVG(s), isGigi = s.key === 'mayak';
-    var card = el('div', 'card svc' + (isGigi ? ' gigi' : ''), '<img alt="" src="' + favSrc(s) + '"><div class="tx"><div class="n">' + esc(s.name) + '</div><div class="d">' + dom(s.dom) + '</div><div class="r">' + (isGigi ? 'свой визуал: маскот Джи-джи, не меняем' : 'lucide/' + s.icon) + '</div></div>');
+    var card = el('div', 'card svc' + (isGigi ? ' gigi' : ''), '<img alt="" src="' + favSrc(s) + '"><div class="tx"><div class="n">' + esc(s.name) + '</div><div class="d">' + dom(s.dom) + '</div><div class="r">' + (isGigi ? 'свой визуал: маскот Джи-джи, не меняем' : favNote(s)) + '</div></div>');
     var btn = el('button', 'dlb', '<svg class="i"><use href="#i-download"/></svg>SVG'); btn.type = 'button'; btn.title = 'Скачать фавикон ' + s.name;
     btn.addEventListener('click', function(){ download('gg-favicon-' + s.key + '.svg', svg, 'image/svg+xml'); });
     if (!isGigi) card.querySelector('.r').appendChild(btn);
@@ -1004,7 +993,7 @@ a{color:var(--sky-ink)}
     inv.appendChild(el('div', 'inv', '<img alt="" src="' + invSrc(s) + '"><span>' + esc(s.name) + '</span>'));
     var m = el('img'); m.src = favSrc(s); m.alt = s.name; m.title = s.name; minis.appendChild(m);
   });
-  var rootCard = el('div', 'card svc root', '<img alt="" src="' + uri(ROOT) + '"><div class="tx"><div class="n">Корень GG</div><div class="d">экран входа · каталог levauth · письма и счета</div><div class="r">Знак GG из логотипа, белым на navy-градиенте. Фавикон всего, что не относится к одному сервису.</div></div>');
+  var rootCard = el('div', 'card svc root', '<img alt="" src="' + uri(ROOT) + '"><div class="tx"><div class="n">Корень GG</div><div class="d">экран входа · каталог levauth · письма и счета</div><div class="r">Знак GG графитом на белой плитке, без метки. Фавикон всего, что не относится к одному сервису.</div></div>');
   var rb = el('button', 'dlb', '<svg class="i"><use href="#i-download"/></svg>SVG'); rb.type = 'button';
   rb.addEventListener('click', function(){ download('gg-favicon-root.svg', ROOT, 'image/svg+xml'); });
   rootCard.querySelector('.r').appendChild(rb); grid.insertBefore(rootCard, grid.firstChild);
@@ -1034,7 +1023,7 @@ a{color:var(--sky-ink)}
     q('f-contour').textContent = CONTOURS[s.contour].name + ' · ' + CONTOURS[s.contour].color;
     var src = favSrc(s);
     q('stage-fav').src = src;
-    q('stage-cap').textContent = s.key === 'mayak' ? 'маскот Джи-джи, как есть' : 'фавикон: lucide/' + s.icon;
+    q('stage-cap').textContent = s.key === 'mayak' ? 'маскот Джи-джи, как есть' : 'фавикон: ' + favNote(s);
     sizes.innerHTML = '';
     [64, 32, 16].forEach(function(px){
       var u = el('div', 'u', '<img alt="" width="' + px + '" height="' + px + '" style="border-radius:' + Math.round(px * 0.22) + 'px" src="' + src + '"><span>' + px + '</span>');
@@ -1044,7 +1033,7 @@ a{color:var(--sky-ink)}
     if (chip) chip.classList.add('on');
   }
   SERVICES.forEach(function(s, i){
-    var c = el('button', 'pchip', '<span class="dot" style="background:' + color(s) + '"></span>' + esc(s.name)); c.type = 'button';
+    var c = el('button', 'pchip', '<span class="dot" style="background:' + CONTOURS[s.contour].badge + '"></span>' + esc(s.name)); c.type = 'button';
     c.addEventListener('click', function(){ pick(s, c); });
     chips.appendChild(c);
     if (i === 0) pick(s, c);

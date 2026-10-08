@@ -1,31 +1,53 @@
 [
  {
+  "key": "root",
+  "name": "Global Generation (вход, каталог, письма)",
+  "favicon": "assets/favicons/root.svg",
+  "png180": "assets/favicons/png/root-180.png",
+  "ico": "assets/favicons/ico/root.ico",
+  "icon": null,
+  "contour": "core",
+  "badge": null
+ },
+ {
   "key": "akb",
   "name": "АКБ",
   "favicon": "assets/favicons/akb.svg",
-  "icon": "lucide/users",
-  "contour": "mentor"
+  "png180": "assets/favicons/png/akb-180.png",
+  "ico": "assets/favicons/ico/akb.ico",
+  "icon": "gg/people",
+  "contour": "mentor",
+  "badge": "#F76B15"
  },
  {
   "key": "pulse",
   "name": "Пульс",
   "favicon": "assets/favicons/pulse.svg",
-  "icon": "lucide/activity",
-  "contour": "mentor"
+  "png180": "assets/favicons/png/pulse-180.png",
+  "ico": "assets/favicons/ico/pulse.ico",
+  "icon": "gg/pulse",
+  "contour": "mentor",
+  "badge": "#F76B15"
  },
  {
   "key": "cabinet",
   "name": "Кабинет ментора",
   "favicon": "assets/favicons/cabinet.svg",
-  "icon": "lucide/briefcase-business",
-  "contour": "mentor"
+  "png180": "assets/favicons/png/cabinet-180.png",
+  "ico": "assets/favicons/ico/cabinet.ico",
+  "icon": "gg/briefcase",
+  "contour": "mentor",
+  "badge": "#F76B15"
  },
  {
   "key": "portal",
   "name": "Студенческий портал",
   "favicon": "assets/favicons/portal.svg",
-  "icon": "lucide/graduation-cap",
-  "contour": "student"
+  "png180": "assets/favicons/png/portal-180.png",
+  "ico": "assets/favicons/ico/portal.ico",
+  "icon": "gg/graduation-cap",
+  "contour": "student",
+  "badge": "#2F9E62"
  },
  {
   "key": "mayak",
@@ -37,49 +59,70 @@
   "key": "legal",
   "name": "Юротдел",
   "favicon": "assets/favicons/legal.svg",
-  "icon": "lucide/scale",
-  "contour": "ops"
+  "png180": "assets/favicons/png/legal-180.png",
+  "ico": "assets/favicons/ico/legal.ico",
+  "icon": "gg/scale",
+  "contour": "ops",
+  "badge": "#3E63DD"
  },
  {
   "key": "accounting",
   "name": "Бухгалтерия",
   "favicon": "assets/favicons/accounting.svg",
-  "icon": "lucide/calculator",
-  "contour": "ops"
+  "png180": "assets/favicons/png/accounting-180.png",
+  "ico": "assets/favicons/ico/accounting.ico",
+  "icon": "gg/calculator",
+  "contour": "ops",
+  "badge": "#3E63DD"
  },
  {
   "key": "reporter",
   "name": "Репортер",
   "favicon": "assets/favicons/reporter.svg",
-  "icon": "lucide/chart-column",
-  "contour": "ops"
+  "png180": "assets/favicons/png/reporter-180.png",
+  "ico": "assets/favicons/ico/reporter.ico",
+  "icon": "gg/bars",
+  "contour": "ops",
+  "badge": "#3E63DD"
  },
  {
   "key": "onboarding",
   "name": "Онбординг",
   "favicon": "assets/favicons/onboarding.svg",
-  "icon": "lucide/signpost",
-  "contour": "ops"
+  "png180": "assets/favicons/png/onboarding-180.png",
+  "ico": "assets/favicons/ico/onboarding.ico",
+  "icon": "gg/flag",
+  "contour": "ops",
+  "badge": "#3E63DD"
  },
  {
   "key": "levauth",
   "name": "Сервисы",
   "favicon": "assets/favicons/levauth.svg",
-  "icon": "lucide/key-round",
-  "contour": "core"
+  "png180": "assets/favicons/png/levauth-180.png",
+  "ico": "assets/favicons/ico/levauth.ico",
+  "icon": "gg/key",
+  "contour": "core",
+  "badge": "#27272A"
  },
  {
   "key": "strategy",
   "name": "Стратегия",
   "favicon": "assets/favicons/strategy.svg",
-  "icon": "lucide/compass",
-  "contour": "core"
+  "png180": "assets/favicons/png/strategy-180.png",
+  "ico": "assets/favicons/ico/strategy.ico",
+  "icon": "gg/compass",
+  "contour": "core",
+  "badge": "#27272A"
  },
  {
   "key": "llm",
   "name": "LLM-расходы",
   "favicon": "assets/favicons/llm.svg",
-  "icon": "lucide/coins",
-  "contour": "core"
+  "png180": "assets/favicons/png/llm-180.png",
+  "ico": "assets/favicons/ico/llm.ico",
+  "icon": "gg/coins",
+  "contour": "core",
+  "badge": "#27272A"
  }
 ]
