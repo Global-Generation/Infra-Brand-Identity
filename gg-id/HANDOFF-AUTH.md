@@ -25,7 +25,8 @@
 | `gg-id/gg-id.css` | токены (светлая и тёмная), раскладки `split` / `card` / `minimal`, все компоненты | да, источник |
 | `gg-id/gg-id.js` | поведение: глаз пароля, только рабочая почта, правила пароля, ячейки кода, отсчёт, подписи Face ID / Touch ID / Windows Hello, `GGID.busy/error/shake` | да, источник |
 | `gg-id/fonts/montserrat-{cyrillic,latin}.woff2` | переменный Montserrat 400-700 | нет, генерируется из `src/fonts.css` |
-| `gg-id/sprite.svg` | все символы: логотип `gid-logo`, плитка фавикона `gid-tile`, иконки `gi-*` | нет, генерируется |
+| `gg-id/sprite.svg` | все символы: логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя), иконки `gi-*` | нет, генерируется |
+| `gg-id/gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 (README, «Поведение в сервисе») | да, источник |
 | `gg-id/screens/*.html` | 17 эталонных страниц, открываются как есть | нет, генерируются |
 | `gg-id/README.md` | справочник кита: каркас, атрибуты, таблица экранов → API | да (таблица между маркерами генерируется) |
 | `gg-id/HANDOFF-AUTH.md` | этот файл | да |
@@ -116,7 +117,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 <meta name="theme-color" content="#13445d" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#081b26" media="(prefers-color-scheme: dark)">
 <title>Вход · GG ID</title>
-<link rel="icon" ...>                         <!-- фавикон корня GG как сейчас (root.svg) -->
+<link rel="icon" href="/assets/favicons/gg-id.svg" type="image/svg+xml">   <!-- иконка GG ID: ключ на светлом градиенте (тот же, что levauth.svg) -->
 <link rel="stylesheet" href="/assets/gg-id/gg-id.css">
 </head>
 <body class="gid-body">
@@ -142,7 +143,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 </html>
 ```
 
-- Иконки: `<svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-eye"/></svg>`. Внешний спрайт работает только с того же origin, на levauth это так. Плитку фавикона `gid-tile` (в ней градиент) надёжнее вставлять инлайн.
+- Иконки: `<svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-eye"/></svg>`. Внешний спрайт работает только с того же origin, на levauth это так. Иконку GG ID (`gid-id-icon`, в ней градиент) в сервисах надёжнее вставлять инлайн: готовый SVG в README кита, раздел «Иконка GG ID».
 - Разметку каждого вида брать из `gg-id/screens/<экран>.html` (внутри `<section class="gid-card">`), убрать `data-go` (это демо-переходы) и `href="<экран>.html"`.
 - `gg-id.js` сам вызывает `GGID.init(document)` на загрузке. Если вид появляется позже или в нём меняется разметка, вызвать `GGID.init(узел)` ещё раз (повторно уже обработанные элементы не трогаются).
 - Показ видов: атрибут `hidden` (кит его не переопределяет). Скрытые виды не фокусируются.
@@ -373,8 +374,8 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 
 Правило для всех сервисов GG: своей формы пароля и PIN нет. На экране сервиса одна кнопка, в шапке аккаунт, на 401 окно. Разметка целиком в витрине (раздел «Компоненты для сервисов») и в `gg-id/README.md`.
 
-1. **Кнопка «Войти через GG ID»** (`.gid-sso`): ведёт на `https://levauth.global-generations-edu.com/api/auth/authorize?...` (параметры по твоему SSO-контракту). Варианты: обычная navy, `--light` (на белом), `--on-dark` (на navy), `--sm` (в шапке), `--block` (во всю ширину). Значок = плитка фавикона корня GG (`gid-tile`, инлайн SVG, у сервиса свой origin, поэтому внешний спрайт хаба не подойдёт).
-2. **Аккаунт в шапке** (`.gid-chip` + `.gid-menu`): инициалы на navy-градиенте (без фото), имя; в меню имя и почта, «Мои сервисы» → `https://levauth.global-generations-edu.com/cabinet/`, «Аккаунт GG ID» (Face ID и пароль) → страница хаба для ключей (если её нет, пока убрать пункт), «Выйти» → выход сервиса + отзыв сессии (`/api/v1/sessions/revoke` по контракту), затем экран `signedout`.
+1. **Кнопка «Войти через GG ID»** (`.gid-sso`): ведёт на `https://levauth.global-generations-edu.com/api/auth/authorize?...` (параметры по твоему SSO-контракту). Варианты: обычная navy, `--light` (на белом), `--on-dark` (на navy), `--sm` (в шапке), `--block` (во всю ширину). Значок = иконка GG ID: белый ключ на светлом градиенте `--grad-tile` (`gid-id-icon`, инлайн SVG из README кита: у сервиса свой origin, поэтому внешний спрайт хаба не подойдёт). Тёмную плитку корня GG не ставить (правило 4a).
+2. **Аккаунт в шапке** (`.gid-acct` = `.gid-chip` + `.gid-menu`, поведение в `gg-id-service.js`): инициалы на navy-градиенте (без фото), имя; в меню имя и почта, «Мои сервисы» → `https://levauth.global-generations-edu.com/cabinet/`, «Аккаунт GG ID» (Face ID и пароль) → страница хаба для ключей (если её нет, пока убрать пункт), «Выйти» → выход сервиса + отзыв сессии (`/api/v1/sessions/revoke` по контракту), затем экран `signedout`.
 3. **Сессия истекла** (`.gid-scrim` + `.gid-dialog`): на 401 от API сервиса вместо внезапного выброса на логин. Текст «Войдите снова, и мы вернём вас на эту же страницу.», кнопка GG ID с возвратом на текущий URL. Esc и клик по фону закрывают.
 
 Подключение в сервисе: обёртка с классом `gid-kit` (даёт токены, тема по системе или `data-theme`), `gg-id.css` копией в статику сервиса (или только нужные блоки), Montserrat у сервисов GG и так самохостом из бренд-репо.

@@ -4,6 +4,9 @@ the e-mail card gg-id/email-card.html and the showcase gg-id.html.
 Fails on horizontal scroll, elements sticking out of the screen, missing Montserrat, console errors, dashes in text;
 for the card also on text outside the card padding, wrong proportions, more than one accent, proportional digits;
 for the e-mail card on low contrast in light, dark (Apple Mail) and inverted (Gmail on iPhone) modes.
+Layout everywhere (screens and every component of the showcase at 1440, 1024 and 390, both themes): every element inside
+its component card, no cut content, no overlapping siblings, avatars with white centred initials, one-line button labels.
+gg-id-service.js: account menu (mouse, keyboard, Esc, click outside), «Сессия истекла» (401, focus trap, Esc, backdrop).
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).
 """
@@ -151,8 +154,107 @@ def email_page(values):
     return re.sub(r'\{\{([a-z_]+)\}\}', lambda m: html.escape(values[m.group(1)], quote=True), src)
 
 
+# Layout of every component: each element inside its component card (unless an ancestor clips or scrolls it on purpose),
+# no content cut by overflow:hidden, no overlapping in-flow siblings, avatars with white centred initials, one-line buttons.
+LAYOUT = r'''async (sel) => {
+  await document.fonts.ready;
+  const name = e => {
+    const c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : '';
+    return e.tagName.toLowerCase() + (c ? '.' + c : '');
+  };
+  const txt = e => '"' + (e.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 22) + '"';
+  const clips = e => { const s = getComputedStyle(e); return s.overflowX !== 'visible' || s.overflowY !== 'visible'; };
+  const scrolls = e => { const s = getComputedStyle(e); return /auto|scroll/.test(s.overflowX + s.overflowY); };
+  // намеренная обрезка: рамки витрины, бегущие строки и пятна фона (корень .gid), аватар, полоса прогресса
+  // .gid-chip прячет имя и стрелку на скрытой второй строке, когда остаются только инициалы
+  const CROPS = '.sc-viewport,.sc-phone,.sc-thumb-frame,.sc-mini,.sc-url,.gid,.gid-aside,.gid-mq,.gid-mq-row,.gid-avatar,.sc-browser,.gid-progress,.gid-chip';
+  const moving = e => e.getAnimations && e.getAnimations().some(a => a.playState === 'running' && a.effect && a.effect.getComputedTiming().iterations === 1);
+  const out = {outside: [], cut: [], overlap: [], avatars: [], wrapped: []};
+  const seen = new Set();
+  const add = (k, v) => { if (!seen.has(k + v)) { seen.add(k + v); out[k].push(v); } };
+  const boxes = [...document.querySelectorAll(sel)].filter(b => b.getClientRects().length);
+  boxes.forEach(box => {
+    const B = box.getBoundingClientRect();
+    if (!B.width || !B.height) return;
+    const boxScrolls = scrolls(box);   // лента вкладок и т.п.: содержимое листается, это не вылезание
+    [box, ...box.querySelectorAll('*')].forEach(e => {
+      if (e.closest('svg') && e.tagName.toLowerCase() !== 'svg') return;
+      const st = getComputedStyle(e);
+      if (st.visibility === 'hidden' || !e.getClientRects().length) return;
+      // content cut by overflow:hidden (not a scroll box, not an ellipsis, not an intentional crop)
+      const sx = st.overflowX;
+      if ((sx === 'hidden' || sx === 'clip') && e.scrollWidth > e.clientWidth + 1 && st.textOverflow !== 'ellipsis' && !e.matches(CROPS))
+        add('cut', name(e) + ' ' + txt(e) + ' ' + (e.scrollWidth - e.clientWidth) + 'px');
+      if (e === box || boxScrolls || moving(e)) return;   // разовая анимация (встряска поля, появление) в процессе
+      const r = e.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      let p = e.parentElement, skip = false;
+      while (p && p !== box) { if (clips(p) || scrolls(p)) { skip = true; break; } p = p.parentElement; }
+      if (skip) return;
+      const inline = st.display === 'inline';
+      const d = Math.max(B.left - r.left, r.right - B.right, inline ? 0 : B.top - r.top, inline ? 0 : r.bottom - B.bottom);
+      if (d > 0.75) add('outside', name(box) + ' > ' + name(e) + ' ' + txt(e) + ' ' + Math.round(d) + 'px');
+    });
+    [box, ...box.querySelectorAll('*')].forEach(parent => {
+      const tag = parent.tagName.toLowerCase();
+      if (tag === 'svg' || parent.closest('svg') || parent.closest('[aria-hidden="true"]')) return;
+      const kids = [...parent.children].filter(k => {
+        const t = k.tagName.toLowerCase();
+        if (t === 'template' || t === 'script' || t === 'style') return false;
+        const s = getComputedStyle(k);
+        if (/absolute|fixed/.test(s.position) || /none|inline|contents/.test(s.display) && s.display !== 'inline-block' && s.display !== 'inline-flex' && s.display !== 'inline-grid' || s.visibility === 'hidden') return false;
+        const r = k.getBoundingClientRect(); return r.width > 0 && r.height > 0;
+      });
+      for (let i = 0; i < kids.length; i++) for (let j = i + 1; j < kids.length; j++) {
+        const a = kids[i].getBoundingClientRect(), b = kids[j].getBoundingClientRect();
+        const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left), oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (ox > 1 && oy > 1) add('overlap', name(parent) + ': ' + name(kids[i]) + ' x ' + name(kids[j]) + ' ' + Math.round(ox) + 'x' + Math.round(oy));
+      }
+    });
+  });
+  document.querySelectorAll('.gid-avatar').forEach(a => {
+    if (!a.getClientRects().length) return;
+    const s = getComputedStyle(a), r = a.getBoundingClientRect();
+    if (!r.width) return;
+    const t = [...a.childNodes].find(n => n.nodeType === 3 && n.nodeValue.trim());
+    let dx = 0, dy = 0;
+    if (t) { const rg = document.createRange(); rg.selectNodeContents(t); const q = rg.getBoundingClientRect();
+      dx = (q.left + q.right) / 2 - (r.left + r.right) / 2; dy = (q.top + q.bottom) / 2 - (r.top + r.bottom) / 2; }
+    if (!/grid/.test(s.display) || s.color !== 'rgb(255, 255, 255)' || Math.abs(dx) > 1.5 || Math.abs(dy) > 2 || parseFloat(s.fontSize) < 10.5)
+      add('avatars', name(a.parentElement) + ' > avatar ' + txt(a) + ': display ' + s.display + ', color ' + s.color + ', font ' + s.fontSize + ', off ' + dx.toFixed(1) + ',' + dy.toFixed(1));
+  });
+  document.querySelectorAll('.gid-sso, .gid-btn').forEach(b => {
+    if (!b.getClientRects().length) return;
+    const tops = [];
+    const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+      if (!n.nodeValue.trim()) continue;
+      const rg = document.createRange(); rg.selectNodeContents(n);
+      [...rg.getClientRects()].forEach(q => { if (q.width > 1) tops.push(q.top); });
+    }
+    if (tops.length && Math.max(...tops) - Math.min(...tops) > 0.6 * parseFloat(getComputedStyle(b).fontSize))
+      add('wrapped', name(b) + ' ' + txt(b));
+  });
+  return out;
+}'''
+SCREEN_BOXES = '.gid-card, .gid-btn, .gid-account, .gid-who, .gid-msg, .gid-idcard, .gid-code'
+SHOWCASE_BOXES = ('.sc-top, .sc-hero, .sc-bar, .sc-seg, .sc-sel, .sc-tabs, .sc-browser, .sc-phone, .sc-thumb-frame, .sc-cap, '
+                  '#stage .gid-card, .sc-card, .sc-demo, .sc-hdr, .gid-acct, .gid-menu, .gid-dialog, .gid-sso, .sc-idc-cell, '
+                  '.sc-row-demo, .gid-idrow, .gid-idcard, .sc-where > div, .sc-mail-frame, .sc-mail-notes, .sc-rules, .sc-files, '
+                  '.sc-api, .sc-foot')
+
+
+def layout_issues(label, r):
+    found = []
+    for k, what in (('outside', 'sticks out of its card'), ('cut', 'content cut by overflow'), ('overlap', 'overlapping siblings'),
+                    ('avatars', 'avatar initials not white and centred'), ('wrapped', 'button label on two lines')):
+        if r[k]:
+            found.append(f'{label}: {what} {r[k][:4]}')
+    return found
+
+
 problems = []
-counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0}
+counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0}
 with sync_playwright() as p:
     b = p.chromium.launch()
     for vw, vh, tag in [(1440, 900, 'desktop'), (390, 844, 'phone')]:
@@ -171,6 +273,7 @@ with sync_playwright() as p:
                     pg.wait_for_timeout(250)
                     r = pg.evaluate(PROBE)
                     counts['screens'] += 1
+                    problems.extend(layout_issues(f'{tag}/{theme}/{layout}/{key}', pg.evaluate(LAYOUT, SCREEN_BOXES)))
                     label = f'{tag}/{theme}/{layout}/{key}'
                     if r['scrollW'] > r['clientW']:
                         problems.append(f'{label}: horizontal scroll {r["scrollW"]} > {r["clientW"]}')
@@ -282,6 +385,154 @@ with sync_playwright() as p:
                     pg.locator('.gidm-card').screenshot(path=os.path.join(OUT, f'email-{tag}-{mode}-card.png'))
                 ctx.close()
 
+    # showcase layout: every component card at 1440, 1024 (the narrowest three-column view) and 390, both themes
+    for vw, tag in ((1440, 'desktop'), (1024, 'narrow'), (390, 'phone')):
+        for scheme in ('light', 'dark'):
+            ctx = b.new_context(viewport={'width': vw, 'height': 900}, device_scale_factor=1, color_scheme=scheme)
+            pg = ctx.new_page()
+            errs = []
+            pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type in ('error', 'warning') else None)
+            pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}'))
+            for h in ('s=login&l=split&t=light&d=desktop', 's=card&l=card&t=dark&d=phone', 's=password&l=minimal&t=dark&d=all'):
+                pg.goto('file://' + os.path.join(ROOT, 'gg-id.html') + '#' + h)
+                pg.reload()
+                pg.wait_for_timeout(600)
+                counts['layout'] += 1
+                problems.extend(layout_issues(f'layout/{tag}/{scheme}/{h}', pg.evaluate(LAYOUT, SHOWCASE_BOXES)))
+                sw = pg.evaluate('[document.documentElement.scrollWidth, document.documentElement.clientWidth]')
+                if sw[0] > sw[1]:
+                    problems.append(f'layout/{tag}/{scheme}/{h}: horizontal scroll {sw}')
+            if vw != 1440 or scheme == 'light':
+                pg.locator('.sc-comp').screenshot(path=os.path.join(OUT, f'components-{vw}-{scheme}.png'))
+            if errs:
+                problems.append(f'layout/{tag}/{scheme}: console {errs[:3]}')
+            ctx.close()
+
+    # gg-id-service.js on the showcase served from a test origin: menu, keyboard, click outside, 401, focus trap, Esc, backdrop
+    ORIGIN = 'https://gg-id.test'
+
+    def serve(route):
+        path = route.request.url[len(ORIGIN):].split('?')[0].split('#')[0]
+        if path.startswith('/api/'):
+            status = 200 if path.startswith('/api/ok') else 401
+            return route.fulfill(status=status, content_type='application/json', body='{}')
+        local = os.path.join(ROOT, path.lstrip('/'))
+        if os.path.isfile(local):
+            return route.fulfill(path=local)
+        return route.fulfill(status=404, body='')
+
+    ctx = b.new_context(viewport={'width': 1440, 'height': 900})
+    pg = ctx.new_page()
+    errs = []
+    pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type == 'error' and '401' not in m.text else None)
+    pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}'))
+    pg.route(ORIGIN + '/**', serve)
+    pg.goto(ORIGIN + '/gg-id.html#s=login&l=split&t=light&d=desktop')
+    pg.wait_for_timeout(600)
+    T = []                                                   # (name, ok)
+
+    def state():
+        return pg.evaluate('''() => { const c = document.querySelector('[aria-controls="scAcctMenu"]'), m = document.getElementById('scAcctMenu'),
+            a = document.activeElement, items = [...m.querySelectorAll('[role="menuitem"]')];
+            return {open: !m.hidden, expanded: c.getAttribute('aria-expanded'), focus: a === c ? 'chip' : items.indexOf(a)}; }''')
+
+    def expect(name, want):
+        got = state()
+        T.append((name, all(got[k] == v for k, v in want.items()), got))
+
+    expect('menu starts open in the showcase', {'open': True, 'expanded': 'true'})
+    pg.click('[aria-controls="scAcctMenu"]')
+    expect('click on the chip closes, focus stays on the chip', {'open': False, 'expanded': 'false', 'focus': 'chip'})
+    pg.click('[aria-controls="scAcctMenu"]')
+    expect('click opens, focus stays on the chip (mouse)', {'open': True, 'expanded': 'true', 'focus': 'chip'})
+    pg.keyboard.press('ArrowDown')
+    expect('ArrowDown moves to the first item', {'focus': 0})
+    pg.keyboard.press('ArrowDown')
+    expect('ArrowDown moves to the next item', {'focus': 1})
+    pg.keyboard.press('End')
+    expect('End moves to the last item', {'focus': 2})
+    pg.keyboard.press('ArrowDown')
+    expect('ArrowDown wraps to the first item', {'focus': 0})
+    pg.keyboard.press('ArrowUp')
+    expect('ArrowUp wraps to the last item', {'focus': 2})
+    pg.keyboard.press('Home')
+    expect('Home moves to the first item', {'focus': 0})
+    pg.keyboard.press('Escape')
+    expect('Esc closes and returns focus to the chip', {'open': False, 'focus': 'chip'})
+    pg.keyboard.press('ArrowDown')
+    expect('ArrowDown on the closed chip opens on the first item', {'open': True, 'focus': 0})
+    pg.keyboard.press('Tab')
+    expect('Tab closes the menu', {'open': False})
+    pg.focus('[aria-controls="scAcctMenu"]')
+    pg.keyboard.press('Enter')
+    expect('Enter on the chip opens with focus on the first item', {'open': True, 'focus': 0})
+    pg.mouse.click(5, 5)
+    expect('click outside closes', {'open': False})
+    pg.click('[aria-controls="scAcctMenu"]')
+    pg.evaluate('document.activeElement.blur()')
+    pg.keyboard.press('Escape')
+    expect('Esc closes even when focus fell to body (Safari, Firefox)', {'open': False})
+    # the standard pattern: menu inside .gid-acct, hidden at start, absolute under the chip
+    pg.evaluate('''() => { const d = document.createElement('div');
+      d.innerHTML = '<div class="gid-acct gid-kit" data-theme="light" id="tAcct" style="position:fixed;top:200px;right:40px">'
+        + '<button class="gid-chip" type="button"><span class="gid-avatar gid-avatar--xs">ИО</span><span class="gid-chip-name">Иван</span></button>'
+        + '<div class="gid-menu" hidden><a class="gid-menu-item" href="#a">А</a><button class="gid-menu-item" type="button">Б</button></div></div>';
+      document.body.appendChild(d.firstChild); GGIDService.init(document.getElementById('tAcct')); }''')
+    pg.click('#tAcct .gid-chip')
+    acct = pg.evaluate('''() => { const a = document.getElementById('tAcct'), c = a.querySelector('.gid-chip'), m = a.querySelector('.gid-menu');
+      const cr = c.getBoundingClientRect(), mr = m.getBoundingClientRect();
+      return {open: !m.hidden, roles: m.getAttribute('role') + ',' + [...m.querySelectorAll('.gid-menu-item')].map(i => i.getAttribute('role')).join(','),
+              below: mr.top >= cr.bottom, right: Math.abs(mr.right - cr.right) < 1.5, other: !document.getElementById('scAcctMenu').hidden}; }''')
+    T.append(('.gid-acct: menu under the chip at the right edge, roles set, one menu open at a time',
+              acct['open'] and acct['below'] and acct['right'] and acct['roles'] == 'menu,menuitem,menuitem' and not acct['other'], acct))
+    pg.click('#tAcct .gid-menu-item >> nth=1')
+    T.append(('choosing an item closes the menu', pg.evaluate('document.querySelector("#tAcct .gid-menu").hidden'), None))
+
+    def dlg():
+        return pg.evaluate('''() => { const d = document.getElementById('gid-expired'), a = document.activeElement;
+            return {open: !d.hidden, inside: d.contains(a), focus: a ? (a.id || a.className || a.tagName) : '',
+                    href: d.querySelector('.gid-sso').getAttribute('href')}; }''')
+
+    pg.focus('#openDlg')
+    pg.evaluate("fetch('/api/public/ping').then(() => 1)")
+    pg.wait_for_timeout(150)
+    T.append(('401 from a path in data-gid-401-ignore does not open the window', not dlg()['open'], dlg()))
+    pg.evaluate("fetch('/api/ok').then(() => 1)")
+    pg.wait_for_timeout(150)
+    T.append(('200 does not open the window', not dlg()['open'], dlg()))
+    pg.evaluate("fetch('/api/data').then(() => 1)")
+    pg.wait_for_timeout(200)
+    d = dlg()
+    T.append(('401 from the own origin opens the window with focus on the sign-in button', d['open'] and d['inside'] and 'gid-sso' in d['focus'], d))
+    T.append(('data-gid-return adds next=<this page> to the sign-in link', 'client_id=demo&next=%2Fgg-id.html' in d['href'], d['href']))
+    pg.keyboard.press('Tab')
+    T.append(('Tab stays inside the window', dlg()['inside'], dlg()))
+    pg.keyboard.press('Shift+Tab')
+    T.append(('Shift+Tab stays inside the window', dlg()['inside'], dlg()))
+    pg.evaluate("document.getElementById('openDlg').focus()")
+    T.append(('focus cannot go under the window', dlg()['inside'], dlg()))
+    pg.keyboard.press('Escape')
+    d = dlg()
+    T.append(('Esc closes and returns focus where it was', not d['open'] and d['focus'] == 'openDlg', d))
+    pg.click('#openDlg')
+    pg.wait_for_timeout(100)
+    T.append(('the showcase button opens the window', dlg()['open'], dlg()))
+    pg.click('#gid-expired .gid-h')
+    T.append(('click inside the window keeps it open', dlg()['open'], dlg()))
+    pg.mouse.click(8, 450)
+    T.append(('click on the backdrop closes', not dlg()['open'], dlg()))
+    pg.evaluate("document.dispatchEvent(new CustomEvent('gid:session-expired'))")
+    T.append(('event gid:session-expired opens the window', dlg()['open'], dlg()))
+    pg.evaluate('GGIDService.closeSessionExpired()')
+    T.append(('GGIDService.closeSessionExpired() closes', not dlg()['open'], dlg()))
+    for name_, ok, got in T:
+        counts['service'] += 1
+        if not ok:
+            problems.append(f'gg-id-service.js: {name_} ({got})')
+    if errs:
+        problems.append(f'gg-id-service.js: console {errs[:3]}')
+    ctx.close()
+
     # showcase: page width, all modes render, console clean
     for vw, vh, tag in [(1440, 900, 'desktop'), (390, 844, 'phone')]:
         ctx = b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=2 if vw < 500 else 1)
@@ -354,7 +605,8 @@ with sync_playwright() as p:
         ctx.close()
     b.close()
 
-summary = (f'{counts["screens"]} screen renders, {counts["card"]} card renders, {counts["email"]} e-mail renders, '
+summary = (f'{counts["screens"]} screen renders, {counts["layout"]} showcase layout states, {counts["service"]} gg-id-service.js tests, '
+           f'{counts["card"]} card renders, {counts["email"]} e-mail renders, '
            f'{counts["showcase"]} showcase states')
 if problems:
     print('GG ID CHECK FAILED', '|', summary)

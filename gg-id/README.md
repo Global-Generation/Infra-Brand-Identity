@@ -12,13 +12,15 @@
 | `gg-id.css` | токены (светлая и тёмная тема), раскладки `split`, `card`, `minimal`, все компоненты |
 | `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи Face ID / Touch ID / Windows Hello |
 | `fonts/` | Montserrat (переменный, 400-700), кириллица и латиница, самохостом |
-| `sprite.svg` | логотип `gid-logo`, плитка фавикона `gid-tile` и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
+| `gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 своего origin (раздел «Поведение в сервисе») |
+| `sprite.svg` | логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя) и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
+| `gg-id-icon.svg` | иконка GG ID отдельным файлом (копия `assets/favicons/gg-id.svg`) |
 | `screens/` | 18 эталонных страниц (17 экранов входа и карточка GG ID), генерируются, руками не править |
 | `email-card.html` | карточка GG ID для писем: таблицы, встроенные стили, подстановки `{{...}}` |
 | `email/gg-id-lockup-2x.png` | подпись «логотип \| ID» для письма (белая на navy-плашке), генерируется `src/rasterize_gg_id_email.py` |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
 
-Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg` и `email/` к себе (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинку из `email/` письма берут по https: `https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png`.
+Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинку из `email/` письма берут по https: `https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png`.
 
 ## Каркас страницы
 
@@ -100,22 +102,97 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 Сервис не рисует свою форму пароля и PIN. Обёртка `class="gid-kit"` даёт токены (тема по системе или `data-theme`).
 
+### Иконка GG ID
+
+Иконка GG ID = белый ключ на светлом градиенте `#8FBADD → #4B8FD6` (токен `--grad-tile`), файл `assets/favicons/gg-id.svg` (тот же ключ, что `levauth.svg` хаба). Она стоит в кнопке «Войти через GG ID», в окне «Сессия истекла» и в фавиконе всех экранов GG ID, витрины и презентаций GG ID (`assets/favicons/gg-id.svg`, `png/gg-id-*.png`, `ico/gg-id.ico`). Тёмную плитку корня GG (`root.svg`) в кнопках и окнах не ставим: правило 4a, тёмные градиентные плитки в интерфейсе запрещены. Символ спрайта `gid-id-icon`; старое имя `gid-tile` теперь показывает ту же иконку, старая разметка менять картинку не обязана.
+
+<!-- idicon:start -->
+```html
+<!-- кнопка в сервисе (свой origin): иконка инлайном, спрайт хаба не нужен -->
+<a class="gid-sso" href="https://levauth.global-generations-edu.com/api/auth/authorize?..."><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><radialGradient id="gid-id-icon-inline-g" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse"><stop stop-color="#8FBADD"/><stop offset="1" stop-color="#4B8FD6"/></radialGradient></defs><rect width="64" height="64" rx="14.8" fill="url(#gid-id-icon-inline-g)"/><g transform="translate(10.00 10.00) scale(0.6875)"><path d="M6 23A17 17 0 1 0 40 23A17 17 0 1 0 6 23ZM14.5 23A8.5 8.5 0 1 0 31.5 23A8.5 8.5 0 1 0 14.5 23Z" fill="#ffffff" fill-rule="evenodd"/><path d="M33 33L55 55M44 44L38.5 49.5M51 51L45.5 56.5" fill="none" stroke="#ffffff" stroke-width="7.5" stroke-linecap="round"/><circle cx="23" cy="23" r="4.5" fill="rgba(255,255,255,0.7)"/></g></svg><span>Войти через GG&nbsp;ID</span></a>
+
+<!-- на хабе (тот же origin): символ спрайта -->
+<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gid-id-icon"/></svg>
+```
+<!-- idicon:end -->
+
+### Разметка
+
 ```html
 <!-- единственная кнопка входа на экране сервиса: ведёт на /api/auth/authorize хаба (параметры по SSO-контракту хаба, как у sso-gate) -->
 <a class="gid-sso" href="https://levauth.global-generations-edu.com/api/auth/authorize?...">
-  <svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span>
+  <svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span>
 </a>
 <!-- варианты: gid-sso--light (на белом), gid-sso--on-dark (на navy), gid-sso--sm (в шапке), gid-sso--block (во всю ширину) -->
 
-<!-- аккаунт в шапке -->
-<button class="gid-chip" aria-expanded="false" aria-haspopup="menu"><span class="gid-avatar gid-avatar--xs">ЛА</span><span>Лёв</span><svg class="gid-ic"><use href="#gi-chevron-down"/></svg></button>
-<div class="gid-menu" role="menu">  <!-- gid-menu-head, gid-menu-item, gid-menu-sep, gid-menu-meta -->
+<!-- аккаунт в шапке: чип и выпадающее меню в одной обёртке .gid-acct -->
+<div class="gid-acct gid-kit" data-theme="light">
+  <button class="gid-chip" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="gid-acct-menu">
+    <span class="gid-avatar gid-avatar--xs" aria-hidden="true">ИО</span><span class="gid-chip-name">Иван</span>
+    <svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-down"/></svg>
+  </button>
+  <div class="gid-menu" id="gid-acct-menu" role="menu" aria-label="Аккаунт" hidden>
+    <div class="gid-menu-head"><span class="gid-avatar" aria-hidden="true">ИО</span>
+      <div class="gid-menu-head-tx"><b>Иван Образцов</b><span>ivan.obraztsov@global-generations.com</span></div></div>
+    <a class="gid-menu-item" role="menuitem" href="https://levauth.global-generations-edu.com/cabinet/"><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg>Мои сервисы</a>
+    <div class="gid-menu-sep"></div>
+    <button class="gid-menu-item" role="menuitem" type="button"><svg class="gid-ic" aria-hidden="true"><use href="#gi-log-out"/></svg>Выйти</button>
+  </div>
+</div>
 
 <!-- сессия истекла (сервис получил 401): окно поверх страницы, не выброс на логин -->
-<div class="gid-scrim gid-kit"><div class="gid-dialog" role="dialog" aria-modal="true">...</div></div>
+<div class="gid-scrim gid-kit" data-theme="light" id="gid-expired" hidden>
+  <div class="gid-dialog" aria-labelledby="gid-expired-h">
+    <h2 class="gid-h" id="gid-expired-h">Сессия истекла</h2>
+    <p class="gid-sub">Войдите снова, и мы вернём вас на эту же страницу.</p>
+    <a class="gid-sso gid-sso--block" href="/auth/gg-id/login" data-gid-return="next"><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
+  </div>
+</div>
+<script src="/static/gg-id/gg-id-service.js" defer></script>
 ```
 
-Разметку целиком брать из витрины (раздел «Компоненты для сервисов»). Значок кнопки = фавикон сайта как есть (`assets/favicons/root.svg`), символ `gid-tile` в спрайте.
+- Чип ужимается вместе с шапкой: сначала уходит стрелка, потом имя (`.gid-chip-name`) обрезается многоточием, а когда на него остаётся меньше 2,4 em, в чипе остаются только инициалы (круг 40 px). В шапке логотип с подписью `flex: none`, обёртке аккаунта ничего ставить не надо: у `.gid-acct` и `.gid-chip` уже `min-width`, `max-width: 100%`.
+- Меню выпадает под чипом у правого края (`.gid-acct > .gid-menu`); если шапка переносится и аккаунт стоит слева, `.gid-acct--start`.
+- Аватар не зависит от контейнера: текст в шапке меню только через `.gid-menu-head-tx` (правило вида `.контейнер span` больше не перекрашивает инициалы). Длинные имя и почта в шапке меню переносятся.
+- Цвета кнопок и пунктов меню под курсором заданы явно: `a:hover` страницы сервиса их не перекрашивает.
+
+Разметку целиком брать из витрины (раздел «Компоненты для сервисов»).
+
+## Поведение в сервисе: `gg-id-service.js`
+
+Один файл на все сервисы вместо своих копий. Без зависимостей и без сетевых вызовов. Подключение: `<script src="/static/gg-id/gg-id-service.js" defer></script>`. Сам находит разметку выше и оживляет её.
+
+| Что | Как |
+|---|---|
+| Меню аккаунта | клик по чипу открывает и закрывает; Enter или пробел на чипе открывают с фокусом на первом пункте; ↓ и ↑ на закрытом чипе открывают; в меню ↓ ↑ Home End ходят по пунктам, Esc закрывает и возвращает фокус на чип, Tab закрывает и уводит фокус дальше, клик вне меню закрывает, выбор пункта закрывает. Открыто только одно меню |
+| Safari и Firefox на Mac | кнопка не получает фокус по клику мышью: файл сам ставит фокус на чип, клавиши слушает на документе (Esc работает, даже если фокус на body) |
+| Окно «Сессия истекла» | открывается на 401 от `fetch` на свой origin, вызовом `GGIDService.sessionExpired()` или событием `gid:session-expired` на `document`; фокус на кнопке входа, Tab и Shift+Tab не уходят под окно, Esc и клик по фону закрывают, фокус возвращается туда, где был |
+| Перехват 401 | `fetch` оборачивается один раз, только ответы своего origin; пути из `data-gid-401-ignore` не открывают окно (например проверка `/api/me` на странице входа) |
+
+Разметка и атрибуты:
+
+| Где | Атрибут или класс | Зачем |
+|---|---|---|
+| обёртка аккаунта | `.gid-acct` | чип `.gid-chip` и меню `.gid-menu` внутри (или меню по `aria-controls` на чипе) |
+| чип | `aria-expanded`, `aria-controls` | состояние меню; файл ставит их сам, если нет |
+| пункты меню | `role="menuitem"` или `.gid-menu-item` | по ним ходят стрелки |
+| окно | `id="gid-expired"` или `data-gid-expired` | окно «Сессия истекла», изначально `hidden` |
+| окно | `data-gid-401-ignore="/api/me /health"` | пути (начало пути), чей 401 окно не открывает |
+| кнопка входа в окне | `data-gid-return="next"` | при открытии окна к ссылке добавляется `?next=<эта страница>`; ставить, только если вход сервиса принимает такой параметр |
+
+JS:
+
+```js
+GGIDService.init(root)            // оживить разметку внутри root (по умолчанию document); повторный вызов безопасен
+GGIDService.openMenu(acct)        // открыть меню (acct = элемент .gid-acct; без аргумента все)
+GGIDService.closeMenu(acct)       // закрыть меню
+GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
+GGIDService.closeSessionExpired() // закрыть окно
+GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
+GGIDService.version               // '2026-10-08'
+```
+
+События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
 
 ## Карточка GG ID
 
@@ -216,6 +293,7 @@ GGID.card(document.querySelector('.gid-idcard'), {
 
 ## Правила
 
+- Иконка GG ID = белый ключ на светлом градиенте `--grad-tile` (`assets/favicons/gg-id.svg`): в кнопке «Войти через GG ID», в окне «Сессия истекла» и в фавиконе экранов GG ID. Тёмных градиентных плиток нет (правило 4a).
 - Над заголовком ничего: ни замка, ни значка, ни плашки (правило 07.10). Заголовок называет сервис: «Вход в АКБ». Названия сервисов пишем так, чтобы не склонять («сервис «Пульс»»).
 - Подпись «логотип | ID»: логотип один, одного цвета (navy на светлом, белый на тёмном), высота 28 px (ширина не меньше 110 px).
 - Одно главное действие на экране. Aura только ссылкой и только если сервер включил.

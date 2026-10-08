@@ -290,10 +290,13 @@
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")}
 
 /* ---------- аккаунт ---------- */
-.gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;border-radius:50%;background:var(--g-avatar);
-  color:#fff;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
-.gid-avatar--sm{width:36px;height:36px;font-size:13px}
-.gid-avatar--xs{width:28px;height:28px;font-size:11px}
+/* аватар: инициалы белым по центру круга в любом контейнере. Селектор (0,2,0) сильнее правил вида «.контейнер span»,
+   а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
+:is(.gid,.gid-kit) .gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;margin:0;padding:0;border-radius:50%;
+  background:var(--g-avatar);color:#fff;font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
+  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+:is(.gid,.gid-kit) .gid-avatar--sm{width:36px;height:36px;font-size:13px}
+:is(.gid,.gid-kit) .gid-avatar--xs{width:28px;height:28px;font-size:11px}
 .gid-account{display:flex;align-items:center;gap:14px;width:100%;margin-top:28px;padding:14px 16px;border-radius:16px;
   border:1px solid var(--g-second-line);background:var(--g-second);text-align:left;cursor:pointer;
   transition:border-color .16s,background-color .16s,transform .12s var(--g-ease)}
@@ -351,55 +354,69 @@
 
 /* ============ компоненты для шапок и экранов сервисов ============ */
 
-/* кнопка «Войти через GG ID»: единственный вход на собственном экране сервиса */
-.gid-sso{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 22px 0 14px;border-radius:14px;
+/* кнопка «Войти через GG ID»: единственный вход на собственном экране сервиса.
+   Значок = иконка GG ID (белый ключ на светлом градиенте --grad-tile): символ gid-id-icon спрайта или инлайн-SVG (README) */
+.gid-sso{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;max-width:100%;padding:0 22px 0 14px;border-radius:14px;
   border:1px solid transparent;background:#13445d;color:#fff;font-family:var(--g-font);font-size:15px;font-weight:700;letter-spacing:-.005em;
-  text-decoration:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
+  line-height:1.2;text-align:left;text-decoration:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
   transition:background-color .18s var(--g-ease),transform .12s var(--g-ease),box-shadow .18s var(--g-ease),border-color .18s}
-.gid-sso:hover{background:#1a5a7a}
+.gid-sso > span{min-width:0;text-wrap:balance}   /* в узком месте перенос ровный: «Войти через / GG ID» */
+/* цвета под курсором заданы явно: стили страницы сервиса (a:hover и т.п.) не перекрашивают кнопку */
+.gid-sso:hover,.gid-sso:focus-visible{background:#1a5a7a;color:#fff;text-decoration:none}
 .gid-sso:active{transform:scale(.985)}
 .gid-sso:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(0,156,220,.25)}
-.gid-sso-tile{width:28px;height:28px;flex:none;border-radius:7px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.gid-sso-tile{width:28px;height:28px;flex:none;border-radius:7px;display:block}
 .gid-sso--light{background:#fff;color:#0f172a;border-color:#d5dee8;box-shadow:0 1px 2px rgba(15,23,42,.05)}
-.gid-sso--light:hover{background:#f6f9fc;border-color:#94a3b8}
-.gid-sso--light .gid-sso-tile{box-shadow:none}
+.gid-sso--light:hover,.gid-sso--light:focus-visible{background:#f6f9fc;color:#0f172a;border-color:#94a3b8}
 .gid-sso--on-dark{background:#fff;color:#0d2f42;box-shadow:0 12px 32px -16px rgba(92,195,236,.6)}
-.gid-sso--on-dark:hover{background:#e6f5fc}
-.gid-sso--on-dark .gid-sso-tile{box-shadow:none}
+.gid-sso--on-dark:hover,.gid-sso--on-dark:focus-visible{background:#e6f5fc;color:#0d2f42}
 .gid-sso--sm{min-height:40px;font-size:13.5px;gap:10px;padding:0 16px 0 9px;border-radius:11px}
 .gid-sso--sm .gid-sso-tile{width:22px;height:22px;border-radius:6px}
 .gid-sso--block{display:flex;width:100%}
 
-/* аккаунт в шапке сервиса */
-.gid-chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 10px 0 6px;border-radius:999px;border:1px solid var(--g-line);
-  background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-size:13.5px;font-weight:600;cursor:pointer;
-  transition:border-color .15s,background-color .15s}
-.gid-chip:hover,.gid-chip[aria-expanded="true"]{border-color:var(--g-field-hover);background:var(--g-second-hover)}
+/* аккаунт в шапке сервиса: обёртка .gid-acct (чип + выпадающее меню), чип ужимается вместе с шапкой.
+   Места мало: сначала уходит стрелка, потом имя обрезается многоточием; когда на имя остаётся меньше 2,4 em, имя уходит
+   на скрытую вторую строку и в чипе остаются только инициалы (круг 40 px). Ничего не вылезает за край шапки. */
+.gid-acct{position:relative;display:inline-flex;min-width:40px;max-width:100%;vertical-align:middle}
+.gid-chip{display:inline-flex;flex-wrap:wrap;align-items:center;align-content:flex-start;column-gap:9px;row-gap:0;
+  height:40px;min-width:40px;max-width:100%;padding:0 5px;overflow:hidden;border-radius:999px;border:1px solid var(--g-line);
+  background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-size:13.5px;font-weight:600;line-height:38px;
+  text-align:left;cursor:pointer;transition:border-color .15s,background-color .15s}
+.gid-chip:hover,.gid-chip[aria-expanded="true"]{border-color:var(--g-field-hover);background:var(--g-second-hover);color:var(--g-ink)}
 .gid-chip:focus-visible{outline:none;box-shadow:0 0 0 3px var(--g-ring)}
-.gid-chip .gid-ic{width:16px;height:16px;color:var(--g-faint);transition:transform .18s var(--g-ease)}
+.gid-chip > .gid-avatar{margin-block:5px}
+.gid-chip-name,.gid-chip > span:not(.gid-avatar){flex:1 1 0;min-width:2.4em;max-width:max-content;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gid-chip .gid-ic{width:16px;height:16px;margin:11px 4px 11px 0;color:var(--g-faint);transition:transform .18s var(--g-ease)}
 .gid-chip[aria-expanded="true"] .gid-ic{transform:rotate(180deg)}
 .gid-menu{width:300px;max-width:calc(100vw - 32px);padding:8px;border-radius:18px;border:1px solid var(--g-card-line);background:var(--g-solid);
-  box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);transform-origin:top right;animation:gidMenu .2s var(--g-pop) both}
+  box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);text-align:left;transform-origin:top right;animation:gidMenu .2s var(--g-pop) both}
 @keyframes gidMenu{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+/* выпадающее меню под чипом у правого края; --start: шапка переносится и аккаунт стоит слева */
+.gid-acct > .gid-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:60}
+.gid-menu[hidden]{display:none!important}
+.gid-acct--start > .gid-menu{right:auto;left:0;transform-origin:top left}
 .gid-menu-head{display:flex;align-items:center;gap:12px;padding:10px 10px 14px;margin-bottom:6px;border-bottom:1px solid var(--g-line)}
-.gid-menu-head b{display:block;font-size:14.5px;font-weight:600;color:var(--g-ink)}
-.gid-menu-head span{display:block;font-size:12.5px;color:var(--g-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gid-menu-head > div{min-width:0}
-.gid-menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:0;border-radius:11px;background:none;
+/* текст шапки меню только через свой класс: правило не задевает аватар рядом. Длинные имя и почта переносятся, а не режутся */
+.gid-menu-head-tx,.gid-menu-head > div{display:flex;flex-direction:column;min-width:0}
+.gid-menu-head-tx b,.gid-menu-head > div > b{display:block;font-size:14.5px;font-weight:600;line-height:1.35;color:var(--g-ink);overflow-wrap:anywhere}
+.gid-menu-head-tx span,.gid-menu-head > div > span{display:block;font-size:12.5px;line-height:1.4;color:var(--g-muted);overflow-wrap:anywhere}
+.gid-menu-item{display:flex;align-items:center;gap:12px;width:100%;min-width:0;padding:10px;border:0;border-radius:11px;background:none;
   font:inherit;font-size:14px;font-weight:600;color:var(--g-ink);text-decoration:none;cursor:pointer;text-align:left;transition:background-color .14s}
-.gid-menu-item:hover,.gid-menu-item:focus-visible{background:var(--g-soft);outline:none}
+.gid-menu-item:hover,.gid-menu-item:focus-visible{background:var(--g-soft);color:var(--g-ink);text-decoration:none;outline:none}
 .gid-menu-item .gid-ic{width:18px;height:18px;color:var(--g-muted)}
-.gid-menu-meta{margin-left:auto;font-size:12px;font-weight:500;color:var(--g-faint)}
+.gid-menu-meta{margin-left:auto;padding-left:8px;font-size:12px;font-weight:500;color:var(--g-faint);white-space:nowrap}
 .gid-menu-sep{height:1px;margin:6px 4px;background:var(--g-line)}
 
 /* сессия истекла: окно поверх страницы сервиса */
 .gid-scrim{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:rgba(8,27,38,.42);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:gidFade .2s var(--g-ease) both}
+.gid-scrim[hidden]{display:none!important}
 @keyframes gidFade{from{opacity:0}to{opacity:1}}
 .gid-dialog{width:100%;max-width:400px;padding:30px 30px 26px;border-radius:22px;background:var(--g-solid);border:1px solid var(--g-card-line);
   box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);animation:gidMenu .24s var(--g-pop) both}
 .gid-dialog .gid-h{font-size:22px}
 .gid-dialog .gid-sso{margin-top:24px}
+@media (max-width:420px){.gid-dialog{padding:26px 22px 22px}}
 
 /* ============ карточка GG ID: как студенческий ID в Duke или Stanford ============ */
 /* Лицевая сторона всегда navy (как панель сплита), тема меняет глубину, кольцо и тень: токены --g-idc-*.
