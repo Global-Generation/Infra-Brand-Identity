@@ -149,7 +149,7 @@ def grad(contour):
 
 # ---------- пиктограммы (вариант 10) ----------
 
-def pictogram(key, m):
+def pictogram(key, m, acc=SKY):
     if key == "root":
         return mark(32, 32, 58, m), ""
     if key == "akb":
@@ -157,47 +157,47 @@ def pictogram(key, m):
         defs = ('<mask id="k"><rect width="64" height="64" fill="#fff"/>'
                 f'<circle cx="23" cy="23" r="14" fill="#000"/>'
                 f'<path d="{front}" fill="#000" stroke="#000" stroke-width="7" stroke-linejoin="round"/></mask>')
-        back = (f'<g mask="url(#k)" fill="{SKY}"><circle cx="43" cy="19" r="9"/>'
+        back = (f'<g mask="url(#k)" fill="{acc}"><circle cx="43" cy="19" r="9"/>'
                 '<path d="M30 54V45A12 12 0 0 1 42 33H48A12 12 0 0 1 60 45V54Z"/></g>')
         return back + f'<g fill="{m}"><circle cx="23" cy="23" r="10.5"/><path d="{front}"/></g>', defs
     if key == "pulse":
         return (f'<path d="M5 34H15L22 16L33 48L40 34H45" fill="none" stroke="{m}" stroke-width="7" '
-                f'stroke-linecap="round" stroke-linejoin="round"/><circle cx="56" cy="34" r="6" fill="{SKY}"/>'), ""
+                f'stroke-linecap="round" stroke-linejoin="round"/><circle cx="56" cy="34" r="6" fill="{acc}"/>'), ""
     if key == "cabinet":
         return (f'<path d="M23 20V14A4 4 0 0 1 27 10H37A4 4 0 0 1 41 14V20" fill="none" stroke="{m}" stroke-width="6"/>'
-                f'<path d="{rr(6, 19, 52, 37, 8)}" fill="{m}"/><path d="{rr(27, 32, 10, 9, 2)}" fill="{SKY}"/>'), ""
+                f'<path d="{rr(6, 19, 52, 37, 8)}" fill="{m}"/><path d="{rr(27, 32, 10, 9, 2)}" fill="{acc}"/>'), ""
     if key == "portal":
         return (f'<path d="M32 9L62 23L32 37L2 23Z" fill="{m}"/>'
                 f'<path d="M14 31.5L32 40L50 31.5V44C50 50 42 54.5 32 54.5C22 54.5 14 50 14 44Z" fill="{m}"/>'
-                f'<path d="M56 25V41" stroke="{SKY}" stroke-width="3.5" stroke-linecap="round"/>'
-                f'<circle cx="56" cy="45" r="4.5" fill="{SKY}"/>'), ""
+                f'<path d="M56 25V41" stroke="{acc}" stroke-width="3.5" stroke-linecap="round"/>'
+                f'<circle cx="56" cy="45" r="4.5" fill="{acc}"/>'), ""
     if key == "legal":
         return (f'<g fill="{m}"><path d="{rr(29.5, 12, 5, 40, 1)}"/><path d="{rr(17, 51, 30, 6, 3)}"/>'
                 f'<path d="{rr(8, 13, 48, 5.5, 2.75)}"/><circle cx="32" cy="10" r="4.5"/></g>'
                 f'<path d="M16 18L9 37M16 18L23 37M48 18L41 37M48 18L55 37" fill="none" stroke="{m}" stroke-width="2.5" stroke-linecap="round"/>'
-                f'<path d="M4 37H28A12 12 0 0 1 4 37ZM36 37H60A12 12 0 0 1 36 37Z" fill="{SKY}"/>'), ""
+                f'<path d="M4 37H28A12 12 0 0 1 4 37ZM36 37H60A12 12 0 0 1 36 37Z" fill="{acc}"/>'), ""
     if key == "accounting":
         keys = "".join(rr(18 + 11 * i, 30 + 10 * j, 7, 6, 1.5) for j in range(3) for i in range(3))
         return (f'<path d="{rr(12, 4, 40, 56, 8)}{keys}" fill="{m}" fill-rule="evenodd"/>'
-                f'<path d="{rr(18, 10, 28, 14, 3)}" fill="{SKY}"/>'), ""
+                f'<path d="{rr(18, 10, 28, 14, 3)}" fill="{acc}"/>'), ""
     if key == "reporter":
         return (f'<path d="{rr(6, 34, 14, 24, 3)}{rr(25, 22, 14, 36, 3)}" fill="{m}"/>'
-                f'<path d="{rr(44, 8, 14, 50, 3)}" fill="{SKY}"/>'), ""
+                f'<path d="{rr(44, 8, 14, 50, 3)}" fill="{acc}"/>'), ""
     if key == "onboarding":
         return (f'<path d="{rr(11, 6, 6, 54, 3)}" fill="{m}"/>'
-                f'<path d="M17 9H53L45 21L53 33H17Z" fill="{SKY}"/>'), ""
+                f'<path d="M17 9H53L45 21L53 33H17Z" fill="{acc}"/>'), ""
     if key == "levauth":
         return (f'<path d="{circ(23, 23, 17)}{circ(23, 23, 8.5)}" fill="{m}" fill-rule="evenodd"/>'
                 f'<path d="M33 33L55 55M44 44L38.5 49.5M51 51L45.5 56.5" fill="none" stroke="{m}" stroke-width="7.5" stroke-linecap="round"/>'
-                f'<circle cx="23" cy="23" r="4.5" fill="{SKY}"/>'), ""
+                f'<circle cx="23" cy="23" r="4.5" fill="{acc}"/>'), ""
     if key == "strategy":
         return (f'<path d="{circ(32, 32, 29)}{circ(32, 32, 23)}" fill="{m}" fill-rule="evenodd"/>'
-                f'<path d="M45 19L36.95 36.95L27.05 27.05Z" fill="{SKY}"/>'
+                f'<path d="M45 19L36.95 36.95L27.05 27.05Z" fill="{acc}"/>'
                 f'<path d="M19 45L27.05 27.05L36.95 36.95Z" fill="{m}"/>'), ""
     if key == "llm":
         defs = '<mask id="c"><rect width="64" height="64" fill="#fff"/><circle cx="40" cy="38" r="22" fill="#000"/></mask>'
         return (f'<circle cx="24" cy="26" r="18" fill="{m}" mask="url(#c)"/>'
-                f'<circle cx="40" cy="38" r="18" fill="{SKY}"/>'
+                f'<circle cx="40" cy="38" r="18" fill="{acc}"/>'
                 f'<circle cx="40" cy="38" r="10" fill="none" stroke="{WHITE}" stroke-opacity=".55" stroke-width="3"/>'), defs
     raise KeyError(key)
 
@@ -322,6 +322,77 @@ def build_variants(T):
     ]
 
 
+# ---------- вариант 9 с иконками: светлые палитры без navy/голубого ----------
+
+GRAPHITE, HAIR = "#18181B", "#E4E4E7"
+INV = "INVC"  # цвет иконки на метке у варианта без плитки: белый на светлом, графит на тёмном
+CONTOUR_COL = {"mentor": "#F76B15", "student": "#2F9E62", "ops": "#3E63DD", "core": "#27272A"}
+SERVICE_COL = {
+    "akb": "#F76B15", "pulse": "#E5484D", "cabinet": "#64748B", "portal": "#06A5C9",
+    "legal": "#A0703C", "accounting": "#2F9E62", "reporter": "#3E63DD", "onboarding": "#D49B00",
+    "levauth": "#27272A", "strategy": "#0F9488", "llm": "#6BA80F",
+}
+
+
+def rgba(hex_color, a):
+    h = hex_color.lstrip("#")
+    return f"rgba({int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)},{a})"
+
+
+def v9_icons(p):
+    """Знак GG слева сверху, круглая метка с иконкой справа снизу, без пересечения."""
+    def fn(s, m):
+        ink = GRAPHITE if m == NAVY else m
+        inv = {NAVY: WHITE, WHITE: GRAPHITE, MAIN: INV}[m]
+        mark_col = ink if p["mark"] == "ink" else p["mark"]
+        parts = []
+        if p.get("tile"):
+            stroke = f' stroke="{p["border"]}" stroke-width="1.5"' if p.get("border") else ""
+            parts.append(f'<rect x=".75" y=".75" width="62.5" height="62.5" rx="13.5" fill="{p["tile"]}"{stroke}/>')
+        if s["key"] == "root":
+            parts.append(mark(32, 32, 40, mark_col))
+            return svg("".join(parts))
+        bc = p["badge"](s)
+        badge, icon = (ink, inv) if bc == "ink" else (bc, WHITE)
+        acc = icon if icon == INV else rgba(icon, 0.62)
+        body, defs = pictogram(s["key"], icon, acc)
+        k, c = 21 / 64, 45.5
+        parts.append(mark(19, 20, 30, mark_col))
+        parts.append(f'<circle cx="{c}" cy="{c}" r="17" fill="{badge}"/>')
+        parts.append(f'<g transform="translate({c - 32 * k:.2f} {c - 32 * k:.2f}) scale({k:.4f})">{body}</g>')
+        return svg("".join(parts), defs)
+    return fn
+
+
+def build_v9_icons(variants):
+    white = dict(tile=WHITE, border=HAIR, mark=GRAPHITE)
+    same = "все метки одного цвета, сервис различаешь по иконке"
+    return [
+        dict(variants[9], n=0, label="9", slug="v9", title="Исходный 9"),
+        dict(n=1, slug="mono", title="Чёрно-белый", fn=v9_icons(dict(white, badge=lambda s: GRAPHITE)), adaptive=False,
+             idea="Белая плитка, графитовый знак GG, чёрная метка с белой иконкой. Чисто и строго, как у Apple и Vercel.",
+             plus="самый чистый, ничего лишнего", minus=same),
+        dict(n=2, slug="orange", title="Оранжевый", fn=v9_icons(dict(white, badge=lambda s: "#F76B15")), adaptive=False,
+             idea="Белая плитка, графитовый знак, оранжевая метка. Один тёплый акцент на всех сервисах.",
+             plus="живой акцент, вкладки GG видно сразу", minus=same),
+        dict(n=3, slug="green", title="Зелёный", fn=v9_icons(dict(white, badge=lambda s: "#2F9E62")), adaptive=False,
+             idea="Белая плитка, графитовый знак, зелёная метка. Спокойный свежий акцент.",
+             plus="спокойно, не спорит с интерфейсом", minus=same),
+        dict(n=4, slug="coral", title="Коралл", fn=v9_icons(dict(white, badge=lambda s: "#FF6B5B")), adaptive=False,
+             idea="Белая плитка, графитовый знак, коралловая метка. Мягче красного, светлее оранжевого.",
+             plus="самый лёгкий из цветных", minus="рядом с алертами похож на цвет ошибки"),
+        dict(n=5, slug="contour", title="По контурам", fn=v9_icons(dict(white, badge=lambda s: CONTOUR_COL[s["contour"]])), adaptive=False,
+             idea="Цвет метки = контур: менторы оранжевый, студенты зелёный, операционка синий, ядро графит.",
+             plus="группы сервисов читаются по цвету", minus="четыре цвета, чуть пестрее"),
+        dict(n=6, slug="each", title="Каждому свой", fn=v9_icons(dict(white, badge=lambda s: SERVICE_COL[s["key"]])), adaptive=False,
+             idea="У каждого сервиса свой цвет метки, как у приложений Google. Плитка и знак общие.",
+             plus="на 16 px различаешь по цвету, даже если иконку не видно", minus="самый пёстрый"),
+        dict(n=7, slug="bare", title="Без плитки", fn=v9_icons(dict(mark="ink", badge=lambda s: "ink")), adaptive=True, ink=GRAPHITE,
+             idea="Только знак и метка, без фона: графит на светлом, белые на тёмном, иконка на метке наоборот.",
+             plus="самый лёгкий", minus="без плитки меньше похоже на приложение"),
+    ]
+
+
 def render(v, s, dark=False):
     return v["fn"](s, WHITE if dark else NAVY)
 
@@ -329,10 +400,12 @@ def render(v, s, dark=False):
 def export(v, s):
     """Самостоятельный SVG-файл; у вариантов без плитки цвет переключается по теме."""
     out = v["fn"](s, MAIN)
-    if MAIN in out:
-        out = out.replace(f'fill="{MAIN}"', 'class="f"').replace(f'stroke="{MAIN}"', 'class="s"')
-        style = (f"<style>.f{{fill:{NAVY}}}.s{{stroke:{NAVY}}}"
-                 "@media (prefers-color-scheme:dark){.f{fill:#fff}.s{stroke:#fff}}</style>")
+    if MAIN in out or INV in out:
+        ink = v.get("ink", NAVY)
+        out = (out.replace(f'fill="{MAIN}"', 'class="f"').replace(f'stroke="{MAIN}"', 'class="s"')
+               .replace(f'fill="{INV}"', 'class="i"').replace(f'stroke="{INV}"', 'class="j"'))
+        style = (f"<style>.f{{fill:{ink}}}.s{{stroke:{ink}}}.i{{fill:#fff}}.j{{stroke:#fff}}"
+                 f"@media (prefers-color-scheme:dark){{.f{{fill:#fff}}.s{{stroke:#fff}}.i{{fill:{ink}}}.j{{stroke:{ink}}}}}</style>")
         out = out.replace('viewBox="0 0 64 64">', 'viewBox="0 0 64 64">' + style, 1)
     return out
 
@@ -545,7 +618,23 @@ CHECK = ('<svg viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-
 MINUS = ('<svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9.5"/></svg>')
 
 
-def page(variants):
+PAGES = {
+    "variants": dict(
+        file="favicons-variants.html", title="Фавиконы GG", kick="Вариант {n} из 10",
+        description="Фавиконы внутренних сервисов Global Generation: 10 вариантов на выбор во вкладках Chrome, сеткой и в размерах.",
+        h1="Фавиконы: 10 вариантов вместо иконок lucide",
+        intro="Сейчас у каждого сервиса градиентная плитка и тонкая иконка, на 16 px это каша. Ниже 10 направлений: каждое во вкладках Chrome, сеткой по всем сервисам и в размерах. <b>Вкладка этой страницы тоже меняет фавикон</b> на АКБ выбранного варианта. Плюс экран входа: замок в бледной плашке убираем, на его место значок сервиса или ничего. Маяк остаётся с Джи-джи, его не трогаем.",
+        foot="напиши номер или комбинацию, например «3, но буквы как в 4». После выбора соберу финальные SVG, PNG и ICO для всех сервисов в assets/favicons и раскатаю по сервисам."),
+    "v9": dict(
+        file="favicons-v9-icons.html", title="Фавиконы GG: вариант 9", kick="Палитра {n} из 7",
+        description="Вариант 9 фавиконов GG: знак GG и метка сервиса с иконкой, 7 светлых палитр без navy и голубого.",
+        h1="Вариант 9 с иконками: светлее и чище",
+        intro="Знак GG на каждой вкладке, в углу круглая метка сервиса с иконкой. Navy и голубой убрал, плитка белая, знак и метка больше не налезают друг на друга. Иконки свои, толстые и залитые: тонкие lucide в метке такого размера не видны. <b>Вкладка этой страницы меняет фавикон</b> на выбранную палитру. На первой вкладке исходный 9 для сравнения.",
+        foot="напиши номер палитры или комбинацию, например «1, но метка как в 6». После выбора соберу финальные SVG, PNG и ICO в assets/favicons, поменяю замок на экране входа и раскатаю по сервисам."),
+}
+
+
+def page(variants, meta):
     fonts = (ROOT / "src/fonts.css").read_text()
     gigi = "data:image/png;base64," + base64.b64encode((ROOT / "src/gigi-256.png").read_bytes()).decode()
     logo = (ROOT / "assets/logo/global-logo-navy.svg").read_text().strip()
@@ -556,10 +645,10 @@ def page(variants):
     nav, secs = [], []
     for v in variants:
         n = v["n"]
-        num = "0" if n == 0 else str(n)
+        num = v.get("label") or str(n)
         nav.append(f'<button class="tab" role="tab" aria-controls="v-{v["slug"]}" data-title="{html.escape(v["title"])}">'
                    f'<span class="n">{num}</span>{html.escape(v["title"])}</button>')
-        kick = "Для сравнения" if n == 0 else f"Вариант {n} из 10"
+        kick = "Для сравнения" if n == 0 else meta["kick"].format(n=n)
         pm = ""
         if v["plus"]:
             pm = (f'<div class="pm"><div class="p">{CHECK}<span><b>Плюс:</b> {html.escape(v["plus"])}</span></div>'
@@ -582,8 +671,8 @@ def page(variants):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Фавиконы GG</title>
-<meta name="description" content="Фавиконы внутренних сервисов Global Generation: 10 вариантов на выбор во вкладках Chrome, сеткой и в размерах.">
+<title>{meta["title"]}</title>
+<meta name="description" content="{meta["description"]}">
 <link id="fav" rel="icon" href="data:,">
 <style>{fonts}
 {css}</style>
@@ -592,11 +681,11 @@ def page(variants):
 {symbol}
 <header><div class="wrap"><div class="hd">{logo}<span class="svcname">Фавиконы сервисов</span></div></div></header>
 <div class="wrap">
-<div class="intro"><div class="kick">Айдентика · 07.10.2026</div><h1>Фавиконы: 10 вариантов вместо иконок lucide</h1>
-<p>Сейчас у каждого сервиса градиентная плитка и тонкая иконка, на 16 px это каша. Ниже 10 направлений: каждое во вкладках Chrome, сеткой по всем сервисам и в размерах. <b>Вкладка этой страницы тоже меняет фавикон</b> на АКБ выбранного варианта. Плюс экран входа: замок в бледной плашке убираем, на его место значок сервиса или ничего. Маяк остаётся с Джи-джи, его не трогаем.</p></div>
+<div class="intro"><div class="kick">Айдентика · 07.10.2026</div><h1>{meta["h1"]}</h1>
+<p>{meta["intro"]}</p></div>
 <div class="tabs" role="tablist" aria-label="Варианты">{"".join(nav)}</div>
 {"".join(secs)}
-<p class="foot"><b>Как выбрать:</b> напиши номер или комбинацию, например «3, но буквы как в 4». После выбора соберу финальные SVG, PNG и ICO для всех сервисов в assets/favicons и раскатаю по сервисам.</p>
+<p class="foot"><b>Как выбрать:</b> {meta["foot"]}</p>
 </div>
 <script>{JS}</script>
 </body>
@@ -608,26 +697,31 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", help="дополнительная папка для копии страницы")
     ap.add_argument("--apply", type=int, help="записать вариант N в assets/favicons/*.svg")
+    ap.add_argument("--apply-v9", type=int, help="записать палитру N варианта 9 с иконками в assets/favicons/*.svg")
     a = ap.parse_args()
 
     T = Type()
-    variants = build_variants(T)
+    sets = {"variants": build_variants(T)}
+    sets["v9"] = build_v9_icons(sets["variants"])
 
-    if a.apply:
-        v = next(x for x in variants if x["n"] == a.apply)
-        for s in SERVICES:
-            (ROOT / f"assets/favicons/{s['key']}.svg").write_text(export(v, s) + "\n")
-        print(f"вариант {a.apply} записан в assets/favicons/")
-        return
+    for key, n in (("variants", a.apply), ("v9", a.apply_v9)):
+        if n:
+            v = next(x for x in sets[key] if x["n"] == n)
+            for s in SERVICES:
+                (ROOT / f"assets/favicons/{s['key']}.svg").write_text(export(v, s) + "\n")
+            print(f"{key} {n} записан в assets/favicons/")
+            return
 
-    dst = ROOT / "favicons-variants.html"
-    dst.write_text(page(variants))
-    print(f"{dst} ({dst.stat().st_size // 1024} KB)")
-    if a.out:
-        out = Path(a.out).expanduser()
-        out.mkdir(parents=True, exist_ok=True)
-        shutil.copy(dst, out / dst.name)
-        print(out / dst.name)
+    for key, variants in sets.items():
+        meta = PAGES[key]
+        dst = ROOT / meta["file"]
+        dst.write_text(page(variants, meta))
+        print(f"{dst} ({dst.stat().st_size // 1024} KB)")
+        if a.out:
+            out = Path(a.out).expanduser()
+            out.mkdir(parents=True, exist_ok=True)
+            shutil.copy(dst, out / dst.name)
+            print(out / dst.name)
 
 
 if __name__ == "__main__":
