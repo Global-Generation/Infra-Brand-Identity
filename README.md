@@ -32,6 +32,7 @@
 - `favicons-v9-icons.html` - вариант 9 с иконками в 7 палитрах (история выбора).
 - `favicons-client-site.html`, `favicons-v3.html` - история выбора.
 - `favicons-final.html` - **итог 07.10.2026**: клиентские = фавикон сайта на своём синем фоне, внутренние = светлый фон анкеты и крупная иконка. Страница рисует файлы из `assets/favicons`.
+- `gg-id.html` - **GG ID, единый вход** (08.10.2026): 17 экранов входа хаба, три раскладки, светлая и тёмная тема, кнопка «Войти через GG ID», аккаунт в шапке, «сессия истекла». Кит и правила подключения: `gg-id/README.md`.
 - `assets/` - готовые файлы: бери отсюда, не рисуй заново.
 
 ## Правила (утверждены Лёвом 28.09.2026)
@@ -47,6 +48,7 @@
 7. Шрифт Montserrat самохостом (`src/fonts.css`), никаких CDN шрифтов. Иконки интерфейса lucide инлайн SVG (фавиконы: правило 3).
 8. Нельзя: эмодзи, длинное тире, фиолетовый/сиреневый, декоративные полосы слева или сверху, «больничные» пастели.
 9. Копирайт: «ментор» (не «наставник»), «Джи-джи» (не «ИИ»); стаффу чётко и корпоративно, студенту тепло, как Duolingo.
+10. **Вход только через GG ID** (с 08.10.2026): экраны входа живут в хабе levauth и собираются из кита `gg-id/`; сервис показывает одну кнопку «Войти через GG ID» и аккаунт в шапке, своих форм пароля и PIN не рисует.
 
 ## Контуры и цвета плиток
 
@@ -65,6 +67,8 @@ python3 src/build_lockups.py  # lockups.html
 python3 src/check.py          # Playwright: 1440/390 px, шрифты, тире, ошибки (нужен playwright)
 uv run --with fonttools --with brotli python src/build_favicon_variants.py --apply-final  # assets/favicons/*.svg
 uv run --with playwright python src/rasterize_favicons.py                                  # png/*-180.png, ico/*.ico
+python3 src/build_gg_id.py                                  # GG ID: gg-id.html, gg-id/screens, gg-id/fonts
+uv run --with playwright python src/check_gg_id.py          # GG ID: все экраны x раскладки x темы x 1440/390
 ```
 
 Правки дизайна - в `src/template.html`, потом сборка и `check.py`. Новый сервис: строка в `SERVICES` в `src/build_favicon_variants.py` (контур + пиктограмма в `pictogram()`), строка в `SERVICES` внутри `template.html` и в `manifest.json`, затем две команды фавиконов выше и `build.py`.

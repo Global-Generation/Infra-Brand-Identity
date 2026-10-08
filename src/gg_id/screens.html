@@ -1,0 +1,226 @@
+<!-- GG ID: экраны входа. Источник для src/build_gg_id.py (витрина gg-id.html и gg-id/screens/*.html).
+     Один <template> = одно состояние. data-key = имя файла, data-tab = вкладка витрины, data-title = <title> страницы.
+     data-lockup="off" = без подписи «логотип | ID». data-go="ключ" = демо-переход на другой экран (в бою = вызов API).
+     data-svc = название сервиса, куда входит человек (из client_id); пишется так, чтобы не склонялось. -->
+
+<template data-key="login" data-tab="Вход" data-title="Вход">
+  <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
+  <p class="gid-sub">Один вход GG ID открывает все сервисы команды Global Generation.</p>
+  <div class="gid-stack">
+    <button class="gid-btn gid-btn--primary" type="button" data-go="passkey">
+      <svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span>
+    </button>
+    <a class="gid-btn gid-btn--secondary" data-go="password">
+      <svg class="gid-ic" aria-hidden="true"><use href="#gi-key-round"/></svg><span>Войти по паролю</span>
+    </a>
+  </div>
+  <div class="gid-alt">
+    <a class="gid-link gid-link--muted" data-go="continue"><svg class="gid-ic gid-ic--fill" aria-hidden="true"><use href="#gi-aura"/></svg>Войти через Aura</a>
+  </div>
+</template>
+
+<template data-key="password" data-tab="По паролю" data-title="Вход по паролю">
+  <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
+  <p class="gid-sub">Рабочая почта и пароль GG ID.</p>
+  <form class="gid-form" novalidate data-go-submit="enroll">
+    <div class="gid-field">
+      <label class="gid-label" for="gid-email">Рабочая почта</label>
+      <input class="gid-input" id="gid-email" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
+        placeholder="имя@global-generations.com" data-gid-domain="global-generations.com" value="lev@global-generations.com">
+      <p class="gid-hint is-error" data-gid-domain-hint hidden>Войти можно только с рабочей почтой @global-generations.com</p>
+    </div>
+    <div class="gid-field">
+      <div class="gid-label-row"><label class="gid-label" for="gid-pass">Пароль</label><a class="gid-link gid-link--sm" data-go="forgot">Забыли пароль?</a></div>
+      <div class="gid-input-wrap">
+        <input class="gid-input" id="gid-pass" type="password" name="password" autocomplete="current-password" value="mentor-ggid-2026">
+        <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
+      </div>
+    </div>
+    <button class="gid-btn gid-btn--primary" type="submit">Войти</button>
+  </form>
+  <div class="gid-or"><span>или</span></div>
+  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button>
+</template>
+
+<template data-key="error" data-tab="Ошибка" data-title="Неверный пароль">
+  <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
+  <p class="gid-sub">Рабочая почта и пароль GG ID.</p>
+  <form class="gid-form" novalidate data-go-submit="done">
+    <div class="gid-field">
+      <label class="gid-label" for="gid-email-e">Рабочая почта</label>
+      <input class="gid-input is-error" aria-invalid="true" id="gid-email-e" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
+        placeholder="имя@global-generations.com" data-gid-domain="global-generations.com" value="lev@global-generations.com">
+    </div>
+    <div class="gid-field">
+      <div class="gid-label-row"><label class="gid-label" for="gid-pass-e">Пароль</label><a class="gid-link gid-link--sm" data-go="forgot">Забыли пароль?</a></div>
+      <div class="gid-input-wrap">
+        <input class="gid-input is-error is-shake" aria-invalid="true" id="gid-pass-e" type="password" name="password" autocomplete="current-password" value="" placeholder="Введите пароль ещё раз">
+        <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
+      </div>
+    </div>
+    <div class="gid-msg gid-msg--error" role="alert" data-gid-error><svg class="gid-ic" aria-hidden="true"><use href="#gi-circle-alert"/></svg><span data-gid-error-text>Неверная почта или пароль. Проверьте раскладку и Caps Lock.</span></div>
+    <button class="gid-btn gid-btn--primary" type="submit">Войти</button>
+  </form>
+  <div class="gid-or"><span>или</span></div>
+  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button>
+</template>
+
+<template data-key="passkey" data-tab="Face ID" data-title="Подтвердите вход">
+  <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
+  <p class="gid-sub">Подтвердите вход в системном окне на этом устройстве. Это займёт секунду.</p>
+  <div class="gid-stack">
+    <button class="gid-btn gid-btn--primary is-busy" type="button" aria-busy="true" data-go="done">
+      <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Подтвердите Face ID</span>
+    </button>
+    <a class="gid-btn gid-btn--secondary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-key-round"/></svg><span>Войти по паролю</span></a>
+  </div>
+  <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="login">Отменить</a></div>
+</template>
+
+<template data-key="done" data-tab="Готово" data-title="Вход выполнен" data-lockup="off">
+  <div class="gid-done" role="status">
+    @LOADER@
+    <h1 class="gid-h gid-h--sm">Вход выполнен</h1>
+    <p class="gid-sub">Открываем <span data-svc>АКБ</span></p>
+    <div class="gid-progress" aria-hidden="true"><i></i></div>
+  </div>
+</template>
+
+<template data-key="continue" data-tab="Продолжить как" data-title="Продолжить">
+  <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
+  <p class="gid-sub">Вы уже вошли в GG ID на этом устройстве.</p>
+  <a class="gid-account" data-go="done">
+    <span class="gid-avatar" aria-hidden="true">ЛА</span>
+    <span class="gid-account-tx"><b>Лёв Авдошин</b><span>lev@global-generations.com</span></span>
+    <svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-right"/></svg>
+  </a>
+  <div class="gid-alt"><a class="gid-link" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-user-round-plus"/></svg>Войти в другой аккаунт</a></div>
+</template>
+
+<template data-key="enroll" data-tab="Подключить Face ID" data-title="Вход без пароля">
+  <h1 class="gid-h">В следующий раз без пароля</h1>
+  <p class="gid-sub">Подключите Face ID, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
+  <div class="gid-stack">
+    <button class="gid-btn gid-btn--primary" type="button" data-go="done"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="enroll">Подключить Face ID</span></button>
+    <a class="gid-btn gid-btn--quiet" data-go="done">Не сейчас</a>
+  </div>
+</template>
+
+<template data-key="forgot" data-tab="Забыли пароль" data-title="Восстановить пароль">
+  <h1 class="gid-h">Восстановить пароль</h1>
+  <p class="gid-sub">Напишите рабочую почту. Если она есть в GG ID, пришлём ссылку, чтобы задать новый пароль.</p>
+  <form class="gid-form" novalidate data-go-submit="sent">
+    <div class="gid-field">
+      <label class="gid-label" for="gid-email-f">Рабочая почта</label>
+      <input class="gid-input" id="gid-email-f" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
+        placeholder="имя@global-generations.com" data-gid-domain="global-generations.com">
+      <p class="gid-hint is-error" data-gid-domain-hint hidden>Ссылка приходит только на рабочую почту @global-generations.com</p>
+    </div>
+    <button class="gid-btn gid-btn--primary" type="submit">Отправить ссылку</button>
+  </form>
+  <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-left"/></svg>Вернуться ко входу</a></div>
+</template>
+
+<template data-key="sent" data-tab="Письмо отправлено" data-title="Проверьте почту">
+  <h1 class="gid-h">Проверьте почту</h1>
+  <p class="gid-sub">Если <b>lev@global-generations.com</b> есть в GG ID, ссылка уже в пути. Она действует недолго, лучше не откладывать.</p>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" href="https://mail.google.com/" target="_blank" rel="noopener"><svg class="gid-ic" aria-hidden="true"><use href="#gi-mail"/></svg><span>Открыть почту</span></a>
+  </div>
+  <p class="gid-note" style="margin-top:18px">Письма нет пару минут? Загляните в «Спам». Отправить ещё раз можно через <b data-gid-countdown="42" data-gid-countdown-done="enable:#gid-resend">0:42</b>.</p>
+  <div class="gid-alt"><button class="gid-link" id="gid-resend" type="button" disabled data-go="sent">Отправить ещё раз</button><a class="gid-link gid-link--muted" data-go="login">Ко входу</a></div>
+</template>
+
+<template data-key="setpass" data-tab="Новый пароль" data-title="Задайте пароль">
+  <h1 class="gid-h">Добро пожаловать в команду</h1>
+  <p class="gid-sub">Придумайте пароль GG ID. С ним вы входите во все сервисы Global Generation.</p>
+  <form class="gid-form" novalidate data-go-submit="saved">
+    <input type="email" name="username" autocomplete="username" value="lev@global-generations.com" hidden>
+    <div class="gid-field">
+      <label class="gid-label" for="gid-new">Новый пароль</label>
+      <div class="gid-input-wrap">
+        <input class="gid-input" id="gid-new" type="password" name="new-password" autocomplete="new-password" data-gid-newpass value="Mentor2026">
+        <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
+      </div>
+      <div class="gid-meter" data-gid-meter aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <ul class="gid-rules" data-gid-rules>
+        <li data-rule="len">Не короче 12 символов</li>
+        <li data-rule="mix">Буквы и цифры</li>
+        <li data-rule="case">Заглавные и строчные</li>
+      </ul>
+    </div>
+    <div class="gid-field">
+      <label class="gid-label" for="gid-rep">Повторите пароль</label>
+      <div class="gid-input-wrap">
+        <input class="gid-input" id="gid-rep" type="password" name="repeat-password" autocomplete="new-password" data-gid-repeat>
+        <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
+      </div>
+    </div>
+    <button class="gid-btn gid-btn--primary" type="submit">Сохранить пароль</button>
+  </form>
+</template>
+
+<template data-key="saved" data-tab="Пароль сохранён" data-title="Пароль сохранён">
+  <h1 class="gid-h">Пароль сохранён</h1>
+  <p class="gid-sub">Теперь войдите с новым паролем. После входа на этом устройстве можно будет подключить Face ID.</p>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Перейти ко входу</span></a>
+  </div>
+</template>
+
+<template data-key="resetoff" data-tab="Восстановление выключено" data-title="Восстановить пароль">
+  <h1 class="gid-h">Восстановить пароль</h1>
+  <p class="gid-sub">Восстановление по почте пока не включено.</p>
+  <div class="gid-msg gid-msg--info" style="margin-top:24px"><svg class="gid-ic" aria-hidden="true"><use href="#gi-circle-help"/></svg><span>Чтобы задать новый пароль, напишите Лёве: он пришлёт ссылку на рабочую почту.</span></div>
+  <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-left"/></svg>Вернуться ко входу</a></div>
+</template>
+
+<template data-key="expired" data-tab="Ссылка устарела" data-title="Ссылка не работает">
+  <h1 class="gid-h">Ссылка больше не работает</h1>
+  <p class="gid-sub">Она устарела или уже была использована. Это нормально: запросите новую, письмо придёт за минуту.</p>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" data-go="forgot"><svg class="gid-ic" aria-hidden="true"><use href="#gi-send"/></svg><span>Запросить новую ссылку</span></a>
+  </div>
+  <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="login">Вернуться ко входу</a></div>
+</template>
+
+<template data-key="noaccess" data-tab="Нет доступа" data-title="Нет доступа">
+  <h1 class="gid-h">Нет доступа</h1>
+  <p class="gid-sub">Вы вошли в GG ID, но сервис «<span data-svc>АКБ</span>» пока не открыт для вашего аккаунта. Если он нужен для работы, напишите Лёве: он откроет доступ.</p>
+  <div class="gid-who">
+    <span class="gid-avatar gid-avatar--sm" aria-hidden="true">МИ</span>
+    <span class="gid-who-tx"><b>Мария Иванова</b><span>maria@global-generations.com</span></span>
+    <a class="gid-link gid-link--sm" data-go="login">Сменить</a>
+  </div>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" href="/cabinet/"><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg><span>Мои сервисы</span></a>
+  </div>
+</template>
+
+<template data-key="pin" data-tab="Код доступа" data-title="Код доступа">
+  <h1 class="gid-h">Код доступа</h1>
+  <p class="gid-sub">Сервис «<span data-svc>АКБ</span>» пока входит по коду для команды. Скоро и он перейдёт на GG ID.</p>
+  <div class="gid-code" data-gid-code data-go-complete="done" role="group" aria-label="Код доступа из 4 цифр">
+    <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" pattern="[0-9]" aria-label="Цифра 1" value="4">
+    <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Цифра 2" value="7">
+    <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Цифра 3">
+    <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" aria-label="Цифра 4">
+  </div>
+  <div class="gid-alt" style="justify-content:flex-start"><a class="gid-link gid-link--muted" data-go="login">Войти через GG ID</a></div>
+</template>
+
+<template data-key="unavailable" data-tab="Недоступен" data-title="Вход временно недоступен">
+  <h1 class="gid-h">Вход временно недоступен</h1>
+  <p class="gid-sub">GG ID не отвечает. Обычно это минута: попробуем снова сами через <b data-gid-countdown="15" data-gid-countdown-done="reload">0:15</b>.</p>
+  <div class="gid-stack">
+    <button class="gid-btn gid-btn--primary" type="button" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-refresh-cw"/></svg><span>Попробовать сейчас</span></button>
+  </div>
+</template>
+
+<template data-key="signedout" data-tab="Вы вышли" data-title="Вы вышли">
+  <h1 class="gid-h">Вы вышли</h1>
+  <p class="gid-sub">Сессия GG ID на этом устройстве закрыта. Чтобы продолжить работу, войдите снова.</p>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти снова</span></a>
+  </div>
+</template>

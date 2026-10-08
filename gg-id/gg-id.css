@@ -1,0 +1,400 @@
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, 2026-10-08.
+   Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
+   Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
+   Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
+   Компоненты в шапках сервисов (кнопка GG ID, аккаунт, диалог): внутри элемента с классом gid-kit. */
+
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/montserrat-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/montserrat-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* ---------- токены: светлая тема ---------- */
+.gid,.gid-kit{
+  --g-font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --g-ease:cubic-bezier(.22,.61,.36,1); --g-pop:cubic-bezier(.34,1.3,.64,1);
+  --g-page:#eef3f9;
+  --g-page-bg:radial-gradient(1100px 560px at 50% -8%,#f8fbff 0%,rgba(248,251,255,0) 62%),linear-gradient(180deg,#e7eff8 0%,#eef3f9 100%);
+  --g-solid:#ffffff;
+  --g-card:#ffffff; --g-card-line:rgba(19,68,93,.08); --g-card-blur:none;
+  --g-card-shadow:0 1px 2px rgba(15,23,42,.04),0 34px 80px -44px rgba(19,68,93,.5);
+  --g-head:#13445d; --g-ink:#0f172a; --g-ink-2:#334155; --g-muted:#64748b; --g-faint:#94a3b8;
+  --g-line:#e2e8f0; --g-soft:#f1f5f9; --g-surface:#f8fafc;
+  --g-logo:#13445d; --g-divider:rgba(19,68,93,.2);
+  --g-primary:#13445d; --g-primary-hi:#1a5a7a; --g-primary-ink:#ffffff;
+  --g-primary-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
+  --g-second:#ffffff; --g-second-line:#d5dee8; --g-second-ink:#0f172a; --g-second-hover:#f6f9fc;
+  --g-accent:#009CDC; --g-link:#0077a8; --g-ring:rgba(0,156,220,.22);
+  --g-field:#ffffff; --g-field-line:#d5dee8; --g-field-hover:#94a3b8; --g-autofill:#f2f8fd;
+  --g-danger:#dc2626; --g-danger-ink:#b91c1c; --g-danger-soft:#fef2f2; --g-danger-ring:rgba(220,38,38,.14);
+  --g-success:#16a34a; --g-warn:#d97706;
+  --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
+  --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
+  color-scheme:light;
+  font-family:var(--g-font);
+}
+
+/* ---------- токены: тёмная тема (явно или по системе) ---------- */
+.gid[data-theme="dark"],.gid-kit[data-theme="dark"]{
+  --g-page:#081b26;
+  --g-page-bg:radial-gradient(1100px 620px at 50% -12%,#15425c 0%,rgba(21,66,92,0) 62%),linear-gradient(180deg,#0b2433 0%,#071721 100%);
+  --g-solid:#0a1f2c;
+  --g-card:rgba(255,255,255,.045); --g-card-line:rgba(255,255,255,.10); --g-card-blur:blur(22px) saturate(140%);
+  --g-card-shadow:0 34px 90px -44px rgba(0,0,0,.75);
+  --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
+  --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
+  --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+  --g-primary:#ffffff; --g-primary-hi:#e6f5fc; --g-primary-ink:#0d2f42;
+  --g-primary-shadow:0 12px 32px -16px rgba(92,195,236,.6);
+  --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
+  --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3);
+  --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
+  --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
+  --g-success:#4ade80; --g-warn:#fbbf24;
+  --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+  --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
+  --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){
+  .gid:not([data-theme="light"]),.gid-kit:not([data-theme="light"]){
+    --g-page:#081b26;
+    --g-page-bg:radial-gradient(1100px 620px at 50% -12%,#15425c 0%,rgba(21,66,92,0) 62%),linear-gradient(180deg,#0b2433 0%,#071721 100%);
+    --g-solid:#0a1f2c;
+    --g-card:rgba(255,255,255,.045); --g-card-line:rgba(255,255,255,.10); --g-card-blur:blur(22px) saturate(140%);
+    --g-card-shadow:0 34px 90px -44px rgba(0,0,0,.75);
+    --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
+    --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
+    --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+    --g-primary:#ffffff; --g-primary-hi:#e6f5fc; --g-primary-ink:#0d2f42;
+    --g-primary-shadow:0 12px 32px -16px rgba(92,195,236,.6);
+    --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
+    --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3);
+    --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
+    --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
+    --g-success:#4ade80; --g-warn:#fbbf24;
+    --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+    --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
+    --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+}
+
+/* ---------- страница и оболочка ---------- */
+.gid-body{margin:0;min-height:100vh;min-height:100dvh;background:#eef3f9}
+@media (prefers-color-scheme:dark){.gid-body{background:#081b26}}
+.gid,.gid *,.gid *::before,.gid *::after,.gid-kit *,.gid-kit *::before,.gid-kit *::after{box-sizing:border-box}
+.gid{position:relative;isolation:isolate;overflow:hidden;min-height:var(--gid-h,100vh);min-height:var(--gid-h,100dvh);
+  background:var(--g-page-bg),var(--g-page);color:var(--g-ink);font-weight:500;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;
+  container:gid/inline-size}
+/* сбросы с нулевой специфичностью: классы кита и сервиса всегда сильнее */
+:where(.gid,.gid-kit) :where(h1,h2,p,ul){margin:0}
+:where(.gid,.gid-kit) :where(button,input){font:inherit;color:inherit}
+:where(.gid,.gid-kit) a{color:inherit;text-decoration:none}
+/* атрибут hidden прячет всегда, даже кнопки и плашки с display:flex */
+.gid [hidden],.gid-kit [hidden]{display:none!important}
+
+/* голубые «пятна» за карточкой (только раскладка card), медленно плывут */
+.gid[data-layout="card"]::before,.gid[data-layout="card"]::after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none;will-change:transform}
+.gid[data-layout="card"]::before{width:760px;height:760px;left:-260px;top:-300px;background:radial-gradient(closest-side,var(--g-blob-a),transparent);animation:gidDriftA 26s var(--g-ease) infinite alternate}
+.gid[data-layout="card"]::after{width:680px;height:680px;right:-240px;bottom:-320px;background:radial-gradient(closest-side,var(--g-blob-b),transparent);animation:gidDriftB 32s var(--g-ease) infinite alternate}
+@keyframes gidDriftA{to{transform:translate(120px,90px) scale(1.08)}}
+@keyframes gidDriftB{to{transform:translate(-110px,-70px) scale(1.1)}}
+
+.gid-frame{display:grid;grid-template-columns:minmax(0,1fr);min-height:inherit}
+.gid-main{display:flex;flex-direction:column;align-items:center;min-height:inherit;min-width:0;
+  padding:max(28px,env(safe-area-inset-top)) 20px max(22px,env(safe-area-inset-bottom))}
+.gid-card{width:100%;max-width:428px;margin-block:auto;position:relative;
+  background:var(--g-card);border:1px solid var(--g-card-line);border-radius:24px;box-shadow:var(--g-card-shadow);
+  -webkit-backdrop-filter:var(--g-card-blur);backdrop-filter:var(--g-card-blur);
+  padding:40px 40px 34px;animation:gidIn .42s var(--g-ease) both}
+@keyframes gidIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* минимал и сплит: без карточки, форма прямо на ровном фоне */
+.gid[data-layout="minimal"],.gid[data-layout="split"]{background:var(--g-solid)}
+.gid[data-layout="minimal"] .gid-card,.gid[data-layout="split"] .gid-card{background:none;border:0;box-shadow:none;border-radius:0;
+  -webkit-backdrop-filter:none;backdrop-filter:none;padding:0;max-width:384px}
+.gid[data-layout="minimal"] .gid-h{font-size:34px}
+
+/* сплит: тёмная панель бренда слева, на узком экране прячется */
+.gid-aside{display:none}
+@container gid (min-width:960px){
+  .gid[data-layout="split"] .gid-frame{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}
+  .gid[data-layout="split"] .gid-aside{display:flex}
+  .gid[data-layout="split"] .gid-card .gid-lockup{display:none}
+  .gid[data-layout="split"] .gid-h{font-size:32px}
+}
+.gid-aside{position:relative;overflow:hidden;isolation:isolate;flex-direction:column;justify-content:space-between;gap:32px;
+  min-height:inherit;padding:44px 52px 48px;color:#fff;
+  background:radial-gradient(90% 70% at 0% 0%,#1d6386 0%,rgba(29,99,134,0) 60%),linear-gradient(160deg,#164e6b 0%,#0d2f42 52%,#082231 100%)}
+.gid[data-theme="dark"] .gid-aside{background:radial-gradient(90% 70% at 0% 0%,#154b66 0%,rgba(21,75,102,0) 60%),linear-gradient(160deg,#0f3a51 0%,#0a2433 52%,#06161f 100%)}
+.gid-aside::after{content:"";position:absolute;z-index:-1;width:620px;height:620px;right:-220px;bottom:-260px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,156,220,.34),transparent);animation:gidDriftB 22s var(--g-ease) infinite alternate;pointer-events:none}
+.gid-aside .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;position:relative}
+.gid-aside-copy{position:relative;max-width:540px}
+.gid-aside-title{font-size:40px;line-height:1.08;font-weight:700;letter-spacing:-.03em;color:#fff;text-wrap:balance}
+.gid-aside-sub{margin-top:14px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.68);max-width:400px}
+/* бегущие строки с названиями сервисов: один вход открывает их все */
+.gid-mq{position:absolute;z-index:-1;inset:-10% -20%;display:flex;flex-direction:column;justify-content:center;gap:6px;
+  transform:rotate(-9deg);pointer-events:none;user-select:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent 8%,#000 32%,#000 56%,transparent 76%);mask-image:linear-gradient(180deg,transparent 8%,#000 32%,#000 56%,transparent 76%)}
+.gid-mq-row{display:flex;width:max-content;white-space:nowrap;font-size:58px;line-height:1.12;font-weight:700;letter-spacing:-.035em;color:#fff;
+  animation:gidMq 90s linear infinite;will-change:transform}
+.gid-mq-row span{padding-right:44px}
+.gid-mq-row:nth-child(1){opacity:.05;animation-duration:110s}
+.gid-mq-row:nth-child(2){opacity:.09;animation-direction:reverse;animation-duration:95s}
+.gid-mq-row:nth-child(3){opacity:.14;animation-duration:80s}
+.gid-mq-row:nth-child(4){opacity:.09;animation-direction:reverse;animation-duration:100s}
+.gid-mq-row:nth-child(5){opacity:.05;animation-duration:120s}
+@keyframes gidMq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- подпись «логотип | ID» (вариант 2 «Во всю высоту») ---------- */
+.gid-lockup{display:inline-flex;align-items:stretch;gap:14px;color:var(--g-logo);margin-bottom:34px;max-width:100%}
+.gid-logo{display:block;height:28px;width:auto;flex:none;fill:currentColor}
+.gid-lockup-name{display:flex;align-items:center;padding-left:14px;border-left:1px solid var(--g-divider);
+  font-size:16px;font-weight:600;line-height:1.1;white-space:nowrap;color:var(--g-logo)}
+
+/* ---------- текст ---------- */
+.gid-h{font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.028em;color:var(--g-head);text-wrap:balance}
+.gid-h--sm{font-size:22px}
+.gid-sub{margin-top:10px;font-size:15px;line-height:1.55;color:var(--g-muted);max-width:36ch;text-wrap:pretty}
+.gid-sub b,.gid-note b{color:var(--g-ink);font-weight:600}
+.gid-note{font-size:13px;line-height:1.55;color:var(--g-muted);text-wrap:pretty}
+.gid-body-gap{height:28px}
+
+/* ---------- раскладка формы ---------- */
+.gid-stack{display:flex;flex-direction:column;gap:10px;margin-top:28px}
+.gid-form{display:flex;flex-direction:column;gap:18px;margin-top:28px}
+.gid-form .gid-btn{margin-top:4px}
+.gid-alt{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin-top:22px}
+.gid-or{display:flex;align-items:center;gap:14px;margin:22px 0 16px;font-size:12px;font-weight:600;color:var(--g-faint);letter-spacing:.02em}
+.gid-or::before,.gid-or::after{content:"";flex:1;height:1px;background:var(--g-line)}
+
+/* ---------- иконки (lucide инлайн) ---------- */
+.gid-ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gid-ic--sm{width:16px;height:16px}
+.gid-ic--fill{fill:currentColor;stroke:none}
+
+/* ---------- кнопки ---------- */
+.gid-btn{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:0 18px;
+  border-radius:14px;border:1px solid transparent;font-size:15px;font-weight:700;letter-spacing:-.005em;line-height:1.2;text-align:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
+  transition:background-color .18s var(--g-ease),border-color .18s var(--g-ease),color .18s var(--g-ease),transform .12s var(--g-ease),box-shadow .18s var(--g-ease)}
+.gid-btn:active:not(:disabled){transform:scale(.985)}
+.gid-btn:focus-visible{outline:none;box-shadow:0 0 0 4px var(--g-ring)}
+.gid-btn--primary{background:var(--g-primary);color:var(--g-primary-ink);box-shadow:var(--g-primary-shadow)}
+.gid-btn--primary:hover:not(:disabled){background:var(--g-primary-hi)}
+.gid-btn--primary:focus-visible{box-shadow:var(--g-primary-shadow),0 0 0 4px var(--g-ring)}
+.gid-btn--secondary{background:var(--g-second);color:var(--g-second-ink);border-color:var(--g-second-line)}
+.gid-btn--secondary:hover:not(:disabled){background:var(--g-second-hover);border-color:var(--g-field-hover)}
+.gid-btn--quiet{background:transparent;color:var(--g-muted);font-weight:600}
+.gid-btn--quiet:hover{color:var(--g-ink);background:var(--g-soft)}
+.gid-btn:disabled{opacity:.55;cursor:default}
+.gid-btn.is-busy{cursor:progress}
+.gid-btn.is-busy::before{content:"";position:absolute;inset:-5px;border-radius:18px;border:2px solid var(--g-accent);opacity:0;pointer-events:none;
+  animation:gidRing 1.7s var(--g-ease) infinite}
+@keyframes gidRing{0%{opacity:.55;transform:scale(.97)}100%{opacity:0;transform:scale(1.05)}}
+.gid-spin{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:gidSpin .8s linear infinite;flex:none}
+@keyframes gidSpin{to{transform:rotate(360deg)}}
+
+/* Face ID: сканирующая линия внутри значка */
+.gid-scan{position:relative;display:inline-grid;place-items:center;width:20px;height:20px;flex:none}
+.gid-scan .gid-ic{position:absolute;inset:0}
+.gid-scan::after{content:"";position:absolute;left:2px;right:2px;top:2px;height:2px;border-radius:2px;background:currentColor;
+  box-shadow:0 0 10px 1px currentColor;animation:gidScan 1.25s var(--g-ease) infinite alternate}
+@keyframes gidScan{to{transform:translateY(14px)}}
+
+/* ссылки-кнопки */
+.gid-link{display:inline-flex;align-items:center;gap:7px;padding:4px 2px;border:0;background:none;cursor:pointer;
+  font-size:14px;font-weight:600;color:var(--g-link);border-radius:6px;transition:color .15s}
+.gid-link:hover{color:var(--g-head);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.gid-link:focus-visible{outline:none;box-shadow:0 0 0 3px var(--g-ring)}
+.gid-link:disabled{color:var(--g-faint);cursor:default;text-decoration:none}
+.gid-link--sm{font-size:13px}
+.gid-link--muted{color:var(--g-muted)}
+.gid-link .gid-ic{width:17px;height:17px}
+
+/* ---------- поля ---------- */
+.gid-field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.gid-label{font-size:13px;font-weight:600;color:var(--g-ink-2);letter-spacing:.005em}
+.gid-label-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.gid-label-row .gid-link{padding:0}
+.gid-input-wrap{position:relative}
+.gid-input{display:block;width:100%;height:52px;padding:0 16px;border-radius:14px;border:1.5px solid var(--g-field-line);background:var(--g-field);
+  font-size:16px;font-weight:500;color:var(--g-ink);outline:none;-webkit-appearance:none;appearance:none;
+  transition:border-color .16s var(--g-ease),box-shadow .16s var(--g-ease),background-color .16s}
+.gid-input-wrap .gid-input{padding-right:52px}
+.gid-input::placeholder{color:var(--g-faint);font-weight:500}
+.gid-input:hover{border-color:var(--g-field-hover)}
+.gid-input:focus{border-color:var(--g-accent);box-shadow:0 0 0 4px var(--g-ring)}
+.gid-input[type="password"]{letter-spacing:.08em}
+.gid-input[type="password"]::placeholder{letter-spacing:normal}
+.gid-input:-webkit-autofill{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset;-webkit-text-fill-color:var(--g-ink);caret-color:var(--g-ink)}
+.gid-input.is-error,.gid-input[aria-invalid="true"]{border-color:var(--g-danger);box-shadow:0 0 0 4px var(--g-danger-ring)}
+.gid-input.is-shake{animation:gidShake .42s var(--g-ease)}
+@keyframes gidShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.gid-eye{position:absolute;top:6px;right:6px;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:10px;
+  background:transparent;color:var(--g-faint);cursor:pointer;transition:color .15s,background-color .15s}
+.gid-eye:hover{color:var(--g-ink);background:var(--g-soft)}
+.gid-eye:focus-visible{outline:none;box-shadow:0 0 0 3px var(--g-ring)}
+.gid-eye .gid-ic{width:19px;height:19px}
+.gid-eye [data-off]{display:none}
+.gid-eye[aria-pressed="true"] [data-on]{display:none}
+.gid-eye[aria-pressed="true"] [data-off]{display:block}
+.gid-hint{font-size:12.5px;color:var(--g-muted);line-height:1.45}
+.gid-hint.is-error{color:var(--g-danger-ink)}
+
+/* сообщение об ошибке над кнопкой */
+.gid-msg{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;font-size:13.5px;line-height:1.45;font-weight:600;
+  animation:gidIn .3s var(--g-ease) both}
+.gid-msg .gid-ic{width:18px;height:18px;margin-top:1px}
+.gid-msg--error{background:var(--g-danger-soft);color:var(--g-danger-ink)}
+.gid-msg--info{background:var(--g-surface);color:var(--g-ink-2);border:1px solid var(--g-line);font-weight:500}
+.gid-msg--info .gid-ic{color:var(--g-link)}
+
+/* код доступа: 4 ячейки */
+.gid-code{display:grid;grid-template-columns:repeat(var(--gid-code-n,4),minmax(0,64px));gap:12px;margin-top:30px}
+.gid-code input{width:100%;height:72px;padding:0;border-radius:16px;border:1.5px solid var(--g-field-line);background:var(--g-field);
+  text-align:center;font-size:30px;font-weight:700;color:var(--g-head);caret-color:var(--g-accent);outline:none;
+  -webkit-appearance:none;appearance:none;transition:border-color .16s,box-shadow .16s,transform .2s var(--g-pop)}
+.gid-code input:hover{border-color:var(--g-field-hover)}
+.gid-code input:focus{border-color:var(--g-accent);box-shadow:0 0 0 4px var(--g-ring)}
+.gid-code input.is-filled{border-color:var(--g-head);animation:gidPop .26s var(--g-pop)}
+.gid-code.is-error input{border-color:var(--g-danger);box-shadow:0 0 0 4px var(--g-danger-ring)}
+.gid-code.is-shake{animation:gidShake .42s var(--g-ease)}
+@keyframes gidPop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* новый пароль: шкала и правила */
+.gid-meter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:2px}
+.gid-meter i{height:4px;border-radius:4px;background:var(--g-soft);transition:background-color .25s var(--g-ease)}
+.gid-meter[data-level="1"] i:nth-child(-n+1){background:var(--g-danger)}
+.gid-meter[data-level="2"] i:nth-child(-n+2){background:var(--g-warn)}
+.gid-meter[data-level="3"] i:nth-child(-n+3){background:var(--g-accent)}
+.gid-meter[data-level="4"] i{background:var(--g-success)}
+.gid-rules{list-style:none;padding:0;display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.gid-rules li{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;color:var(--g-muted);transition:color .2s}
+.gid-rules li::before{content:"";width:16px;height:16px;flex:none;border-radius:50%;border:1.5px solid var(--g-field-line);
+  background:center/10px no-repeat;transition:background-color .2s,border-color .2s,transform .25s var(--g-pop)}
+.gid-rules li.is-ok{color:var(--g-ink)}
+.gid-rules li.is-ok::before{border-color:var(--g-success);background-color:var(--g-success);transform:scale(1.05);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")}
+
+/* ---------- аккаунт ---------- */
+.gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;border-radius:50%;background:var(--g-avatar);
+  color:#fff;font-size:15px;font-weight:700;letter-spacing:.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.gid-avatar--sm{width:36px;height:36px;font-size:13px}
+.gid-avatar--xs{width:28px;height:28px;font-size:11px}
+.gid-account{display:flex;align-items:center;gap:14px;width:100%;margin-top:28px;padding:14px 16px;border-radius:16px;
+  border:1px solid var(--g-second-line);background:var(--g-second);text-align:left;cursor:pointer;
+  transition:border-color .16s,background-color .16s,transform .12s var(--g-ease)}
+.gid-account:hover{border-color:var(--g-field-hover);background:var(--g-second-hover)}
+.gid-account:active{transform:scale(.99)}
+.gid-account:focus-visible{outline:none;box-shadow:0 0 0 4px var(--g-ring)}
+.gid-account-tx,.gid-who-tx{display:flex;flex-direction:column;min-width:0;flex:1}
+.gid-account-tx b,.gid-who-tx b{font-size:15px;font-weight:600;color:var(--g-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gid-account-tx span,.gid-who-tx span{font-size:13px;color:var(--g-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gid-account > .gid-ic{color:var(--g-faint);transition:transform .16s var(--g-ease),color .16s}
+.gid-account:hover > .gid-ic{color:var(--g-ink);transform:translateX(3px)}
+.gid-who{display:flex;align-items:center;gap:12px;margin-top:24px;padding:12px 14px;border-radius:14px;background:var(--g-surface);border:1px solid var(--g-line)}
+.gid-who-tx b{font-size:14px}
+.gid-who-tx span{font-size:12.5px}
+
+/* ---------- вход выполнен: фирменная сборка знака ---------- */
+.gid-done{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 0 14px}
+.gid-done .gid-sub{margin-inline:auto}
+.gid-ld{display:flex;align-items:center;justify-content:center;gap:9px;height:64px;margin-bottom:30px;color:var(--g-logo)}
+.gid-ld-mark{width:66px;height:44px;overflow:visible;fill:currentColor}
+.gid-ld-word{line-height:0;clip-path:inset(0 100% 0 0);animation:gidLdWipe 3.4s cubic-bezier(.22,.9,.24,1) infinite}
+.gid-ld-word svg{height:35px;width:auto;fill:currentColor;display:block}
+.gid-ld-main{transform-box:fill-box;transform-origin:center;animation:gidLdMain 3.4s var(--g-pop) infinite}
+.gid-ld-arc{animation:gidLdLeft 3.4s var(--g-ease) infinite}
+.gid-ld-right{animation:gidLdRight 3.4s var(--g-ease) infinite}
+@keyframes gidLdMain{0%,6%{opacity:0;transform:scale(.8)}22%{opacity:1;transform:scale(1)}86%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes gidLdLeft{0%,16%{opacity:0;transform:translateX(3px)}34%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes gidLdRight{0%,20%{opacity:0;transform:translateX(-3px)}38%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes gidLdWipe{0%,30%{clip-path:inset(0 100% 0 0)}52%{clip-path:inset(0 0 0 0)}86%{clip-path:inset(0 0 0 0);opacity:1}100%{clip-path:inset(0 0 0 0);opacity:0}}
+.gid-done .gid-progress{width:140px;height:3px;border-radius:3px;background:var(--g-soft);overflow:hidden;margin-top:22px}
+.gid-done .gid-progress i{display:block;height:100%;width:40%;border-radius:3px;background:var(--g-accent);animation:gidProg 1.4s var(--g-ease) infinite}
+@keyframes gidProg{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+
+/* ---------- подвал ---------- */
+.gid-foot{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 16px;width:100%;max-width:428px;margin-top:28px;
+  font-size:12.5px;color:var(--g-muted);text-align:center}
+.gid-foot b{font-weight:700;color:var(--g-ink-2);letter-spacing:.01em}
+.gid[data-layout="minimal"] .gid-foot,.gid[data-layout="split"] .gid-foot{max-width:384px;justify-content:flex-start;text-align:left}
+
+/* ---------- узкий экран (телефон) ---------- */
+@container gid (max-width:520px){
+  .gid-main{padding:max(20px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom))}
+  .gid-card{padding:30px 22px 26px;border-radius:22px}
+  .gid-h{font-size:25px}
+  .gid[data-layout="minimal"] .gid-h,.gid[data-layout="split"] .gid-h{font-size:28px}
+  .gid-lockup{margin-bottom:28px}
+  .gid-code{gap:10px}
+  .gid-code input{height:64px;font-size:27px}
+}
+@container gid (max-width:360px){
+  .gid-lockup{gap:10px}
+  .gid-lockup-name{padding-left:10px;font-size:15px}
+  .gid-logo{height:28px}
+}
+
+/* ============ компоненты для шапок и экранов сервисов ============ */
+
+/* кнопка «Войти через GG ID»: единственный вход на собственном экране сервиса */
+.gid-sso{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:0 22px 0 14px;border-radius:14px;
+  border:1px solid transparent;background:#13445d;color:#fff;font-family:var(--g-font);font-size:15px;font-weight:700;letter-spacing:-.005em;
+  text-decoration:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
+  transition:background-color .18s var(--g-ease),transform .12s var(--g-ease),box-shadow .18s var(--g-ease),border-color .18s}
+.gid-sso:hover{background:#1a5a7a}
+.gid-sso:active{transform:scale(.985)}
+.gid-sso:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(0,156,220,.25)}
+.gid-sso-tile{width:28px;height:28px;flex:none;border-radius:7px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.gid-sso--light{background:#fff;color:#0f172a;border-color:#d5dee8;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.gid-sso--light:hover{background:#f6f9fc;border-color:#94a3b8}
+.gid-sso--light .gid-sso-tile{box-shadow:none}
+.gid-sso--on-dark{background:#fff;color:#0d2f42;box-shadow:0 12px 32px -16px rgba(92,195,236,.6)}
+.gid-sso--on-dark:hover{background:#e6f5fc}
+.gid-sso--on-dark .gid-sso-tile{box-shadow:none}
+.gid-sso--sm{min-height:40px;font-size:13.5px;gap:10px;padding:0 16px 0 9px;border-radius:11px}
+.gid-sso--sm .gid-sso-tile{width:22px;height:22px;border-radius:6px}
+.gid-sso--block{display:flex;width:100%}
+
+/* аккаунт в шапке сервиса */
+.gid-chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 10px 0 6px;border-radius:999px;border:1px solid var(--g-line);
+  background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-size:13.5px;font-weight:600;cursor:pointer;
+  transition:border-color .15s,background-color .15s}
+.gid-chip:hover,.gid-chip[aria-expanded="true"]{border-color:var(--g-field-hover);background:var(--g-second-hover)}
+.gid-chip:focus-visible{outline:none;box-shadow:0 0 0 3px var(--g-ring)}
+.gid-chip .gid-ic{width:16px;height:16px;color:var(--g-faint);transition:transform .18s var(--g-ease)}
+.gid-chip[aria-expanded="true"] .gid-ic{transform:rotate(180deg)}
+.gid-menu{width:300px;max-width:calc(100vw - 32px);padding:8px;border-radius:18px;border:1px solid var(--g-card-line);background:var(--g-solid);
+  box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);transform-origin:top right;animation:gidMenu .2s var(--g-pop) both}
+@keyframes gidMenu{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+.gid-menu-head{display:flex;align-items:center;gap:12px;padding:10px 10px 14px;margin-bottom:6px;border-bottom:1px solid var(--g-line)}
+.gid-menu-head b{display:block;font-size:14.5px;font-weight:600;color:var(--g-ink)}
+.gid-menu-head span{display:block;font-size:12.5px;color:var(--g-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gid-menu-head > div{min-width:0}
+.gid-menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:0;border-radius:11px;background:none;
+  font:inherit;font-size:14px;font-weight:600;color:var(--g-ink);text-decoration:none;cursor:pointer;text-align:left;transition:background-color .14s}
+.gid-menu-item:hover,.gid-menu-item:focus-visible{background:var(--g-soft);outline:none}
+.gid-menu-item .gid-ic{width:18px;height:18px;color:var(--g-muted)}
+.gid-menu-meta{margin-left:auto;font-size:12px;font-weight:500;color:var(--g-faint)}
+.gid-menu-sep{height:1px;margin:6px 4px;background:var(--g-line)}
+
+/* сессия истекла: окно поверх страницы сервиса */
+.gid-scrim{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:rgba(8,27,38,.42);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:gidFade .2s var(--g-ease) both}
+@keyframes gidFade{from{opacity:0}to{opacity:1}}
+.gid-dialog{width:100%;max-width:400px;padding:30px 30px 26px;border-radius:22px;background:var(--g-solid);border:1px solid var(--g-card-line);
+  box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);animation:gidMenu .24s var(--g-pop) both}
+.gid-dialog .gid-h{font-size:22px}
+.gid-dialog .gid-sso{margin-top:24px}
+
+/* ---------- меньше движения ---------- */
+@media (prefers-reduced-motion:reduce){
+  .gid *,.gid::before,.gid::after,.gid-kit *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .gid-mq-row{animation:none!important}
+  .gid-ld-word{clip-path:none}
+  .gid-ld-main,.gid-ld-arc,.gid-ld-right,.gid-ld-word{animation:none!important;opacity:1}
+}

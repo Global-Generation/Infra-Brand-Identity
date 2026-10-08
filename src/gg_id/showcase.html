@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>GG ID</title>
+<link rel="icon" href="@FAVICON_URI@" type="image/svg+xml">
+<style>
+/*@GID_CSS@*/
+
+/* ---------- витрина ---------- */
+:root{--navy:#13445d;--navy-deep:#0d2f42;--sky:#009CDC;--sky-ink:#0077a8;--fg:#0f172a;--sfg:#334155;--mfg:#64748b;--lfg:#94a3b8;
+  --border:#e2e8f0;--border-hi:#cbd5e1;--card:#fff;--bg:#eef3f9;--font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body.sc{margin:0;font-family:var(--font);font-weight:500;color:var(--fg);line-height:1.5;-webkit-font-smoothing:antialiased;
+  background:linear-gradient(180deg,#e7eff8 0%,#eef3f9 520px) no-repeat,#eef3f9}
+.wrap{max-width:1260px;margin:0 auto;padding:0 24px}
+code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding:2px 6px;border-radius:6px;overflow-wrap:anywhere}
+
+.sc-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:26px;flex-wrap:wrap}
+.sc-top .gid-lockup{margin:0}
+.sc-top .meta{font-size:12.5px;font-weight:600;color:var(--mfg)}
+.sc-hero{padding-top:46px}
+.sc-hero h1{margin:0;font-size:64px;line-height:.95;font-weight:700;letter-spacing:-.045em;color:var(--navy)}
+.sc-hero p{margin:16px 0 0;max-width:720px;font-size:16px;line-height:1.6;color:var(--sfg)}
+
+.sc-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:34px}
+.sc-seg{display:inline-flex;gap:2px;padding:4px;border-radius:13px;background:#fff;border:1px solid var(--border);max-width:100%;overflow-x:auto}
+.sc-seg button{flex:none;border:0;background:none;padding:9px 13px;border-radius:9px;font:600 13px/1 var(--font);color:var(--sfg);cursor:pointer;white-space:nowrap;transition:background-color .15s,color .15s}
+.sc-seg button:hover{color:var(--fg);background:#f1f5f9}
+.sc-seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.sc-seg button small{font-size:11px;font-weight:600;opacity:.65;margin-left:6px}
+.sc-sel{display:inline-flex;align-items:center;gap:8px;padding:4px 4px 4px 14px;border-radius:13px;background:#fff;border:1px solid var(--border);font-size:12.5px;font-weight:600;color:var(--mfg)}
+.sc-sel select{font:600 13px var(--font);color:var(--fg);border:0;background:#f1f5f9;border-radius:9px;padding:8px 10px;cursor:pointer}
+
+.sc-tabs{display:flex;gap:6px;margin-top:14px;padding-bottom:6px;overflow-x:auto;scrollbar-width:thin}
+.sc-tab{flex:none;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:#fff;padding:9px 13px;border-radius:999px;
+  font:600 12.5px/1 var(--font);color:var(--sfg);cursor:pointer;transition:border-color .15s,background-color .15s,color .15s}
+.sc-tab i{font-style:normal;font-weight:700;color:var(--lfg)}
+.sc-tab:hover{border-color:var(--border-hi);color:var(--fg)}
+.sc-tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.sc-tab[aria-selected="true"] i{color:rgba(255,255,255,.6)}
+.sc-tabs.is-off{opacity:.45;pointer-events:none}
+
+.sc-stage{margin-top:18px;min-width:0}
+.sc-browser{border-radius:16px;overflow:hidden;background:#fff;border:1px solid var(--border);box-shadow:0 40px 90px -50px rgba(19,68,93,.55)}
+.sc-chrome{height:42px;display:flex;align-items:center;gap:14px;padding:0 14px;background:#f5f8fb;border-bottom:1px solid var(--border)}
+.sc-dots{display:flex;gap:7px;flex:none}.sc-dots i{width:11px;height:11px;border-radius:50%;background:#d6dee8}
+.sc-url{flex:1;min-width:0;max-width:540px;margin:0 auto;height:28px;border-radius:8px;background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:7px;padding:0 10px;font:600 12px var(--font);color:var(--mfg);white-space:nowrap;overflow:hidden}
+.sc-url svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sc-url span{overflow:hidden;text-overflow:ellipsis}
+.sc-viewport{position:relative;overflow:hidden}
+.sc-screen{position:absolute;left:0;top:0;width:1280px;height:800px;overflow:auto;transform-origin:0 0}
+.sc-phone-wrap{display:flex;justify-content:center;padding:14px 0 10px}
+.sc-phone-box{position:relative}
+.sc-phone{position:absolute;left:0;top:0;width:390px;height:844px;border-radius:52px;overflow:hidden;transform-origin:0 0;background:#000;
+  box-shadow:0 0 0 11px #0f172a,0 0 0 12px #3b4a5e,0 50px 90px -40px rgba(15,23,42,.6)}
+.sc-phone::before{content:"";position:absolute;z-index:5;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;border-radius:20px;background:#000}
+.sc-phone .sc-phone-in{position:absolute;inset:0;overflow:auto;scrollbar-width:none}
+.sc-phone .sc-phone-in::-webkit-scrollbar{display:none}
+.sc-phone .gid-main,.sc-mini .gid-main{padding-top:58px}
+
+.sc-cap{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 18px;max-width:900px;margin:22px auto 0;padding:18px 22px;border-radius:16px;
+  background:#fff;border:1px solid var(--border);font-size:13.5px;color:var(--sfg)}
+.sc-cap dt{font-weight:700;color:var(--fg)}
+.sc-cap dd{margin:0;min-width:0}
+
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:26px 20px;margin-top:6px}
+.sc-thumb{display:flex;flex-direction:column;gap:10px;border:0;background:none;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.sc-thumb-frame{position:relative;width:100%;aspect-ratio:390/844;border-radius:24px;overflow:hidden;background:#fff;
+  box-shadow:0 0 0 1px var(--border),0 24px 50px -34px rgba(19,68,93,.5);transition:transform .2s cubic-bezier(.22,.61,.36,1),box-shadow .2s}
+.sc-thumb:hover .sc-thumb-frame{transform:translateY(-3px);box-shadow:0 0 0 1px var(--border-hi),0 30px 60px -34px rgba(19,68,93,.6)}
+.sc-thumb:focus-visible{outline:none}.sc-thumb:focus-visible .sc-thumb-frame{box-shadow:0 0 0 3px var(--sky)}
+.sc-mini{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;pointer-events:none}
+.sc-mini *,.sc-mini .gid::before,.sc-mini .gid::after{animation:none!important;transition:none!important}
+.sc-mini .gid-ld-word{clip-path:none}
+.sc-thumb b{font-size:13px;font-weight:700;color:var(--fg)}
+.sc-thumb b i{font-style:normal;color:var(--lfg);margin-right:6px}
+
+.sc-sec{padding-top:72px}
+.sc-sec h2{margin:0;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.03em;color:var(--navy)}
+.sc-sec > .wrap > p,.sc-sec .lead{margin:10px 0 0;max-width:760px;font-size:15px;line-height:1.6;color:var(--sfg)}
+.sc-comp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}
+.sc-card{min-width:0;display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:20px;background:#fff;border:1px solid var(--border)}
+.sc-card h3{margin:0;font-size:16px;font-weight:700}
+.sc-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--mfg)}
+.sc-demo{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:22px;border-radius:14px;background:#f3f7fb;min-width:0}
+.sc-demo.dark{background:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%)}
+.sc-demo .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sc-hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:10px 10px 10px 14px;border-radius:14px;background:#fff;border:1px solid var(--border)}
+.sc-hdr .gid-lockup{margin:0}
+.sc-hdr .gid-lockup-name{font-size:15px}
+.sc-menu-slot{display:flex;justify-content:flex-end;width:100%}
+.sc-open{font:600 13px var(--font);color:var(--sky-ink);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+
+.sc-how{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;margin-top:26px;align-items:start}
+.sc-rules{margin:0;padding:22px 22px 22px 44px;border-radius:20px;background:#fff;border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55;color:var(--sfg)}
+.sc-rules b{color:var(--fg)}
+.sc-files{margin-top:16px;padding:20px 22px;border-radius:20px;background:#fff;border:1px solid var(--border);font-size:13.5px;color:var(--sfg);display:flex;flex-direction:column;gap:8px}
+.sc-files div{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px}
+.sc-api{border-radius:20px;background:#fff;border:1px solid var(--border);overflow:hidden}
+.sc-api table{width:100%;border-collapse:collapse;font-size:13px}
+.sc-api th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mfg);padding:14px 16px;border-bottom:1px solid var(--border);background:#f8fafc}
+.sc-api td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--sfg);line-height:1.5}
+.sc-api tr:last-child td{border-bottom:0}
+.sc-api td b{display:block;color:var(--fg);font-size:13.5px}
+.sc-api td span{display:block;font:500 11.5px var(--mono);color:var(--lfg);margin-top:2px}
+.sc-api td:first-child{width:24%}.sc-api td:last-child{width:34%}
+.sc-api td code{display:inline-block;overflow-wrap:normal;word-break:normal}
+.sc-foot{padding:64px 0 48px;font-size:12.5px;color:var(--mfg)}
+
+@media (max-width:1020px){.sc-comp{grid-template-columns:minmax(0,1fr)}.sc-how{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .sc-hero{padding-top:30px}.sc-hero h1{font-size:46px}.sc-hero p{font-size:15px}
+  .sc-cap{grid-template-columns:minmax(0,1fr);gap:2px}.sc-cap dd{margin-bottom:8px}
+  .sc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
+  .sc-files div{grid-template-columns:minmax(0,1fr);gap:2px}
+  .sc-api thead{display:none}.sc-api tr{display:block;padding:12px 0;border-bottom:1px solid var(--border)}.sc-api td{display:block;border:0;padding:3px 16px}
+  .sc-sec h2{font-size:26px}
+}
+</style>
+</head>
+<body class="sc">
+
+<header class="wrap sc-top">
+  <div class="gid-kit" data-theme="light">@LOCKUP@</div>
+  <div class="meta">Infra-Brand-Identity · 08.10.2026</div>
+</header>
+
+<section class="wrap sc-hero">
+  <h1>GG ID</h1>
+  <p>Единый вход во все сервисы Global Generation: @N_SCREENS@ экранов входа, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
+</section>
+
+<section class="wrap">
+  <div class="sc-bar">
+    <div class="sc-seg" role="group" aria-label="Раскладка" data-k="layout">
+      <button type="button" data-v="split">Сплит<small>рекомендую</small></button><button type="button" data-v="card">Карточка</button><button type="button" data-v="minimal">Минимал</button>
+    </div>
+    <div class="sc-seg" role="group" aria-label="Тема" data-k="theme">
+      <button type="button" data-v="light">Светлая</button><button type="button" data-v="dark">Тёмная</button>
+    </div>
+    <div class="sc-seg" role="group" aria-label="Устройство" data-k="device">
+      <button type="button" data-v="desktop">Компьютер</button><button type="button" data-v="phone">Телефон</button><button type="button" data-v="all">Все экраны</button>
+    </div>
+    <label class="sc-sel">Куда входим
+      <select id="svc">
+        <option value="akb">АКБ</option><option value="cabinet">Кабинет ментора</option><option value="pulse">Пульс</option><option value="legal">Юротдел</option><option value="production">Продакшн</option><option value="hub">хаб команды</option>
+      </select>
+    </label>
+  </div>
+  <nav class="sc-tabs" id="tabs" role="tablist" aria-label="Экраны"></nav>
+  <div class="sc-stage" id="stage"></div>
+  <dl class="sc-cap" id="cap"></dl>
+</section>
+
+<section class="sc-sec">
+  <div class="wrap">
+    <h2>Компоненты для сервисов</h2>
+    <p class="lead">Сервис не рисует свою форму пароля. На его экране одна кнопка «Войти через GG ID», в шапке аккаунт с меню, а когда сессия истекает, окно поверх страницы.</p>
+    <div class="sc-comp">
+      <div class="sc-card">
+        <h3>Кнопка «Войти через GG ID»</h3>
+        <div class="sc-demo gid-kit" data-theme="light">
+          <a class="gid-sso" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a>
+          <a class="gid-sso gid-sso--light" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a>
+          <a class="gid-sso gid-sso--sm" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a>
+        </div>
+        <div class="sc-demo dark gid-kit" data-theme="dark">
+          <a class="gid-sso gid-sso--on-dark" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a>
+        </div>
+        <p>Значок = фавикон сайта как есть (корень GG). Ведёт на <code>/api/auth/authorize</code> хаба, возврат на ту же страницу.</p>
+      </div>
+      <div class="sc-card">
+        <h3>Аккаунт в шапке</h3>
+        <div class="sc-demo gid-kit" data-theme="light">
+          <div class="sc-hdr">
+            <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">АКБ</span></div>
+            <button class="gid-chip" type="button" aria-expanded="true" aria-haspopup="menu" id="chip"><span class="gid-avatar gid-avatar--xs" aria-hidden="true">ЛА</span><span>Лёв</span><svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-down"/></svg></button>
+          </div>
+          <div class="sc-menu-slot" id="menuSlot">
+            <div class="gid-menu" role="menu" aria-label="Аккаунт">
+              <div class="gid-menu-head"><span class="gid-avatar" aria-hidden="true">ЛА</span><div><b>Лёв Авдошин</b><span>lev@global-generations.com</span></div></div>
+              <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg>Мои сервисы</a>
+              <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-shield-check"/></svg>Аккаунт GG ID<span class="gid-menu-meta">Face ID, пароль</span></a>
+              <div class="gid-menu-sep"></div>
+              <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-log-out"/></svg>Выйти</a>
+            </div>
+          </div>
+        </div>
+        <p>Инициалы на navy-градиенте, без фото. «Выйти» закрывает сессию GG ID на устройстве (экран «Вы вышли»).</p>
+      </div>
+      <div class="sc-card">
+        <h3>Сессия истекла</h3>
+        <div class="sc-demo gid-kit" data-theme="light">
+          <div class="gid-dialog" role="dialog" aria-labelledby="dlgT" style="animation:none">
+            <h2 class="gid-h" id="dlgT">Сессия истекла</h2>
+            <p class="gid-sub">Войдите снова, и мы вернём вас на эту же страницу.</p>
+            <a class="gid-sso gid-sso--block" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a>
+          </div>
+          <button class="sc-open" type="button" id="openDlg">Показать поверх страницы</button>
+        </div>
+        <p>Сервис получил 401 на запрос: окно вместо внезапного выброса на логин, черновики на странице не теряются.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sc-sec">
+  <div class="wrap">
+    <h2>Как подключить</h2>
+    <p class="lead">Экраны входа один раз собираются в хабе levauth (Lambda gg-portal-auth), сервисы только отправляют туда человека и показывают аккаунт. Подробно: <code>gg-id/README.md</code>.</p>
+    <div class="sc-how">
+      <div>
+        <ol class="sc-rules">
+          <li><b>Формы входа только в хабе.</b> Сервис рисует одну кнопку «Войти через GG ID», свои пароли и PIN не спрашивает.</li>
+          <li><b>Заголовок называет сервис:</b> «Вход в АКБ». Над заголовком ничего: ни замка, ни значка, ни плашки.</li>
+          <li><b>Подпись «логотип | ID»</b>, логотип одного цвета, не меньше 28 px в высоту (110 px в ширину).</li>
+          <li><b>Одно главное действие.</b> Face ID, если ключ на устройстве есть; иначе пароль. Aura только ссылкой и только если сервер включил.</li>
+          <li><b>Только рабочая почта</b> @global-generations.com, подсказка ещё до отправки.</li>
+          <li><b>Ошибки человеческим языком</b>, без кодов: «Неверная почта или пароль», «Слишком много попыток, подождите минуту», «Сеть недоступна».</li>
+          <li><b>Поля 16 px</b> (iPhone не приближает), autocomplete <code>username</code>, <code>current-password</code>, <code>new-password</code>, <code>one-time-code</code>.</li>
+          <li><b>Тема по системе.</b> В тёмной главная кнопка белая. Движение только opacity и transform, «меньше движения» его выключает.</li>
+        </ol>
+        <div class="sc-files">
+          <div><code>gg-id/gg-id.css</code><span>токены, три раскладки, все компоненты</span></div>
+          <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи Face ID</span></div>
+          <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
+          <div><code>gg-id/screens/</code><span>@N_SCREENS@ эталонных страниц для хаба</span></div>
+        </div>
+      </div>
+      <div class="sc-api">
+        <table>
+          <thead><tr><th>Экран</th><th>Когда</th><th>Хаб</th></tr></thead>
+          <tbody><!--@API_ROWS@--></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap sc-foot">GG ID · Global-Generation/Infra-Brand-Identity · сборка <code>python3 src/build_gg_id.py</code></footer>
+
+<!--@SPRITE@-->
+<!--@TEMPLATES@-->
+<script>window.GGID_MANUAL = true;</script>
+<script>
+/*@GID_JS@*/
+</script>
+<script>
+(function () {
+  'use strict';
+  var META = /*@META@*/;
+  var BY = {}; META.forEach(function (m, i) { m.n = ('0' + (i + 1)).slice(-2); BY[m.key] = m; });
+  var st = { s: 'login', l: 'split', t: 'light', d: 'desktop', svc: 'АКБ' };
+  var lastDevice = 'desktop';
+  var stage = document.getElementById('stage'), tabs = document.getElementById('tabs'), cap = document.getElementById('cap'), svcSel = document.getElementById('svc');
+
+  // ссылка на конкретное состояние: #s=error&l=card&t=dark&d=phone
+  try {
+    var h = new URLSearchParams(location.hash.slice(1));
+    if (BY[h.get('s')]) st.s = h.get('s');
+    if (/^(split|card|minimal)$/.test(h.get('l') || '')) st.l = h.get('l');
+    if (/^(light|dark)$/.test(h.get('t') || '')) st.t = h.get('t');
+    if (/^(desktop|phone|all)$/.test(h.get('d') || '')) st.d = h.get('d');
+    if (h.get('svc')) st.svc = h.get('svc');
+  } catch (e) {}
+  if (st.d !== 'all') lastDevice = st.d;
+  [].forEach.call(svcSel.options, function (o) { if (o.text === st.svc) svcSel.value = o.value; });
+
+  function save() {
+    var q = 's=' + st.s + '&l=' + st.l + '&t=' + st.t + '&d=' + st.d + (st.svc !== 'АКБ' ? '&svc=' + encodeURIComponent(st.svc) : '');
+    try { history.replaceState(null, '', '#' + q); } catch (e) {}
+  }
+
+  META.forEach(function (m) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'sc-tab'; b.setAttribute('role', 'tab'); b.dataset.key = m.key;
+    b.innerHTML = '<i>' + m.n + '</i>' + m.tab;
+    b.addEventListener('click', function () { go(m.key); });
+    tabs.appendChild(b);
+  });
+
+  function build(key) {
+    var g = document.getElementById('tpl-shell').content.firstElementChild.cloneNode(true);
+    g.setAttribute('data-layout', st.l); g.setAttribute('data-theme', st.t);
+    var card = g.querySelector('.gid-card');
+    card.setAttribute('data-gid-screen', key);
+    if (BY[key].lockup) card.appendChild(document.getElementById('tpl-lockup').content.cloneNode(true));
+    card.appendChild(document.getElementById('scr-' + key).content.cloneNode(true));
+    g.querySelectorAll('[data-svc]').forEach(function (e) { e.textContent = st.svc; });
+    g.querySelectorAll('a[data-go]').forEach(function (a) { a.setAttribute('href', '#' + a.getAttribute('data-go')); });
+    return g;
+  }
+
+  function wire(g) {
+    GGID.init(g, { demo: true });
+    g.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-go]');
+      if (t && !t.disabled) { e.preventDefault(); go(t.getAttribute('data-go')); return; }
+      var a = e.target.closest('a[href]');
+      if (a && a.target !== '_blank') e.preventDefault();
+    });
+    g.addEventListener('submit', function (e) { e.preventDefault(); var f = e.target; if (f.dataset.goSubmit) go(f.dataset.goSubmit); });
+    g.addEventListener('gid:code', function (e) { var b = e.target.closest('[data-go-complete]'); if (b) setTimeout(function () { go(b.dataset.goComplete); }, 380); });
+  }
+
+  var fitters = [];
+  function fit() { fitters.forEach(function (f) { f(); }); }
+  window.addEventListener('resize', fit);
+
+  function render() {
+    fitters = [];
+    stage.innerHTML = '';
+    tabs.classList.toggle('is-off', st.d === 'all');
+    tabs.querySelectorAll('.sc-tab').forEach(function (b) {
+      var on = b.dataset.key === st.s; b.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && st.d !== 'all') b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+    document.querySelectorAll('.sc-seg').forEach(function (seg) {
+      var v = st[{ layout: 'l', theme: 't', device: 'd' }[seg.dataset.k]];
+      seg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'); });
+    });
+    var m = BY[st.s];
+    cap.innerHTML = st.d === 'all'
+      ? '<dt>Все экраны</dt><dd>' + META.length + ' состояний в раскладке телефона. Нажмите на экран, чтобы открыть его крупно.</dd>'
+      : '<dt>' + m.n + ' · ' + m.tab + '</dt><dd>' + m.when + '</dd><dt>Хаб</dt><dd><code></code></dd>';
+    if (st.d !== 'all') cap.querySelector('code').textContent = m.api;
+
+    if (st.d === 'desktop') {
+      var br = document.createElement('div'); br.className = 'sc-browser';
+      br.innerHTML = '<div class="sc-chrome"><div class="sc-dots"><i></i><i></i><i></i></div><div class="sc-url"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span></span></div><div style="width:47px"></div></div><div class="sc-viewport"><div class="sc-screen"></div></div>';
+      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value);
+      var vp = br.querySelector('.sc-viewport'), scr = br.querySelector('.sc-screen');
+      var g = build(st.s); g.style.setProperty('--gid-h', '800px'); scr.appendChild(g); wire(g);
+      stage.appendChild(br);
+      fitters.push(function () { var s = Math.min(1, vp.clientWidth / 1280); scr.style.transform = 'scale(' + s + ')'; vp.style.height = Math.round(800 * s) + 'px'; });
+    } else if (st.d === 'phone') {
+      var wrap = document.createElement('div'); wrap.className = 'sc-phone-wrap';
+      wrap.innerHTML = '<div class="sc-phone-box"><div class="sc-phone"><div class="sc-phone-in"></div></div></div>';
+      var box = wrap.querySelector('.sc-phone-box'), ph = wrap.querySelector('.sc-phone');
+      var gp = build(st.s); gp.style.setProperty('--gid-h', '844px'); wrap.querySelector('.sc-phone-in').appendChild(gp); wire(gp);
+      stage.appendChild(wrap);
+      fitters.push(function () {
+        var s = Math.min(1, (stage.clientWidth - 30) / 390);
+        ph.style.transform = 'scale(' + s + ')';
+        box.style.width = Math.round(390 * s) + 'px'; box.style.height = Math.round(844 * s) + 'px';
+      });
+    } else {
+      var grid = document.createElement('div'); grid.className = 'sc-grid';
+      META.forEach(function (mm) {
+        var t = document.createElement('button'); t.type = 'button'; t.className = 'sc-thumb';
+        t.innerHTML = '<span class="sc-thumb-frame"><span class="sc-mini"></span></span><b><i>' + mm.n + '</i>' + mm.tab + '</b>';
+        var gm = build(mm.key); gm.style.setProperty('--gid-h', '844px'); gm.setAttribute('inert', ''); gm.setAttribute('aria-hidden', 'true');
+        t.querySelector('.sc-mini').appendChild(gm);
+        GGID.init(gm, { demo: true });
+        t.addEventListener('click', function () { st.s = mm.key; st.d = lastDevice; render(); stage.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+        grid.appendChild(t);
+      });
+      stage.appendChild(grid);
+      fitters.push(function () {
+        grid.querySelectorAll('.sc-thumb-frame').forEach(function (f) { f.firstChild.style.transform = 'scale(' + (f.clientWidth / 390) + ')'; });
+      });
+    }
+    fit();
+    save();
+  }
+
+  function go(key) { if (!BY[key]) return; st.s = key; if (st.d === 'all') st.d = lastDevice; render(); }
+
+  document.querySelectorAll('.sc-seg').forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var k = { layout: 'l', theme: 't', device: 'd' }[seg.dataset.k];
+      st[k] = b.dataset.v;
+      if (k === 'd' && b.dataset.v !== 'all') lastDevice = b.dataset.v;
+      render();
+    });
+  });
+  svcSel.addEventListener('change', function () { st.svc = svcSel.options[svcSel.selectedIndex].text; render(); });
+
+  // компоненты: ссылки-заглушки, меню аккаунта, окно поверх страницы
+  document.querySelectorAll('[data-noop]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
+  var chip = document.getElementById('chip'), slot = document.getElementById('menuSlot');
+  chip.addEventListener('click', function () {
+    var open = chip.getAttribute('aria-expanded') !== 'true';
+    chip.setAttribute('aria-expanded', open ? 'true' : 'false'); slot.hidden = !open;
+  });
+  document.getElementById('openDlg').addEventListener('click', function () {
+    var s = document.createElement('div'); s.className = 'gid-scrim gid-kit'; s.setAttribute('data-theme', 'light');
+    s.innerHTML = '<div class="gid-dialog" role="dialog" aria-modal="true" aria-labelledby="dlgT2"><h2 class="gid-h" id="dlgT2">Сессия истекла</h2>'
+      + '<p class="gid-sub">Войдите снова, и мы вернём вас на эту же страницу.</p>'
+      + '<a class="gid-sso gid-sso--block" href="#"><svg class="gid-sso-tile" viewBox="0 0 39 39" aria-hidden="true"><use href="#gid-tile"/></svg><span>Войти через GG ID</span></a></div>';
+    function close() { s.remove(); document.removeEventListener('keydown', esc); }
+    function esc(e) { if (e.key === 'Escape') close(); }
+    s.addEventListener('click', function (e) { e.preventDefault(); if (e.target === s || e.target.closest('.gid-sso')) close(); });
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(s);
+    s.querySelector('.gid-sso').focus();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
