@@ -1,0 +1,25 @@
+{
+ "title": "Claude Config (GG)",
+ "tagline": "Скиллы, агенты и хуки Claude Code для продуктов и инфраструктуры Global Generation: деплой, релизы, SEO-фабрика, Sales Engine, сценарии YouTube. Источник правды для ~/.claude.",
+ "body": "replace",
+ "body_md": "GG-часть конфигурации Claude Code: скиллы, агенты и хуки, по которым агенты работают с продуктами и инфраструктурой Global Generation. Источник правды: правки только через PR сюда, на маке `~/.claude` ссылается на этот репо.\n\n## Что внутри\n\n| Папка | Что | Сколько |\n|---|---|---|\n| `skills/` | Скиллы GG: деплой и проверка прода, релизы (SAT, IELTS, Essay, Saxon, партнёры), SEO-фабрика и SEO-пакет, Sales Engine, IG-DM, найм, сценарии и аналитика YouTube, штамповка продуктов, ролики Remotion | 61 |\n| `agents/` | Сабагенты SEO-пакета (технический аудит, контент, схема, карта сайта и др.) | 18 |\n| `hooks/` | `openrouter-key-guard.py`: не даёт агенту прочитать или вставить чужой ключ OpenRouter (правило `Infra-API-Keys`), тесты рядом | 1 |\n\n## Как это подключено на маке\n\n- `~/.claude/skills/<имя>` -> `skills/<имя>` этого репо (симлинк на каждый скилл).\n- `~/.claude/agents` -> `agents/`.\n- `~/.claude/hooks/openrouter-key-guard.py` -> `hooks/openrouter-key-guard.py`; сам хук прописан в `~/.claude/settings.json`.\n- Профили `cc <профиль>` берут те же `~/.claude/skills` и `agents`, отдельной настройки не нужно.\n\nЛичная часть конфигурации (глобальный CLAUDE.md, личные скиллы) живёт в отдельном приватном репо владельца.\n\n## Правила\n\n- У каждого скилла и агента во frontmatter обязательно `model:` и `effort:` (стандарт бюджета моделей): рутина по шаблону = `sonnet`/`medium`, тексты для людей = `opus`/`medium`, архитектура = `inherit`/`high`.\n- Секретов в репо нет и не будет: PIN, ключи и пароли скиллов лежат в `~/.claude/skills-secrets.env` на маке, ключи сервисов в AWS Secrets Manager (`Infra-API-Keys`).\n- Новый скилл: папка `skills/<имя>/SKILL.md`, PR, после мержа симлинк `ln -s <путь к клону>/skills/<имя> ~/.claude/skills/<имя>`.\n- Длинных тире и эмодзи в текстах скиллов нет.\n\n## Вендорное\n\n`skills/seo`, `skills/seo-*` (кроме `seo-agency-log`) и `agents/seo-*` - пак AgriciDaniel/claude-seo v2.2.5. Локальные правки описаны в `skills/seo/LOCAL-PATCHES.md`, при обновлении пака переносить вручную. Окружение пака (`.venv`, `ms-playwright`) локальное и в git не попадает.\n",
+ "badges": [
+  {
+   "label": "Claude Code",
+   "message": "skills + agents",
+   "color": "D97757",
+   "logo": "anthropic"
+  },
+  {
+   "label": "Python",
+   "message": "hooks",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Скиллов",
+   "message": "61",
+   "color": "2F6DB0"
+  }
+ ]
+}
