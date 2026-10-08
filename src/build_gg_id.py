@@ -1,7 +1,8 @@
 """Build GG ID (единый вход): gg-id/fonts/*.woff2, gg-id/screens/*.html and the showcase gg-id.html.
 
 Sources: gg-id/gg-id.css + gg-id/gg-id.js (the kit, edited by hand), src/gg_id/screens.html (screens),
-src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/root.svg.
+src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/root.svg,
+gg-id/email-card.html + gg-id/email/gg-id-lockup-2x.png (the e-mail card, checked here, PNG from src/rasterize_gg_id_email.py).
 
 Run: python3 src/build_gg_id.py
 """
@@ -108,14 +109,77 @@ def shell(layout, card_inner, key):
             '</div></div>')
 
 
+# ---- карточка GG ID: одна разметка для экрана card, витрины и README. Данные вымышленные ----
+MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+DEMO = {'name': 'Иван Образцов', 'positions': ['Ментор', 'Продажи'], 'email': 'ivan.obraztsov@global-generations.com',
+        'id': 'GG 0042-7F3A', 'since': '2024-03', 'status': 'active', 'passkey': True}
+LONG = {'name': 'Александра Образцова-Константинопольская',
+        'positions': ['Ментор', 'Руководитель направления «Магистратура в Европе»', 'Ведущая роликов YouTube-канала'],
+        'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': '2025-09',
+        'status': 'active', 'passkey': True}
+ID_MAX = 14  # номер GG ID: строка до 14 символов, формат решает хаб
+
+
+def initials(name):
+    return ''.join(w[0] for w in name.split()[:2]).upper()
+
+
+def since_text(v):
+    y, m = v.split('-')[:2]
+    return f'{MONTHS_GEN[int(m) - 1]} {y}'
+
+
+def idcard(d, indent=''):
+    """The card markup, pretty, with data-gid-field hooks. Inline-sensitive spots (li, email, icon) stay on one line."""
+    e = htmlmod.escape
+    assert len(d['id']) <= ID_MAX and 0 <= len(d['positions']) <= 3 and d['email'].endswith('@global-generations.com'), d
+    local, dom = d['email'].rsplit('@', 1)
+    roles = ''.join(f'<li>{e(p)}</li>' for p in d['positions'])
+    on = d['status'] == 'active'
+    lines = [
+        f'<article class="gid-idcard" aria-label="Global Generation ID: {e(d["name"])}">',
+        '  <div class="gid-idcard-top">',
+        '    ' + LOCKUP,
+        f'    <span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>',
+        '  </div>',
+        '  <div class="gid-idcard-person">',
+        f'    <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">{e(initials(d["name"]))}</span>',
+        '    <div class="gid-idcard-who">',
+        f'      <p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>',
+        f'      <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"{"" if roles else " hidden"}>{roles}</ul>',
+        f'      <p class="gid-idcard-mail" data-gid-field="email">{e(local)}<wbr><span>@{e(dom)}</span></p>',
+        '      <p class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
+        '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>',
+        '    </div>',
+        '  </div>',
+        '  <div class="gid-idcard-facts">',
+        f'    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</dd></dl>',
+        f'    <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">{e(since_text(d["since"]))}</dd></dl>',
+        '  </div>',
+        '</article>']
+    return '\n'.join(indent + ln for ln in lines)
+
+
+def idrow(d, status=True):
+    """The compact row: initials, name, number (+ status). Same data-gid-field hooks as the card."""
+    e = htmlmod.escape
+    st = ('<span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>' if status else '')
+    return (f'<div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">{e(initials(d["name"]))}</span>'
+            f'<span class="gid-idrow-tx"><b data-gid-field="name">{e(d["name"])}</b>'
+            f'<span class="gid-idrow-num" data-gid-field="id">{e(d["id"])}</span></span>{st}</div>')
+
+
+IDCARD = idcard(DEMO)
+
+
 # ---- screens ----
 src = read(HERE, 'gg_id', 'screens.html')
 SCREENS = []
 for attrs, body in re.findall(r'<template ([^>]*)>(.*?)</template>', src, flags=re.S):
     a = dict(re.findall(r'(data-[a-z]+)="([^"]*)"', attrs))
-    body = body.strip().replace('@LOADER@', LOADER)
+    body = body.strip().replace('@LOADER@', LOADER).replace('@IDCARD@', idcard(DEMO, '  ').lstrip())
     SCREENS.append({'key': a['data-key'], 'tab': a['data-tab'], 'title': a['data-title'],
-                    'lockup': a.get('data-lockup') != 'off', 'body': body})
+                    'lockup': a.get('data-lockup') != 'off', 'path': a.get('data-path', ''), 'body': body})
 KEYS = [s['key'] for s in SCREENS]
 assert len(KEYS) == len(set(KEYS)), KEYS
 for s in SCREENS:
@@ -146,6 +210,9 @@ INFO = {
     'pin': ('Переходный вход по коду для сервисов, которые ещё не на GG ID.', 'sso-gate: PIN-ворота'),
     'unavailable': ('GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.', 'sso-gate: sso-unavailable'),
     'signedout': ('После «Выйти» в меню аккаунта.', 'POST /api/v1/sessions/revoke'),
+    'card': ('Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения '
+             '(онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.',
+             'GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()'),
 }
 assert set(INFO) == set(KEYS), set(INFO) ^ set(KEYS)
 
@@ -257,7 +324,8 @@ for s in SCREENS:
     write_if_changed(os.path.join(KIT, 'screens', s['key'] + '.html'), page)
 
 # full sprite for the hub: every symbol any screen or service component uses (<use href="/assets/gg-id/sprite.svg#gi-eye">)
-all_text = ''.join(s['body'] for s in SCREENS) + LOCKUP + read(HERE, 'gg_id', 'showcase.html') + ' data-gid-passkey-icon '
+all_text = (''.join(s['body'] for s in SCREENS) + LOCKUP + IDCARD + idrow(DEMO) + read(HERE, 'gg_id', 'showcase.html') +
+            ' data-gid-passkey-icon ')
 full = sprite(all_text).replace('<svg width="0" height="0" style="position:absolute" aria-hidden="true">',
                                 '<svg xmlns="http://www.w3.org/2000/svg">', 1)
 full = '<!-- GG ID: logo, root favicon tile and kit icons. Generated by src/build_gg_id.py -->\n' + full + '\n'
@@ -269,13 +337,76 @@ for fn in os.listdir(os.path.join(KIT, 'screens')):
     if fn.endswith('.html') and fn[:-5] not in KEYS:
         os.remove(os.path.join(KIT, 'screens', fn))
 
+# ---- карточка GG ID в письме: gg-id/email-card.html (правится руками) + подпись gg-id/email/gg-id-lockup-2x.png ----
+EMAIL_PATH = os.path.join(KIT, 'email-card.html')
+EMAIL_PNG = os.path.join(KIT, 'email', 'gg-id-lockup-2x.png')
+EMAIL_PNG_URL = 'https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png'
+EMAIL_FIELDS = ('name', 'initials', 'positions', 'email', 'id', 'since')
+email_html = read(EMAIL_PATH)
+brand_check('gg-id/email-card.html', email_html)
+
+
+def email_problems(text):
+    """What would break the card in mail clients (Gmail drops SVG, data: images, flex; Outlook drops rgba and variables)."""
+    problems = []
+    m = re.search(r'<!-- gg-id-card:start -->(.*?)<!-- gg-id-card:end -->', text, flags=re.S)
+    if not m:
+        return ['no <!-- gg-id-card:start --> ... <!-- gg-id-card:end --> block']
+    block = m.group(1)
+    found = set(re.findall(r'\{\{([a-z_]+)\}\}', block))
+    if found != set(EMAIL_FIELDS):
+        problems.append(f'placeholders {sorted(found)}, expected {sorted(EMAIL_FIELDS)}')
+    for bad, why in [('<link', 'external stylesheet'), ('@import', '@import'), ('@font-face', 'web font'), ('<script', 'script'),
+                     ('<svg', 'inline SVG (Gmail drops it)'), ('data:', 'data: URI (Gmail blocks it)'), ('display:flex', 'flex'),
+                     ('display:grid', 'grid'), ('position:', 'position'), ('var(--', 'CSS variables'), ('class="gid-', 'kit classes')]:
+        if bad in text:
+            problems.append(f'{why}: {bad}')
+    if 'rgba(' in block:
+        problems.append('rgba() inside the card (Outlook): use solid colours')
+    for img in re.findall(r'<img [^>]*>', block):
+        if not re.search(r'src="https://[^"]+"', img) or not all(f'{a}="' in img for a in ('alt', 'width', 'height')):
+            problems.append(f'img needs https src, alt, width, height: {img[:90]}')
+    if EMAIL_PNG_URL not in block:
+        problems.append(f'the lockup image is not {EMAIL_PNG_URL}')
+    texts = re.findall(r'<(td|div)\b([^>]*)>([^<]+)<', block)
+    bare = [t[2].strip() for t in texts if t[2].strip() and 'font-family:' not in t[1]]
+    if bare:
+        problems.append(f'text without an inline font-family: {bare[:4]}')
+    png = open(EMAIL_PNG, 'rb').read()
+    pw, ph = int.from_bytes(png[16:20], 'big'), int.from_bytes(png[20:24], 'big')
+    tag = re.search(r'<img [^>]*' + re.escape(EMAIL_PNG_URL) + r'[^>]*>', block)
+    if tag:
+        w, h = int(re.search(r'width="(\d+)"', tag.group(0)).group(1)), int(re.search(r'height="(\d+)"', tag.group(0)).group(1))
+        if (pw, ph) != (2 * w, 2 * h):
+            problems.append(f'lockup PNG is {pw}x{ph}, the tag says {w}x{h} (expected exactly 2x)')
+    return problems
+
+
+bad_mail = email_problems(email_html)
+if bad_mail:
+    print('EMAIL CHECK FAILED in gg-id/email-card.html')
+    for p in bad_mail:
+        print(' -', p)
+    sys.exit(1)
+
+
+def email_filled(d, logo_src=EMAIL_PNG_URL):
+    """The e-mail card with the values of d, every value HTML-escaped, the way the hub fills it."""
+    vals = {'name': d['name'], 'initials': initials(d['name']), 'positions': ' · '.join(d['positions']), 'email': d['email'],
+            'id': d['id'], 'since': since_text(d['since'])}
+    out = re.sub(r'\{\{([a-z_]+)\}\}', lambda mm: htmlmod.escape(vals[mm.group(1)], quote=True), email_html)
+    return out.replace(EMAIL_PNG_URL, logo_src)
+
+
+EMAIL_PNG_URI = 'data:image/png;base64,' + base64.b64encode(open(EMAIL_PNG, 'rb').read()).decode()
+
 # ---- showcase: gg-id.html (one self-contained file) ----
 tpl = read(HERE, 'gg_id', 'showcase.html')
 templates = ['<template id="tpl-lockup">' + LOCKUP + '</template>',
              '<template id="tpl-shell">' + shell('split', '', '') + '</template>']
 templates += [f'<template id="scr-{s["key"]}">{s["body"]}</template>' for s in SCREENS]
 templates = '\n'.join(templates)
-meta = [{'key': s['key'], 'tab': s['tab'], 'title': s['title'], 'lockup': s['lockup'],
+meta = [{'key': s['key'], 'tab': s['tab'], 'title': s['title'], 'lockup': s['lockup'], 'path': s['path'],
          'when': INFO[s['key']][0], 'api': INFO[s['key']][1]} for s in SCREENS]
 api_rows = ''.join(
     f'<tr><td><b>{htmlmod.escape(m["tab"])}</b><span>screens/{m["key"]}.html</span></td><td>{htmlmod.escape(m["when"])}</td>'
@@ -288,6 +419,11 @@ page = (tpl
         .replace('<!--@API_ROWS@-->', api_rows)
         .replace('@LOCKUP@', LOCKUP)
         .replace('@FAVICON_URI@', FAVICON_URI)
+        .replace('@IDCARD@', idcard(DEMO, '        '))
+        .replace('@IDCARD_LONG@', idcard(LONG, '        '))
+        .replace('@IDROW@', idrow(DEMO))
+        .replace('@EMAIL_SRCDOC@', htmlmod.escape(email_filled(DEMO, EMAIL_PNG_URI), quote=True))
+        .replace('@N_LOGIN@', str(len([s for s in SCREENS if s['key'] != 'card'])))
         .replace('@N_SCREENS@', str(len(SCREENS))))
 page = page.replace('<!--@SPRITE@-->', sprite(page))
 brand_check('gg-id.html', page)
@@ -300,6 +436,11 @@ table = ['## Экраны', '', '| Экран | Файл | Когда | Хаб |
 table += [f'| {m["tab"]} | `screens/{m["key"]}.html` | {m["when"]} | `{m["api"]}` |' for m in meta]
 readme = re.sub(r'<!-- screens:start -->.*?<!-- screens:end -->',
                 lambda _: '<!-- screens:start -->\n' + '\n'.join(table) + '\n<!-- screens:end -->', readme, flags=re.S)
+# the card markup in the README is the same string the screens and the showcase use
+card_md = '```html\n' + IDCARD + '\n\n<!-- компактная строка -->\n' + idrow(DEMO) + '\n```'
+assert '<!-- idcard:start -->' in readme, 'gg-id/README.md: add <!-- idcard:start --><!-- idcard:end --> markers'
+readme = re.sub(r'<!-- idcard:start -->.*?<!-- idcard:end -->',
+                lambda _: '<!-- idcard:start -->\n' + card_md + '\n<!-- idcard:end -->', readme, flags=re.S)
 brand_check('gg-id/README.md', readme)
 write_if_changed(readme_path, readme)
 print('ok gg-id.html', f'{len(page) / 1024:.0f} KB', '| screens:', len(SCREENS), '| fonts:', ', '.join(sorted(woff)))

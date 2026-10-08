@@ -38,6 +38,10 @@
   --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
   --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
   --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
+  /* карточка GG ID: лицевая сторона всегда navy, тема меняет глубину, кольцо и тень */
+  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1f6a8f 0%,rgba(31,106,143,0) 55%),linear-gradient(150deg,#174f6c 0%,#0f3a51 52%,#0a2738 100%);
+  --g-idc-ring:rgba(255,255,255,.06);
+  --g-idc-shadow:0 1px 2px rgba(15,23,42,.10),0 28px 60px -30px rgba(13,47,66,.65);
   color-scheme:light;
   font-family:var(--g-font);
 }
@@ -62,6 +66,9 @@
   --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
   --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
   --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
+  --g-idc-ring:rgba(255,255,255,.14);
+  --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
   color-scheme:dark;
 }
 @media (prefers-color-scheme:dark){
@@ -84,6 +91,9 @@
     --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
     --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
     --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+    --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
+    --g-idc-ring:rgba(255,255,255,.14);
+    --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
     color-scheme:dark;
   }
 }
@@ -130,7 +140,7 @@
 @container gid (min-width:960px){
   .gid[data-layout="split"] .gid-frame{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}
   .gid[data-layout="split"] .gid-aside{display:flex}
-  .gid[data-layout="split"] .gid-card .gid-lockup{display:none}
+  .gid[data-layout="split"] .gid-card > .gid-lockup{display:none}
   .gid[data-layout="split"] .gid-h{font-size:32px}
 }
 .gid-aside{position:relative;overflow:hidden;isolation:isolate;flex-direction:column;justify-content:space-between;gap:32px;
@@ -400,6 +410,69 @@
 .gid-dialog .gid-h{font-size:22px}
 .gid-dialog .gid-sso{margin-top:24px}
 
+/* ============ карточка GG ID: как студенческий ID в Duke или Stanford ============ */
+/* Лицевая сторона всегда navy (как панель сплита), тема меняет глубину, кольцо и тень: токены --g-idc-*.
+   Пропорции настоящей карты 85,6 x 54 мм. Если данных больше (три длинные должности), карта растёт вниз, без обрезки.
+   Один акцент: точка статуса «Активен». Подпись «логотип | ID» как на экранах входа, логотип белый.
+   Ставится внутри .gid или .gid-kit. Поля data-gid-field и GGID.card(): README.md, раздел «Карточка GG ID». */
+.gid-idcard{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;row-gap:14px;
+  width:100%;max-width:var(--gid-idcard-w,460px);container:gidcard/inline-size;padding:22px 24px;border-radius:18px;
+  background:var(--g-idc-face);color:#fff;font-family:var(--g-font);font-weight:500;line-height:1.4;text-align:left;
+  box-shadow:inset 0 0 0 1px var(--g-idc-ring),var(--g-idc-shadow)}
+/* распорка: минимальная высота = ширина x 54 / 85,6 (с учётом паддингов 22 и 24 px), данные могут карту удлинить.
+   Не aspect-ratio: во flex- и grid-родителях он не даёт карте вырасти и текст вылезает. */
+.gid-idcard::before{content:"";grid-area:1/1/4/2;padding-top:calc(63.084% - 13.72px);pointer-events:none}
+.gid-idcard-top{grid-area:1/1;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.gid-idcard .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;flex:none}
+.gid-idcard .gid-logo{height:28px}
+.gid-idcard-status{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;line-height:1;color:rgba(255,255,255,.88);white-space:nowrap}
+.gid-idcard-status::before{content:"";width:8px;height:8px;flex:none;border-radius:50%;background:#5cc3ec;box-shadow:0 0 0 3px rgba(92,195,236,.2)}
+.gid-idcard-status[data-status="disabled"]{color:rgba(255,255,255,.7)}
+.gid-idcard-status[data-status="disabled"]::before{background:rgba(255,255,255,.42);box-shadow:none}
+
+.gid-idcard-person{grid-area:2/1;align-self:center;display:flex;align-items:center;gap:clamp(12px,4.2cqi,18px);min-width:0}
+.gid-idcard-photo{flex:none;display:grid;place-items:center;width:clamp(54px,16cqi,74px);aspect-ratio:4/5;border-radius:14px;
+  background:linear-gradient(150deg,#2f80a8 0%,#15506e 92%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  color:#fff;font-size:clamp(19px,5.6cqi,26px);font-weight:700;letter-spacing:.02em;line-height:1}
+.gid-idcard-who{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.gid-idcard-name{font-size:clamp(18px,4.9cqi,22px);font-weight:700;line-height:1.18;letter-spacing:-.02em;color:#fff;
+  text-wrap:balance;overflow-wrap:anywhere}
+.gid-idcard-roles{list-style:none;padding:0;font-size:13.5px;font-weight:600;line-height:1.42;color:rgba(255,255,255,.86);text-wrap:pretty}
+.gid-idcard-roles li{display:inline}
+.gid-idcard-roles li + li::before{content:"\00a0\00b7\0020";color:rgba(255,255,255,.55)}
+.gid-idcard-roles:empty{display:none}
+.gid-idcard-mail{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.74);overflow-wrap:anywhere}
+.gid-idcard-mail span{white-space:nowrap}   /* домен целиком: адрес переносится только перед @ */
+.gid-idcard-passkey{display:flex;align-items:center;gap:6px;margin-top:1px;font-size:12.5px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.74)}
+.gid-idcard-passkey .gid-ic{width:16px;height:16px}
+
+.gid-idcard-facts{grid-area:3/1;align-self:end;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 20px;min-width:0}
+.gid-idcard-fact{display:flex;flex-direction:column;gap:4px;margin:0;min-width:0}
+.gid-idcard-fact + .gid-idcard-fact{text-align:right}
+.gid-idcard-fact dt{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.66)}
+.gid-idcard-fact dd{margin:0;font-size:14.5px;font-weight:600;line-height:1.3;color:#fff;white-space:nowrap}
+.gid-idcard-fact .gid-idcard-num{font-size:16px;line-height:1.2;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+@container gidcard (max-width:380px){
+  .gid-idcard .gid-lockup{gap:11px}
+  .gid-idcard .gid-lockup-name{padding-left:11px;font-size:15px}
+  .gid-idcard-roles{font-size:13px}
+  .gid-idcard-mail,.gid-idcard-passkey{font-size:12px}
+  .gid-idcard-fact dd{font-size:14px}
+  .gid-idcard-fact .gid-idcard-num{font-size:15px}
+}
+.gid-sub + .gid-idcard{margin-top:26px}
+.gid-idcard + .gid-stack{margin-top:24px}
+
+/* компактная строка GG ID: шапка, меню аккаунта, списки людей. Поверхность по теме, инициалы как у .gid-chip */
+.gid-idrow{display:inline-flex;align-items:center;gap:12px;min-width:0;max-width:100%;padding:8px 16px 8px 8px;border-radius:16px;
+  border:1px solid var(--g-line);background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-weight:500;line-height:1.3;text-align:left}
+.gid-idrow-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gid-idrow-tx b{font-size:14px;font-weight:600;color:var(--g-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gid-idrow-num{font-size:12.5px;font-weight:600;letter-spacing:.05em;font-variant-numeric:tabular-nums;color:var(--g-muted);white-space:nowrap}
+.gid-idrow .gid-idcard-status{margin-left:8px;font-size:12px;color:var(--g-muted)}
+.gid-idrow .gid-idcard-status::before{background:var(--g-accent);box-shadow:0 0 0 3px var(--g-ring)}
+.gid-idrow .gid-idcard-status[data-status="disabled"]::before{background:var(--g-faint);box-shadow:none}
+
 /* ---------- меньше движения ---------- */
 @media (prefers-reduced-motion:reduce){
   .gid *,.gid::before,.gid::after,.gid-kit *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -484,6 +557,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-sec{padding-top:72px}
 .sc-sec h2{margin:0;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.03em;color:var(--navy)}
 .sc-sec > .wrap > p,.sc-sec .lead{margin:10px 0 0;max-width:760px;font-size:15px;line-height:1.6;color:var(--sfg)}
+.sc-sec .lead a{color:var(--sky-ink);font-weight:600;text-underline-offset:3px}
 .sc-comp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}
 .sc-card{min-width:0;display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:20px;background:#fff;border:1px solid var(--border)}
 .sc-card h3{margin:0;font-size:16px;font-weight:700}
@@ -513,7 +587,30 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-api td code{display:inline-block;overflow-wrap:normal;word-break:normal}
 .sc-foot{padding:64px 0 48px;font-size:12.5px;color:var(--mfg)}
 
-@media (max-width:1020px){.sc-comp{grid-template-columns:minmax(0,1fr)}.sc-how{grid-template-columns:minmax(0,1fr)}}
+/* карточка GG ID */
+.sc-idc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
+.sc-idc-cell{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 28px 22px;
+  border-radius:20px;background:#f3f7fb;border:1px solid var(--border)}
+.sc-idc-cell.dark{background:#081b26;border-color:#081b26}
+.sc-idc-cell figcaption,.sc-idc-cell > p{margin:0;font-size:12.5px;font-weight:600;color:var(--mfg);text-align:center}
+.sc-idc-cell.dark figcaption{color:#8ea4b7}
+.sc-idc-rows{align-items:stretch;padding:28px}
+.sc-row-demo{display:flex;justify-content:center;padding:22px 16px;border-radius:14px;background:#fff;border:1px solid var(--border)}
+.sc-row-demo.dark{background:#0b2433;border-color:#0b2433}
+.sc-sub{margin:40px 0 0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--fg)}
+.sc-where{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.sc-where div{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;background:#fff;border:1px solid var(--border);min-width:0}
+.sc-where b{font-size:14px;font-weight:700;color:var(--fg)}
+.sc-where span{font-size:13px;line-height:1.55;color:var(--sfg)}
+.sc-mail{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;margin-top:14px;align-items:start}
+.sc-mail-frame{border-radius:20px;overflow:hidden;border:1px solid var(--border);background:#eef3f9}
+.sc-mail-frame iframe{display:block;width:100%;height:420px;border:0}
+.sc-mail-notes{display:flex;flex-direction:column;gap:10px;padding:20px 22px;border-radius:20px;background:#fff;border:1px solid var(--border);font-size:13.5px;line-height:1.55;color:var(--sfg)}
+.sc-mail-notes p{margin:0}
+.sc-mail-notes b{color:var(--fg)}
+
+@media (max-width:1020px){.sc-comp{grid-template-columns:minmax(0,1fr)}.sc-how{grid-template-columns:minmax(0,1fr)}
+  .sc-idc,.sc-mail{grid-template-columns:minmax(0,1fr)}.sc-where{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){
   .wrap{padding:0 16px}
   .sc-hero{padding-top:30px}.sc-hero h1{font-size:46px}.sc-hero p{font-size:15px}
@@ -522,6 +619,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   .sc-files div{grid-template-columns:minmax(0,1fr);gap:2px}
   .sc-api thead{display:none}.sc-api tr{display:block;padding:12px 0;border-bottom:1px solid var(--border)}.sc-api td{display:block;border:0;padding:3px 16px}
   .sc-sec h2{font-size:26px}
+  .sc-idc-cell{padding:24px 12px 16px}.sc-idc-rows{padding:12px}.sc-where{grid-template-columns:minmax(0,1fr)}
 }
 </style>
 </head>
@@ -534,7 +632,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
 <section class="wrap sc-hero">
   <h1>GG ID</h1>
-  <p>Единый вход во все сервисы Global Generation: 17 экранов входа, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
+  <p>Единый вход во все сервисы Global Generation: 17 экранов входа, карточка GG ID, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
 </section>
 
 <section class="wrap">
@@ -557,6 +655,204 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   <nav class="sc-tabs" id="tabs" role="tablist" aria-label="Экраны"></nav>
   <div class="sc-stage" id="stage"></div>
   <dl class="sc-cap" id="cap"></dl>
+</section>
+
+<section class="sc-sec" id="idcard">
+  <div class="wrap">
+    <h2>Карточка GG ID</h2>
+    <p class="lead">Как студенческий ID в Duke или Stanford, только для команды Global Generation: имя, должности, рабочая почта и номер GG ID. Один взгляд, и понятно, под каким аккаунтом вы вошли. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
+    <div class="sc-idc">
+      <figure class="sc-idc-cell gid-kit" data-theme="light">
+        <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+          <div class="gid-idcard-top">
+            <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+          </div>
+          <div class="gid-idcard-person">
+            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
+            <div class="gid-idcard-who">
+              <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+              <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
+            </div>
+          </div>
+          <div class="gid-idcard-facts">
+            <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
+            <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">марта 2024</dd></dl>
+          </div>
+        </article>
+        <figcaption>Светлая тема</figcaption>
+      </figure>
+      <figure class="sc-idc-cell dark gid-kit" data-theme="dark">
+        <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+          <div class="gid-idcard-top">
+            <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+          </div>
+          <div class="gid-idcard-person">
+            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
+            <div class="gid-idcard-who">
+              <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+              <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
+            </div>
+          </div>
+          <div class="gid-idcard-facts">
+            <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
+            <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">марта 2024</dd></dl>
+          </div>
+        </article>
+        <figcaption>Тёмная тема</figcaption>
+      </figure>
+    </div>
+    <div class="sc-idc">
+      <figure class="sc-idc-cell gid-kit" data-theme="light">
+        <article class="gid-idcard" aria-label="Global Generation ID: Александра Образцова-Константинопольская">
+          <div class="gid-idcard-top">
+            <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+          </div>
+          <div class="gid-idcard-person">
+            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">АО</span>
+            <div class="gid-idcard-who">
+              <p class="gid-idcard-name" data-gid-field="name">Александра Образцова-Константинопольская</p>
+              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Руководитель направления «Магистратура в Европе»</li><li>Ведущая роликов YouTube-канала</li></ul>
+              <p class="gid-idcard-mail" data-gid-field="email">aleksandra.obraztsova-konstantinopolskaya<wbr><span>@global-generations.com</span></p>
+              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
+            </div>
+          </div>
+          <div class="gid-idcard-facts">
+            <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 9031-55C0E7</dd></dl>
+            <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">сентября 2025</dd></dl>
+          </div>
+        </article>
+        <figcaption>Три должности и длинное имя: карточка растёт вниз, ничего не обрезается</figcaption>
+      </figure>
+      <div class="sc-idc-cell sc-idc-rows">
+        <div class="gid-kit sc-row-demo" data-theme="light"><div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">ИО</span><span class="gid-idrow-tx"><b data-gid-field="name">Иван Образцов</b><span class="gid-idrow-num" data-gid-field="id">GG 0042-7F3A</span></span><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span></div></div>
+        <div class="gid-kit sc-row-demo dark" data-theme="dark"><div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">ИО</span><span class="gid-idrow-tx"><b data-gid-field="name">Иван Образцов</b><span class="gid-idrow-num" data-gid-field="id">GG 0042-7F3A</span></span><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span></div></div>
+        <p>Компактная строка: шапка хаба, меню аккаунта, списки людей</p>
+      </div>
+    </div>
+
+    <h3 class="sc-sub">Где показываем</h3>
+    <div class="sc-where">
+      <div><b>Кабинет «Мои сервисы»</b><span>Вверху /cabinet/ хаба, над списком сервисов: человек сразу видит, что вошёл под своим аккаунтом.</span></div>
+      <div><b>Письмо-приглашение</b><span>В письме «Ваш единый вход готов»: письмо-безопасная копия <code>gg-id/email-card.html</code>.</span></div>
+      <div><b>Онбординг</b><span>Первый вход после приглашения и первый день в команде: «Ваш GG ID» рядом с чек-листом доступов.</span></div>
+      <div><b>Инструкция «Как войти»</b><span>Образец карточки в <code>kak-voyti.html</code> хаба: так выглядит ваш GG ID.</span></div>
+    </div>
+
+    <h3 class="sc-sub">В письме</h3>
+    <div class="sc-mail">
+      <div class="sc-mail-frame"><iframe title="Карточка GG ID в письме" id="mailFrame" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ru&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+&lt;meta name=&quot;x-apple-disable-message-reformatting&quot;&gt;
+&lt;meta name=&quot;format-detection&quot; content=&quot;telephone=no,date=no,address=no,email=no&quot;&gt;
+&lt;meta name=&quot;color-scheme&quot; content=&quot;light dark&quot;&gt;
+&lt;meta name=&quot;supported-color-schemes&quot; content=&quot;light dark&quot;&gt;
+&lt;title&gt;Global Generation ID&lt;/title&gt;
+&lt;!--
+  Карточка GG ID для писем: письмо-приглашение и другие письма хаба. Источник: Global-Generation/Infra-Brand-Identity,
+  gg-id/email-card.html (контракт и проверки: gg-id/README.md, раздел «Карточка GG ID», и src/build_gg_id.py).
+
+  Подстановки. Хаб экранирует каждое значение как HTML (как invite_email.py), разметку в значения не кладёт:
+    Иван Образцов       полное имя: «Иван Образцов»
+    ИО   1-2 буквы, первые буквы двух первых слов имени: «ИО»
+    Ментор · Продажи  должности через « · », от 0 до 3; нет должностей = пустая строка, строка схлопнется
+    ivan.obraztsov@global-generations.com      рабочая почта @global-generations.com (два места: текст и mailto)
+    GG 0042-7F3A         номер GG ID, до 14 символов: «GG 0042-7F3A»
+    марта 2024      месяц в родительном падеже и год, читается после «с»: «марта 2024»
+
+  В своё письмо вставлять блок между gg-id-card:start и gg-id-card:end (таблица шириной до 440 px).
+  Подпись «логотип | ID» = картинка gg-id/email/gg-id-lockup-2x.png по https: хаб отдаёт кит из /assets/gg-id/.
+  Тёмная тема: Apple Mail видит color-scheme и оставляет карточку navy; Gmail на Android тёмный фон не трогает;
+  Gmail на iPhone инвертирует цвета карточки, текст остаётся контрастным, подпись остаётся на своей navy-плашке.
+  Шрифт системный (Montserrat только если он установлен), внешних шрифтов и скриптов нет.
+--&gt;
+&lt;style&gt;
+  body{margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table{border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0}
+  img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic}
+  @media only screen and (max-width:480px){
+    .gidm-wrap{padding:16px 10px!important}
+    .gidm-pad{padding:18px 20px 20px 12px!important}
+  }
+&lt;/style&gt;
+&lt;style&gt;
+  :root{color-scheme:light dark;supported-color-schemes:light dark}
+  @media (prefers-color-scheme:dark){
+    body,.body,.gidm-page{background:#081b26!important}
+    .gidm-card{box-shadow:0 0 0 1px #2f5d76!important}
+  }
+  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}
+  u + .body a{color:inherit;text-decoration:none;font-size:inherit;font-family:inherit;font-weight:inherit;line-height:inherit}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;body&quot; style=&quot;margin:0;padding:0;background:#eef3f9;&quot;&gt;
+&lt;table role=&quot;presentation&quot; class=&quot;gidm-page&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#eef3f9&quot; style=&quot;width:100%;background:#eef3f9;&quot;&gt;
+&lt;tr&gt;&lt;td class=&quot;gidm-wrap&quot; align=&quot;center&quot; style=&quot;padding:28px 12px;&quot;&gt;
+&lt;!-- gg-id-card:start --&gt;
+&lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;440&quot; align=&quot;center&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+&lt;table role=&quot;presentation&quot; class=&quot;gidm-card&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#13445d&quot; style=&quot;width:100%;max-width:440px;background:#13445d;border-radius:18px;border-collapse:separate;&quot;&gt;
+&lt;tr&gt;&lt;td class=&quot;gidm-pad&quot; style=&quot;padding:20px 26px 22px 18px;&quot;&gt;
+  &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding:0;&quot;&gt;
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;
+      &lt;td valign=&quot;middle&quot; style=&quot;padding:0;&quot;&gt;&lt;img src=&quot;data:image/png;base64,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&quot; width=&quot;175&quot; height=&quot;40&quot; alt=&quot;Global Generation ID&quot; style=&quot;display:block;width:175px;height:40px;border:0;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:14px;font-weight:700;line-height:40px;color:#ffffff;&quot;&gt;&lt;/td&gt;
+      &lt;td align=&quot;right&quot; valign=&quot;middle&quot; style=&quot;padding:0 0 0 12px;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:12px;font-weight:600;line-height:16px;color:#dee5e8;white-space:nowrap;&quot;&gt;&lt;span style=&quot;display:inline-block;width:8px;height:8px;border-radius:4px;background:#5cc3ec;vertical-align:middle;margin:0 7px 2px 0;&quot;&gt;&lt;/span&gt;Активен&lt;/td&gt;
+    &lt;/tr&gt;&lt;/table&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding:18px 0 0 8px;&quot;&gt;
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;
+      &lt;td width=&quot;58&quot; valign=&quot;middle&quot; style=&quot;width:58px;padding:0;&quot;&gt;
+        &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;
+          &lt;td width=&quot;58&quot; height=&quot;72&quot; align=&quot;center&quot; valign=&quot;middle&quot; bgcolor=&quot;#2a7099&quot; style=&quot;width:58px;height:72px;padding:0;background:#2a7099;border-radius:13px;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:22px;font-weight:700;line-height:72px;color:#ffffff;text-align:center;&quot;&gt;ИО&lt;/td&gt;
+        &lt;/tr&gt;&lt;/table&gt;
+      &lt;/td&gt;
+      &lt;td valign=&quot;middle&quot; style=&quot;padding:0 0 0 16px;&quot;&gt;
+        &lt;div style=&quot;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:19px;font-weight:700;line-height:24px;color:#ffffff;&quot;&gt;Иван Образцов&lt;/div&gt;
+        &lt;div style=&quot;padding-top:4px;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:13px;font-weight:600;line-height:19px;color:#dee5e8;&quot;&gt;Ментор · Продажи&lt;/div&gt;
+        &lt;div style=&quot;padding-top:3px;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:12.5px;font-weight:500;line-height:18px;color:#c2ced5;word-break:break-all;&quot;&gt;&lt;a href=&quot;mailto:ivan.obraztsov@global-generations.com&quot; style=&quot;color:#c2ced5;text-decoration:none;&quot;&gt;ivan.obraztsov@global-generations.com&lt;/a&gt;&lt;/div&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;&lt;/table&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td style=&quot;padding:20px 0 0 8px;&quot;&gt;
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;
+      &lt;td valign=&quot;bottom&quot; style=&quot;padding:0 16px 0 0;&quot;&gt;
+        &lt;div style=&quot;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.2px;line-height:13px;color:#afbfc8;&quot;&gt;НОМЕР GG ID&lt;/div&gt;
+        &lt;div style=&quot;padding-top:4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;line-height:20px;color:#ffffff;white-space:nowrap;font-variant-numeric:tabular-nums;&quot;&gt;GG 0042-7F3A&lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td valign=&quot;bottom&quot; align=&quot;right&quot; style=&quot;padding:0;text-align:right;&quot;&gt;
+        &lt;div style=&quot;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.2px;line-height:13px;color:#afbfc8;&quot;&gt;В КОМАНДЕ С&lt;/div&gt;
+        &lt;div style=&quot;padding-top:4px;font-family:Montserrat,-apple-system,&#x27;Segoe UI&#x27;,Roboto,Arial,sans-serif;font-size:14px;font-weight:600;line-height:20px;color:#ffffff;white-space:nowrap;&quot;&gt;марта 2024&lt;/div&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;&lt;/table&gt;
+  &lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+&lt;!-- gg-id-card:end --&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></div>
+      <div class="sc-mail-notes">
+        <p><b>Файл:</b> <code>gg-id/email-card.html</code>. Таблицы и встроенные стили, системный шрифт, без внешних шрифтов и скриптов. Хаб вставляет в своё письмо блок между метками <code>gg-id-card:start</code> и <code>gg-id-card:end</code>.</p>
+        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{initials}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> <code>{{since}}</code>. Каждое значение экранируется как HTML.</p>
+        <p><b>Тёмная тема:</b> Apple Mail оставляет карточку navy. Gmail на Android тёмный фон не трогает. Gmail на iPhone инвертирует цвета: текст остаётся контрастным, подпись с логотипом на своей navy-плашке.</p>
+        <p><b>Подпись:</b> картинка <code>gg-id/email/gg-id-lockup-2x.png</code> по https из <code>/assets/gg-id/</code> хаба: почта не рисует SVG.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="sc-sec">
@@ -631,13 +927,14 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           <div><code>gg-id/gg-id.css</code><span>токены, три раскладки, все компоненты</span></div>
           <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи Face ID</span></div>
           <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
-          <div><code>gg-id/screens/</code><span>17 эталонных страниц для хаба</span></div>
+          <div><code>gg-id/screens/</code><span>18 эталонных страниц для хаба</span></div>
+          <div><code>gg-id/email-card.html</code><span>карточка GG ID для писем</span></div>
         </div>
       </div>
       <div class="sc-api">
         <table>
           <thead><tr><th>Экран</th><th>Когда</th><th>Хаб</th></tr></thead>
-          <tbody><tr><td><b>Вход</b><span>screens/login.html</span></td><td>Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Aura только ссылкой и только когда сервер включил.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities,<br>GGPasskey.enabled(),<br>GGPasskey.login()</code></td></tr><tr><td><b>По паролю</b><span>screens/password.html</span></td><td>Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login</code></td></tr><tr><td><b>Ошибка</b><span>screens/error.html</span></td><td>401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login: 401,<br>429</code></td></tr><tr><td><b>Face ID</b><span>screens/passkey.html</span></td><td>Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.</td><td><code>GGPasskey.login()</code></td></tr><tr><td><b>Готово</b><span>screens/done.html</span></td><td>Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me,<br>переход на next</code></td></tr><tr><td><b>Продолжить как</b><span>screens/continue.html</span></td><td>Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>authorize</code></td></tr><tr><td><b>Подключить Face ID</b><span>screens/enroll.html</span></td><td>После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.</td><td><code>GGPasskey.register()</code></td></tr><tr><td><b>Забыли пароль</b><span>screens/forgot.html</span></td><td>Восстановление по рабочей почте.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot</code></td></tr><tr><td><b>Письмо отправлено</b><span>screens/sent.html</span></td><td>Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot: 200</code></td></tr><tr><td><b>Новый пароль</b><span>screens/setpass.html</span></td><td>Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check,<br>POST /<wbr>api/<wbr>auth/<wbr>set-password</code></td></tr><tr><td><b>Пароль сохранён</b><span>screens/saved.html</span></td><td>После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password: 200</code></td></tr><tr><td><b>Восстановление выключено</b><span>screens/resetoff.html</span></td><td>capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities</code></td></tr><tr><td><b>Ссылка устарела</b><span>screens/expired.html</span></td><td>Токен из ссылки устарел или уже использован.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check: ошибка</code></td></tr><tr><td><b>Нет доступа</b><span>screens/noaccess.html</span></td><td>Человек вошёл, но роли в этом сервисе у него нет.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me (level),<br>entitlements</code></td></tr><tr><td><b>Код доступа</b><span>screens/pin.html</span></td><td>Переходный вход по коду для сервисов, которые ещё не на GG ID.</td><td><code>sso-gate: PIN-ворота</code></td></tr><tr><td><b>Недоступен</b><span>screens/unavailable.html</span></td><td>GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.</td><td><code>sso-gate: sso-unavailable</code></td></tr><tr><td><b>Вы вышли</b><span>screens/signedout.html</span></td><td>После «Выйти» в меню аккаунта.</td><td><code>POST /<wbr>api/<wbr>v1/<wbr>sessions/<wbr>revoke</code></td></tr></tbody>
+          <tbody><tr><td><b>Вход</b><span>screens/login.html</span></td><td>Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Aura только ссылкой и только когда сервер включил.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities,<br>GGPasskey.enabled(),<br>GGPasskey.login()</code></td></tr><tr><td><b>По паролю</b><span>screens/password.html</span></td><td>Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login</code></td></tr><tr><td><b>Ошибка</b><span>screens/error.html</span></td><td>401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login: 401,<br>429</code></td></tr><tr><td><b>Face ID</b><span>screens/passkey.html</span></td><td>Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.</td><td><code>GGPasskey.login()</code></td></tr><tr><td><b>Готово</b><span>screens/done.html</span></td><td>Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me,<br>переход на next</code></td></tr><tr><td><b>Продолжить как</b><span>screens/continue.html</span></td><td>Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>authorize</code></td></tr><tr><td><b>Подключить Face ID</b><span>screens/enroll.html</span></td><td>После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.</td><td><code>GGPasskey.register()</code></td></tr><tr><td><b>Забыли пароль</b><span>screens/forgot.html</span></td><td>Восстановление по рабочей почте.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot</code></td></tr><tr><td><b>Письмо отправлено</b><span>screens/sent.html</span></td><td>Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot: 200</code></td></tr><tr><td><b>Новый пароль</b><span>screens/setpass.html</span></td><td>Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check,<br>POST /<wbr>api/<wbr>auth/<wbr>set-password</code></td></tr><tr><td><b>Пароль сохранён</b><span>screens/saved.html</span></td><td>После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password: 200</code></td></tr><tr><td><b>Восстановление выключено</b><span>screens/resetoff.html</span></td><td>capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities</code></td></tr><tr><td><b>Ссылка устарела</b><span>screens/expired.html</span></td><td>Токен из ссылки устарел или уже использован.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check: ошибка</code></td></tr><tr><td><b>Нет доступа</b><span>screens/noaccess.html</span></td><td>Человек вошёл, но роли в этом сервисе у него нет.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me (level),<br>entitlements</code></td></tr><tr><td><b>Код доступа</b><span>screens/pin.html</span></td><td>Переходный вход по коду для сервисов, которые ещё не на GG ID.</td><td><code>sso-gate: PIN-ворота</code></td></tr><tr><td><b>Недоступен</b><span>screens/unavailable.html</span></td><td>GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.</td><td><code>sso-gate: sso-unavailable</code></td></tr><tr><td><b>Вы вышли</b><span>screens/signedout.html</span></td><td>После «Выйти» в меню аккаунта.</td><td><code>POST /<wbr>api/<wbr>v1/<wbr>sessions/<wbr>revoke</code></td></tr><tr><td><b>Карточка GG ID</b><span>screens/card.html</span></td><td>Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me: display_name,<br>email (уже есть); positions,<br>gg_id,<br>since,<br>status (добавить); GGPasskey.list()</code></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -819,6 +1116,30 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   <p class="gid-sub">Сессия GG ID на этом устройстве закрыта. Чтобы продолжить работу, войдите снова.</p>
   <div class="gid-stack">
     <a class="gid-btn gid-btn--primary" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти снова</span></a>
+  </div></template>
+<template id="scr-card"><h1 class="gid-h">Ваш GG ID</h1>
+  <p class="gid-sub">Один вход во все сервисы Global Generation. Карточка всегда под рукой в «Моих сервисах».</p>
+  <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+    <div class="gid-idcard-top">
+      <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+      <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+    </div>
+    <div class="gid-idcard-person">
+      <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
+      <div class="gid-idcard-who">
+        <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+        <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+        <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+        <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
+      </div>
+    </div>
+    <div class="gid-idcard-facts">
+      <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
+      <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">марта 2024</dd></dl>
+    </div>
+  </article>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" href="/cabinet/"><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg><span>Открыть мои сервисы</span></a>
   </div></template>
 <script>window.GGID_MANUAL = true;</script>
 <script>
@@ -1034,9 +1355,61 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     });
   }
 
+  // Карточка GG ID (.gid-idcard) и компактная строка (.gid-idrow): заполнить поля [data-gid-field] данными хаба.
+  // Только textContent, поэтому имя или должность с разметкой остаются текстом. Контракт данных: README.md, «Карточка GG ID».
+  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  // «2024-03» или «2024-03-18» = «марта 2024» (после «В команде с»); любая другая строка остаётся как есть.
+  function cardSince(v) {
+    var m = /^(\d{4})-(\d{2})/.exec(String(v == null ? '' : v));
+    return m && +m[2] >= 1 && +m[2] <= 12 ? MONTHS[+m[2] - 1] + ' ' + m[1] : String(v == null ? '' : v);
+  }
+  // Инициалы: первые буквы двух первых слов имени («Иван Образцов» = «ИО», «Лёв» = «Л»).
+  function cardInitials(name) {
+    return String(name || '').trim().split(/\s+/).slice(0, 2)
+      .map(function (w) { return Array.from(w)[0] || ''; }).join('').toUpperCase();
+  }
+  function card(root, d) {
+    if (!root) return;
+    d = d || {};
+    function each(field, fn) {
+      var own = root.matches && root.matches('[data-gid-field="' + field + '"]') ? [root] : [];
+      own.concat([].slice.call(root.querySelectorAll('[data-gid-field="' + field + '"]'))).forEach(fn);
+    }
+    each('name', function (el) { el.textContent = d.name || ''; });
+    each('initials', function (el) { el.textContent = d.initials || cardInitials(d.name); });
+    each('positions', function (el) {
+      el.textContent = '';
+      [].concat(d.positions || []).filter(Boolean).slice(0, 3).forEach(function (p) {
+        var li = document.createElement('li'); li.textContent = String(p); el.appendChild(li);
+      });
+      el.hidden = !el.children.length;
+    });
+    each('email', function (el) {   // перенос строки только перед @: домен в <span> не рвётся на дефисе
+      var v = String(d.email || ''), at = v.lastIndexOf('@');
+      el.textContent = '';
+      if (at > 0) {
+        var dom = document.createElement('span');
+        dom.textContent = v.slice(at);
+        el.appendChild(document.createTextNode(v.slice(0, at)));
+        el.appendChild(document.createElement('wbr'));
+        el.appendChild(dom);
+      } else el.textContent = v;
+    });
+    each('id', function (el) { el.textContent = d.id || ''; });
+    each('since', function (el) { el.textContent = cardSince(d.since); });
+    each('status', function (el) {
+      var on = (d.status || 'active') === 'active';
+      el.setAttribute('data-status', on ? 'active' : 'disabled');
+      el.textContent = on ? 'Активен' : 'Отключён';
+    });
+    each('passkey', function (el) { el.hidden = !d.passkey; });
+    if (root.hasAttribute && root.hasAttribute('aria-label') && d.name) root.setAttribute('aria-label', 'Global Generation ID: ' + d.name);
+  }
+
   window.GGID = {
     init: init, busy: busy, shake: shake, error: error,
-    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel
+    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
+    card: card, cardSince: cardSince, cardInitials: cardInitials
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
@@ -1046,23 +1419,27 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <script>
 (function () {
   'use strict';
-  var META = [{"key": "login", "tab": "Вход", "title": "Вход", "lockup": true, "when": "Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Aura только ссылкой и только когда сервер включил.", "api": "GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()"}, {"key": "password", "tab": "По паролю", "title": "Вход по паролю", "lockup": true, "when": "Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.", "api": "POST /api/auth/login"}, {"key": "error", "tab": "Ошибка", "title": "Неверный пароль", "lockup": true, "when": "401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».", "api": "POST /api/auth/login: 401, 429"}, {"key": "passkey", "tab": "Face ID", "title": "Подтвердите вход", "lockup": true, "when": "Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.", "api": "GGPasskey.login()"}, {"key": "done", "tab": "Готово", "title": "Вход выполнен", "lockup": false, "when": "Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.", "api": "GET /api/auth/me, переход на next"}, {"key": "continue", "tab": "Продолжить как", "title": "Продолжить", "lockup": true, "when": "Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.", "api": "GET /api/auth/authorize"}, {"key": "enroll", "tab": "Подключить Face ID", "title": "Вход без пароля", "lockup": true, "when": "После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.", "api": "GGPasskey.register()"}, {"key": "forgot", "tab": "Забыли пароль", "title": "Восстановить пароль", "lockup": true, "when": "Восстановление по рабочей почте.", "api": "POST /api/auth/forgot"}, {"key": "sent", "tab": "Письмо отправлено", "title": "Проверьте почту", "lockup": true, "when": "Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.", "api": "POST /api/auth/forgot: 200"}, {"key": "setpass", "tab": "Новый пароль", "title": "Задайте пароль", "lockup": true, "when": "Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.", "api": "POST /api/auth/set-password/check, POST /api/auth/set-password"}, {"key": "saved", "tab": "Пароль сохранён", "title": "Пароль сохранён", "lockup": true, "when": "После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.", "api": "POST /api/auth/set-password: 200"}, {"key": "resetoff", "tab": "Восстановление выключено", "title": "Восстановить пароль", "lockup": true, "when": "capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.", "api": "GET /api/auth/capabilities"}, {"key": "expired", "tab": "Ссылка устарела", "title": "Ссылка не работает", "lockup": true, "when": "Токен из ссылки устарел или уже использован.", "api": "POST /api/auth/set-password/check: ошибка"}, {"key": "noaccess", "tab": "Нет доступа", "title": "Нет доступа", "lockup": true, "when": "Человек вошёл, но роли в этом сервисе у него нет.", "api": "GET /api/auth/me (level), entitlements"}, {"key": "pin", "tab": "Код доступа", "title": "Код доступа", "lockup": true, "when": "Переходный вход по коду для сервисов, которые ещё не на GG ID.", "api": "sso-gate: PIN-ворота"}, {"key": "unavailable", "tab": "Недоступен", "title": "Вход временно недоступен", "lockup": true, "when": "GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.", "api": "sso-gate: sso-unavailable"}, {"key": "signedout", "tab": "Вы вышли", "title": "Вы вышли", "lockup": true, "when": "После «Выйти» в меню аккаунта.", "api": "POST /api/v1/sessions/revoke"}];
+  var META = [{"key": "login", "tab": "Вход", "title": "Вход", "lockup": true, "path": "", "when": "Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Aura только ссылкой и только когда сервер включил.", "api": "GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()"}, {"key": "password", "tab": "По паролю", "title": "Вход по паролю", "lockup": true, "path": "", "when": "Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.", "api": "POST /api/auth/login"}, {"key": "error", "tab": "Ошибка", "title": "Неверный пароль", "lockup": true, "path": "", "when": "401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».", "api": "POST /api/auth/login: 401, 429"}, {"key": "passkey", "tab": "Face ID", "title": "Подтвердите вход", "lockup": true, "path": "", "when": "Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.", "api": "GGPasskey.login()"}, {"key": "done", "tab": "Готово", "title": "Вход выполнен", "lockup": false, "path": "", "when": "Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.", "api": "GET /api/auth/me, переход на next"}, {"key": "continue", "tab": "Продолжить как", "title": "Продолжить", "lockup": true, "path": "", "when": "Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.", "api": "GET /api/auth/authorize"}, {"key": "enroll", "tab": "Подключить Face ID", "title": "Вход без пароля", "lockup": true, "path": "", "when": "После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.", "api": "GGPasskey.register()"}, {"key": "forgot", "tab": "Забыли пароль", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "Восстановление по рабочей почте.", "api": "POST /api/auth/forgot"}, {"key": "sent", "tab": "Письмо отправлено", "title": "Проверьте почту", "lockup": true, "path": "", "when": "Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.", "api": "POST /api/auth/forgot: 200"}, {"key": "setpass", "tab": "Новый пароль", "title": "Задайте пароль", "lockup": true, "path": "", "when": "Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.", "api": "POST /api/auth/set-password/check, POST /api/auth/set-password"}, {"key": "saved", "tab": "Пароль сохранён", "title": "Пароль сохранён", "lockup": true, "path": "", "when": "После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.", "api": "POST /api/auth/set-password: 200"}, {"key": "resetoff", "tab": "Восстановление выключено", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.", "api": "GET /api/auth/capabilities"}, {"key": "expired", "tab": "Ссылка устарела", "title": "Ссылка не работает", "lockup": true, "path": "", "when": "Токен из ссылки устарел или уже использован.", "api": "POST /api/auth/set-password/check: ошибка"}, {"key": "noaccess", "tab": "Нет доступа", "title": "Нет доступа", "lockup": true, "path": "", "when": "Человек вошёл, но роли в этом сервисе у него нет.", "api": "GET /api/auth/me (level), entitlements"}, {"key": "pin", "tab": "Код доступа", "title": "Код доступа", "lockup": true, "path": "", "when": "Переходный вход по коду для сервисов, которые ещё не на GG ID.", "api": "sso-gate: PIN-ворота"}, {"key": "unavailable", "tab": "Недоступен", "title": "Вход временно недоступен", "lockup": true, "path": "", "when": "GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.", "api": "sso-gate: sso-unavailable"}, {"key": "signedout", "tab": "Вы вышли", "title": "Вы вышли", "lockup": true, "path": "", "when": "После «Выйти» в меню аккаунта.", "api": "POST /api/v1/sessions/revoke"}, {"key": "card", "tab": "Карточка GG ID", "title": "Ваш GG ID", "lockup": false, "path": "/cabinet/", "when": "Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.", "api": "GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()"}];
   var BY = {}; META.forEach(function (m, i) { m.n = ('0' + (i + 1)).slice(-2); BY[m.key] = m; });
   var st = { s: 'login', l: 'split', t: 'light', d: 'desktop', svc: 'АКБ' };
   var lastDevice = 'desktop';
   var stage = document.getElementById('stage'), tabs = document.getElementById('tabs'), cap = document.getElementById('cap'), svcSel = document.getElementById('svc');
 
-  // ссылка на конкретное состояние: #s=error&l=card&t=dark&d=phone
-  try {
-    var h = new URLSearchParams(location.hash.slice(1));
-    if (BY[h.get('s')]) st.s = h.get('s');
-    if (/^(split|card|minimal)$/.test(h.get('l') || '')) st.l = h.get('l');
-    if (/^(light|dark)$/.test(h.get('t') || '')) st.t = h.get('t');
-    if (/^(desktop|phone|all)$/.test(h.get('d') || '')) st.d = h.get('d');
-    if (h.get('svc')) st.svc = h.get('svc');
-  } catch (e) {}
-  if (st.d !== 'all') lastDevice = st.d;
-  [].forEach.call(svcSel.options, function (o) { if (o.text === st.svc) svcSel.value = o.value; });
+  // ссылка на конкретное состояние: #s=error&l=card&t=dark&d=phone, карточка GG ID: #s=card
+  function readHash() {
+    try {
+      var h = new URLSearchParams(location.hash.slice(1));
+      if (BY[h.get('s')]) st.s = h.get('s');
+      if (/^(split|card|minimal)$/.test(h.get('l') || '')) st.l = h.get('l');
+      if (/^(light|dark)$/.test(h.get('t') || '')) st.t = h.get('t');
+      if (/^(desktop|phone|all)$/.test(h.get('d') || '')) st.d = h.get('d');
+      if (h.get('svc')) st.svc = h.get('svc');
+    } catch (e) {}
+    if (st.d !== 'all') lastDevice = st.d;
+    [].forEach.call(svcSel.options, function (o) { if (o.text === st.svc) svcSel.value = o.value; });
+  }
+  readHash();
+  window.addEventListener('hashchange', function () { readHash(); render(); stage.scrollIntoView({ block: 'start' }); });
 
   function save() {
     var q = 's=' + st.s + '&l=' + st.l + '&t=' + st.t + '&d=' + st.d + (st.svc !== 'АКБ' ? '&svc=' + encodeURIComponent(st.svc) : '');
@@ -1126,7 +1503,8 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     if (st.d === 'desktop') {
       var br = document.createElement('div'); br.className = 'sc-browser';
       br.innerHTML = '<div class="sc-chrome"><div class="sc-dots"><i></i><i></i><i></i></div><div class="sc-url"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span></span></div><div style="width:47px"></div></div><div class="sc-viewport"><div class="sc-screen"></div></div>';
-      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value);
+      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com' +
+        (m.path || '/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value));
       var vp = br.querySelector('.sc-viewport'), scr = br.querySelector('.sc-screen');
       var g = build(st.s); g.style.setProperty('--gid-h', '800px'); scr.appendChild(g); wire(g);
       stage.appendChild(br);
@@ -1174,6 +1552,15 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     });
   });
   svcSel.addEventListener('change', function () { st.svc = svcSel.options[svcSel.selectedIndex].text; render(); });
+
+  // карточка GG ID в письме: высота окна по содержимому письма
+  var mail = document.getElementById('mailFrame');
+  function fitMail() {
+    try { var d = mail.contentDocument; if (d && d.body && d.body.firstElementChild) mail.style.height = Math.ceil(d.body.offsetHeight) + 'px'; } catch (e) {}
+  }
+  mail.addEventListener('load', fitMail);
+  window.addEventListener('resize', fitMail);
+  fitMail();
 
   // компоненты: ссылки-заглушки, меню аккаунта, окно поверх страницы
   document.querySelectorAll('[data-noop]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });

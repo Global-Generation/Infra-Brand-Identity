@@ -29,6 +29,10 @@
   --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
   --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
   --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
+  /* карточка GG ID: лицевая сторона всегда navy, тема меняет глубину, кольцо и тень */
+  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1f6a8f 0%,rgba(31,106,143,0) 55%),linear-gradient(150deg,#174f6c 0%,#0f3a51 52%,#0a2738 100%);
+  --g-idc-ring:rgba(255,255,255,.06);
+  --g-idc-shadow:0 1px 2px rgba(15,23,42,.10),0 28px 60px -30px rgba(13,47,66,.65);
   color-scheme:light;
   font-family:var(--g-font);
 }
@@ -53,6 +57,9 @@
   --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
   --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
   --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
+  --g-idc-ring:rgba(255,255,255,.14);
+  --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
   color-scheme:dark;
 }
 @media (prefers-color-scheme:dark){
@@ -75,6 +82,9 @@
     --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
     --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
     --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+    --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
+    --g-idc-ring:rgba(255,255,255,.14);
+    --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
     color-scheme:dark;
   }
 }
@@ -121,7 +131,7 @@
 @container gid (min-width:960px){
   .gid[data-layout="split"] .gid-frame{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}
   .gid[data-layout="split"] .gid-aside{display:flex}
-  .gid[data-layout="split"] .gid-card .gid-lockup{display:none}
+  .gid[data-layout="split"] .gid-card > .gid-lockup{display:none}
   .gid[data-layout="split"] .gid-h{font-size:32px}
 }
 .gid-aside{position:relative;overflow:hidden;isolation:isolate;flex-direction:column;justify-content:space-between;gap:32px;
@@ -390,6 +400,69 @@
   box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);animation:gidMenu .24s var(--g-pop) both}
 .gid-dialog .gid-h{font-size:22px}
 .gid-dialog .gid-sso{margin-top:24px}
+
+/* ============ карточка GG ID: как студенческий ID в Duke или Stanford ============ */
+/* Лицевая сторона всегда navy (как панель сплита), тема меняет глубину, кольцо и тень: токены --g-idc-*.
+   Пропорции настоящей карты 85,6 x 54 мм. Если данных больше (три длинные должности), карта растёт вниз, без обрезки.
+   Один акцент: точка статуса «Активен». Подпись «логотип | ID» как на экранах входа, логотип белый.
+   Ставится внутри .gid или .gid-kit. Поля data-gid-field и GGID.card(): README.md, раздел «Карточка GG ID». */
+.gid-idcard{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;row-gap:14px;
+  width:100%;max-width:var(--gid-idcard-w,460px);container:gidcard/inline-size;padding:22px 24px;border-radius:18px;
+  background:var(--g-idc-face);color:#fff;font-family:var(--g-font);font-weight:500;line-height:1.4;text-align:left;
+  box-shadow:inset 0 0 0 1px var(--g-idc-ring),var(--g-idc-shadow)}
+/* распорка: минимальная высота = ширина x 54 / 85,6 (с учётом паддингов 22 и 24 px), данные могут карту удлинить.
+   Не aspect-ratio: во flex- и grid-родителях он не даёт карте вырасти и текст вылезает. */
+.gid-idcard::before{content:"";grid-area:1/1/4/2;padding-top:calc(63.084% - 13.72px);pointer-events:none}
+.gid-idcard-top{grid-area:1/1;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.gid-idcard .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;flex:none}
+.gid-idcard .gid-logo{height:28px}
+.gid-idcard-status{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;line-height:1;color:rgba(255,255,255,.88);white-space:nowrap}
+.gid-idcard-status::before{content:"";width:8px;height:8px;flex:none;border-radius:50%;background:#5cc3ec;box-shadow:0 0 0 3px rgba(92,195,236,.2)}
+.gid-idcard-status[data-status="disabled"]{color:rgba(255,255,255,.7)}
+.gid-idcard-status[data-status="disabled"]::before{background:rgba(255,255,255,.42);box-shadow:none}
+
+.gid-idcard-person{grid-area:2/1;align-self:center;display:flex;align-items:center;gap:clamp(12px,4.2cqi,18px);min-width:0}
+.gid-idcard-photo{flex:none;display:grid;place-items:center;width:clamp(54px,16cqi,74px);aspect-ratio:4/5;border-radius:14px;
+  background:linear-gradient(150deg,#2f80a8 0%,#15506e 92%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  color:#fff;font-size:clamp(19px,5.6cqi,26px);font-weight:700;letter-spacing:.02em;line-height:1}
+.gid-idcard-who{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.gid-idcard-name{font-size:clamp(18px,4.9cqi,22px);font-weight:700;line-height:1.18;letter-spacing:-.02em;color:#fff;
+  text-wrap:balance;overflow-wrap:anywhere}
+.gid-idcard-roles{list-style:none;padding:0;font-size:13.5px;font-weight:600;line-height:1.42;color:rgba(255,255,255,.86);text-wrap:pretty}
+.gid-idcard-roles li{display:inline}
+.gid-idcard-roles li + li::before{content:"\00a0\00b7\0020";color:rgba(255,255,255,.55)}
+.gid-idcard-roles:empty{display:none}
+.gid-idcard-mail{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.74);overflow-wrap:anywhere}
+.gid-idcard-mail span{white-space:nowrap}   /* домен целиком: адрес переносится только перед @ */
+.gid-idcard-passkey{display:flex;align-items:center;gap:6px;margin-top:1px;font-size:12.5px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.74)}
+.gid-idcard-passkey .gid-ic{width:16px;height:16px}
+
+.gid-idcard-facts{grid-area:3/1;align-self:end;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 20px;min-width:0}
+.gid-idcard-fact{display:flex;flex-direction:column;gap:4px;margin:0;min-width:0}
+.gid-idcard-fact + .gid-idcard-fact{text-align:right}
+.gid-idcard-fact dt{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.66)}
+.gid-idcard-fact dd{margin:0;font-size:14.5px;font-weight:600;line-height:1.3;color:#fff;white-space:nowrap}
+.gid-idcard-fact .gid-idcard-num{font-size:16px;line-height:1.2;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+@container gidcard (max-width:380px){
+  .gid-idcard .gid-lockup{gap:11px}
+  .gid-idcard .gid-lockup-name{padding-left:11px;font-size:15px}
+  .gid-idcard-roles{font-size:13px}
+  .gid-idcard-mail,.gid-idcard-passkey{font-size:12px}
+  .gid-idcard-fact dd{font-size:14px}
+  .gid-idcard-fact .gid-idcard-num{font-size:15px}
+}
+.gid-sub + .gid-idcard{margin-top:26px}
+.gid-idcard + .gid-stack{margin-top:24px}
+
+/* компактная строка GG ID: шапка, меню аккаунта, списки людей. Поверхность по теме, инициалы как у .gid-chip */
+.gid-idrow{display:inline-flex;align-items:center;gap:12px;min-width:0;max-width:100%;padding:8px 16px 8px 8px;border-radius:16px;
+  border:1px solid var(--g-line);background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-weight:500;line-height:1.3;text-align:left}
+.gid-idrow-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gid-idrow-tx b{font-size:14px;font-weight:600;color:var(--g-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gid-idrow-num{font-size:12.5px;font-weight:600;letter-spacing:.05em;font-variant-numeric:tabular-nums;color:var(--g-muted);white-space:nowrap}
+.gid-idrow .gid-idcard-status{margin-left:8px;font-size:12px;color:var(--g-muted)}
+.gid-idrow .gid-idcard-status::before{background:var(--g-accent);box-shadow:0 0 0 3px var(--g-ring)}
+.gid-idrow .gid-idcard-status[data-status="disabled"]::before{background:var(--g-faint);box-shadow:none}
 
 /* ---------- меньше движения ---------- */
 @media (prefers-reduced-motion:reduce){

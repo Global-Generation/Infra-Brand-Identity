@@ -84,6 +84,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-sec{padding-top:72px}
 .sc-sec h2{margin:0;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.03em;color:var(--navy)}
 .sc-sec > .wrap > p,.sc-sec .lead{margin:10px 0 0;max-width:760px;font-size:15px;line-height:1.6;color:var(--sfg)}
+.sc-sec .lead a{color:var(--sky-ink);font-weight:600;text-underline-offset:3px}
 .sc-comp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}
 .sc-card{min-width:0;display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:20px;background:#fff;border:1px solid var(--border)}
 .sc-card h3{margin:0;font-size:16px;font-weight:700}
@@ -113,7 +114,30 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-api td code{display:inline-block;overflow-wrap:normal;word-break:normal}
 .sc-foot{padding:64px 0 48px;font-size:12.5px;color:var(--mfg)}
 
-@media (max-width:1020px){.sc-comp{grid-template-columns:minmax(0,1fr)}.sc-how{grid-template-columns:minmax(0,1fr)}}
+/* карточка GG ID */
+.sc-idc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
+.sc-idc-cell{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 28px 22px;
+  border-radius:20px;background:#f3f7fb;border:1px solid var(--border)}
+.sc-idc-cell.dark{background:#081b26;border-color:#081b26}
+.sc-idc-cell figcaption,.sc-idc-cell > p{margin:0;font-size:12.5px;font-weight:600;color:var(--mfg);text-align:center}
+.sc-idc-cell.dark figcaption{color:#8ea4b7}
+.sc-idc-rows{align-items:stretch;padding:28px}
+.sc-row-demo{display:flex;justify-content:center;padding:22px 16px;border-radius:14px;background:#fff;border:1px solid var(--border)}
+.sc-row-demo.dark{background:#0b2433;border-color:#0b2433}
+.sc-sub{margin:40px 0 0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--fg)}
+.sc-where{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.sc-where div{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;background:#fff;border:1px solid var(--border);min-width:0}
+.sc-where b{font-size:14px;font-weight:700;color:var(--fg)}
+.sc-where span{font-size:13px;line-height:1.55;color:var(--sfg)}
+.sc-mail{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;margin-top:14px;align-items:start}
+.sc-mail-frame{border-radius:20px;overflow:hidden;border:1px solid var(--border);background:#eef3f9}
+.sc-mail-frame iframe{display:block;width:100%;height:420px;border:0}
+.sc-mail-notes{display:flex;flex-direction:column;gap:10px;padding:20px 22px;border-radius:20px;background:#fff;border:1px solid var(--border);font-size:13.5px;line-height:1.55;color:var(--sfg)}
+.sc-mail-notes p{margin:0}
+.sc-mail-notes b{color:var(--fg)}
+
+@media (max-width:1020px){.sc-comp{grid-template-columns:minmax(0,1fr)}.sc-how{grid-template-columns:minmax(0,1fr)}
+  .sc-idc,.sc-mail{grid-template-columns:minmax(0,1fr)}.sc-where{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){
   .wrap{padding:0 16px}
   .sc-hero{padding-top:30px}.sc-hero h1{font-size:46px}.sc-hero p{font-size:15px}
@@ -122,6 +146,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   .sc-files div{grid-template-columns:minmax(0,1fr);gap:2px}
   .sc-api thead{display:none}.sc-api tr{display:block;padding:12px 0;border-bottom:1px solid var(--border)}.sc-api td{display:block;border:0;padding:3px 16px}
   .sc-sec h2{font-size:26px}
+  .sc-idc-cell{padding:24px 12px 16px}.sc-idc-rows{padding:12px}.sc-where{grid-template-columns:minmax(0,1fr)}
 }
 </style>
 </head>
@@ -134,7 +159,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
 <section class="wrap sc-hero">
   <h1>GG ID</h1>
-  <p>Единый вход во все сервисы Global Generation: @N_SCREENS@ экранов входа, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
+  <p>Единый вход во все сервисы Global Generation: @N_LOGIN@ экранов входа, карточка GG ID, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
 </section>
 
 <section class="wrap">
@@ -157,6 +182,53 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   <nav class="sc-tabs" id="tabs" role="tablist" aria-label="Экраны"></nav>
   <div class="sc-stage" id="stage"></div>
   <dl class="sc-cap" id="cap"></dl>
+</section>
+
+<section class="sc-sec" id="idcard">
+  <div class="wrap">
+    <h2>Карточка GG ID</h2>
+    <p class="lead">Как студенческий ID в Duke или Stanford, только для команды Global Generation: имя, должности, рабочая почта и номер GG ID. Один взгляд, и понятно, под каким аккаунтом вы вошли. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
+    <div class="sc-idc">
+      <figure class="sc-idc-cell gid-kit" data-theme="light">
+@IDCARD@
+        <figcaption>Светлая тема</figcaption>
+      </figure>
+      <figure class="sc-idc-cell dark gid-kit" data-theme="dark">
+@IDCARD@
+        <figcaption>Тёмная тема</figcaption>
+      </figure>
+    </div>
+    <div class="sc-idc">
+      <figure class="sc-idc-cell gid-kit" data-theme="light">
+@IDCARD_LONG@
+        <figcaption>Три должности и длинное имя: карточка растёт вниз, ничего не обрезается</figcaption>
+      </figure>
+      <div class="sc-idc-cell sc-idc-rows">
+        <div class="gid-kit sc-row-demo" data-theme="light">@IDROW@</div>
+        <div class="gid-kit sc-row-demo dark" data-theme="dark">@IDROW@</div>
+        <p>Компактная строка: шапка хаба, меню аккаунта, списки людей</p>
+      </div>
+    </div>
+
+    <h3 class="sc-sub">Где показываем</h3>
+    <div class="sc-where">
+      <div><b>Кабинет «Мои сервисы»</b><span>Вверху /cabinet/ хаба, над списком сервисов: человек сразу видит, что вошёл под своим аккаунтом.</span></div>
+      <div><b>Письмо-приглашение</b><span>В письме «Ваш единый вход готов»: письмо-безопасная копия <code>gg-id/email-card.html</code>.</span></div>
+      <div><b>Онбординг</b><span>Первый вход после приглашения и первый день в команде: «Ваш GG ID» рядом с чек-листом доступов.</span></div>
+      <div><b>Инструкция «Как войти»</b><span>Образец карточки в <code>kak-voyti.html</code> хаба: так выглядит ваш GG ID.</span></div>
+    </div>
+
+    <h3 class="sc-sub">В письме</h3>
+    <div class="sc-mail">
+      <div class="sc-mail-frame"><iframe title="Карточка GG ID в письме" id="mailFrame" srcdoc="@EMAIL_SRCDOC@"></iframe></div>
+      <div class="sc-mail-notes">
+        <p><b>Файл:</b> <code>gg-id/email-card.html</code>. Таблицы и встроенные стили, системный шрифт, без внешних шрифтов и скриптов. Хаб вставляет в своё письмо блок между метками <code>gg-id-card:start</code> и <code>gg-id-card:end</code>.</p>
+        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{initials}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> <code>{{since}}</code>. Каждое значение экранируется как HTML.</p>
+        <p><b>Тёмная тема:</b> Apple Mail оставляет карточку navy. Gmail на Android тёмный фон не трогает. Gmail на iPhone инвертирует цвета: текст остаётся контрастным, подпись с логотипом на своей navy-плашке.</p>
+        <p><b>Подпись:</b> картинка <code>gg-id/email/gg-id-lockup-2x.png</code> по https из <code>/assets/gg-id/</code> хаба: почта не рисует SVG.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="sc-sec">
@@ -232,6 +304,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи Face ID</span></div>
           <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
           <div><code>gg-id/screens/</code><span>@N_SCREENS@ эталонных страниц для хаба</span></div>
+          <div><code>gg-id/email-card.html</code><span>карточка GG ID для писем</span></div>
         </div>
       </div>
       <div class="sc-api">
@@ -261,17 +334,21 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   var lastDevice = 'desktop';
   var stage = document.getElementById('stage'), tabs = document.getElementById('tabs'), cap = document.getElementById('cap'), svcSel = document.getElementById('svc');
 
-  // ссылка на конкретное состояние: #s=error&l=card&t=dark&d=phone
-  try {
-    var h = new URLSearchParams(location.hash.slice(1));
-    if (BY[h.get('s')]) st.s = h.get('s');
-    if (/^(split|card|minimal)$/.test(h.get('l') || '')) st.l = h.get('l');
-    if (/^(light|dark)$/.test(h.get('t') || '')) st.t = h.get('t');
-    if (/^(desktop|phone|all)$/.test(h.get('d') || '')) st.d = h.get('d');
-    if (h.get('svc')) st.svc = h.get('svc');
-  } catch (e) {}
-  if (st.d !== 'all') lastDevice = st.d;
-  [].forEach.call(svcSel.options, function (o) { if (o.text === st.svc) svcSel.value = o.value; });
+  // ссылка на конкретное состояние: #s=error&l=card&t=dark&d=phone, карточка GG ID: #s=card
+  function readHash() {
+    try {
+      var h = new URLSearchParams(location.hash.slice(1));
+      if (BY[h.get('s')]) st.s = h.get('s');
+      if (/^(split|card|minimal)$/.test(h.get('l') || '')) st.l = h.get('l');
+      if (/^(light|dark)$/.test(h.get('t') || '')) st.t = h.get('t');
+      if (/^(desktop|phone|all)$/.test(h.get('d') || '')) st.d = h.get('d');
+      if (h.get('svc')) st.svc = h.get('svc');
+    } catch (e) {}
+    if (st.d !== 'all') lastDevice = st.d;
+    [].forEach.call(svcSel.options, function (o) { if (o.text === st.svc) svcSel.value = o.value; });
+  }
+  readHash();
+  window.addEventListener('hashchange', function () { readHash(); render(); stage.scrollIntoView({ block: 'start' }); });
 
   function save() {
     var q = 's=' + st.s + '&l=' + st.l + '&t=' + st.t + '&d=' + st.d + (st.svc !== 'АКБ' ? '&svc=' + encodeURIComponent(st.svc) : '');
@@ -335,7 +412,8 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     if (st.d === 'desktop') {
       var br = document.createElement('div'); br.className = 'sc-browser';
       br.innerHTML = '<div class="sc-chrome"><div class="sc-dots"><i></i><i></i><i></i></div><div class="sc-url"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span></span></div><div style="width:47px"></div></div><div class="sc-viewport"><div class="sc-screen"></div></div>';
-      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value);
+      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com' +
+        (m.path || '/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value));
       var vp = br.querySelector('.sc-viewport'), scr = br.querySelector('.sc-screen');
       var g = build(st.s); g.style.setProperty('--gid-h', '800px'); scr.appendChild(g); wire(g);
       stage.appendChild(br);
@@ -383,6 +461,15 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     });
   });
   svcSel.addEventListener('change', function () { st.svc = svcSel.options[svcSel.selectedIndex].text; render(); });
+
+  // карточка GG ID в письме: высота окна по содержимому письма
+  var mail = document.getElementById('mailFrame');
+  function fitMail() {
+    try { var d = mail.contentDocument; if (d && d.body && d.body.firstElementChild) mail.style.height = Math.ceil(d.body.offsetHeight) + 'px'; } catch (e) {}
+  }
+  mail.addEventListener('load', fitMail);
+  window.addEventListener('resize', fitMail);
+  fitMail();
 
   // компоненты: ссылки-заглушки, меню аккаунта, окно поверх страницы
   document.querySelectorAll('[data-noop]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
