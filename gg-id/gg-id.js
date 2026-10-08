@@ -210,9 +210,61 @@
     });
   }
 
+  // Карточка GG ID (.gid-idcard) и компактная строка (.gid-idrow): заполнить поля [data-gid-field] данными хаба.
+  // Только textContent, поэтому имя или должность с разметкой остаются текстом. Контракт данных: README.md, «Карточка GG ID».
+  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  // «2024-03» или «2024-03-18» = «марта 2024» (после «В команде с»); любая другая строка остаётся как есть.
+  function cardSince(v) {
+    var m = /^(\d{4})-(\d{2})/.exec(String(v == null ? '' : v));
+    return m && +m[2] >= 1 && +m[2] <= 12 ? MONTHS[+m[2] - 1] + ' ' + m[1] : String(v == null ? '' : v);
+  }
+  // Инициалы: первые буквы двух первых слов имени («Иван Образцов» = «ИО», «Лёв» = «Л»).
+  function cardInitials(name) {
+    return String(name || '').trim().split(/\s+/).slice(0, 2)
+      .map(function (w) { return Array.from(w)[0] || ''; }).join('').toUpperCase();
+  }
+  function card(root, d) {
+    if (!root) return;
+    d = d || {};
+    function each(field, fn) {
+      var own = root.matches && root.matches('[data-gid-field="' + field + '"]') ? [root] : [];
+      own.concat([].slice.call(root.querySelectorAll('[data-gid-field="' + field + '"]'))).forEach(fn);
+    }
+    each('name', function (el) { el.textContent = d.name || ''; });
+    each('initials', function (el) { el.textContent = d.initials || cardInitials(d.name); });
+    each('positions', function (el) {
+      el.textContent = '';
+      [].concat(d.positions || []).filter(Boolean).slice(0, 3).forEach(function (p) {
+        var li = document.createElement('li'); li.textContent = String(p); el.appendChild(li);
+      });
+      el.hidden = !el.children.length;
+    });
+    each('email', function (el) {   // перенос строки только перед @: домен в <span> не рвётся на дефисе
+      var v = String(d.email || ''), at = v.lastIndexOf('@');
+      el.textContent = '';
+      if (at > 0) {
+        var dom = document.createElement('span');
+        dom.textContent = v.slice(at);
+        el.appendChild(document.createTextNode(v.slice(0, at)));
+        el.appendChild(document.createElement('wbr'));
+        el.appendChild(dom);
+      } else el.textContent = v;
+    });
+    each('id', function (el) { el.textContent = d.id || ''; });
+    each('since', function (el) { el.textContent = cardSince(d.since); });
+    each('status', function (el) {
+      var on = (d.status || 'active') === 'active';
+      el.setAttribute('data-status', on ? 'active' : 'disabled');
+      el.textContent = on ? 'Активен' : 'Отключён';
+    });
+    each('passkey', function (el) { el.hidden = !d.passkey; });
+    if (root.hasAttribute && root.hasAttribute('aria-label') && d.name) root.setAttribute('aria-label', 'Global Generation ID: ' + d.name);
+  }
+
   window.GGID = {
     init: init, busy: busy, shake: shake, error: error,
-    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel
+    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
+    card: card, cardSince: cardSince, cardInitials: cardInitials
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);

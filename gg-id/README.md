@@ -13,9 +13,12 @@
 | `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи Face ID / Touch ID / Windows Hello |
 | `fonts/` | Montserrat (переменный, 400-700), кириллица и латиница, самохостом |
 | `sprite.svg` | логотип `gid-logo`, плитка фавикона `gid-tile` и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
-| `screens/` | 17 эталонных экранов, генерируются, руками не править |
+| `screens/` | 18 эталонных страниц (17 экранов входа и карточка GG ID), генерируются, руками не править |
+| `email-card.html` | карточка GG ID для писем: таблицы, встроенные стили, подстановки `{{...}}` |
+| `email/gg-id-lockup-2x.png` | подпись «логотип \| ID» для письма (белая на navy-плашке), генерируется `src/rasterize_gg_id_email.py` |
+| `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
 
-Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg` к себе (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`.
+Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg` и `email/` к себе (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинку из `email/` письма берут по https: `https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png`.
 
 ## Каркас страницы
 
@@ -90,6 +93,7 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 | Код доступа | `screens/pin.html` | Переходный вход по коду для сервисов, которые ещё не на GG ID. | `sso-gate: PIN-ворота` |
 | Недоступен | `screens/unavailable.html` | GG ID не отвечает (5xx или таймаут). Страница сама пробует снова. | `sso-gate: sso-unavailable` |
 | Вы вышли | `screens/signedout.html` | После «Выйти» в меню аккаунта. | `POST /api/v1/sessions/revoke` |
+| Карточка GG ID | `screens/card.html` | Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html. | `GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()` |
 <!-- screens:end -->
 
 ## Компоненты для сервисов
@@ -113,6 +117,103 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 Разметку целиком брать из витрины (раздел «Компоненты для сервисов»). Значок кнопки = фавикон сайта как есть (`assets/favicons/root.svg`), символ `gid-tile` в спрайте.
 
+## Карточка GG ID
+
+Карточка сотрудника, как студенческий ID в Duke или Stanford: имя, должности, рабочая почта и номер GG ID. Один взгляд, и человек видит, под каким аккаунтом вошёл.
+
+Где показываем: вверху кабинета «Мои сервисы» (`/cabinet/` хаба), на первом входе после приглашения и в онбординге, образцом в инструкции «Как войти» (`kak-voyti.html`). В письме-приглашении её копия `email-card.html` (ниже). Эталон: `screens/card.html`; витрина: `gg-id.html#s=card` и раздел «Карточка GG ID».
+
+- Лицевая сторона всегда navy, как панель сплита. Подпись «логотип | ID» белая, логотип из спрайта (`gid-logo`), не перерисовывать.
+- Тема как у всего кита (`data-theme` или система): меняются глубина navy, кольцо и тень, токены `--g-idc-face`, `--g-idc-ring`, `--g-idc-shadow`.
+- Размер: `width: 100%`, `max-width: var(--gid-idcard-w, 460px)`, высота не меньше ширины x 54 / 85,6 (пропорции настоящей карты 85,6 x 54 мм). На телефоне во всю ширину контейнера. Если данных больше (длинное имя, три длинные должности, длинная почта на узкой карте), карта растёт вниз, ничего не обрезается.
+- Пропорцию держит распорка `.gid-idcard::before`, а не `aspect-ratio`: во flex- и grid-родителях `aspect-ratio` не даёт карте вырасти, и текст вылезает. В flex-ряду с `align-items: stretch` карточка тянется на высоту ряда: поставить ей `align-self: flex-start`.
+- Один акцент: голубая точка статуса «Активен». Больше на карточке ничего не подсвечиваем.
+- Ставится внутри `.gid` или `.gid-kit` (оттуда шрифт и токены). Над заголовком экрана карточку не ставим: сначала заголовок, потом карточка.
+
+![Карточка GG ID: светлая и тёмная тема](preview/card-light-dark.png)
+
+| Телефон, 390 px | Длинные данные и компактная строка |
+|---|---|
+| ![Карточка на телефоне](preview/card-phone.png) | ![Длинные данные и компактная строка](preview/card-long-and-row.png) |
+
+Картинки обновляет `uv run --with playwright python src/check_gg_id.py --preview` (после зелёной проверки).
+
+### Разметка
+
+Обычная карточка и компактная строка (генерируется из `src/build_gg_id.py`, та же строка, что в `screens/card.html` и витрине; данные вымышленные):
+
+<!-- idcard:start -->
+```html
+<article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+  <div class="gid-idcard-top">
+    <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+    <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+  </div>
+  <div class="gid-idcard-person">
+    <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
+    <div class="gid-idcard-who">
+      <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+      <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+      <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+      <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
+    </div>
+  </div>
+  <div class="gid-idcard-facts">
+    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
+    <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">марта 2024</dd></dl>
+  </div>
+</article>
+
+<!-- компактная строка -->
+<div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">ИО</span><span class="gid-idrow-tx"><b data-gid-field="name">Иван Образцов</b><span class="gid-idrow-num" data-gid-field="id">GG 0042-7F3A</span></span><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span></div>
+```
+<!-- idcard:end -->
+
+### Поля и что нужно от хаба
+
+| Поле | `data-gid-field` | Как выглядит | Ограничения | Откуда в хабе |
+|---|---|---|---|---|
+| Имя | `name` | полное имя, крупно | переносится по словам | `display_name`, уже есть в `GET /api/auth/me` |
+| Инициалы | `initials` | 1-2 буквы на navy-градиенте, без фото (как у `.gid-chip`) | первые буквы двух первых слов имени | считаются из имени (`GGID.cardInitials`) |
+| Должности | `positions` | `<ul>`, до трёх `<li>` в строку через « · » | 0-3, длинные названия переносятся; нет должностей = `hidden` | названия из `user_positions` + `positions.title`: добавить в `/api/auth/me` |
+| Почта | `email` | рабочая почта | только @global-generations.com; перенос только перед @: `имя<wbr><span>@global-generations.com</span>` | `email`, уже есть |
+| Номер GG ID | `id` | строка, цифры моноширинные (`tabular-nums`) | до 14 символов; формат решает хаб, пример `GG 0042-7F3A` | новое поле `gg_id` |
+| В команде с | `since` | «марта 2024» (месяц в родительном падеже и год) | `YYYY-MM` или готовая строка | новое поле: месяц прихода в команду. `users.created_at` не подходит: аккаунты заведены при переезде на GG ID |
+| Статус | `status` | «Активен» с голубой точкой; `data-status="disabled"` = «Отключён», точка серая | `active` или `disabled` | `users.status` |
+| Face ID | `passkey` | «Face ID подключён» со значком `gi-scan-face` | только если у аккаунта есть ключ входа, иначе `hidden` | `GGPasskey.list()` не пустой (или число ключей в `/api/auth/me`) |
+
+Данные для `GGID.card(el, data)`:
+
+```js
+GGID.card(document.querySelector('.gid-idcard'), {
+  name: 'Иван Образцов',
+  positions: ['Ментор', 'Продажи'],               // 0-3
+  email: 'ivan.obraztsov@global-generations.com',
+  id: 'GG 0042-7F3A',                               // до 14 символов
+  since: '2024-03',                                 // или готовая строка «марта 2024»
+  status: 'active',                                 // active | disabled
+  passkey: true                                     // Face ID подключён
+});
+```
+
+`GGID.card` пишет только через `textContent` (имя с разметкой остаётся текстом), сам считает инициалы, ставит перенос почты перед @, оставляет не больше трёх должностей и прячет пустые поля. Тот же вызов заполняет компактную строку. Можно отдать разметку уже заполненной с сервера: тогда JS не нужен, правила те же (значения экранировать, нет должностей или ключа = `hidden`).
+
+### Компактная строка
+
+`.gid-idrow`: инициалы (`.gid-avatar--sm`), имя, номер и по желанию статус. Поверхность по теме, как у `.gid-chip`. Для шапки хаба, меню аккаунта и списков людей.
+
+### В письме: `email-card.html`
+
+- Таблицы и встроенные стили, системный шрифт (Montserrat, только если он установлен), без внешних шрифтов, скриптов, SVG и `data:`. Ширина до 440 px, на телефоне во всю ширину.
+- Подстановки: `{{name}}`, `{{initials}}`, `{{positions}}` (через « · », пусто = строка схлопнется), `{{email}}`, `{{id}}`, `{{since}}` («марта 2024»). Хаб экранирует каждое значение как HTML, как `invite_email.py`.
+- В своё письмо вставлять блок между `<!-- gg-id-card:start -->` и `<!-- gg-id-card:end -->`.
+- Подпись = картинка `email/gg-id-lockup-2x.png` (350 x 80, показываем 175 x 40) по адресу `https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png`. Почта не рисует SVG и блокирует `data:`-картинки, поэтому PNG. Пересобрать: `uv run --with playwright python src/rasterize_gg_id_email.py`.
+- Тёмная тема: Apple Mail видит `color-scheme` и оставляет карточку navy; Gmail на Android тёмный фон не трогает; Gmail на iPhone инвертирует цвета карточки, текст остаётся контрастным, а подпись лежит на своей navy-плашке внутри PNG и не теряется.
+
+| Письмо | Gmail на iPhone, тёмная тема (симуляция инверсии в проверке) |
+|---|---|
+| ![Карточка в письме](preview/email-light.png) | ![Карточка в письме после инверсии Gmail](preview/email-gmail-ios-dark.png) |
+
 ## Правила
 
 - Над заголовком ничего: ни замка, ни значка, ни плашки (правило 07.10). Заголовок называет сервис: «Вход в АКБ». Названия сервисов пишем так, чтобы не склонять («сервис «Пульс»»).
@@ -127,8 +228,9 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 ## Пересобрать и проверить
 
 ```
-python3 src/build_gg_id.py                                  # gg-id.html, gg-id/screens/*.html, gg-id/fonts/*
-uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px + витрина
+python3 src/build_gg_id.py                                  # gg-id.html, gg-id/screens/*.html, gg-id/fonts/*, проверка email-card.html
+uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px, карточка, письмо, витрина
+uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась подпись: email/gg-id-lockup-2x.png
 ```
 
-Правки вида: `gg-id/gg-id.css`. Тексты и экраны: `src/gg_id/screens.html` (подписи «когда» и «API» в `INFO` внутри `src/build_gg_id.py`). Витрина: `src/gg_id/showcase.html`.
+Правки вида: `gg-id/gg-id.css`. Тексты и экраны: `src/gg_id/screens.html` (подписи «когда» и «API» в `INFO` внутри `src/build_gg_id.py`). Разметка карточки: `idcard()` в `src/build_gg_id.py`. Письмо: `gg-id/email-card.html`. Витрина: `src/gg_id/showcase.html`.

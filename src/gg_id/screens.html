@@ -1,6 +1,7 @@
 <!-- GG ID: экраны входа. Источник для src/build_gg_id.py (витрина gg-id.html и gg-id/screens/*.html).
      Один <template> = одно состояние. data-key = имя файла, data-tab = вкладка витрины, data-title = <title> страницы.
      data-lockup="off" = без подписи «логотип | ID». data-go="ключ" = демо-переход на другой экран (в бою = вызов API).
+     data-path = адрес в строке браузера витрины (по умолчанию /login). @IDCARD@ = карточка GG ID из src/build_gg_id.py.
      data-svc = название сервиса, куда входит человек (из client_id); пишется так, чтобы не склонялось. -->
 
 <template data-key="login" data-tab="Вход" data-title="Вход">
@@ -222,5 +223,14 @@
   <p class="gid-sub">Сессия GG ID на этом устройстве закрыта. Чтобы продолжить работу, войдите снова.</p>
   <div class="gid-stack">
     <a class="gid-btn gid-btn--primary" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти снова</span></a>
+  </div>
+</template>
+
+<template data-key="card" data-tab="Карточка GG ID" data-title="Ваш GG ID" data-lockup="off" data-path="/cabinet/">
+  <h1 class="gid-h">Ваш GG ID</h1>
+  <p class="gid-sub">Один вход во все сервисы Global Generation. Карточка всегда под рукой в «Моих сервисах».</p>
+  @IDCARD@
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" href="/cabinet/"><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg><span>Открыть мои сервисы</span></a>
   </div>
 </template>
