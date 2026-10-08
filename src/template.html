@@ -602,11 +602,11 @@ footer b{color:#fff;font-weight:700}
 <section class="blk" id="marks">
   <div class="wrap">
     <div class="lead">04 · Знаки сервисов и фавиконы</div>
-    <h2 class="stit">Знак GG и метка сервиса</h2>
-    <p class="sint">Фавикон сервиса = белая плитка, знак GG графитом слева сверху и круглая метка справа снизу. <b>Цвет метки говорит, чей это сервис</b> (контур), белая иконка в ней - какой именно. Иконки свои, толстые и залитые, не lucide. Корень (вход, levauth-каталог) = только знак GG. Готовые SVG, PNG 180 и ICO лежат в <code>assets/favicons</code>, SVG скачивается кнопкой.</p>
+    <h2 class="stit">Фавикон сайта и метка сервиса</h2>
+    <p class="sint">Все фавиконы GG, клиентские и внутренние, это версии фавикона global-generations.com: тот же navy-градиент и белый знак GG, знак чуть меньше слева сверху, в углу <b>белая метка с иконкой сервиса</b>. Иконки свои, толстые и залитые, не lucide. Корень (сайт, вход, levauth-каталог, письма) = фавикон сайта как есть. Готовые SVG, PNG и ICO лежат в <code>assets/favicons</code>, SVG скачивается кнопкой.</p>
     <div class="grid g4 cgrid" id="contours"></div>
     <div class="grid g3" id="svcgrid"></div>
-    <p class="minor">На тёмном фоне плитка остаётся белой, отдельной инверсии нет.</p>
+    <p class="minor">На тёмном фоне фавикон тот же, отдельной инверсии нет.</p>
     <div class="invrow" id="invrow"></div>
     <p class="minor">Размеры 64 / 32 / 16 и вид во вкладке браузера (сервис идёт первым, потому что вкладки обрезаются справа):</p>
     <div class="favline">
@@ -832,8 +832,8 @@ footer b{color:#fff;font-weight:700}
   --advance:#0f766e; --wait:#075985;
   <span class="c">/* контуры сервисов в интерфейсе */</span>
   --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
-  <span class="c">/* метка фавикона по контуру */</span>
-  --fav-mentor:#F76B15; --fav-student:#2F9E62; --fav-ops:#3E63DD; --fav-core:#27272A;
+  <span class="c">/* фавикон: плитка сайта и иконка в белой метке */</span>
+  --fav-tile-light:#3D6488; --fav-tile-dark:#1F3053; --fav-icon:#12284C;
   <span class="c">/* шрифт */</span>
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   <span class="c">/* радиусы */</span>
@@ -871,7 +871,7 @@ a{color:var(--sky-ink)}
           <li><svg class="i"><use href="#i-check"/></svg>Один акцент - голубой #009CDC; ссылки текстом #0077a8</li>
           <li><svg class="i"><use href="#i-check"/></svg>Montserrat самохостом, заголовки 700</li>
           <li><svg class="i"><use href="#i-check"/></svg>Логотип одним цветом; название сервиса полужирным через тонкую линию на всю высоту логотипа</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон из assets/favicons: белая плитка, знак GG, метка цвета контура со своей иконкой</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон из assets/favicons: плитка сайта, знак GG и белая метка с иконкой сервиса</li>
           <li><svg class="i"><use href="#i-check"/></svg>Экран входа без значка над заголовком: ни замка, ни плашки</li>
           <li><svg class="i"><use href="#i-check"/></svg>Джи-джи всегда в своём визуале: маскот как есть, без плиток, градиентов и перекраски</li>
           <li><svg class="i"><use href="#i-check"/></svg>Иконки интерфейса только lucide, линия 2 px, инлайн SVG</li>
@@ -923,10 +923,10 @@ a{color:var(--sky-ink)}
   var ld = document.getElementById('ldRight'); if (ld) ld.setAttribute('d', RIGHT_TOP + ' ' + RIGHT_BOTTOM);
 
   var CONTOURS = {
-    mentor:  {name:'Менторский',  color:'#13445d', badge:'#F76B15', note:'Стафф, который ведёт клиентов менторства'},
-    student: {name:'Студенческий', color:'#009CDC', badge:'#2F9E62', note:'Всё, что видит и получает студент'},
-    ops:     {name:'Операционный', color:'#0077a8', badge:'#3E63DD', note:'Юристы, бухгалтерия, отчёты, онбординг'},
-    core:    {name:'Ядро',         color:'#1e293b', badge:'#27272A', note:'Вход, стратегия и инфраструктура'}
+    mentor:  {name:'Менторский',  color:'#13445d', note:'Стафф, который ведёт клиентов менторства'},
+    student: {name:'Студенческий', color:'#009CDC', note:'Всё, что видит и получает студент'},
+    ops:     {name:'Операционный', color:'#0077a8', note:'Юристы, бухгалтерия, отчёты, онбординг'},
+    core:    {name:'Ядро',         color:'#1e293b', note:'Вход, стратегия и инфраструктура'}
   };
   var SERVICES = [
     {key:'akb', name:'АКБ', icon:'users', contour:'mentor', dom:'hub.global-generations-edu.com', repo:'GG-Product-Mentorship-AKB', who:'Админы, продажи, менторы', desc:'CRM активной базы менторства: клиенты, оплаты, задачи, чеки и выплаты менторам. Канон всей системы.'},
@@ -948,7 +948,7 @@ a{color:var(--sky-ink)}
   function uri(svg){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
   function favSVG(s){ return FAVS[s.key] ? FAVS[s.key].svg : ''; }
   function iconName(s){ return ((FAVS[s.key] || {}).icon || '').replace('gg/', ''); }
-  function favNote(s){ return 'метка ' + CONTOURS[s.contour].badge + ' · иконка ' + iconName(s); }
+  function favNote(s){ return 'плитка сайта · иконка ' + iconName(s); }
   // Джи-джи keeps its own mascot: never a tile, gradient or recolor (Лёв 28.09).
   var GIGI = '@GIGI_URI@';
   function favSrc(s){ return s.key === 'mayak' ? GIGI : uri(favSVG(s)); }
@@ -975,7 +975,7 @@ a{color:var(--sky-ink)}
   Object.keys(CONTOURS).forEach(function(k){
     var c = CONTOURS[k];
     var list = SERVICES.filter(function(s){ return s.contour === k; }).map(function(s){ return s.name; }).join(', ');
-    var d = el('div', 'card contour', '<span class="sw" style="background:' + c.badge + '"></span><div style="min-width:0"><h4>' + c.name + '</h4><div class="hx">метка ' + c.badge + '</div><p>' + esc(c.note) + '. ' + esc(list) + '.</p></div>');
+    var d = el('div', 'card contour', '<span class="sw" style="background:' + c.color + '"></span><div style="min-width:0"><h4>' + c.name + '</h4><div class="hx">' + c.color + '</div><p>' + esc(c.note) + '. ' + esc(list) + '.</p></div>');
     cBox.appendChild(d);
   });
 
@@ -993,7 +993,7 @@ a{color:var(--sky-ink)}
     inv.appendChild(el('div', 'inv', '<img alt="" src="' + invSrc(s) + '"><span>' + esc(s.name) + '</span>'));
     var m = el('img'); m.src = favSrc(s); m.alt = s.name; m.title = s.name; minis.appendChild(m);
   });
-  var rootCard = el('div', 'card svc root', '<img alt="" src="' + uri(ROOT) + '"><div class="tx"><div class="n">Корень GG</div><div class="d">экран входа · каталог levauth · письма и счета</div><div class="r">Знак GG графитом на белой плитке, без метки. Фавикон всего, что не относится к одному сервису.</div></div>');
+  var rootCard = el('div', 'card svc root', '<img alt="" src="' + uri(ROOT) + '"><div class="tx"><div class="n">Корень GG</div><div class="d">экран входа · каталог levauth · письма и счета</div><div class="r">Фавикон сайта global-generations.com как есть, без метки. Фавикон всего, что не относится к одному сервису.</div></div>');
   var rb = el('button', 'dlb', '<svg class="i"><use href="#i-download"/></svg>SVG'); rb.type = 'button';
   rb.addEventListener('click', function(){ download('gg-favicon-root.svg', ROOT, 'image/svg+xml'); });
   rootCard.querySelector('.r').appendChild(rb); grid.insertBefore(rootCard, grid.firstChild);
@@ -1033,7 +1033,7 @@ a{color:var(--sky-ink)}
     if (chip) chip.classList.add('on');
   }
   SERVICES.forEach(function(s, i){
-    var c = el('button', 'pchip', '<span class="dot" style="background:' + CONTOURS[s.contour].badge + '"></span>' + esc(s.name)); c.type = 'button';
+    var c = el('button', 'pchip', '<span class="dot" style="background:' + CONTOURS[s.contour].color + '"></span>' + esc(s.name)); c.type = 'button';
     c.addEventListener('click', function(){ pick(s, c); });
     chips.appendChild(c);
     if (i === 0) pick(s, c);

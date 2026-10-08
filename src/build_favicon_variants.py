@@ -451,9 +451,12 @@ def internal_dark(s, m):
     return svg(t + mark(19, 20, 30, WHITE) + b, defs)
 
 
-def client_version(kind):
+def client_version(kind, everyone=False):
+    """everyone=True: внутренние тоже как клиентские (выбор Лёва 07.10: «знак меньше + метка» для всех)."""
     def fn(s, m):
-        if not s.get("client"):
+        if s["key"] == "root":
+            return SITE_SVG if everyone else internal_dark(s, m)
+        if not s.get("client") and not everyone:
             return internal_dark(s, m)
         if s["key"] == "site" or kind == "same":
             return SITE_SVG
@@ -806,12 +809,21 @@ def main():
     ap.add_argument("--out", help="дополнительная папка для копии страницы")
     ap.add_argument("--apply", type=int, help="записать вариант N в assets/favicons/*.svg")
     ap.add_argument("--apply-v9", type=int, help="записать палитру N варианта 9 с иконками в assets/favicons/*.svg")
+    ap.add_argument("--apply-final", action="store_true",
+                    help="стандарт 07.10: плитка сайта, знак меньше + белая метка с иконкой для всех")
     a = ap.parse_args()
 
     T = Type()
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
     sets["client"] = build_client()
+
+    if a.apply_final:
+        v = dict(fn=client_version("small", everyone=True))
+        for s in SERVICES + [c for c in CLIENT_SERVICES if c["key"] not in BY_KEY and c["key"] != "site"]:
+            (ROOT / f"assets/favicons/{s['key']}.svg").write_text(export(v, s) + "\n")
+        print("стандарт 07.10 записан в assets/favicons/")
+        return
 
     for key, n in (("variants", a.apply), ("v9", a.apply_v9)):
         if n:

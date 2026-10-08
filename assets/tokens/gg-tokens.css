@@ -19,8 +19,8 @@
   --advance:#0f766e; --wait:#075985;
   /* контуры сервисов в интерфейсе */
   --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
-  /* метка фавикона по контуру (фавиконы: assets/favicons) */
-  --fav-mentor:#F76B15; --fav-student:#2F9E62; --fav-ops:#3E63DD; --fav-core:#27272A;
+  /* фавикон: плитка сайта и иконка в белой метке (файлы: assets/favicons) */
+  --fav-tile-light:#3D6488; --fav-tile-dark:#1F3053; --fav-icon:#12284C;
   /* шрифт */
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   /* радиусы */
