@@ -614,9 +614,52 @@ def final_cards(v):
     return (f'<div class="card"><h3>Во вкладках Chrome <span>реальный размер 16 px, закреплённые вкладки слева</span></h3>'
             f'{chrome(v, False, pinned, tabs)}{chrome(v, True, pinned, tabs)}</div>'
             f'<div class="card"><h3>Клиентские <span>сайт, портал, анкета, презентация; Маяк с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
-            f'<div class="card"><h3>Внутренние <span>та же схема, отличается иконка</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
+            f'<div class="card"><h3>Внутренние <span>один фон на всех, сервис = крупная иконка</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
             f'<div class="card"><h3>Экран входа <span>никакого значка над заголовком</span></h3>{logins}</div>'
             f'<div class="card"><h3>Размеры <span>АКБ, Портал, Юротдел: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("akb", "portal", "legal"))}</div>')
+
+
+# ---------- v3 (Лёв 07.10): клиентские = фавикон сайта с другим фоном, внутренние = один фон + крупная иконка ----------
+
+CLIENT_BG = {
+    "blues": {"portal": ("#4B8FD6", "#2F6BB0"), "apply": ("#8FBADD", "#4B8FD6"), "deck": ("#2A5F9E", "#1C3F7A")},
+    "colors": {"portal": ("#3FB37F", "#1E7A4F"), "apply": ("#FF9A4D", "#E2600F"), "deck": ("#2CC0B0", "#0E7F75")},
+}
+INTERNAL_BG = {"graphite": ("#3A3A40", "#18181B"), "navy": ("#2A4A78", "#12284C")}
+
+
+def radial_tile(a, b):
+    defs = (f'<radialGradient id="sg" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse">'
+            f'<stop stop-color="{a}"/><stop offset="1" stop-color="{b}"/></radialGradient>')
+    return '<rect width="64" height="64" rx="14.8" fill="url(#sg)"/>', defs
+
+
+def family_v3(client_set, internal_bg):
+    def fn(s, m):
+        if s["key"] in ("root", "site"):
+            return SITE_SVG
+        if s.get("client"):
+            t, d = radial_tile(*CLIENT_BG[client_set][s["key"]])
+            return svg(t + mark(31.6, 31.3, 50, WHITE), d)
+        t, d = radial_tile(*INTERNAL_BG[internal_bg])
+        k = 44 / 64
+        body, pd = pictogram(s["key"], WHITE, rgba(WHITE, 0.55))
+        return svg(t + f'<g transform="translate({32 - 32 * k:.2f} {32 - 32 * k:.2f}) scale({k:.4f})">{body}</g>', d + pd)
+    return fn
+
+
+def build_v3():
+    return [
+        dict(n=1, slug="blues-graphite", title="Синие фоны + графит", fn=family_v3("blues", "graphite"), adaptive=False,
+             idea="Клиентские = фавикон сайта как есть, у каждого продукта свой синий фон из медиакита. Внутренние все на одном графитовом фоне с крупной белой иконкой сервиса.",
+             plus="клиентские сразу «как сайт», внутренние не спутать с клиентскими", minus="синие фоны клиентских близки между собой"),
+        dict(n=2, slug="blues-navy", title="Синие фоны + navy", fn=family_v3("blues", "navy"), adaptive=False,
+             idea="То же, но внутренние на одном navy-фоне, ближе к сайту.",
+             plus="вся система в синих тонах", minus="внутренние похожи на клиентские по цвету"),
+        dict(n=3, slug="colors-graphite", title="Цветные фоны + графит", fn=family_v3("colors", "graphite"), adaptive=False,
+             idea="Клиентские = фавикон сайта с разными цветными фонами (портал зелёный, анкета оранжевая, презентация бирюзовая), сайт остаётся navy. Внутренние на графите с крупной иконкой.",
+             plus="клиентские продукты различаются сразу", minus="уходит от палитры медиакита"),
+    ]
 
 
 CSS = """
@@ -780,6 +823,13 @@ PAGES = {
         intro="Все фавиконы GG, клиентские и внутренние, это версии фавикона global-generations.com: navy-градиент, белый знак GG чуть меньше и белая метка с иконкой сервиса. Сайт и вход с фавиконом сайта как есть, Маяк с Джи-джи. На экранах входа значков нет. Страница рисует ровно файлы из assets/favicons, которые ушли в PR сервисов. <b>Вкладка этой страницы тоже с новым фавиконом</b> (АКБ).",
         foot="напиши «деплой», и я смержу PR и выкачу с проверкой каждого сервиса на проде.", foot_label="Дальше:",
         fav_key="akb", cards=final_cards),
+    "v3": dict(
+        file="favicons-v3.html", title="Фавиконы GG: v3", kick="Вариант {n} из 3",
+        description="Фавиконы GG v3: клиентские = фавикон сайта с разным фоном, внутренние = один фон и крупная иконка.",
+        h1="Клиентские как сайт, внутренние крупной иконкой",
+        intro="Клиентские (сайт, Студенческий портал, анкета, презентация клиенту) = ровно фавикон global-generations.com, у каждого свой фон. Внутренние = один фон на всех и крупная белая иконка сервиса, без знака. Сайт, вход и каталог с фавиконом сайта, Маяк с Джи-джи, на экранах входа значков нет. <b>Вкладка этой страницы меняет фавикон</b> на АКБ выбранного варианта.",
+        foot="напиши номер варианта: пересоберу assets/favicons и обновлю все 12 PR.",
+        fav_key="akb", cards=final_cards),
 }
 
 
@@ -851,6 +901,7 @@ def main():
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
     sets["client"] = build_client()
+    sets["v3"] = build_v3()
     sets["final"] = [dict(n=1, slug="final", title="Итог", fn=final_fav, adaptive=False,
                           idea="Плитка сайта, знак меньше, белая метка с иконкой сервиса. Одинаково для клиентских и внутренних.",
                           plus="", minus="")]
