@@ -592,6 +592,33 @@ def login(v):
             '</div>')
 
 
+def final_fav(s, m):
+    """Итог = ровно файлы из assets/favicons (то, что ушло в PR сервисов)."""
+    key = "root" if s["key"] == "site" else s["key"]
+    return (ROOT / f"assets/favicons/{key}.svg").read_text().strip()
+
+
+def final_cards(v):
+    pinned = ["root", "legal", "onboarding"]
+    tabs = [("akb", "АКБ - Маяк"), ("portal", "Мой кабинет · GG"), ("accounting", "Бухгалтерия"), ("apply", "Анкета · GG"),
+            ("strategy", "Стратегия"), ("deck", "Презентация · GG"), ("gigi", "Маяк · Джи-джи")]
+    rest = ('<div class="lh">Вход для команды</div><div class="ls">Введите PIN-код, чтобы открыть раздел</div>'
+            '<div class="pins"><i></i><i></i><i></i><i></i></div>')
+
+    def lockup(name):
+        return (f'<div class="lk"><svg class="gl" viewBox="0 0 777 196" aria-label="Global Generation" role="img">'
+                f'<use href="#gglogo"/></svg><span class="svcname">{name}</span></div>')
+    logins = ('<div class="logins">'
+              f'<div class="login">{lockup("Онбординг")}{rest}</div>'
+              f'<div class="login">{lockup("Юротдел")}{rest}</div></div>')
+    return (f'<div class="card"><h3>Во вкладках Chrome <span>реальный размер 16 px, закреплённые вкладки слева</span></h3>'
+            f'{chrome(v, False, pinned, tabs)}{chrome(v, True, pinned, tabs)}</div>'
+            f'<div class="card"><h3>Клиентские <span>сайт, портал, анкета, презентация; Маяк с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
+            f'<div class="card"><h3>Внутренние <span>та же схема, отличается иконка</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
+            f'<div class="card"><h3>Экран входа <span>никакого значка над заголовком</span></h3>{logins}</div>'
+            f'<div class="card"><h3>Размеры <span>АКБ, Портал, Юротдел: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("akb", "portal", "legal"))}</div>')
+
+
 CSS = """
 :root{--navy:#13445d;--sky:#009CDC;--sky-ink:#0077a8;--fg:#0f172a;--sfg:#334155;--mfg:#64748b;--border:#e2e8f0;--soft:#f1f5f9;
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;--ui:system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -708,7 +735,7 @@ JS = """
       if(e.key==='ArrowLeft'){e.preventDefault();show((i-1+tabs.length)%tabs.length,true)}
     });
   });
-  var start=1,h=location.hash.slice(1);
+  var start=Math.min(1,secs.length-1),h=location.hash.slice(1);
   secs.forEach(function(s,j){if(s.id===h)start=j});
   show(start);
 })();
@@ -746,6 +773,13 @@ PAGES = {
         intro="Клиентские GG (сайт, Студенческий портал, анкета, презентация клиенту) делаем версиями фавикона global-generations.com: тот же navy-градиент и белый знак. SAT и IELTS теперь Aura, их тут нет. Маяк остаётся с Джи-джи. Внутренние на тёмной плитке: белый знак GG и цветная метка по типу (менторы оранжевый, операционка синий, ядро белый). Ниже 3 варианта клиентских. <b>Вкладка этой страницы меняет фавикон</b> на Студенческий портал выбранного варианта.",
         foot="напиши номер варианта для клиентских. Внутренние на тёмной плитке пересоберу в assets/favicons и обновлю уже открытые PR сервисов.",
         fav_key="portal", cards=client_cards),
+    "final": dict(
+        file="favicons-final.html", title="Фавиконы GG: итог", kick="Утверждено 07.10.2026",
+        description="Итоговые фавиконы Global Generation: версии фавикона сайта с меткой сервиса, экран входа без значка.",
+        h1="Фавиконы GG: итог",
+        intro="Все фавиконы GG, клиентские и внутренние, это версии фавикона global-generations.com: navy-градиент, белый знак GG чуть меньше и белая метка с иконкой сервиса. Сайт и вход с фавиконом сайта как есть, Маяк с Джи-джи. На экранах входа значков нет. Страница рисует ровно файлы из assets/favicons, которые ушли в PR сервисов. <b>Вкладка этой страницы тоже с новым фавиконом</b> (АКБ).",
+        foot="напиши «деплой», и я смержу PR и выкачу с проверкой каждого сервиса на проде.", foot_label="Дальше:",
+        fav_key="akb", cards=final_cards),
 }
 
 
@@ -796,7 +830,7 @@ def page(variants, meta):
 <p>{meta["intro"]}</p></div>
 <div class="tabs" role="tablist" aria-label="Варианты">{"".join(nav)}</div>
 {"".join(secs)}
-<p class="foot"><b>Как выбрать:</b> {meta["foot"]}</p>
+<p class="foot"><b>{meta.get("foot_label", "Как выбрать:")}</b> {meta["foot"]}</p>
 </div>
 <script>{JS}</script>
 </body>
@@ -817,6 +851,9 @@ def main():
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
     sets["client"] = build_client()
+    sets["final"] = [dict(n=1, slug="final", title="Итог", fn=final_fav, adaptive=False,
+                          idea="Плитка сайта, знак меньше, белая метка с иконкой сервиса. Одинаково для клиентских и внутренних.",
+                          plus="", minus="")]
 
     if a.apply_final:
         v = dict(fn=client_version("small", everyone=True))

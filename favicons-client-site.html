@@ -140,7 +140,7 @@ section[hidden]{display:none}
       if(e.key==='ArrowLeft'){e.preventDefault();show((i-1+tabs.length)%tabs.length,true)}
     });
   });
-  var start=1,h=location.hash.slice(1);
+  var start=Math.min(1,secs.length-1),h=location.hash.slice(1);
   secs.forEach(function(s,j){if(s.id===h)start=j});
   show(start);
 })();
