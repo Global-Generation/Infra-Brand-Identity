@@ -195,6 +195,41 @@ def pictogram(key, m, acc=SKY):
         return (f'<path d="{circ(32, 32, 29)}{circ(32, 32, 23)}" fill="{m}" fill-rule="evenodd"/>'
                 f'<path d="M45 19L36.95 36.95L27.05 27.05Z" fill="{acc}"/>'
                 f'<path d="M19 45L27.05 27.05L36.95 36.95Z" fill="{m}"/>'), ""
+    if key == "production":  # хлопушка
+        return (f'<path d="M9 16L51 7L54 19L12 28Z" fill="{acc}"/>'
+                f'<path d="{rr(8, 30, 48, 27, 5)}" fill="{m}"/>'
+                f'<path d="M20 13.5L26 22M33 11L39 19.5M46 8L51 15" stroke="{m}" stroke-width="3.5" stroke-linecap="round"/>'), ""
+    if key == "studio":  # камера
+        return (f'<path d="{rr(4, 17, 40, 31, 7)}" fill="{m}"/>'
+                f'<path d="M47 27L60 19V46L47 38Z" fill="{m}"/><circle cx="15" cy="27" r="4" fill="{acc}"/>'), ""
+    if key == "scripts":  # лист сценария и карандаш
+        return pictogram("sat", m, acc)
+    if key == "youtube":  # кнопка play
+        return f'<path d="{rr(4, 12, 56, 40, 12)}M27 22L43 32L27 42Z" fill="{m}" fill-rule="evenodd"/>', ""
+    if key == "infracost":  # облако
+        return (f'<g fill="{m}"><circle cx="21" cy="36" r="12"/><circle cx="37" cy="27" r="15"/>'
+                f'<circle cx="48" cy="38" r="10"/><path d="{rr(9, 36, 49, 14, 7)}"/></g>'), ""
+    if key == "paid":  # мишень
+        return (f'<path d="{circ(32, 32, 27)}{circ(32, 32, 20)}{circ(32, 32, 13)}{circ(32, 32, 7)}" fill="{m}" fill-rule="evenodd"/>'
+                f'<circle cx="32" cy="32" r="4" fill="{acc}"/>'), ""
+    if key == "publisher":  # загрузка
+        return (f'<path d="M32 5L53 28H40V44H24V28H11Z" fill="{m}"/>'
+                f'<path d="{rr(10, 50, 44, 8, 4)}" fill="{acc}"/>'), ""
+    if key == "guide":  # открытая книга
+        return (f'<path d="M4 14C14 10 24 11 30.5 16V56C24 51 14 50 4 54Z" fill="{m}"/>'
+                f'<path d="M60 14C50 10 40 11 33.5 16V56C40 51 50 50 60 54Z" fill="{acc}"/>'), ""
+    if key == "crmchats":  # две реплики
+        front = f"{rr(4, 24, 38, 26, 9)}M11 48L9 60L23 48Z"
+        defs = ('<mask id="cm"><rect width="64" height="64" fill="#fff"/>'
+                f'<path d="{front}" fill="#000" stroke="#000" stroke-width="7" stroke-linejoin="round"/></mask>')
+        return (f'<g mask="url(#cm)" fill="{acc}"><path d="{rr(22, 6, 38, 26, 9)}M53 30L55 42L41 30Z"/></g>'
+                f'<path d="{front}" fill="{m}"/>'), defs
+    if key == "team":  # оргсхема
+        return (f'<path d="M32 20V30M13 30H51M13 30V38M51 30V38M32 30V38" fill="none" stroke="{m}" stroke-width="4" stroke-linecap="round"/>'
+                f'<path d="{rr(23, 5, 18, 15, 4)}" fill="{m}"/>'
+                f'<path d="{rr(4, 38, 18, 15, 4)}{rr(23, 38, 18, 15, 4)}{rr(42, 38, 18, 15, 4)}" fill="{acc}"/>'), ""
+    if key == "preview":  # онбординг продюсера превью = флаг онбординга
+        return pictogram("onboarding", m, acc)
     if key == "sat":  # лист теста и карандаш
         lines = rr(17, 16, 20, 4.5, 2.25) + rr(17, 26, 20, 4.5, 2.25) + rr(17, 36, 12, 4.5, 2.25)
         return (f'<path d="{rr(9, 6, 36, 50, 7)}{lines}" fill="{m}" fill-rule="evenodd"/>'
@@ -651,6 +686,83 @@ def family_v3(client_set, internal_bg):
 
 FINAL_FN = family_v3("blues", "sky")  # утверждено 07.10: клиентские = сайт на синих фонах, внутренние = фон анкеты + крупная иконка
 
+# ---------- 08.10: все сайты GG (не Aura), раскладка = каталог levauth ----------
+
+CLIENT_BG["blues"].update({
+    "notetaker": ("#5AB0D8", "#2A82B5"), "careers": ("#6C8DB8", "#34557F"), "covers": ("#7FA7E6", "#4A74C9"),
+    "merch": ("#3E7FC2", "#1F558F"), "anel": ("#4D9BBF", "#23698C"), "task": ("#5F7FA0", "#2C4A6B"),
+    "demoitaly": ("#4B8FD6", "#2F6BB0"),
+})
+# key, название, хост, семья, репо, что сейчас
+SITES = [
+    ("site", "Сайт GG", "global-generations.com, .us, merch на сайте", "client", "Web-Main-Site", "ok: фавикон сайта"),
+    ("portal", "Студенческий портал + демо США", "students.*, demo.*", "client", "GG-Product-Mentorship-Portal", "ok: выкачен 08.10"),
+    ("apply", "Анкета", "apply.*", "client", "GG-LeadGen-Consultation-Prep", "ok в админке, проверить публичную страницу"),
+    ("deck", "Презентация клиенту", "apply.*/d/", "client", "GG-LeadGen-Consultation-Prep", "ok: выкачен 08.10"),
+    ("notetaker", "Notetaker (запись к ментору)", "notetaker.global-generations.com", "client", "GG-Product-Notetaker", "фавикон сайта без своего фона"),
+    ("careers", "Вакансии", "careers.*", "client", "Web-HR", "нет фавикона (битая ссылка)"),
+    ("covers", "Конкурс обложек", "covers.*", "client", "найти (CloudFront)", "нет фавикона"),
+    ("merch", "Мерч", "merch.*", "client", "Web-Merch-Store", "фавикон сайта без своего фона"),
+    ("anel", "Асхат и Анель (дека)", "anel.*", "client", "Client-Ashat-Anel", "свой старый"),
+    ("task", "Тестовое задание", "task.*", "client", "Ops-Dev-Hiring", "свой старый"),
+    ("demoitaly", "Демо-карта Италия", "demo.italy.*", "client", "GG-Product-Italy-Portal", "свой старый"),
+    ("akb", "АКБ и Пульс", "hub.*", "internal", "GG-Product-Mentorship-AKB", "ok: выкачен 08.10"),
+    ("cabinet", "Кабинет ментора", "cabinet.*", "internal", "GG-Product-Mentorship-Mentor-Cabinet", "ok: выкачен 08.10"),
+    ("legal", "Юротдел", "legal.*", "internal", "Ops-Legal", "ok: выкачен 08.10"),
+    ("accounting", "Бухгалтерия", "accounting.*", "internal", "Ops-Accounting", "ok: выкачен 08.10"),
+    ("onboarding", "Онбординг", "onboarding.*", "internal", "Ops-Onboarding", "ok: выкачен 08.10"),
+    ("reporter", "Репортер", "reporter.*", "internal", "Ops-Notion-Reporter", "ok: выкачен 08.10"),
+    ("levauth", "Сервисы (хаб)", "levauth.*", "internal", "Infra-Services-Portal", "ok: выкачен 08.10"),
+    ("strategy", "Стратегия", "strategy.*", "internal", "GG-Strategy", "ok: выкачен 08.10"),
+    ("llm", "LLM-расходы", "openrouter.*", "internal", "Infra-OpenRouter-Costs", "ok: выкачен 08.10"),
+    ("production", "Продакшн", "production.*", "internal", "GG-Marketing-Production", "старая плитка с lucide"),
+    ("studio", "Фабрика роликов WRLD", "studio.*", "internal", "GG-YouTube-Video-Factory", "старая плитка с lucide"),
+    ("scripts", "Horizontal Scripts", "scripts.*", "internal", "найти (gg-horizontal-scripts)", "свой старый"),
+    ("youtube", "YouTube-трекер", "youtube.*", "internal", "GG-YouTube-Tracker", "свой старый"),
+    ("infracost", "Инфра-косты", "infra-cost.*", "internal", "Infra-AWS", "нет фавикона"),
+    ("paid", "Paid (Google Ads)", "paid.*", "internal", "GG-Marketing-Paid", "нет фавикона"),
+    ("publisher", "YT Publisher", "publisher.*", "internal", "GG-YouTube-Publisher", "проверить"),
+    ("guide", "Руководство для креаторов", "guide.*", "internal", "найти (gg-creator-guide)", "свой старый"),
+    ("crmchats", "CRM-чаты", "crm-chats.*", "internal", "Ops-Chat-Registry", "свой старый"),
+    ("team", "Структура команды", "team.*", "internal", "найти (/var/www/team)", "нет фавикона"),
+    ("preview", "Онбординг продюсера превью", "preview.*", "internal", "найти (preview-producer-onboarding)", "свой старый"),
+    ("root", "Страницы входа: PIN-ворота и SSO", "/__gate/, /__sso/login (все закрытые сайты)", "root", "сервер + Infra-Services-Portal/sso-gate", "нет фавикона, вкладка пустая"),
+]
+for _k, _n, _h, _f, _r, _now in SITES:
+    if _k not in ALL_BY_KEY:
+        ALL_BY_KEY[_k] = dict(key=_k, name=_n, contour="ops" if _f == "internal" else "student",
+                              client=_f == "client", note=_h)
+    elif _f == "client":
+        ALL_BY_KEY[_k] = dict(ALL_BY_KEY[_k], client=True)
+
+
+def all_cards(v):
+    groups = [("client", "Клиентские", "фавикон сайта, у каждого свой синий фон"),
+              ("internal", "Внутренние", "один светлый фон, крупная белая иконка"),
+              ("root", "Страницы входа", "фавикон сайта как есть, без иконок над заголовком")]
+    out = []
+    pinned = ["root", "akb", "legal"]
+    tabs = [("site", "Global Generation"), ("notetaker", "Запись к ментору"), ("production", "Продакшн"),
+            ("studio", "Фабрика роликов"), ("youtube", "YouTube-трекер"), ("careers", "Вакансии"), ("paid", "Paid")]
+    out.append(f'<div class="card"><h3>Во вкладках Chrome <span>новые сайты вперемешку с уже выкаченными, 16 px</span></h3>'
+               f'{chrome(v, False, pinned, tabs)}{chrome(v, True, pinned, tabs)}</div>')
+    for fam, title, sub in groups:
+        cards = []
+        for key, name, host, f, repo, now in SITES:
+            if f != fam:
+                continue
+            s = ALL_BY_KEY[key]
+            todo = "" if now.startswith("ok") else " todo"
+            cards.append(
+                f'<div class="svc{todo}"><div class="big">{inline(render(v, s), 64)}</div>'
+                f'<div class="mini"><span class="chip l">{inline(render(v, s), 16)}</span>'
+                f'<span class="chip d">{inline(render(v, s, True), 16)}</span>'
+                f'<span class="chip l c32">{inline(render(v, s), 32)}</span></div>'
+                f'<div class="nm">{html.escape(name)}</div><div class="ct">{html.escape(host)}</div>'
+                f'<div class="now">{"сейчас: " + html.escape(now)}</div><div class="ct">{html.escape(repo)}</div></div>')
+        out.append(f'<div class="card"><h3>{title} <span>{sub}</span></h3><div class="svcgrid">{"".join(cards)}</div></div>')
+    return "".join(out)
+
 
 def build_v3():
     return [
@@ -737,7 +849,9 @@ section[hidden]{display:none}
 .chip.l{background:#fff;border:1px solid var(--border)}.chip.d{background:#1f2023}
 .chip svg{display:block}
 .nm{font-weight:700;font-size:13px;margin-top:8px;line-height:1.25;overflow-wrap:anywhere}
-.ct{font-size:11.5px;color:var(--mfg);font-weight:600}
+.ct{font-size:11.5px;color:var(--mfg);font-weight:600;overflow-wrap:anywhere}
+.now{font-size:11.5px;color:var(--mfg);font-weight:500;margin-top:4px;line-height:1.35}
+.svc.todo .now{color:var(--fg);font-weight:700}
 .szpanel{border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
 .szwrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media(max-width:760px){.szwrap{grid-template-columns:minmax(0,1fr)}}
@@ -830,6 +944,13 @@ PAGES = {
         intro="Клиентские GG (Студенческий портал, анкета, презентация клиенту) = ровно фавикон global-generations.com, у каждого свой синий фон. Внутренние = один светлый фон (как у анкеты) и крупная белая иконка сервиса. Сайт, вход и каталог с фавиконом сайта как есть, Маяк с Джи-джи. На экранах входа значков нет. Страница рисует ровно файлы из assets/favicons, которые уходят в PR сервисов. <b>Вкладка этой страницы тоже с новым фавиконом</b> (АКБ).",
         foot="напиши «деплой», и я смержу PR и выкачу с проверкой каждого сервиса на проде.", foot_label="Дальше:",
         fav_key="akb", cards=final_cards),
+    "all": dict(
+        file="favicons-all-gg.html", title="Фавиконы GG: все сайты", kick="Все ресурсы GG, не Aura", start=0,
+        description="Все сайты и ресурсы Global Generation (не Aura) по каталогу levauth: какой фавикон сейчас и какой будет.",
+        h1="Все сайты GG: что есть и что будет",
+        intro="Раскладка GG и Aura взята из каталога levauth (SAT, IELTS, Италия, Saxon, Dreamadmit, SportWay и прочее Aura не трогаю, архив тоже). Проверены все 99 хостов из DNS. Жирным отмечено, что ещё надо поменять. <b>Клиентские</b> = фавикон сайта на своём синем фоне. <b>Внутренние</b> = светлый фон и крупная иконка, для новых сервисов иконки нарисованы. <b>Страницы входа</b> (PIN-ворота и SSO перед закрытыми сайтами) сейчас без фавикона вообще, будет фавикон сайта.",
+        foot="напиши «го», и я открою PR по каждому репо, а после твоего «деплой» выкачу с проверкой на проде.", foot_label="Дальше:",
+        fav_key="production", cards=all_cards),
     "v3": dict(
         file="favicons-v3.html", title="Фавиконы GG: v3", kick="Вариант {n} из 4", start=0,
         description="Фавиконы GG v3: клиентские = фавикон сайта с разным фоном, внутренние = один фон и крупная иконка.",
@@ -909,6 +1030,9 @@ def main():
     sets["v9"] = build_v9_icons(sets["variants"])
     sets["client"] = build_client()
     sets["v3"] = build_v3()
+    sets["all"] = [dict(n=1, slug="all", title="Все сайты GG", fn=FINAL_FN, adaptive=False,
+                        idea="По каждому ресурсу: новый фавикон, хост, что стоит сейчас и в каком репо менять.",
+                        plus="", minus="")]
     sets["final"] = [dict(n=1, slug="final", title="Итог", fn=final_fav, adaptive=False,
                           idea="Клиентские = фавикон сайта на синих фонах. Внутренние = светлый фон анкеты и крупная белая иконка.",
                           plus="", minus="")]

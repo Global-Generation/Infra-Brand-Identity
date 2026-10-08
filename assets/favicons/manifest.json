@@ -1,205 +1,553 @@
 [
  {
   "key": "root",
-  "name": "Global Generation (сайт, вход, каталог, письма)",
+  "name": "Global Generation: сайт, вход, PIN-ворота, SSO, письма",
+  "host": "-",
+  "repo": "-",
+  "family": "root",
   "favicon": "assets/favicons/root.svg",
-  "png32": "assets/favicons/png/root-32.png",
-  "png180": "assets/favicons/png/root-180.png",
-  "png192": "assets/favicons/png/root-192.png",
-  "png512": "assets/favicons/png/root-512.png",
+  "png": {
+   "32": "assets/favicons/png/root-32.png",
+   "180": "assets/favicons/png/root-180.png",
+   "192": "assets/favicons/png/root-192.png",
+   "512": "assets/favicons/png/root-512.png"
+  },
   "ico": "assets/favicons/ico/root.ico",
   "icon": null,
-  "bg": "#3D6488 > #1F3053 (сайт)",
-  "contour": "core",
-  "family": "internal"
- },
- {
-  "key": "akb",
-  "name": "АКБ",
-  "favicon": "assets/favicons/akb.svg",
-  "png32": "assets/favicons/png/akb-32.png",
-  "png180": "assets/favicons/png/akb-180.png",
-  "png192": "assets/favicons/png/akb-192.png",
-  "png512": "assets/favicons/png/akb-512.png",
-  "ico": "assets/favicons/ico/akb.ico",
-  "icon": "gg/people",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "mentor",
-  "family": "internal"
+  "bg": "#3D6488 > #1F3053"
  },
  {
   "key": "pulse",
-  "name": "Пульс",
+  "name": "Пульс (вкладка АКБ)",
+  "host": "hub.*",
+  "repo": "GG-Product-Mentorship-AKB",
+  "family": "internal",
   "favicon": "assets/favicons/pulse.svg",
-  "png32": "assets/favicons/png/pulse-32.png",
-  "png180": "assets/favicons/png/pulse-180.png",
-  "png192": "assets/favicons/png/pulse-192.png",
-  "png512": "assets/favicons/png/pulse-512.png",
+  "png": {
+   "32": "assets/favicons/png/pulse-32.png",
+   "180": "assets/favicons/png/pulse-180.png",
+   "192": "assets/favicons/png/pulse-192.png",
+   "512": "assets/favicons/png/pulse-512.png"
+  },
   "ico": "assets/favicons/ico/pulse.ico",
   "icon": "gg/pulse",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "mentor",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "portal",
+  "name": "Студенческий портал + демо США",
+  "host": "students.*, demo.*",
+  "repo": "GG-Product-Mentorship-Portal",
+  "family": "client",
+  "favicon": "assets/favicons/portal.svg",
+  "png": {
+   "32": "assets/favicons/png/portal-32.png",
+   "180": "assets/favicons/png/portal-180.png",
+   "192": "assets/favicons/png/portal-192.png",
+   "512": "assets/favicons/png/portal-512.png"
+  },
+  "ico": "assets/favicons/ico/portal.ico",
+  "icon": null,
+  "bg": "#4B8FD6 > #2F6BB0"
+ },
+ {
+  "key": "apply",
+  "name": "Анкета",
+  "host": "apply.*",
+  "repo": "GG-LeadGen-Consultation-Prep",
+  "family": "client",
+  "favicon": "assets/favicons/apply.svg",
+  "png": {
+   "32": "assets/favicons/png/apply-32.png",
+   "180": "assets/favicons/png/apply-180.png",
+   "192": "assets/favicons/png/apply-192.png",
+   "512": "assets/favicons/png/apply-512.png"
+  },
+  "ico": "assets/favicons/ico/apply.ico",
+  "icon": null,
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "deck",
+  "name": "Презентация клиенту",
+  "host": "apply.*/d/",
+  "repo": "GG-LeadGen-Consultation-Prep",
+  "family": "client",
+  "favicon": "assets/favicons/deck.svg",
+  "png": {
+   "32": "assets/favicons/png/deck-32.png",
+   "180": "assets/favicons/png/deck-180.png",
+   "192": "assets/favicons/png/deck-192.png",
+   "512": "assets/favicons/png/deck-512.png"
+  },
+  "ico": "assets/favicons/ico/deck.ico",
+  "icon": null,
+  "bg": "#2A5F9E > #1C3F7A"
+ },
+ {
+  "key": "notetaker",
+  "name": "Notetaker (запись к ментору)",
+  "host": "notetaker.global-generations.com",
+  "repo": "GG-Product-Notetaker",
+  "family": "client",
+  "favicon": "assets/favicons/notetaker.svg",
+  "png": {
+   "32": "assets/favicons/png/notetaker-32.png",
+   "180": "assets/favicons/png/notetaker-180.png",
+   "192": "assets/favicons/png/notetaker-192.png",
+   "512": "assets/favicons/png/notetaker-512.png"
+  },
+  "ico": "assets/favicons/ico/notetaker.ico",
+  "icon": null,
+  "bg": "#5AB0D8 > #2A82B5"
+ },
+ {
+  "key": "careers",
+  "name": "Вакансии",
+  "host": "careers.*",
+  "repo": "Web-HR",
+  "family": "client",
+  "favicon": "assets/favicons/careers.svg",
+  "png": {
+   "32": "assets/favicons/png/careers-32.png",
+   "180": "assets/favicons/png/careers-180.png",
+   "192": "assets/favicons/png/careers-192.png",
+   "512": "assets/favicons/png/careers-512.png"
+  },
+  "ico": "assets/favicons/ico/careers.ico",
+  "icon": null,
+  "bg": "#6C8DB8 > #34557F"
+ },
+ {
+  "key": "covers",
+  "name": "Конкурс обложек",
+  "host": "covers.*",
+  "repo": "найти (CloudFront)",
+  "family": "client",
+  "favicon": "assets/favicons/covers.svg",
+  "png": {
+   "32": "assets/favicons/png/covers-32.png",
+   "180": "assets/favicons/png/covers-180.png",
+   "192": "assets/favicons/png/covers-192.png",
+   "512": "assets/favicons/png/covers-512.png"
+  },
+  "ico": "assets/favicons/ico/covers.ico",
+  "icon": null,
+  "bg": "#7FA7E6 > #4A74C9"
+ },
+ {
+  "key": "merch",
+  "name": "Мерч",
+  "host": "merch.*",
+  "repo": "Web-Merch-Store",
+  "family": "client",
+  "favicon": "assets/favicons/merch.svg",
+  "png": {
+   "32": "assets/favicons/png/merch-32.png",
+   "180": "assets/favicons/png/merch-180.png",
+   "192": "assets/favicons/png/merch-192.png",
+   "512": "assets/favicons/png/merch-512.png"
+  },
+  "ico": "assets/favicons/ico/merch.ico",
+  "icon": null,
+  "bg": "#3E7FC2 > #1F558F"
+ },
+ {
+  "key": "anel",
+  "name": "Асхат и Анель (дека)",
+  "host": "anel.*",
+  "repo": "Client-Ashat-Anel",
+  "family": "client",
+  "favicon": "assets/favicons/anel.svg",
+  "png": {
+   "32": "assets/favicons/png/anel-32.png",
+   "180": "assets/favicons/png/anel-180.png",
+   "192": "assets/favicons/png/anel-192.png",
+   "512": "assets/favicons/png/anel-512.png"
+  },
+  "ico": "assets/favicons/ico/anel.ico",
+  "icon": null,
+  "bg": "#4D9BBF > #23698C"
+ },
+ {
+  "key": "task",
+  "name": "Тестовое задание",
+  "host": "task.*",
+  "repo": "Ops-Dev-Hiring",
+  "family": "client",
+  "favicon": "assets/favicons/task.svg",
+  "png": {
+   "32": "assets/favicons/png/task-32.png",
+   "180": "assets/favicons/png/task-180.png",
+   "192": "assets/favicons/png/task-192.png",
+   "512": "assets/favicons/png/task-512.png"
+  },
+  "ico": "assets/favicons/ico/task.ico",
+  "icon": null,
+  "bg": "#5F7FA0 > #2C4A6B"
+ },
+ {
+  "key": "demoitaly",
+  "name": "Демо-карта Италия",
+  "host": "demo.italy.*",
+  "repo": "GG-Product-Italy-Portal",
+  "family": "client",
+  "favicon": "assets/favicons/demoitaly.svg",
+  "png": {
+   "32": "assets/favicons/png/demoitaly-32.png",
+   "180": "assets/favicons/png/demoitaly-180.png",
+   "192": "assets/favicons/png/demoitaly-192.png",
+   "512": "assets/favicons/png/demoitaly-512.png"
+  },
+  "ico": "assets/favicons/ico/demoitaly.ico",
+  "icon": null,
+  "bg": "#4B8FD6 > #2F6BB0"
+ },
+ {
+  "key": "akb",
+  "name": "АКБ и Пульс",
+  "host": "hub.*",
+  "repo": "GG-Product-Mentorship-AKB",
+  "family": "internal",
+  "favicon": "assets/favicons/akb.svg",
+  "png": {
+   "32": "assets/favicons/png/akb-32.png",
+   "180": "assets/favicons/png/akb-180.png",
+   "192": "assets/favicons/png/akb-192.png",
+   "512": "assets/favicons/png/akb-512.png"
+  },
+  "ico": "assets/favicons/ico/akb.ico",
+  "icon": "gg/people",
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "cabinet",
   "name": "Кабинет ментора",
+  "host": "cabinet.*",
+  "repo": "GG-Product-Mentorship-Mentor-Cabinet",
+  "family": "internal",
   "favicon": "assets/favicons/cabinet.svg",
-  "png32": "assets/favicons/png/cabinet-32.png",
-  "png180": "assets/favicons/png/cabinet-180.png",
-  "png192": "assets/favicons/png/cabinet-192.png",
-  "png512": "assets/favicons/png/cabinet-512.png",
+  "png": {
+   "32": "assets/favicons/png/cabinet-32.png",
+   "180": "assets/favicons/png/cabinet-180.png",
+   "192": "assets/favicons/png/cabinet-192.png",
+   "512": "assets/favicons/png/cabinet-512.png"
+  },
   "ico": "assets/favicons/ico/cabinet.ico",
   "icon": "gg/briefcase",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "mentor",
-  "family": "internal"
- },
- {
-  "key": "portal",
-  "name": "Студенческий портал",
-  "favicon": "assets/favicons/portal.svg",
-  "png32": "assets/favicons/png/portal-32.png",
-  "png180": "assets/favicons/png/portal-180.png",
-  "png192": "assets/favicons/png/portal-192.png",
-  "png512": "assets/favicons/png/portal-512.png",
-  "ico": "assets/favicons/ico/portal.ico",
-  "icon": null,
-  "bg": "#4B8FD6 > #2F6BB0",
-  "contour": "student",
-  "family": "client"
- },
- {
-  "key": "apply",
-  "name": "Анкета (apply.*)",
-  "favicon": "assets/favicons/apply.svg",
-  "png32": "assets/favicons/png/apply-32.png",
-  "png180": "assets/favicons/png/apply-180.png",
-  "png192": "assets/favicons/png/apply-192.png",
-  "png512": "assets/favicons/png/apply-512.png",
-  "ico": "assets/favicons/ico/apply.ico",
-  "icon": null,
-  "bg": "#8FBADD > #4B8FD6",
-  "contour": "student",
-  "family": "client"
- },
- {
-  "key": "deck",
-  "name": "Презентация клиенту (/d/)",
-  "favicon": "assets/favicons/deck.svg",
-  "png32": "assets/favicons/png/deck-32.png",
-  "png180": "assets/favicons/png/deck-180.png",
-  "png192": "assets/favicons/png/deck-192.png",
-  "png512": "assets/favicons/png/deck-512.png",
-  "ico": "assets/favicons/ico/deck.ico",
-  "icon": null,
-  "bg": "#2A5F9E > #1C3F7A",
-  "contour": "student",
-  "family": "client"
- },
- {
-  "key": "mayak",
-  "name": "Маяк · Джи-джи",
-  "favicon": "assets/gigi/gigi-mascot.png",
-  "family": "client",
-  "note": "свой визуал Джи-джи, не менять"
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "legal",
   "name": "Юротдел",
+  "host": "legal.*",
+  "repo": "Ops-Legal",
+  "family": "internal",
   "favicon": "assets/favicons/legal.svg",
-  "png32": "assets/favicons/png/legal-32.png",
-  "png180": "assets/favicons/png/legal-180.png",
-  "png192": "assets/favicons/png/legal-192.png",
-  "png512": "assets/favicons/png/legal-512.png",
+  "png": {
+   "32": "assets/favicons/png/legal-32.png",
+   "180": "assets/favicons/png/legal-180.png",
+   "192": "assets/favicons/png/legal-192.png",
+   "512": "assets/favicons/png/legal-512.png"
+  },
   "ico": "assets/favicons/ico/legal.ico",
   "icon": "gg/scale",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "ops",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "accounting",
   "name": "Бухгалтерия",
+  "host": "accounting.*",
+  "repo": "Ops-Accounting",
+  "family": "internal",
   "favicon": "assets/favicons/accounting.svg",
-  "png32": "assets/favicons/png/accounting-32.png",
-  "png180": "assets/favicons/png/accounting-180.png",
-  "png192": "assets/favicons/png/accounting-192.png",
-  "png512": "assets/favicons/png/accounting-512.png",
+  "png": {
+   "32": "assets/favicons/png/accounting-32.png",
+   "180": "assets/favicons/png/accounting-180.png",
+   "192": "assets/favicons/png/accounting-192.png",
+   "512": "assets/favicons/png/accounting-512.png"
+  },
   "ico": "assets/favicons/ico/accounting.ico",
   "icon": "gg/calculator",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "ops",
-  "family": "internal"
- },
- {
-  "key": "reporter",
-  "name": "Репортер",
-  "favicon": "assets/favicons/reporter.svg",
-  "png32": "assets/favicons/png/reporter-32.png",
-  "png180": "assets/favicons/png/reporter-180.png",
-  "png192": "assets/favicons/png/reporter-192.png",
-  "png512": "assets/favicons/png/reporter-512.png",
-  "ico": "assets/favicons/ico/reporter.ico",
-  "icon": "gg/bars",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "ops",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "onboarding",
   "name": "Онбординг",
+  "host": "onboarding.*",
+  "repo": "Ops-Onboarding",
+  "family": "internal",
   "favicon": "assets/favicons/onboarding.svg",
-  "png32": "assets/favicons/png/onboarding-32.png",
-  "png180": "assets/favicons/png/onboarding-180.png",
-  "png192": "assets/favicons/png/onboarding-192.png",
-  "png512": "assets/favicons/png/onboarding-512.png",
+  "png": {
+   "32": "assets/favicons/png/onboarding-32.png",
+   "180": "assets/favicons/png/onboarding-180.png",
+   "192": "assets/favicons/png/onboarding-192.png",
+   "512": "assets/favicons/png/onboarding-512.png"
+  },
   "ico": "assets/favicons/ico/onboarding.ico",
   "icon": "gg/flag",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "ops",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "reporter",
+  "name": "Репортер",
+  "host": "reporter.*",
+  "repo": "Ops-Notion-Reporter",
+  "family": "internal",
+  "favicon": "assets/favicons/reporter.svg",
+  "png": {
+   "32": "assets/favicons/png/reporter-32.png",
+   "180": "assets/favicons/png/reporter-180.png",
+   "192": "assets/favicons/png/reporter-192.png",
+   "512": "assets/favicons/png/reporter-512.png"
+  },
+  "ico": "assets/favicons/ico/reporter.ico",
+  "icon": "gg/bars",
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "levauth",
-  "name": "Сервисы",
+  "name": "Сервисы (хаб)",
+  "host": "levauth.*",
+  "repo": "Infra-Services-Portal",
+  "family": "internal",
   "favicon": "assets/favicons/levauth.svg",
-  "png32": "assets/favicons/png/levauth-32.png",
-  "png180": "assets/favicons/png/levauth-180.png",
-  "png192": "assets/favicons/png/levauth-192.png",
-  "png512": "assets/favicons/png/levauth-512.png",
+  "png": {
+   "32": "assets/favicons/png/levauth-32.png",
+   "180": "assets/favicons/png/levauth-180.png",
+   "192": "assets/favicons/png/levauth-192.png",
+   "512": "assets/favicons/png/levauth-512.png"
+  },
   "ico": "assets/favicons/ico/levauth.ico",
   "icon": "gg/key",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "core",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "strategy",
   "name": "Стратегия",
+  "host": "strategy.*",
+  "repo": "GG-Strategy",
+  "family": "internal",
   "favicon": "assets/favicons/strategy.svg",
-  "png32": "assets/favicons/png/strategy-32.png",
-  "png180": "assets/favicons/png/strategy-180.png",
-  "png192": "assets/favicons/png/strategy-192.png",
-  "png512": "assets/favicons/png/strategy-512.png",
+  "png": {
+   "32": "assets/favicons/png/strategy-32.png",
+   "180": "assets/favicons/png/strategy-180.png",
+   "192": "assets/favicons/png/strategy-192.png",
+   "512": "assets/favicons/png/strategy-512.png"
+  },
   "ico": "assets/favicons/ico/strategy.ico",
   "icon": "gg/compass",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "core",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
  },
  {
   "key": "llm",
   "name": "LLM-расходы",
+  "host": "openrouter.*",
+  "repo": "Infra-OpenRouter-Costs",
+  "family": "internal",
   "favicon": "assets/favicons/llm.svg",
-  "png32": "assets/favicons/png/llm-32.png",
-  "png180": "assets/favicons/png/llm-180.png",
-  "png192": "assets/favicons/png/llm-192.png",
-  "png512": "assets/favicons/png/llm-512.png",
+  "png": {
+   "32": "assets/favicons/png/llm-32.png",
+   "180": "assets/favicons/png/llm-180.png",
+   "192": "assets/favicons/png/llm-192.png",
+   "512": "assets/favicons/png/llm-512.png"
+  },
   "ico": "assets/favicons/ico/llm.ico",
   "icon": "gg/coins",
-  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
-  "contour": "core",
-  "family": "internal"
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "production",
+  "name": "Продакшн",
+  "host": "production.*",
+  "repo": "GG-Marketing-Production",
+  "family": "internal",
+  "favicon": "assets/favicons/production.svg",
+  "png": {
+   "32": "assets/favicons/png/production-32.png",
+   "180": "assets/favicons/png/production-180.png",
+   "192": "assets/favicons/png/production-192.png",
+   "512": "assets/favicons/png/production-512.png"
+  },
+  "ico": "assets/favicons/ico/production.ico",
+  "icon": "gg/clapperboard",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "studio",
+  "name": "Фабрика роликов WRLD",
+  "host": "studio.*",
+  "repo": "GG-YouTube-Video-Factory",
+  "family": "internal",
+  "favicon": "assets/favicons/studio.svg",
+  "png": {
+   "32": "assets/favicons/png/studio-32.png",
+   "180": "assets/favicons/png/studio-180.png",
+   "192": "assets/favicons/png/studio-192.png",
+   "512": "assets/favicons/png/studio-512.png"
+  },
+  "ico": "assets/favicons/ico/studio.ico",
+  "icon": "gg/camera",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "scripts",
+  "name": "Horizontal Scripts",
+  "host": "scripts.*",
+  "repo": "найти (gg-horizontal-scripts)",
+  "family": "internal",
+  "favicon": "assets/favicons/scripts.svg",
+  "png": {
+   "32": "assets/favicons/png/scripts-32.png",
+   "180": "assets/favicons/png/scripts-180.png",
+   "192": "assets/favicons/png/scripts-192.png",
+   "512": "assets/favicons/png/scripts-512.png"
+  },
+  "ico": "assets/favicons/ico/scripts.ico",
+  "icon": "gg/script",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "youtube",
+  "name": "YouTube-трекер",
+  "host": "youtube.*",
+  "repo": "GG-YouTube-Tracker",
+  "family": "internal",
+  "favicon": "assets/favicons/youtube.svg",
+  "png": {
+   "32": "assets/favicons/png/youtube-32.png",
+   "180": "assets/favicons/png/youtube-180.png",
+   "192": "assets/favicons/png/youtube-192.png",
+   "512": "assets/favicons/png/youtube-512.png"
+  },
+  "ico": "assets/favicons/ico/youtube.ico",
+  "icon": "gg/play",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "infracost",
+  "name": "Инфра-косты",
+  "host": "infra-cost.*",
+  "repo": "Infra-AWS",
+  "family": "internal",
+  "favicon": "assets/favicons/infracost.svg",
+  "png": {
+   "32": "assets/favicons/png/infracost-32.png",
+   "180": "assets/favicons/png/infracost-180.png",
+   "192": "assets/favicons/png/infracost-192.png",
+   "512": "assets/favicons/png/infracost-512.png"
+  },
+  "ico": "assets/favicons/ico/infracost.ico",
+  "icon": "gg/cloud",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "paid",
+  "name": "Paid (Google Ads)",
+  "host": "paid.*",
+  "repo": "GG-Marketing-Paid",
+  "family": "internal",
+  "favicon": "assets/favicons/paid.svg",
+  "png": {
+   "32": "assets/favicons/png/paid-32.png",
+   "180": "assets/favicons/png/paid-180.png",
+   "192": "assets/favicons/png/paid-192.png",
+   "512": "assets/favicons/png/paid-512.png"
+  },
+  "ico": "assets/favicons/ico/paid.ico",
+  "icon": "gg/target",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "publisher",
+  "name": "YT Publisher",
+  "host": "publisher.*",
+  "repo": "GG-YouTube-Publisher",
+  "family": "internal",
+  "favicon": "assets/favicons/publisher.svg",
+  "png": {
+   "32": "assets/favicons/png/publisher-32.png",
+   "180": "assets/favicons/png/publisher-180.png",
+   "192": "assets/favicons/png/publisher-192.png",
+   "512": "assets/favicons/png/publisher-512.png"
+  },
+  "ico": "assets/favicons/ico/publisher.ico",
+  "icon": "gg/upload",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "guide",
+  "name": "Руководство для креаторов",
+  "host": "guide.*",
+  "repo": "найти (gg-creator-guide)",
+  "family": "internal",
+  "favicon": "assets/favicons/guide.svg",
+  "png": {
+   "32": "assets/favicons/png/guide-32.png",
+   "180": "assets/favicons/png/guide-180.png",
+   "192": "assets/favicons/png/guide-192.png",
+   "512": "assets/favicons/png/guide-512.png"
+  },
+  "ico": "assets/favicons/ico/guide.ico",
+  "icon": "gg/book",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "crmchats",
+  "name": "CRM-чаты",
+  "host": "crm-chats.*",
+  "repo": "Ops-Chat-Registry",
+  "family": "internal",
+  "favicon": "assets/favicons/crmchats.svg",
+  "png": {
+   "32": "assets/favicons/png/crmchats-32.png",
+   "180": "assets/favicons/png/crmchats-180.png",
+   "192": "assets/favicons/png/crmchats-192.png",
+   "512": "assets/favicons/png/crmchats-512.png"
+  },
+  "ico": "assets/favicons/ico/crmchats.ico",
+  "icon": "gg/chats",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "team",
+  "name": "Структура команды",
+  "host": "team.*",
+  "repo": "найти (/var/www/team)",
+  "family": "internal",
+  "favicon": "assets/favicons/team.svg",
+  "png": {
+   "32": "assets/favicons/png/team-32.png",
+   "180": "assets/favicons/png/team-180.png",
+   "192": "assets/favicons/png/team-192.png",
+   "512": "assets/favicons/png/team-512.png"
+  },
+  "ico": "assets/favicons/ico/team.ico",
+  "icon": "gg/org-chart",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "preview",
+  "name": "Онбординг продюсера превью",
+  "host": "preview.*",
+  "repo": "найти (preview-producer-onboarding)",
+  "family": "internal",
+  "favicon": "assets/favicons/preview.svg",
+  "png": {
+   "32": "assets/favicons/png/preview-32.png",
+   "180": "assets/favicons/png/preview-180.png",
+   "192": "assets/favicons/png/preview-192.png",
+   "512": "assets/favicons/png/preview-512.png"
+  },
+  "ico": "assets/favicons/ico/preview.ico",
+  "icon": "gg/flag",
+  "bg": "#8FBADD > #4B8FD6"
+ },
+ {
+  "key": "mayak",
+  "name": "Маяк · Джи-джи",
+  "family": "client",
+  "favicon": "assets/gigi/gigi-mascot.png",
+  "note": "свой визуал Джи-джи, не менять"
  }
 ]
