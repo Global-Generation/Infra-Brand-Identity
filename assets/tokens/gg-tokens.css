@@ -17,8 +17,10 @@
   --warn:#f59e0b;    --warn-ink:#b45309;
   --danger:#ef4444;  --danger-hi:#dc2626; --danger-ink:#b91c1c;
   --advance:#0f766e; --wait:#075985;
-  /* контуры сервисов (цвет плитки-фавикона) */
+  /* контуры сервисов в интерфейсе */
   --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
+  /* фавиконы: сайт и общий фон внутренних (файлы: assets/favicons) */
+  --fav-site-light:#3D6488; --fav-site-dark:#1F3053; --fav-internal-light:#8FBADD; --fav-internal-dark:#4B8FD6;
   /* шрифт */
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   /* радиусы */

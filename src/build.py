@@ -49,13 +49,14 @@ sprite = ''.join(
     f'<symbol id="i-{n}" viewBox="0 0 24 24">{icon_inner(n)}</symbol>' for n in all_icons)
 icons_json = json.dumps({n: icon_inner(n) for n in svc_icons}, ensure_ascii=False)
 
-# master favicon: navy tile + white G + sky secondary
-fav_svg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39">'
-    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1f6a90"/><stop offset="1" stop-color="#0d2f42"/></linearGradient></defs>'
-    '<rect width="39" height="39" rx="9" fill="url(#g)"/>'
-    f'<path d="{SEC}" fill="#ffffff"/><path d="{MAIN}" fill="#ffffff"/></svg>')
-fav_uri = 'data:image/svg+xml,' + urllib.parse.quote(fav_svg, safe='')
+# favicons = ready files from assets/favicons (since 07.10.2026: white tile, GG mark, contour badge with icon)
+FAV_DIR = os.path.join(OUT_DIR, 'assets', 'favicons')
+manifest = json.load(open(os.path.join(FAV_DIR, 'manifest.json'), encoding='utf-8'))
+favs = {m['key']: {'svg': open(os.path.join(OUT_DIR, m['favicon']), encoding='utf-8').read().strip(),
+                   'icon': m.get('icon'), 'family': m.get('family')}
+        for m in manifest if m['favicon'].endswith('.svg')}
+favs_json = json.dumps(favs, ensure_ascii=False).replace('</', '<\\/')
+fav_uri = 'data:image/svg+xml,' + urllib.parse.quote(favs['root']['svg'], safe='')
 
 html = (tpl
         .replace('/*@FONTS@*/', fonts)
@@ -66,6 +67,7 @@ html = (tpl
         .replace('@LOGO_LETTERS@', LOGO_LETTERS)
         .replace('<!--@SPRITE@-->', sprite)
         .replace('/*@ICONS_JSON@*/', icons_json)
+        .replace('/*@FAVS_JSON@*/', favs_json)
         .replace('@FAVICON_URI@', fav_uri))
 
 # ---- hard brand asserts ----
