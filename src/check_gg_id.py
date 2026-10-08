@@ -58,7 +58,7 @@ CARD_PROBE = '''async (sel) => {
     const outside = [], accents = [];
     c.querySelectorAll('*').forEach(e => {
       const q = e.getBoundingClientRect();
-      if (!q.width || !q.height) return;
+      if (!q.width || !q.height || e.matches('.gid-idcard-holo')) return;   // перелив на всю карту: украшение, не содержимое
       if (q.left < r.left + pl - 1 || q.right > r.right - pr + 1 || q.top < r.top + pt - 1 || q.bottom > r.bottom - pb + 1)
         outside.push(name(e) + ' @' + Math.round(q.left - r.left) + ',' + Math.round(q.top - r.top) + ' ' + Math.round(q.width) + 'x' + Math.round(q.height));
     });
@@ -169,7 +169,7 @@ LAYOUT = r'''async (sel) => {
   // .gid-chip прячет имя и стрелку на скрытой второй строке, когда остаются только инициалы
   const CROPS = '.sc-viewport,.sc-phone,.sc-thumb-frame,.sc-mini,.sc-url,.gid,.gid-aside,.gid-mq,.gid-mq-row,.gid-avatar,.sc-browser,.gid-progress,.gid-chip';
   const moving = e => e.getAnimations && e.getAnimations().some(a => a.playState === 'running' && a.effect && a.effect.getComputedTiming().iterations === 1);
-  const out = {outside: [], cut: [], overlap: [], avatars: [], wrapped: []};
+  const out = {outside: [], cut: [], overlap: [], avatars: [], wrapped: [], contrast: [], small: []};
   const seen = new Set();
   const add = (k, v) => { if (!seen.has(k + v)) { seen.add(k + v); out[k].push(v); } };
   const boxes = [...document.querySelectorAll(sel)].filter(b => b.getClientRects().length);
@@ -223,6 +223,31 @@ LAYOUT = r'''async (sel) => {
     if (!/grid/.test(s.display) || s.color !== 'rgb(255, 255, 255)' || Math.abs(dx) > 1.5 || Math.abs(dy) > 2 || parseFloat(s.fontSize) < 10.5)
       add('avatars', name(a.parentElement) + ' > avatar ' + txt(a) + ': display ' + s.display + ', color ' + s.color + ', font ' + s.fontSize + ', off ' + dx.toFixed(1) + ',' + dy.toFixed(1));
   });
+  // кнопки: подпись контрастная (от 4,5 к фону под кнопкой, полупрозрачные слои и градиенты учтены), высота от 44 px
+  const parseC = v => { const m = v && v.match(/rgba?\(([^)]+)\)/); if (!m) return null; const q = m[1].split(',').map(Number); return {r: q[0], g: q[1], b: q[2], a: q.length > 3 ? q[3] : 1}; };
+  const lum = c => { const f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }; return .2126 * f(c.r) + .7152 * f(c.g) + .0722 * f(c.b); };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  const over = (top, base) => ({r: top.r * top.a + base.r * (1 - top.a), g: top.g * top.a + base.g * (1 - top.a), b: top.b * top.a + base.b * (1 - top.a), a: 1});
+  const behind = el => {   // слои фона от элемента вниз до первого непрозрачного (у градиента берутся все непрозрачные цвета)
+    const layers = [];
+    for (let q = el; q; q = q.parentElement) {
+      const st = getComputedStyle(q), c = parseC(st.backgroundColor);
+      const g = st.backgroundImage !== 'none' ? (st.backgroundImage.match(/rgba?\([^)]+\)/g) || []).map(parseC).filter(x => x.a >= .99) : [];
+      if (c && c.a > 0) { if (c.a >= .99) return {layers, bases: [c]}; layers.push(c); }
+      if (g.length) return {layers, bases: g};
+    }
+    return {layers, bases: [{r: 255, g: 255, b: 255, a: 1}]};
+  };
+  document.querySelectorAll('.gid-sso, .gid-btn').forEach(b => {
+    if (!b.getClientRects().length || b.disabled || b.closest('[aria-hidden="true"]')) return;
+    const br = b.getBoundingClientRect();
+    if (br.height < 43.5 && !b.closest('.sc-mini,.sc-viewport,.sc-phone,.sc-thumb-frame')) add('small', name(b) + ' ' + txt(b) + ' ' + Math.round(br.height) + 'px');   // превью витрины уменьшены
+    const {layers, bases} = behind(b), fg = parseC(getComputedStyle(b).color);
+    let worst = 99;
+    bases.forEach(base => { let bg = base; for (let k = layers.length - 1; k >= 0; k--) bg = over(layers[k], bg);
+      worst = Math.min(worst, ratio(fg.a < 1 ? over(fg, bg) : fg, bg)); });
+    if (worst < 4.5) add('contrast', name(b) + ' ' + txt(b) + ' ' + worst.toFixed(2));
+  });
   document.querySelectorAll('.gid-sso, .gid-btn').forEach(b => {
     if (!b.getClientRects().length) return;
     const tops = [];
@@ -237,7 +262,7 @@ LAYOUT = r'''async (sel) => {
   });
   return out;
 }'''
-SCREEN_BOXES = '.gid-card, .gid-btn, .gid-account, .gid-who, .gid-msg, .gid-idcard, .gid-code'
+SCREEN_BOXES = '.gid-card, .gid-btn, .gid-account, .gid-who, .gid-msg, .gid-idcard, .gid-code, .gid-aside, .gid-hero-holder'
 SHOWCASE_BOXES = ('.sc-top, .sc-hero, .sc-bar, .sc-seg, .sc-sel, .sc-tabs, .sc-browser, .sc-phone, .sc-thumb-frame, .sc-cap, '
                   '#stage .gid-card, .sc-card, .sc-demo, .sc-hdr, .gid-acct, .gid-menu, .gid-dialog, .gid-sso, .sc-idc-cell, '
                   '.sc-row-demo, .gid-idrow, .gid-idcard, .sc-where > div, .sc-mail-frame, .sc-mail-notes, .sc-rules, .sc-files, '
@@ -247,7 +272,8 @@ SHOWCASE_BOXES = ('.sc-top, .sc-hero, .sc-bar, .sc-seg, .sc-sel, .sc-tabs, .sc-b
 def layout_issues(label, r):
     found = []
     for k, what in (('outside', 'sticks out of its card'), ('cut', 'content cut by overflow'), ('overlap', 'overlapping siblings'),
-                    ('avatars', 'avatar initials not white and centred'), ('wrapped', 'button label on two lines')):
+                    ('avatars', 'avatar initials not white and centred'), ('wrapped', 'button label on two lines'),
+                    ('contrast', 'button label contrast below 4.5'), ('small', 'button lower than 44 px')):
         if r[k]:
             found.append(f'{label}: {what} {r[k][:4]}')
     return found
@@ -295,8 +321,19 @@ with sync_playwright() as p:
                         problems.append(f'{label}: console {errs[:3]}')
                     if layout == 'split' and tag == 'desktop' and r['aside'] != 'flex':
                         problems.append(f'{label}: split panel hidden on desktop')
-                    if tag == 'phone' and r['aside'] != 'none':
-                        problems.append(f'{label}: split panel visible on phone')
+                    if tag == 'phone' and layout != 'split' and r['aside'] != 'none':
+                        problems.append(f'{label}: brand panel visible on phone in the {layout} layout')
+                    if tag == 'phone' and layout == 'split' and r['aside'] != 'flex':
+                        problems.append(f'{label}: split panel must sit compactly on top on the phone')
+                    if layout == 'split':   # герой панели: карта GG ID на ленте, QR нарисован и цел, панель не вылезает
+                        h = pg.evaluate('''() => { const a = document.querySelector('.gid-aside'), hc = a.querySelector('.gid-idcard--hero'),
+                            q = a.querySelector('svg[data-gid-qr]'), m = GGID.qrMatrix(q.getAttribute('data-gid-qr'));
+                            const ar = a.getBoundingClientRect(), hr = hc.getBoundingClientRect();
+                            return {hero: !!hc && hr.width > 150, inside: hr.top >= ar.top - 1 && hr.bottom <= ar.bottom + 1 && hr.left >= ar.left - 1 && hr.right <= ar.right + 1,
+                              qr: (q.querySelector('path').getAttribute('d') || '').length > 500 && m.size === m.version * 4 + 17 && m.get(0, 0) && m.get(6, 6) && !m.get(7, 7) && m.get(8, m.size - 8),
+                              key: !!a.querySelector('.gid-idcard-seal use[href="#gid-id-icon"]')}; }''')
+                        if not (h['hero'] and h['inside'] and h['qr'] and h['key']):
+                            problems.append(f'{label}: hero card of the split panel {h}')
                     if r['height'] > r['viewH'] and tag == 'desktop':
                         problems.append(f'{label}: taller than the window {r["height"]} > {r["viewH"]}')
                     shot = (theme == 'light' and layout == 'split') or key in ('login', 'setpass', 'done', 'pin', 'card')
@@ -310,8 +347,8 @@ with sync_playwright() as p:
                 pg.goto('file://' + os.path.join(SCREENS, 'card.html') + '?layout=minimal')
                 pg.wait_for_timeout(250)
                 if data:
-                    pg.evaluate('(d) => GGID.card(document.querySelector(".gid-idcard"), d)', data)
-                r = pg.evaluate(CARD_PROBE, '.gid-idcard')
+                    pg.evaluate('(d) => GGID.card(document.querySelector(".gid-main .gid-idcard"), d)', data)
+                r = pg.evaluate(CARD_PROBE, '.gid-main .gid-idcard')
                 counts['card'] += 1
                 label = f'card/{tag}/{theme}/{data_name}'
                 c = r['cards'][0]
@@ -337,16 +374,16 @@ with sync_playwright() as p:
                 if tag == 'phone' and c['w'] < c['parentW'] - c['parentPad'] - 1:
                     problems.append(f'{label}: not full width on the phone ({c["w"]:.0f} of {c["parentW"]:.0f})')
                 if data_name == 'long':
-                    if pg.evaluate('document.querySelectorAll(".gid-idcard-roles li").length') != 3:
+                    if pg.evaluate('document.querySelectorAll(".gid-main .gid-idcard-roles li").length') != 3:
                         problems.append(f'{label}: three positions expected')
                 if data_name == 'empty':
-                    hid = pg.evaluate('[...document.querySelectorAll(\'[data-gid-field="positions"],[data-gid-field="passkey"]\')].map(e => getComputedStyle(e).display)')
+                    hid = pg.evaluate('[...document.querySelectorAll(\'.gid-main [data-gid-field="positions"],.gid-main [data-gid-field="passkey"]\')].map(e => getComputedStyle(e).display)')
                     if hid != ['none', 'none']:
                         problems.append(f'{label}: empty positions and passkey must be hidden ({hid})')
-                pg.locator('.gid-idcard').screenshot(path=os.path.join(OUT, f'card-{tag}-{theme}-{data_name}.png'))
+                pg.locator('.gid-main .gid-idcard').screenshot(path=os.path.join(OUT, f'card-{tag}-{theme}-{data_name}.png'))
             # GGID.card never parses markup from the data
-            pg.evaluate('() => GGID.card(document.querySelector(".gid-idcard"), {name: "<img src=x onerror=alert(1)>", positions: ["<b>x</b>"], email: "a<i>@global-generations.com", id: "<s>", since: "<u>"})')
-            if pg.evaluate('document.querySelector(".gid-idcard").querySelectorAll("img,b,i,s,u").length'):
+            pg.evaluate('() => GGID.card(document.querySelector(".gid-main .gid-idcard"), {name: "<img src=x onerror=alert(1)>", positions: ["<b>x</b>"], email: "a<i>@global-generations.com", id: "<s>", since: "<u>"})')
+            if pg.evaluate('document.querySelector(".gid-main .gid-idcard").querySelectorAll("img,b,i,s,u").length'):
                 problems.append(f'card/{tag}/{theme}: GGID.card inserted markup from data')
             ctx.close()
 
@@ -556,7 +593,7 @@ with sync_playwright() as p:
             r = pg.evaluate('''() => ({sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth,
               gids: document.querySelectorAll('#stage .gid').length, thumbs: document.querySelectorAll('.sc-thumb').length,
               tabs: document.querySelectorAll('.sc-tab').length, rows: document.querySelectorAll('.sc-api tbody tr').length,
-              idcard: document.querySelectorAll('#stage .gid-idcard').length,
+              idcard: document.querySelectorAll('#stage .gid-main .gid-idcard').length,
               dashes: (document.body.innerText.match(/[\\u2014\\u2013]/g) || []).length})''')
             counts['showcase'] += 1
             label = f'showcase/{tag}/{h}'
@@ -597,7 +634,7 @@ with sync_playwright() as p:
         pg.wait_for_timeout(400)
         pg.click('#toCard')
         pg.wait_for_timeout(300)
-        if pg.evaluate('document.querySelectorAll("#stage .gid-idcard").length') != 1:
+        if pg.evaluate('document.querySelectorAll("#stage .gid-main .gid-idcard").length') != 1:
             problems.append(f'showcase/{tag}: the link in «Карточка GG ID» did not open the card screen')
         pg.goto('file://' + os.path.join(ROOT, 'gg-id.html') + '#s=login&l=split&t=light&d=desktop')
         pg.reload()

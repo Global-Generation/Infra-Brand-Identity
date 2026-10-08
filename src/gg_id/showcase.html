@@ -193,7 +193,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <section class="sc-sec" id="idcard">
   <div class="wrap">
     <h2>Карточка GG ID</h2>
-    <p class="lead">Как студенческий ID в Duke или Stanford, только для команды Global Generation: имя, должности, рабочая почта и номер GG ID. Один взгляд, и понятно, под каким аккаунтом вы вошли. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
+    <p class="lead">Белая карта с голубым голографическим переливом и ключом GG ID, как студенческий ID в Duke или Stanford: имя, должности, рабочая почта и номер GG ID. На экране входа она висит на ленте в прозрачном держателе на navy-панели. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
     <div class="sc-idc">
       <figure class="sc-idc-cell gid-kit" data-theme="light">
 @IDCARD@
@@ -350,6 +350,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 (function () {
   'use strict';
   var META = /*@META@*/;
+  var HERO_DEMO = /*@HERO_DEMO@*/;   // «Продолжить как»: карта в панели оживает именем аккаунта
   var BY = {}; META.forEach(function (m, i) { m.n = ('0' + (i + 1)).slice(-2); BY[m.key] = m; });
   var st = { s: 'login', l: 'split', t: 'light', d: 'desktop', svc: 'АКБ' };
   var lastDevice = 'desktop';
@@ -391,6 +392,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     card.setAttribute('data-gid-screen', key);
     if (BY[key].lockup) card.appendChild(document.getElementById('tpl-lockup').content.cloneNode(true));
     card.appendChild(document.getElementById('scr-' + key).content.cloneNode(true));
+    if (key === 'continue') { var hc = g.querySelector('.gid-aside .gid-idcard'); if (hc) { GGID.card(hc, HERO_DEMO); hc.classList.add('is-alive'); } }
     g.querySelectorAll('[data-svc]').forEach(function (e) { e.textContent = st.svc; });
     g.querySelectorAll('a[data-go]').forEach(function (a) { a.setAttribute('href', '#' + a.getAttribute('data-go')); });
     return g;

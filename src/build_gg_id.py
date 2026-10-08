@@ -91,33 +91,7 @@ LOADER = ('<div class="gid-ld" aria-hidden="true"><svg class="gid-ld-mark" viewB
           f'<path class="gid-ld-arc" d="{ARC}"/><path class="gid-ld-right" d="{RIGHT_TOP} {RIGHT_BOTTOM}"/>'
           f'<path class="gid-ld-main" d="{MAIN}"/></svg><span class="gid-ld-word"><svg viewBox="336 89 444 110">{LETTERS}</svg></span></div>')
 
-# services in the split panel marquee: GG services only
-SERVICES = ['АКБ', 'Пульс', 'Кабинет ментора', 'Студенческий портал', 'Юротдел', 'Бухгалтерия', 'Онбординг', 'Репортер',
-            'Стратегия', 'Продакшн', 'Фабрика роликов', 'YouTube-трекер', 'Маяк', 'Notetaker', 'Консультации',
-            'Структура команды', 'Инфра-косты', 'CRM-чаты', 'LLM-расходы', 'Анкета']
-
-
-def mq_row(i):
-    names = SERVICES[i * 4 % len(SERVICES):] + SERVICES[:i * 4 % len(SERVICES)]
-    one = ''.join(f'<span>{n}</span>' for n in names)
-    return f'<div class="gid-mq-row">{one}{one}</div>'
-
-
-ASIDE = ('<aside class="gid-aside">' + LOCKUP +
-         '<div class="gid-mq" aria-hidden="true">' + ''.join(mq_row(i) for i in range(5)) + '</div>'
-         '<div class="gid-aside-copy"><p class="gid-aside-title">Один вход во все сервисы Global&nbsp;Generation</p>'
-         '<p class="gid-aside-sub">АКБ, Пульс, Кабинет ментора, Юротдел, Продакшн и остальные сервисы команды открываются '
-         'с одним GG ID. Без отдельного пароля в каждом.</p></div></aside>')
-FOOT = '<footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer>'
-
-
-def shell(layout, card_inner, key):
-    return (f'<div class="gid" data-layout="{layout}"><div class="gid-frame">{ASIDE}'
-            f'<main class="gid-main"><section class="gid-card" data-gid-screen="{key}">{card_inner}</section>{FOOT}</main>'
-            '</div></div>')
-
-
-# ---- карточка GG ID: одна разметка для экрана card, витрины и README. Данные вымышленные ----
+# ---- карта GG ID (08.10, «Итог»): светлая, ключ GG ID в печати, без фото и плашки инициалов. Данные вымышленные ----
 MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
 DEMO = {'name': 'Иван Образцов', 'positions': ['Ментор', 'Продажи'], 'email': 'ivan.obraztsov@global-generations.com',
         'id': 'GG 0042-7F3A', 'since': '2024-03', 'status': 'active', 'passkey': True}
@@ -125,6 +99,14 @@ LONG = {'name': 'Александра Образцова-Константино�
         'positions': ['Ментор', 'Руководитель направления «Магистратура в Европе»', 'Ведущая роликов YouTube-канала'],
         'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': '2025-09',
         'status': 'active', 'passkey': True}
+TPL = {'name': 'Имя Фамилия', 'positions': ['Должность'], 'id': 'GG 0042-7F3A'}   # карта на экране входа до входа
+VERIFY = 'https://id.global-generations-edu.com/v/'   # QR карты = адрес проверки: VERIFY + номер через дефис (как в варианте «Итог»)
+
+
+def verify_url(card_id):
+    return VERIFY + '-'.join(card_id.split())
+
+
 ID_MAX = 14  # номер GG ID: строка до 14 символов, формат решает хаб
 
 
@@ -137,8 +119,13 @@ def since_text(v):
     return f'{MONTHS_GEN[int(m) - 1]} {y}'
 
 
+KEY_SEAL = ('<span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false">'
+            '<use href="#gid-id-icon"/></svg></span>')
+HOLO = '<span class="gid-idcard-holo" aria-hidden="true"></span>'
+
+
 def idcard(d, indent=''):
-    """The card markup, pretty, with data-gid-field hooks. Inline-sensitive spots (li, email, icon) stay on one line."""
+    """The cabinet card, pretty, with data-gid-field hooks. Inline-sensitive spots (li, email, icon) stay on one line."""
     e = htmlmod.escape
     assert len(d['id']) <= ID_MAX and 0 <= len(d['positions']) <= 3 and d['email'].endswith('@global-generations.com'), d
     local, dom = d['email'].rsplit('@', 1)
@@ -146,19 +133,19 @@ def idcard(d, indent=''):
     on = d['status'] == 'active'
     lines = [
         f'<article class="gid-idcard" aria-label="Global Generation ID: {e(d["name"])}">',
+        '  ' + HOLO,
         '  <div class="gid-idcard-top">',
         '    ' + LOCKUP,
-        f'    <span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>',
+        '    ' + KEY_SEAL,
         '  </div>',
-        '  <div class="gid-idcard-person">',
-        f'    <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">{e(initials(d["name"]))}</span>',
-        '    <div class="gid-idcard-who">',
-        f'      <p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>',
-        f'      <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"{"" if roles else " hidden"}>{roles}</ul>',
-        f'      <p class="gid-idcard-mail" data-gid-field="email">{e(local)}<wbr><span>@{e(dom)}</span></p>',
-        '      <p class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
-        '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>',
-        '    </div>',
+        '  <div class="gid-idcard-who">',
+        f'    <p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>',
+        f'    <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"{"" if roles else " hidden"}>{roles}</ul>',
+        f'    <p class="gid-idcard-mail" data-gid-field="email">{e(local)}<wbr><span>@{e(dom)}</span></p>',
+        '    <p class="gid-idcard-meta">'
+        f'<span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>'
+        '<span class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
+        '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>',
         '  </div>',
         '  <div class="gid-idcard-facts">',
         f'    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</dd></dl>',
@@ -166,6 +153,49 @@ def idcard(d, indent=''):
         '  </div>',
         '</article>']
     return '\n'.join(indent + ln for ln in lines)
+
+
+def herocard(d, qr=None):
+    """The sign-in hero card: big GG ID, name, position and number bottom left, QR bottom right (gg-id.js draws it)."""
+    e = htmlmod.escape
+    qr = qr or verify_url(d['id'])
+    roles = ''.join(f'<li>{e(p)}</li>' for p in d['positions'])
+    return ('<article class="gid-idcard gid-idcard--hero">' + HOLO +
+            f'<div class="gid-idcard-top">{LOCKUP}{KEY_SEAL}</div><p class="gid-idcard-big">GG ID</p>'
+            '<div class="gid-idcard-bot"><div class="gid-idcard-who">'
+            f'<p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>'
+            f'<ul class="gid-idcard-roles" data-gid-field="positions">{roles}</ul>'
+            f'<p class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</p></div>'
+            f'<svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="{e(qr)}" viewBox="0 0 37 37" role="img" aria-label="QR-код GG ID">'
+            '<path fill="#13445d" d=""/></svg></div></article>')
+
+
+def hero(d=TPL):
+    return ('<div class="gid-aside-hero"><div class="gid-hero" aria-hidden="true"><div class="gid-hero-hang">'
+            '<div class="gid-hero-lan"><span class="gid-hero-strap"></span><svg class="gid-hero-clip" viewBox="0 0 30 36">'
+            '<rect x="4" y="2" width="22" height="16" rx="6"/><rect class="bar" x="11.5" y="14" width="7" height="22" rx="2.5"/></svg></div>'
+            f'<div class="gid-hero-holder"><span class="gid-hero-gloss"></span>{herocard(d)}</div></div></div></div>')
+
+
+ASIDE_COPY = ('<div class="gid-aside-copy"><p class="gid-aside-title">Один вход во все сервисы Global&nbsp;Generation</p>'
+              '<p class="gid-aside-sub">АКБ, Пульс, Кабинет ментора, Юротдел, Продакшн и остальные сервисы команды открываются '
+              'с одним GG ID. Без отдельного пароля в каждом.</p></div>')
+
+
+def aside(d=TPL):
+    return '<aside class="gid-aside">' + LOCKUP + hero(d) + ASIDE_COPY + '</aside>'
+
+
+ASIDE = aside()
+FOOT = '<footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer>'
+# экран «Продолжить как»: аккаунт известен, на карте его имя, должности и номер
+SIDE_FOR = {'continue': aside({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id']})}
+
+
+def shell(layout, card_inner, key, side=None):
+    return (f'<div class="gid" data-layout="{layout}"><div class="gid-frame">{side or ASIDE}'
+            f'<main class="gid-main"><section class="gid-card" data-gid-screen="{key}">{card_inner}</section>{FOOT}</main>'
+            '</div></div>')
 
 
 def idrow(d, status=True):
@@ -323,7 +353,7 @@ for s in SCREENS:
     body = s['body']
     body = re.sub(r'<a class="([^"]+)" data-go="([a-z]+)"', lambda m: f'<a class="{m.group(1)}" href="{m.group(2)}.html" data-go="{m.group(2)}"', body)
     card = (LOCKUP if s['lockup'] else '') + body
-    page_body = shell('split', card, s['key'])
+    page_body = shell('split', card, s['key'], SIDE_FOR.get(s['key']))
     page = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -446,6 +476,7 @@ page = (tpl
         .replace('/*@GID_JS@*/', kit_js.replace('</script', '<\\/script'))
         .replace('/*@GID_SERVICE_JS@*/', service_js.replace('</script', '<\\/script'))
         .replace('/*@META@*/', json.dumps(meta, ensure_ascii=False).replace('</', '<\\/'))
+        .replace('/*@HERO_DEMO@*/', json.dumps({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id'], 'qr': verify_url(DEMO['id'])}, ensure_ascii=False))
         .replace('<!--@TEMPLATES@-->', templates)
         .replace('<!--@API_ROWS@-->', api_rows)
         .replace('@LOCKUP@', LOCKUP)
