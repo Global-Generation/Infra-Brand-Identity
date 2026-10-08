@@ -625,7 +625,8 @@ CLIENT_BG = {
     "blues": {"portal": ("#4B8FD6", "#2F6BB0"), "apply": ("#8FBADD", "#4B8FD6"), "deck": ("#2A5F9E", "#1C3F7A")},
     "colors": {"portal": ("#3FB37F", "#1E7A4F"), "apply": ("#FF9A4D", "#E2600F"), "deck": ("#2CC0B0", "#0E7F75")},
 }
-INTERNAL_BG = {"graphite": ("#3A3A40", "#18181B"), "navy": ("#2A4A78", "#12284C")}
+INTERNAL_BG = {"graphite": ("#3A3A40", "#18181B"), "navy": ("#2A4A78", "#12284C"),
+               "sky": ("#8FBADD", "#4B8FD6")}  # sky = фон анкеты, выбор Лёва 07.10 для всех внутренних
 
 
 def radial_tile(a, b):
@@ -643,13 +644,19 @@ def family_v3(client_set, internal_bg):
             return svg(t + mark(31.6, 31.3, 50, WHITE), d)
         t, d = radial_tile(*INTERNAL_BG[internal_bg])
         k = 44 / 64
-        body, pd = pictogram(s["key"], WHITE, rgba(WHITE, 0.55))
+        body, pd = pictogram(s["key"], WHITE, rgba(WHITE, 0.7 if internal_bg == "sky" else 0.55))
         return svg(t + f'<g transform="translate({32 - 32 * k:.2f} {32 - 32 * k:.2f}) scale({k:.4f})">{body}</g>', d + pd)
     return fn
 
 
+FINAL_FN = family_v3("blues", "sky")  # утверждено 07.10: клиентские = сайт на синих фонах, внутренние = фон анкеты + крупная иконка
+
+
 def build_v3():
     return [
+        dict(n=4, slug="blues-sky", title="Выбрано: синие + светлый", fn=FINAL_FN, adaptive=False,
+             idea="Клиентские = фавикон сайта на синих фонах. Внутренние все на светлом фоне анкеты с крупной белой иконкой. Выбрано Лёвом.",
+             plus="светло и легко, клиентские и внутренние одной семьи", minus="анкета и внутренние на одном фоне, различаются знаком и иконкой"),
         dict(n=1, slug="blues-graphite", title="Синие фоны + графит", fn=family_v3("blues", "graphite"), adaptive=False,
              idea="Клиентские = фавикон сайта как есть, у каждого продукта свой синий фон из медиакита. Внутренние все на одном графитовом фоне с крупной белой иконкой сервиса.",
              plus="клиентские сразу «как сайт», внутренние не спутать с клиентскими", minus="синие фоны клиентских близки между собой"),
@@ -778,7 +785,7 @@ JS = """
       if(e.key==='ArrowLeft'){e.preventDefault();show((i-1+tabs.length)%tabs.length,true)}
     });
   });
-  var start=Math.min(1,secs.length-1),h=location.hash.slice(1);
+  var start=Math.min(typeof START==='number'?START:1,secs.length-1),h=location.hash.slice(1);
   secs.forEach(function(s,j){if(s.id===h)start=j});
   show(start);
 })();
@@ -817,14 +824,14 @@ PAGES = {
         foot="напиши номер варианта для клиентских. Внутренние на тёмной плитке пересоберу в assets/favicons и обновлю уже открытые PR сервисов.",
         fav_key="portal", cards=client_cards),
     "final": dict(
-        file="favicons-final.html", title="Фавиконы GG: итог", kick="Утверждено 07.10.2026",
+        file="favicons-final.html", title="Фавиконы GG: итог", kick="Утверждено 07.10.2026", start=0,
         description="Итоговые фавиконы Global Generation: версии фавикона сайта с меткой сервиса, экран входа без значка.",
         h1="Фавиконы GG: итог",
-        intro="Все фавиконы GG, клиентские и внутренние, это версии фавикона global-generations.com: navy-градиент, белый знак GG чуть меньше и белая метка с иконкой сервиса. Сайт и вход с фавиконом сайта как есть, Маяк с Джи-джи. На экранах входа значков нет. Страница рисует ровно файлы из assets/favicons, которые ушли в PR сервисов. <b>Вкладка этой страницы тоже с новым фавиконом</b> (АКБ).",
+        intro="Клиентские GG (Студенческий портал, анкета, презентация клиенту) = ровно фавикон global-generations.com, у каждого свой синий фон. Внутренние = один светлый фон (как у анкеты) и крупная белая иконка сервиса. Сайт, вход и каталог с фавиконом сайта как есть, Маяк с Джи-джи. На экранах входа значков нет. Страница рисует ровно файлы из assets/favicons, которые уходят в PR сервисов. <b>Вкладка этой страницы тоже с новым фавиконом</b> (АКБ).",
         foot="напиши «деплой», и я смержу PR и выкачу с проверкой каждого сервиса на проде.", foot_label="Дальше:",
         fav_key="akb", cards=final_cards),
     "v3": dict(
-        file="favicons-v3.html", title="Фавиконы GG: v3", kick="Вариант {n} из 3",
+        file="favicons-v3.html", title="Фавиконы GG: v3", kick="Вариант {n} из 4", start=0,
         description="Фавиконы GG v3: клиентские = фавикон сайта с разным фоном, внутренние = один фон и крупная иконка.",
         h1="Клиентские как сайт, внутренние крупной иконкой",
         intro="Клиентские (сайт, Студенческий портал, анкета, презентация клиенту) = ровно фавикон global-generations.com, у каждого свой фон. Внутренние = один фон на всех и крупная белая иконка сервиса, без знака. Сайт, вход и каталог с фавиконом сайта, Маяк с Джи-джи, на экранах входа значков нет. <b>Вкладка этой страницы меняет фавикон</b> на АКБ выбранного варианта.",
@@ -882,7 +889,7 @@ def page(variants, meta):
 {"".join(secs)}
 <p class="foot"><b>{meta.get("foot_label", "Как выбрать:")}</b> {meta["foot"]}</p>
 </div>
-<script>{JS}</script>
+<script>var START={meta.get("start", 1)};{JS}</script>
 </body>
 </html>
 """
@@ -894,7 +901,7 @@ def main():
     ap.add_argument("--apply", type=int, help="записать вариант N в assets/favicons/*.svg")
     ap.add_argument("--apply-v9", type=int, help="записать палитру N варианта 9 с иконками в assets/favicons/*.svg")
     ap.add_argument("--apply-final", action="store_true",
-                    help="стандарт 07.10: плитка сайта, знак меньше + белая метка с иконкой для всех")
+                    help="стандарт 07.10: клиентские = фавикон сайта на синих фонах, внутренние = фон анкеты + крупная иконка")
     a = ap.parse_args()
 
     T = Type()
@@ -903,12 +910,12 @@ def main():
     sets["client"] = build_client()
     sets["v3"] = build_v3()
     sets["final"] = [dict(n=1, slug="final", title="Итог", fn=final_fav, adaptive=False,
-                          idea="Плитка сайта, знак меньше, белая метка с иконкой сервиса. Одинаково для клиентских и внутренних.",
+                          idea="Клиентские = фавикон сайта на синих фонах. Внутренние = светлый фон анкеты и крупная белая иконка.",
                           plus="", minus="")]
 
     if a.apply_final:
-        v = dict(fn=client_version("small", everyone=True))
-        for s in SERVICES + [c for c in CLIENT_SERVICES if c["key"] not in BY_KEY and c["key"] != "site"]:
+        v = dict(fn=FINAL_FN)
+        for s in [s for k, s in ALL_BY_KEY.items() if k != "site"]:  # портал берётся клиентским
             (ROOT / f"assets/favicons/{s['key']}.svg").write_text(export(v, s) + "\n")
         print("стандарт 07.10 записан в assets/favicons/")
         return

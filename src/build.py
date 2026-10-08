@@ -53,7 +53,7 @@ icons_json = json.dumps({n: icon_inner(n) for n in svc_icons}, ensure_ascii=Fals
 FAV_DIR = os.path.join(OUT_DIR, 'assets', 'favicons')
 manifest = json.load(open(os.path.join(FAV_DIR, 'manifest.json'), encoding='utf-8'))
 favs = {m['key']: {'svg': open(os.path.join(OUT_DIR, m['favicon']), encoding='utf-8').read().strip(),
-                   'icon': m.get('icon'), 'badge': m.get('badge')}
+                   'icon': m.get('icon'), 'family': m.get('family')}
         for m in manifest if m['favicon'].endswith('.svg')}
 favs_json = json.dumps(favs, ensure_ascii=False).replace('</', '<\\/')
 fav_uri = 'data:image/svg+xml,' + urllib.parse.quote(favs['root']['svg'], safe='')

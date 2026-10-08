@@ -9,6 +9,7 @@
   "png512": "assets/favicons/png/root-512.png",
   "ico": "assets/favicons/ico/root.ico",
   "icon": null,
+  "bg": "#3D6488 > #1F3053 (сайт)",
   "contour": "core",
   "family": "internal"
  },
@@ -22,6 +23,7 @@
   "png512": "assets/favicons/png/akb-512.png",
   "ico": "assets/favicons/ico/akb.ico",
   "icon": "gg/people",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "mentor",
   "family": "internal"
  },
@@ -35,6 +37,7 @@
   "png512": "assets/favicons/png/pulse-512.png",
   "ico": "assets/favicons/ico/pulse.ico",
   "icon": "gg/pulse",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "mentor",
   "family": "internal"
  },
@@ -48,6 +51,7 @@
   "png512": "assets/favicons/png/cabinet-512.png",
   "ico": "assets/favicons/ico/cabinet.ico",
   "icon": "gg/briefcase",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "mentor",
   "family": "internal"
  },
@@ -60,7 +64,8 @@
   "png192": "assets/favicons/png/portal-192.png",
   "png512": "assets/favicons/png/portal-512.png",
   "ico": "assets/favicons/ico/portal.ico",
-  "icon": "gg/graduation-cap",
+  "icon": null,
+  "bg": "#4B8FD6 > #2F6BB0",
   "contour": "student",
   "family": "client"
  },
@@ -73,7 +78,8 @@
   "png192": "assets/favicons/png/apply-192.png",
   "png512": "assets/favicons/png/apply-512.png",
   "ico": "assets/favicons/ico/apply.ico",
-  "icon": "gg/clipboard",
+  "icon": null,
+  "bg": "#8FBADD > #4B8FD6",
   "contour": "student",
   "family": "client"
  },
@@ -86,7 +92,8 @@
   "png192": "assets/favicons/png/deck-192.png",
   "png512": "assets/favicons/png/deck-512.png",
   "ico": "assets/favicons/ico/deck.ico",
-  "icon": "gg/presentation",
+  "icon": null,
+  "bg": "#2A5F9E > #1C3F7A",
   "contour": "student",
   "family": "client"
  },
@@ -107,6 +114,7 @@
   "png512": "assets/favicons/png/legal-512.png",
   "ico": "assets/favicons/ico/legal.ico",
   "icon": "gg/scale",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "ops",
   "family": "internal"
  },
@@ -120,6 +128,7 @@
   "png512": "assets/favicons/png/accounting-512.png",
   "ico": "assets/favicons/ico/accounting.ico",
   "icon": "gg/calculator",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "ops",
   "family": "internal"
  },
@@ -133,6 +142,7 @@
   "png512": "assets/favicons/png/reporter-512.png",
   "ico": "assets/favicons/ico/reporter.ico",
   "icon": "gg/bars",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "ops",
   "family": "internal"
  },
@@ -146,6 +156,7 @@
   "png512": "assets/favicons/png/onboarding-512.png",
   "ico": "assets/favicons/ico/onboarding.ico",
   "icon": "gg/flag",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "ops",
   "family": "internal"
  },
@@ -159,6 +170,7 @@
   "png512": "assets/favicons/png/levauth-512.png",
   "ico": "assets/favicons/ico/levauth.ico",
   "icon": "gg/key",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "core",
   "family": "internal"
  },
@@ -172,6 +184,7 @@
   "png512": "assets/favicons/png/strategy-512.png",
   "ico": "assets/favicons/ico/strategy.ico",
   "icon": "gg/compass",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "core",
   "family": "internal"
  },
@@ -185,6 +198,7 @@
   "png512": "assets/favicons/png/llm-512.png",
   "ico": "assets/favicons/ico/llm.ico",
   "icon": "gg/coins",
+  "bg": "#8FBADD > #4B8FD6 (общий фон внутренних)",
   "contour": "core",
   "family": "internal"
  }

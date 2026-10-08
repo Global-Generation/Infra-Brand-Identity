@@ -602,8 +602,8 @@ footer b{color:#fff;font-weight:700}
 <section class="blk" id="marks">
   <div class="wrap">
     <div class="lead">04 · Знаки сервисов и фавиконы</div>
-    <h2 class="stit">Фавикон сайта и метка сервиса</h2>
-    <p class="sint">Все фавиконы GG, клиентские и внутренние, это версии фавикона global-generations.com: тот же navy-градиент и белый знак GG, знак чуть меньше слева сверху, в углу <b>белая метка с иконкой сервиса</b>. Иконки свои, толстые и залитые, не lucide. Корень (сайт, вход, levauth-каталог, письма) = фавикон сайта как есть. Готовые SVG, PNG и ICO лежат в <code>assets/favicons</code>, SVG скачивается кнопкой.</p>
+    <h2 class="stit">Клиентские как сайт, внутренние крупной иконкой</h2>
+    <p class="sint"><b>Клиентские</b> (Студенческий портал, анкета, презентация клиенту) = ровно фавикон global-generations.com, у каждого свой синий фон. <b>Внутренние</b> = один светлый фон на всех и крупная белая иконка сервиса (свои залитые пиктограммы, не lucide). Корень (сайт, вход, levauth-каталог, письма) = фавикон сайта как есть. Готовые SVG, PNG и ICO лежат в <code>assets/favicons</code>, SVG скачивается кнопкой.</p>
     <div class="grid g4 cgrid" id="contours"></div>
     <div class="grid g3" id="svcgrid"></div>
     <p class="minor">На тёмном фоне фавикон тот же, отдельной инверсии нет.</p>
@@ -832,8 +832,8 @@ footer b{color:#fff;font-weight:700}
   --advance:#0f766e; --wait:#075985;
   <span class="c">/* контуры сервисов в интерфейсе */</span>
   --c-mentor:#13445d; --c-student:#009CDC; --c-ops:#0077a8; --c-core:#1e293b;
-  <span class="c">/* фавикон: плитка сайта и иконка в белой метке */</span>
-  --fav-tile-light:#3D6488; --fav-tile-dark:#1F3053; --fav-icon:#12284C;
+  <span class="c">/* фавиконы: сайт и общий фон внутренних */</span>
+  --fav-site-light:#3D6488; --fav-site-dark:#1F3053; --fav-internal-light:#8FBADD; --fav-internal-dark:#4B8FD6;
   <span class="c">/* шрифт */</span>
   --font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   <span class="c">/* радиусы */</span>
@@ -871,7 +871,7 @@ a{color:var(--sky-ink)}
           <li><svg class="i"><use href="#i-check"/></svg>Один акцент - голубой #009CDC; ссылки текстом #0077a8</li>
           <li><svg class="i"><use href="#i-check"/></svg>Montserrat самохостом, заголовки 700</li>
           <li><svg class="i"><use href="#i-check"/></svg>Логотип одним цветом; название сервиса полужирным через тонкую линию на всю высоту логотипа</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Свой фавикон из assets/favicons: плитка сайта, знак GG и белая метка с иконкой сервиса</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Фавиконы из assets/favicons: клиентские = фавикон сайта на своём фоне, внутренние = светлый фон и крупная иконка</li>
           <li><svg class="i"><use href="#i-check"/></svg>Экран входа без значка над заголовком: ни замка, ни плашки</li>
           <li><svg class="i"><use href="#i-check"/></svg>Джи-джи всегда в своём визуале: маскот как есть, без плиток, градиентов и перекраски</li>
           <li><svg class="i"><use href="#i-check"/></svg>Иконки интерфейса только lucide, линия 2 px, инлайн SVG</li>
@@ -948,7 +948,7 @@ a{color:var(--sky-ink)}
   function uri(svg){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
   function favSVG(s){ return FAVS[s.key] ? FAVS[s.key].svg : ''; }
   function iconName(s){ return ((FAVS[s.key] || {}).icon || '').replace('gg/', ''); }
-  function favNote(s){ return 'плитка сайта · иконка ' + iconName(s); }
+  function favNote(s){ return (FAVS[s.key] || {}).family === 'client' ? 'фавикон сайта на своём фоне' : 'светлый фон · иконка ' + iconName(s); }
   // Джи-джи keeps its own mascot: never a tile, gradient or recolor (Лёв 28.09).
   var GIGI = '@GIGI_URI@';
   function favSrc(s){ return s.key === 'mayak' ? GIGI : uri(favSVG(s)); }
