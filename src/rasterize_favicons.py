@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""assets/favicons/*.svg -> png/<key>-180.png (apple-touch-icon) и ico/<key>.ico (16/32/48).
+"""assets/favicons/*.svg -> png/<key>-{32,180,192,512}.png (180 = apple-touch-icon) и ico/<key>.ico (16/32/48).
 
 SVG рендерит headless Chromium (маски и rgba, как в браузере), ICO собирает ImageMagick.
   uv run --with playwright python src/rasterize_favicons.py
@@ -34,7 +34,8 @@ async def main():
         with tempfile.TemporaryDirectory() as tmp:
             for f in sorted(FAV.glob("*.svg")):
                 svg, key = f.read_text(), f.stem
-                await render(page, svg, 180, FAV / "png" / f"{key}-180.png")
+                for px in (32, 180, 192, 512):
+                    await render(page, svg, px, FAV / "png" / f"{key}-{px}.png")
                 parts = []
                 for px in (16, 32, 48):
                     out = Path(tmp) / f"{key}-{px}.png"
