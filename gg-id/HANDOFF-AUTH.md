@@ -157,7 +157,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 3. `go()` после успешного входа ждёт `/api/auth/me` и возвращает **незавершающийся** Promise: кнопки остаются занятыми, второй вход и второй Face ID не запускаются.
 4. `mobile = next.indexOf('/m/') === 0` уходит в теле `POST /api/auth/login` (сессия 12 ч для `/m/`).
 5. На загрузке: `GET /api/auth/me`, если жива кука, сразу `land(me)`.
-6. `GET /api/auth/capabilities`: `password_reset === true` показывает «Забыли пароль?», `aura_login === true` показывает «Войти через Aura» с `href = '/api/auth/aura/start?next=' + encodeURIComponent(next)`.
+6. `GET /api/auth/capabilities`: `password_reset === true` показывает «Забыли пароль?». Ссылки «Войти через Aura» на экранах GG ID нет (решение Лёва 08.10: Aura и GG раздельно), `aura_login` экраны входа не читают.
 7. Face ID доступен, только если `GGPasskey.supported` и `platformAvailable()` и `enabled().enabled`.
 8. `NotAllowedError` от `GGPasskey.login()` (человек закрыл системное окно) = тихо вернуть вид, **без** текста ошибки. Любая другая ошибка = «Face ID не сработал, войдите по паролю» и вид пароля.
 9. Супер-админ: тот же `POST /api/auth/login` с `email: 'superadmin'`, поле почты скрыто. В ките отдельного экрана нет: тихая ссылка «Войти как супер-админ» в `.gid-alt` под формой пароля (`gid-link gid-link--muted gid-link--sm`), по нажатию `form.classList.toggle('sa')`, почту прятать, подзаголовок «Супер-админ. Введите пароль».
@@ -168,7 +168,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 | Условие | Вид |
 |---|---|
 | ждём ответ `platformAvailable` + `enabled` (обычно < 200 мс) | только подпись, заголовок и подзаголовок, кнопок нет (не мигать формой) |
-| Face ID готов | `login`: главная кнопка Face ID, вторая «Войти по паролю», ссылка Aura по capabilities |
+| Face ID готов | `login`: главная кнопка Face ID, вторая «Войти по паролю» |
 | Face ID не готов | сразу `password`, кнопка «Войти с Face ID» под «или» скрыта |
 | нажали Face ID | `passkey`: та же кнопка `is-busy` + `.gid-scan` + текст `GGID.passkeyText('wait')`, ссылка «Отменить» |
 | 401/429/сеть на пароле | `password` + `[data-gid-error]` (это экран `error` витрины, отдельный вид не нужен) |
@@ -189,7 +189,6 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
     </button>
     <button class="gid-btn gid-btn--secondary" type="button" id="pwBtn"><svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-key-round"/></svg><span>Войти по паролю</span></button>
   </div>
-  <div class="gid-alt"><a class="gid-link gid-link--muted" id="aura" hidden>...Войти через Aura</a></div>
 </div>
 
 <div data-view="password">                       <!-- без hidden: если JS не загрузился, вход по паролю всё равно виден -->
@@ -239,7 +238,6 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
     .then(function (r) { return r.ok ? r.json() : {}; })
     .then(function (j) {
       $('forgot').hidden = !(j && j.password_reset === true);
-      if (j && j.aura_login === true) { $('aura').href = '/api/auth/aura/start?next=' + encodeURIComponent(next); $('aura').hidden = false; }
     }).catch(function () {});
 
   var faceReady = false, canEnroll = false;                                       // 7
@@ -319,7 +317,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 - `localStorage` оборачивать в try/catch (приватный режим Safari может кидать).
 - `gg-id-pk` = «на этом устройстве уже есть ключ» (точно сервер этого не скажет без сессии; `GGPasskey.list()` после входа покажет ключи, но не устройство). Можно обойтись без флага: предлагать, пока человек не подключил или не нажал «Не сейчас».
 - Экран `continue` («Продолжить как Лёв») нужен, только если `/api/auth/authorize` при живой сессии **не** уводит сразу обратно в сервис. Если уводит, экран не делать.
-- В шапку больше не ставить «Global Generation × Aura» с логотипом Aura: у кита подпись только GG (правило Лёва 08.10: GG и Aura раздельно). Вход через Aura остаётся тихой ссылкой по `capabilities.aura_login`. Если Лёв хочет оставить совместную шапку, это его решение (раздел 8).
+- На экранах входа только GG: ни шапки «Global Generation × Aura», ни логотипа Aura, ни ссылки «Войти через Aura» (решение Лёва 08.10: GG и Aura раздельно).
 
 **Название сервиса в заголовке** («Вход в АКБ»): страница знает только `next`. Для своих страниц хаба писать «Вход в хаб команды». Для SSO (`next` = `/api/auth/authorize?client_id=...`) нужно человеческое имя клиента: предлагаю, чтобы `GET /api/auth/capabilities?client_id=<id>` возвращал `client_name` из реестра клиентов (или authorize сам добавлял `&client=<slug>`, а страница брала имя из захардкоженной карты). Имя вставлять только через `textContent`. Названия пишем так, чтобы не склонялись: «Вход в АКБ», «Вход в Кабинет ментора», «сервис «Пульс»».
 
@@ -410,7 +408,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 ## 8. Решения Лёва (не решать за него)
 
 1. **Раскладка**: по умолчанию «Сплит» (тёмная панель с бегущими названиями сервисов). Альтернативы «Карточка» и «Минимал» переключаются одним атрибутом `data-layout`.
-2. **Шапка «GG × Aura»** на входе хаба: в ките только GG. Убрать логотип Aura и оставить ссылку «Войти через Aura» по `capabilities.aura_login`? (Моя рекомендация: да, по правилу 08.10 «GG only, not Aura».)
+2. **Шапка «GG × Aura»** на входе хаба: решено 08.10, только GG, без логотипа и без ссылки Aura.
 3. **Подпись у логотипа**: сейчас «ID» (= Global Generation ID). Если хочет буквально «GG ID», это одна строка в ките.
 4. **Предложение Face ID** после входа по паролю: показывать (рекомендую) и как часто после «Не сейчас» (в эскизе 7 дней).
 5. **Экран «Продолжить как»**: нужен ли вообще (зависит от поведения authorize).
