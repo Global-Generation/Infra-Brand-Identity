@@ -476,6 +476,72 @@ def split_cards(v):
             f'<div class="card"><h3>Размеры <span>Портал, SAT, Анкета: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "sat", "apply"))}</div>')
 
 
+# ---------- палитра медиакита global-generations.com/mediakit ----------
+
+MK = dict(navy="#12284C", blue="#2F6BB0", sky="#4B8FD6", ice="#EAF6FC", line="#E5EBF4")
+MK_TYPE = {"mentor": MK["navy"], "ops": MK["blue"], "core": MK["sky"], "student": MK["blue"]}
+SITE_SVG = (ROOT / "assets/logo/gg-mark.svg").read_text().strip()  # = фавикон global-generations.com
+INTERNAL_MK = v9_icons(dict(tile=WHITE, border=MK["line"], mark=MK["navy"], badge=lambda s: MK_TYPE[s["contour"]]))
+
+
+def lin(a, b):
+    return (f'<linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">'
+            f'<stop offset="0" stop-color="{a}"/><stop offset="1" stop-color="{b}"/></linearGradient>')
+
+
+def mk_style(kind, internal=INTERNAL_MK):
+    """Клиентские в палитре медиакита; сайт = его настоящий фавикон."""
+    looks = {  # фон, defs, знак, метка, иконка
+        "navy": (MK["navy"], "", WHITE, WHITE, MK["blue"]),
+        "navyblue": ("url(#cg)", lin(MK["navy"], MK["blue"]), WHITE, WHITE, MK["navy"]),
+        "bluesky": ("url(#cg)", lin(MK["blue"], MK["sky"]), WHITE, WHITE, MK["blue"]),
+        "ice": (MK["ice"], "", MK["navy"], MK["blue"], WHITE),
+    }
+
+    def fn(s, m):
+        if not s.get("client"):
+            return internal(s, m)
+        if s["key"] == "site":
+            return SITE_SVG
+        bg, gdefs, mark_col, badge, icon = looks[kind]
+        k, cc = 21 / 64, 45.5
+        body, pdefs = pictogram(s["key"], icon, rgba(icon, 0.55))
+        return svg(tile(bg) + mark(19, 20, 30, mark_col) + f'<circle cx="{cc}" cy="{cc}" r="17" fill="{badge}"/>'
+                   + f'<g transform="translate({cc - 32 * k:.2f} {cc - 32 * k:.2f}) scale({k:.4f})">{body}</g>', gdefs + pdefs)
+    return fn
+
+
+def build_mediakit():
+    return [
+        dict(n=0, label="0", slug="old-internal", title="Внутренние в старых цветах", fn=mk_style("navy", INTERNAL_FN), adaptive=False,
+             idea="Для сравнения: клиентские в палитре медиакита (navy-плитка), а внутренние в прежних цветах типов: оранжевый, синий, графит.",
+             plus="", minus=""),
+        dict(n=1, slug="navy", title="Navy-плитка", fn=mk_style("navy"), adaptive=False,
+             idea="Клиентские: плитка navy #12284c, белый знак GG, белая метка с синей иконкой. Внутренние: белая плитка, метка navy, blue или sky по типу.",
+             plus="строго, как основной цвет медиакита", minus="все клиентские одного цвета, различаешь по иконке"),
+        dict(n=2, slug="navyblue", title="Navy → Blue", fn=mk_style("navyblue"), adaptive=False,
+             idea="Клиентские: градиент navy в blue, как заголовки медиакита. Белый знак, белая метка с navy-иконкой.",
+             plus="ближе всего к сайту и медиакиту", minus="градиент на 16 px читается как ровный синий"),
+        dict(n=3, slug="bluesky", title="Blue → Sky", fn=mk_style("bluesky"), adaptive=False,
+             idea="Клиентские: светлый градиент blue в sky, белый знак, белая метка с синей иконкой. Самый светлый из цветных.",
+             plus="легко и свежо, хорошо видно на тёмной панели", minus="ядро внутренних тоже sky, похожие оттенки"),
+        dict(n=4, slug="ice", title="Ice-плитка", fn=mk_style("ice"), adaptive=False,
+             idea="Клиентские: плитка ice #eaf6fc, знак navy, синяя метка с белой иконкой. Светлая семья, как фоны секций медиакита.",
+             plus="самый лёгкий, без тяжёлых плит", minus="на светлой панели почти как внутренние белые"),
+    ]
+
+
+def mk_cards(v):
+    tabs = [("site", "Global Generation"), ("portal", "Мой кабинет · GG"), ("sat", "SAT · Global Generation"),
+            ("accounting", "Бухгалтерия"), ("ielts", "IELTS · Global Generation"), ("onboarding", "Онбординг"), ("apply", "Анкета")]
+    inner = "прежние цвета типов" if v["n"] == 0 else "палитра медиакита: менторы navy, операционка blue, ядро sky"
+    return (f'<div class="card"><h3>Во вкладках Chrome <span>клиентские и внутренние вперемешку, 16 px</span></h3>'
+            f'{chrome(v, False, ["root", "akb", "legal"], tabs)}{chrome(v, True, ["root", "akb", "legal"], tabs)}</div>'
+            f'<div class="card"><h3>Клиентские <span>сайт = фавикон global-generations.com как есть; Маяк с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
+            f'<div class="card"><h3>Внутренние <span>{inner}</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
+            f'<div class="card"><h3>Размеры <span>Портал, SAT, АКБ: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "sat", "akb"))}</div>')
+
+
 def render(v, s, dark=False):
     return v["fn"](s, WHITE if dark else NAVY)
 
@@ -729,6 +795,13 @@ PAGES = {
         intro="Внутренние (видит команда) остаются как выбрали: белая плитка, знак GG, метка цвета контура. Клиентские (видят студенты и клиенты: сайт, Студенческий портал, SAT, IELTS, анкета) получают свою семью. Ниже 4 варианта клиентского стиля, на нулевой вкладке как сейчас без разделения. <b>Вкладка этой страницы меняет фавикон</b> на SAT выбранного варианта. Маяк остаётся с Джи-джи.",
         foot="напиши номер варианта. Внутренние раскатываются уже сейчас (PR без деплоя), клиентские соберу после выбора.",
         fav_key="sat", cards=split_cards),
+    "mediakit": dict(
+        file="favicons-mediakit.html", title="Фавиконы GG: палитра медиакита", kick="Вариант {n} из 4",
+        description="Фавиконы GG в палитре медиакита global-generations.com: клиентские и внутренние, 4 варианта.",
+        h1="Палитра медиакита: клиентские и внутренние",
+        intro="Цвета как на global-generations.com/mediakit: Navy #12284c, Blue #2f6bb0, Sky #4b8fd6, Ice #eaf6fc, White. Сайт GG остаётся со своим фавиконом. Внутренние тоже в этой палитре: белая плитка, знак GG navy, метка по типу (менторы navy, операционка blue, ядро sky). Клиентские отличаются плиткой, 4 варианта ниже, на нулевой вкладке внутренние в старых цветах для сравнения. <b>Вкладка этой страницы меняет фавикон</b> на SAT выбранного варианта.",
+        foot="напиши номер варианта и оставляем ли внутренние в палитре медиакита (или «0» = внутренние в старых цветах). После выбора пересоберу assets/favicons и обновлю уже открытые PR сервисов.",
+        fav_key="sat", cards=mk_cards),
 }
 
 
@@ -798,6 +871,7 @@ def main():
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
     sets["split"] = build_split()
+    sets["mediakit"] = build_mediakit()
 
     for key, n in (("variants", a.apply), ("v9", a.apply_v9)):
         if n:
