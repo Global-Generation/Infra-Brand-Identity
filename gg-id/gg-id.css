@@ -91,6 +91,8 @@
 :where(.gid,.gid-kit) :where(h1,h2,p,ul){margin:0}
 :where(.gid,.gid-kit) :where(button,input){font:inherit;color:inherit}
 :where(.gid,.gid-kit) a{color:inherit;text-decoration:none}
+/* атрибут hidden прячет всегда, даже кнопки и плашки с display:flex */
+.gid [hidden],.gid-kit [hidden]{display:none!important}
 
 /* голубые «пятна» за карточкой (только раскладка card), медленно плывут */
 .gid[data-layout="card"]::before,.gid[data-layout="card"]::after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none;will-change:transform}
@@ -247,6 +249,8 @@
   animation:gidIn .3s var(--g-ease) both}
 .gid-msg .gid-ic{width:18px;height:18px;margin-top:1px}
 .gid-msg--error{background:var(--g-danger-soft);color:var(--g-danger-ink)}
+.gid-msg--info{background:var(--g-surface);color:var(--g-ink-2);border:1px solid var(--g-line);font-weight:500}
+.gid-msg--info .gid-ic{color:var(--g-link)}
 
 /* код доступа: 4 ячейки */
 .gid-code{display:grid;grid-template-columns:repeat(var(--gid-code-n,4),minmax(0,64px));gap:12px;margin-top:30px}

@@ -81,7 +81,7 @@
   function passwordLevel(v) {
     if (!v) return 0;
     var c = passwordChecks(v), n = (c.len ? 1 : 0) + (c.mix ? 1 : 0) + (c['case'] ? 1 : 0);
-    if (n === 3 && v.length >= 16) return 4;
+    if (n === 3 && v.length >= 14) return 4;   // как в set-password.html хаба
     return Math.max(1, n);
   }
 

@@ -12,9 +12,10 @@
 | `gg-id.css` | токены (светлая и тёмная тема), раскладки `split`, `card`, `minimal`, все компоненты |
 | `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи Face ID / Touch ID / Windows Hello |
 | `fonts/` | Montserrat (переменный, 400-700), кириллица и латиница, самохостом |
-| `screens/` | 15 эталонных экранов, генерируются, руками не править |
+| `sprite.svg` | логотип `gid-logo`, плитка фавикона `gid-tile` и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
+| `screens/` | 17 эталонных экранов, генерируются, руками не править |
 
-Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/` к себе (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`.
+Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg` к себе (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`.
 
 ## Каркас страницы
 
@@ -82,6 +83,8 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 | Забыли пароль | `screens/forgot.html` | Восстановление по рабочей почте. | `POST /api/auth/forgot` |
 | Письмо отправлено | `screens/sent.html` | Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде. | `POST /api/auth/forgot: 200` |
 | Новый пароль | `screens/setpass.html` | Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере. | `POST /api/auth/set-password/check, POST /api/auth/set-password` |
+| Пароль сохранён | `screens/saved.html` | После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль. | `POST /api/auth/set-password: 200` |
+| Восстановление выключено | `screens/resetoff.html` | capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка. | `GET /api/auth/capabilities` |
 | Ссылка устарела | `screens/expired.html` | Токен из ссылки устарел или уже использован. | `POST /api/auth/set-password/check: ошибка` |
 | Нет доступа | `screens/noaccess.html` | Человек вошёл, но роли в этом сервисе у него нет. | `GET /api/auth/me (level), entitlements` |
 | Код доступа | `screens/pin.html` | Переходный вход по коду для сервисов, которые ещё не на GG ID. | `sso-gate: PIN-ворота` |
@@ -125,7 +128,7 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 ```
 python3 src/build_gg_id.py                                  # gg-id.html, gg-id/screens/*.html, gg-id/fonts/*
-uv run --with playwright python src/check_gg_id.py          # 15 экранов x 3 раскладки x 2 темы x 1440/390 px + витрина
+uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px + витрина
 ```
 
 Правки вида: `gg-id/gg-id.css`. Тексты и экраны: `src/gg_id/screens.html` (подписи «когда» и «API» в `INFO` внутри `src/build_gg_id.py`). Витрина: `src/gg_id/showcase.html`.

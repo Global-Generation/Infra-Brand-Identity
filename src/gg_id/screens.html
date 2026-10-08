@@ -134,7 +134,7 @@
 <template data-key="setpass" data-tab="Новый пароль" data-title="Задайте пароль">
   <h1 class="gid-h">Добро пожаловать в команду</h1>
   <p class="gid-sub">Придумайте пароль GG ID. С ним вы входите во все сервисы Global Generation.</p>
-  <form class="gid-form" novalidate data-go-submit="enroll">
+  <form class="gid-form" novalidate data-go-submit="saved">
     <input type="email" name="username" autocomplete="username" value="lev@global-generations.com" hidden>
     <div class="gid-field">
       <label class="gid-label" for="gid-new">Новый пароль</label>
@@ -158,6 +158,21 @@
     </div>
     <button class="gid-btn gid-btn--primary" type="submit">Сохранить пароль</button>
   </form>
+</template>
+
+<template data-key="saved" data-tab="Пароль сохранён" data-title="Пароль сохранён">
+  <h1 class="gid-h">Пароль сохранён</h1>
+  <p class="gid-sub">Теперь войдите с новым паролем. После входа на этом устройстве можно будет подключить Face ID.</p>
+  <div class="gid-stack">
+    <a class="gid-btn gid-btn--primary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Перейти ко входу</span></a>
+  </div>
+</template>
+
+<template data-key="resetoff" data-tab="Восстановление выключено" data-title="Восстановить пароль">
+  <h1 class="gid-h">Восстановить пароль</h1>
+  <p class="gid-sub">Восстановление по почте пока не включено.</p>
+  <div class="gid-msg gid-msg--info" style="margin-top:24px"><svg class="gid-ic" aria-hidden="true"><use href="#gi-circle-help"/></svg><span>Чтобы задать новый пароль, напишите Лёве: он пришлёт ссылку на рабочую почту.</span></div>
+  <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-left"/></svg>Вернуться ко входу</a></div>
 </template>
 
 <template data-key="expired" data-tab="Ссылка устарела" data-title="Ссылка не работает">
