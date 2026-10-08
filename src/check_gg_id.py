@@ -257,6 +257,14 @@ problems = []
 counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0}
 with sync_playwright() as p:
     b = p.chromium.launch()
+    _new_context = b.new_context
+
+    def new_context(**kw):   # общий мак, десятки агентов: 30 секунд Playwright по умолчанию бывает мало
+        c = _new_context(**kw)
+        c.set_default_timeout(180000)
+        c.set_default_navigation_timeout(180000)
+        return c
+    b.new_context = new_context
     for vw, vh, tag in [(1440, 900, 'desktop'), (390, 844, 'phone')]:
         for theme in ('light', 'dark'):
             ctx = b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=2 if vw < 500 else 1,

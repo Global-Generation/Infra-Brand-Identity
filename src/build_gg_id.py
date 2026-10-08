@@ -85,17 +85,13 @@ ID_ICON_INLINE = (f'<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="t
                   f'{id_icon_inner("gid-id-icon-inline")}</svg>')
 FAVICON_URI = 'data:image/svg+xml,' + urllib.parse.quote(ID_ICON_SVG, safe='')
 
-AURA = ('<circle cx="21" cy="21" r="19" fill="none" stroke="currentColor" stroke-width="2.4" opacity=".3"/>'
-        '<circle cx="21" cy="21" r="12" fill="none" stroke="currentColor" stroke-width="2.6" opacity=".6"/>'
-        '<circle cx="21" cy="21" r="6"/>')
-
 LOCKUP = ('<div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation">'
           '<use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>')
 LOADER = ('<div class="gid-ld" aria-hidden="true"><svg class="gid-ld-mark" viewBox="3.6 8.6 31.3 20.95">'
           f'<path class="gid-ld-arc" d="{ARC}"/><path class="gid-ld-right" d="{RIGHT_TOP} {RIGHT_BOTTOM}"/>'
           f'<path class="gid-ld-main" d="{MAIN}"/></svg><span class="gid-ld-word"><svg viewBox="336 89 444 110">{LETTERS}</svg></span></div>')
 
-# services in the split panel marquee (GG only, Aura products are not GG ID)
+# services in the split panel marquee: GG services only
 SERVICES = ['АКБ', 'Пульс', 'Кабинет ментора', 'Студенческий портал', 'Юротдел', 'Бухгалтерия', 'Онбординг', 'Репортер',
             'Стратегия', 'Продакшн', 'Фабрика роликов', 'YouTube-трекер', 'Маяк', 'Notetaker', 'Консультации',
             'Структура команды', 'Инфра-косты', 'CRM-чаты', 'LLM-расходы', 'Анкета']
@@ -200,7 +196,7 @@ for s in SCREENS:
 
 # when each screen shows and what it calls on the hub (levauth, Lambda gg-portal-auth)
 INFO = {
-    'login': ('Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Aura только ссылкой и только когда сервер включил.',
+    'login': ('Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля.',
               'GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()'),
     'password': ('Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.', 'POST /api/auth/login'),
     'error': ('401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».',
@@ -243,10 +239,7 @@ def sprite(text):
     names = sorted(names)
     parts = []
     for n in names:
-        if n == 'aura':
-            parts.append(f'<symbol id="gi-aura" viewBox="0 0 42 42">{AURA}</symbol>')
-        else:
-            parts.append(f'<symbol id="gi-{n}" viewBox="0 0 24 24">{icon_inner(n)}</symbol>')
+        parts.append(f'<symbol id="gi-{n}" viewBox="0 0 24 24">{icon_inner(n)}</symbol>')
     if '#gid-logo' in text:
         parts.append(f'<symbol id="gid-logo" viewBox="0 0 777 196">{LOGO}</symbol>')
     if '#gid-id-icon' in text:
