@@ -208,6 +208,10 @@ def pictogram(key, m, acc=SKY):
         rows = rr(20, 27, 24, 4.5, 2.25) + rr(20, 37, 24, 4.5, 2.25) + rr(20, 47, 15, 4.5, 2.25)
         return (f'<path d="{rr(11, 9, 42, 52, 8)}{rows}" fill="{m}" fill-rule="evenodd"/>'
                 f'<path d="{rr(22, 3, 20, 12, 4)}" fill="{acc}"/>'), ""
+    if key == "deck":  # экран презентации с графиком
+        bars = rr(15, 26, 7, 10, 1.5) + rr(28, 18, 7, 18, 1.5) + rr(41, 22, 7, 14, 1.5)
+        return (f'<path d="{rr(4, 6, 56, 38, 6)}{bars}" fill="{m}" fill-rule="evenodd"/>'
+                f'<path d="M32 44V56M20 58H44" fill="none" stroke="{m}" stroke-width="5" stroke-linecap="round"/>'), ""
     if key == "llm":
         defs = '<mask id="c"><rect width="64" height="64" fill="#fff"/><circle cx="40" cy="38" r="22" fill="#000"/></mask>'
         return (f'<circle cx="24" cy="26" r="18" fill="{m}" mask="url(#c)"/>'
@@ -406,140 +410,84 @@ def build_v9_icons(variants):
     ]
 
 
-# ---------- клиентские и внутренние: две семьи ----------
+# ---------- клиентские GG = версии фавикона сайта, внутренние = тёмная плитка ----------
+# SAT и IELTS теперь Aura (отдельный бренд), сюда не входят. Маяк остаётся с Джи-джи.
 
 CLIENT_SERVICES = [
-    dict(key="site", name="Сайт GG", note="global-generations.com", contour="student", color=GRAPHITE, client=True),
-    dict(key="portal", name="Студенческий портал", note="кабинет студента", contour="student", color="#2F9E62", client=True),
-    dict(key="sat", name="SAT", note="клиентский продукт", contour="student", color="#E5484D", client=True),
-    dict(key="ielts", name="IELTS", note="клиентский продукт", contour="student", color="#0F9488", client=True),
-    dict(key="apply", name="Анкета", note="apply.*, после оплаты", contour="student", color="#3E63DD", client=True),
+    dict(key="site", name="Сайт GG", note="global-generations.com", contour="student", client=True),
+    dict(key="portal", name="Студенческий портал", note="кабинет студента", contour="student", client=True),
+    dict(key="apply", name="Анкета", note="apply.*, после оплаты", contour="student", client=True),
+    dict(key="deck", name="Презентация клиенту", note="/d/, после консультации", contour="student", client=True),
 ]
 INTERNAL_SERVICES = [s for s in SERVICES if s["key"] != "portal"]
 ALL_BY_KEY = {**BY_KEY, **{s["key"]: s for s in CLIENT_SERVICES}}
-INTERNAL_FN = v9_icons(dict(tile=WHITE, border=HAIR, mark=GRAPHITE, badge=lambda s: CONTOUR_COL[s["contour"]]))
-
-
-def client_style(kind):
-    """Внутренние = палитра 5 как есть; клиентские рисуются стилем kind."""
-    def fn(s, m):
-        if not s.get("client"):
-            return INTERNAL_FN(s, m)
-        c, only_mark = s["color"], s["key"] == "site"
-        if kind == "same":
-            return INTERNAL_FN(BY_KEY["root"] if only_mark else s, m)
-        if kind == "mark" or only_mark:
-            bg = GRAPHITE if kind == "dark" else c
-            return svg(tile(bg) + mark(32, 32, 42, WHITE))
-        if kind == "icon":
-            k = 38 / 64
-            body, defs = pictogram(s["key"], WHITE, rgba(WHITE, 0.6))
-            return svg(tile(c) + f'<g transform="translate({32 - 32 * k:.2f} {32 - 32 * k:.2f}) scale({k:.4f})">{body}</g>', defs)
-        k, cc = 21 / 64, 45.5
-        if kind == "inverse":
-            bg, badge, icon, acc = c, WHITE, c, rgba(c, 0.5)
-        else:  # dark
-            bg, badge, icon, acc = GRAPHITE, c, WHITE, rgba(WHITE, 0.62)
-        body, defs = pictogram(s["key"], icon, acc)
-        return svg(tile(bg) + mark(19, 20, 30, WHITE) + f'<circle cx="{cc}" cy="{cc}" r="17" fill="{badge}"/>'
-                   + f'<g transform="translate({cc - 32 * k:.2f} {cc - 32 * k:.2f}) scale({k:.4f})">{body}</g>', defs)
-    return fn
-
-
-def build_split():
-    return [
-        dict(n=0, label="0", slug="same", title="Без разделения", fn=client_style("same"), adaptive=False,
-             idea="Как сейчас в палитре 5: клиентские выглядят так же, как внутренние, только метка зелёная.",
-             plus="", minus=""),
-        dict(n=1, slug="inverse", title="Цветная плитка", fn=client_style("inverse"), adaptive=False,
-             idea="Клиентские = та же схема, но наоборот: плитка цвета продукта, знак GG белый, метка белая с цветной иконкой. Внутренние белые, клиентские цветные.",
-             plus="разделение видно сразу, семья общая", minus="на 16 px метка в цветной плитке мельче читается"),
-        dict(n=2, slug="mark", title="Только знак", fn=client_style("mark"), adaptive=False,
-             idea="Клиент видит бренд, а не устройство компании: плитка цвета продукта и крупный белый знак GG, без меток и иконок.",
-             plus="самый чистый для клиента, знак GG крупный", minus="продукты различаются только цветом"),
-        dict(n=3, slug="icon", title="Иконка продукта", fn=client_style("icon"), adaptive=False,
-             idea="Как приложения на телефоне: плитка цвета продукта и крупная белая иконка, знак GG остаётся в шапке сайта.",
-             plus="продукт узнаётся по картинке, крупно даже на 16 px", minus="во вкладке не видно, что это GG"),
-        dict(n=4, slug="dark", title="Тёмная плитка", fn=client_style("dark"), adaptive=False,
-             idea="Клиентские на графитовой плитке: белый знак GG и метка цвета продукта с белой иконкой. Внутренние светлые, клиентские тёмные.",
-             plus="премиально, контраст светлое и тёмное", minus="в тёмной теме браузера плитка сливается с панелью"),
-    ]
-
-
-def split_cards(v):
-    tabs = [("site", "Global Generation"), ("portal", "Мой кабинет · GG"), ("sat", "SAT · Global Generation"),
-            ("accounting", "Бухгалтерия"), ("ielts", "IELTS · Global Generation"), ("onboarding", "Онбординг"), ("apply", "Анкета")]
-    return (f'<div class="card"><h3>Во вкладках Chrome <span>клиентские и внутренние вперемешку, 16 px</span></h3>'
-            f'{chrome(v, False, ["root", "akb", "legal"], tabs)}{chrome(v, True, ["root", "akb", "legal"], tabs)}</div>'
-            f'<div class="card"><h3>Клиентские <span>видят студенты и клиенты; Маяк остаётся с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
-            f'<div class="card"><h3>Внутренние <span>видит команда, без изменений: палитра 5</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
-            f'<div class="card"><h3>Размеры <span>Портал, SAT, Анкета: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "sat", "apply"))}</div>')
-
-
-# ---------- палитра медиакита global-generations.com/mediakit ----------
-
-MK = dict(navy="#12284C", blue="#2F6BB0", sky="#4B8FD6", ice="#EAF6FC", line="#E5EBF4")
-MK_TYPE = {"mentor": MK["navy"], "ops": MK["blue"], "core": MK["sky"], "student": MK["blue"]}
 SITE_SVG = (ROOT / "assets/logo/gg-mark.svg").read_text().strip()  # = фавикон global-generations.com
-INTERNAL_MK = v9_icons(dict(tile=WHITE, border=MK["line"], mark=MK["navy"], badge=lambda s: MK_TYPE[s["contour"]]))
+SITE_LIGHT, SITE_NAVY, MK_NAVY = "#3D6488", "#1F3053", "#12284C"
+DARK_TILE, DARK_LINE = GRAPHITE, "#3F3F46"
+DARK_TYPE = {"mentor": "#F76B15", "ops": "#3E63DD", "core": WHITE, "student": "#2F9E62"}
 
 
-def lin(a, b):
-    return (f'<linearGradient id="cg" x1="0" y1="0" x2="1" y2="1">'
-            f'<stop offset="0" stop-color="{a}"/><stop offset="1" stop-color="{b}"/></linearGradient>')
+def site_tile():
+    defs = (f'<radialGradient id="sg" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse">'
+            f'<stop stop-color="{SITE_LIGHT}"/><stop offset="1" stop-color="{SITE_NAVY}"/></radialGradient>')
+    return '<rect width="64" height="64" rx="14.8" fill="url(#sg)"/>', defs
 
 
-def mk_style(kind, internal=INTERNAL_MK):
-    """Клиентские в палитре медиакита; сайт = его настоящий фавикон."""
-    looks = {  # фон, defs, знак, метка, иконка
-        "navy": (MK["navy"], "", WHITE, WHITE, MK["blue"]),
-        "navyblue": ("url(#cg)", lin(MK["navy"], MK["blue"]), WHITE, WHITE, MK["navy"]),
-        "bluesky": ("url(#cg)", lin(MK["blue"], MK["sky"]), WHITE, WHITE, MK["blue"]),
-        "ice": (MK["ice"], "", MK["navy"], MK["blue"], WHITE),
-    }
+def badge(key, cx, cy, r, fill, icon, k, ring=None):
+    body, defs = pictogram(key, icon, rgba(icon, 0.55))
+    ring_attr = f' stroke="{ring}" stroke-width="3.5"' if ring else ""
+    return (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}"{ring_attr}/>'
+            f'<g transform="translate({cx - 32 * k:.2f} {cy - 32 * k:.2f}) scale({k:.4f})">{body}</g>'), defs
 
+
+def internal_dark(s, m):
+    """Внутренние: графитовая плитка, белый знак GG, метка цвета типа (ядро белое, иконка графит)."""
+    t = (f'<rect x=".75" y=".75" width="62.5" height="62.5" rx="13.5" fill="{DARK_TILE}" '
+         f'stroke="{DARK_LINE}" stroke-width="1.5"/>')
+    if s["key"] == "root":
+        return svg(t + mark(32, 32, 40, WHITE))
+    c = DARK_TYPE[s["contour"]]
+    b, defs = badge(s["key"], 45.5, 45.5, 17, c, GRAPHITE if c == WHITE else WHITE, 21 / 64)
+    return svg(t + mark(19, 20, 30, WHITE) + b, defs)
+
+
+def client_version(kind):
     def fn(s, m):
         if not s.get("client"):
-            return internal(s, m)
-        if s["key"] == "site":
+            return internal_dark(s, m)
+        if s["key"] == "site" or kind == "same":
             return SITE_SVG
-        bg, gdefs, mark_col, badge, icon = looks[kind]
-        k, cc = 21 / 64, 45.5
-        body, pdefs = pictogram(s["key"], icon, rgba(icon, 0.55))
-        return svg(tile(bg) + mark(19, 20, 30, mark_col) + f'<circle cx="{cc}" cy="{cc}" r="17" fill="{badge}"/>'
-                   + f'<g transform="translate({cc - 32 * k:.2f} {cc - 32 * k:.2f}) scale({k:.4f})">{body}</g>', gdefs + pdefs)
+        t, defs = site_tile()
+        if kind == "small":
+            b, bd = badge(s["key"], 45.5, 45.5, 17, WHITE, MK_NAVY, 21 / 64)
+            return svg(t + mark(19, 20, 30, WHITE) + b, defs + bd)
+        b, bd = badge(s["key"], 49, 49, 13.5, WHITE, MK_NAVY, 17 / 64, ring=SITE_NAVY)  # "over"
+        return svg(t + mark(31.6, 31.3, 50, WHITE) + b, defs + bd)
     return fn
 
 
-def build_mediakit():
+def build_client():
     return [
-        dict(n=0, label="0", slug="old-internal", title="Внутренние в старых цветах", fn=mk_style("navy", INTERNAL_FN), adaptive=False,
-             idea="Для сравнения: клиентские в палитре медиакита (navy-плитка), а внутренние в прежних цветах типов: оранжевый, синий, графит.",
-             plus="", minus=""),
-        dict(n=1, slug="navy", title="Navy-плитка", fn=mk_style("navy"), adaptive=False,
-             idea="Клиентские: плитка navy #12284c, белый знак GG, белая метка с синей иконкой. Внутренние: белая плитка, метка navy, blue или sky по типу.",
-             plus="строго, как основной цвет медиакита", minus="все клиентские одного цвета, различаешь по иконке"),
-        dict(n=2, slug="navyblue", title="Navy → Blue", fn=mk_style("navyblue"), adaptive=False,
-             idea="Клиентские: градиент navy в blue, как заголовки медиакита. Белый знак, белая метка с navy-иконкой.",
-             plus="ближе всего к сайту и медиакиту", minus="градиент на 16 px читается как ровный синий"),
-        dict(n=3, slug="bluesky", title="Blue → Sky", fn=mk_style("bluesky"), adaptive=False,
-             idea="Клиентские: светлый градиент blue в sky, белый знак, белая метка с синей иконкой. Самый светлый из цветных.",
-             plus="легко и свежо, хорошо видно на тёмной панели", minus="ядро внутренних тоже sky, похожие оттенки"),
-        dict(n=4, slug="ice", title="Ice-плитка", fn=mk_style("ice"), adaptive=False,
-             idea="Клиентские: плитка ice #eaf6fc, знак navy, синяя метка с белой иконкой. Светлая семья, как фоны секций медиакита.",
-             plus="самый лёгкий, без тяжёлых плит", minus="на светлой панели почти как внутренние белые"),
+        dict(n=1, slug="small", title="Знак меньше + метка", fn=client_version("small"), adaptive=False,
+             idea="Клиентские = фавикон сайта: тот же navy-градиент и белый знак, знак чуть меньше слева сверху, в углу белая метка с иконкой продукта. Та же сетка, что у внутренних.",
+             plus="продукт читается, родство с сайтом очевидно", minus="знак мельче, чем на сайте"),
+        dict(n=2, slug="over", title="Знак как на сайте + метка", fn=client_version("over"), adaptive=False,
+             idea="Фавикон сайта без изменений, белая метка с иконкой продукта лежит на правом нижнем углу.",
+             plus="максимально как на сайте", minus="метка закрывает край знака"),
+        dict(n=3, slug="same", title="Один фавикон сайта", fn=client_version("same"), adaptive=False,
+             idea="Все клиентские страницы просто с фавиконом сайта, без меток.",
+             plus="полный бренд, ноль новых картинок", minus="вкладки клиентских продуктов не различаются"),
     ]
 
 
-def mk_cards(v):
-    tabs = [("site", "Global Generation"), ("portal", "Мой кабинет · GG"), ("sat", "SAT · Global Generation"),
-            ("accounting", "Бухгалтерия"), ("ielts", "IELTS · Global Generation"), ("onboarding", "Онбординг"), ("apply", "Анкета")]
-    inner = "прежние цвета типов" if v["n"] == 0 else "палитра медиакита: менторы navy, операционка blue, ядро sky"
+def client_cards(v):
+    tabs = [("site", "Global Generation"), ("portal", "Мой кабинет · GG"), ("apply", "Анкета · GG"),
+            ("accounting", "Бухгалтерия"), ("deck", "Презентация · GG"), ("onboarding", "Онбординг"), ("gigi", "Маяк · Джи-джи")]
     return (f'<div class="card"><h3>Во вкладках Chrome <span>клиентские и внутренние вперемешку, 16 px</span></h3>'
             f'{chrome(v, False, ["root", "akb", "legal"], tabs)}{chrome(v, True, ["root", "akb", "legal"], tabs)}</div>'
-            f'<div class="card"><h3>Клиентские <span>сайт = фавикон global-generations.com как есть; Маяк с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
-            f'<div class="card"><h3>Внутренние <span>{inner}</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
-            f'<div class="card"><h3>Размеры <span>Портал, SAT, АКБ: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "sat", "akb"))}</div>')
+            f'<div class="card"><h3>Клиентские <span>версии фавикона global-generations.com; Маяк с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
+            f'<div class="card"><h3>Внутренние <span>тёмная плитка: менторы оранжевый, операционка синий, ядро белый</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
+            f'<div class="card"><h3>Размеры <span>Портал, Анкета, АКБ: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "apply", "akb"))}</div>')
 
 
 def render(v, s, dark=False):
@@ -788,20 +736,13 @@ PAGES = {
         h1="Вариант 9 с иконками: светлее и чище",
         intro="Знак GG на каждой вкладке, в углу круглая метка сервиса с иконкой. Navy и голубой убрал, плитка белая, знак и метка больше не налезают друг на друга. Иконки свои, толстые и залитые: тонкие lucide в метке такого размера не видны. <b>Вкладка этой страницы меняет фавикон</b> на выбранную палитру. На первой вкладке исходный 9 для сравнения.",
         foot="напиши номер палитры или комбинацию, например «1, но метка как в 6». После выбора соберу финальные SVG, PNG и ICO в assets/favicons, поменяю замок на экране входа и раскатаю по сервисам."),
-    "split": dict(
-        file="favicons-client-vs-internal.html", title="Фавиконы GG: клиентские и внутренние", kick="Вариант {n} из 4",
-        description="Фавиконы GG: клиентские продукты отдельной семьёй от внутренних сервисов, 4 варианта.",
-        h1="Клиентские отдельно, внутренние отдельно",
-        intro="Внутренние (видит команда) остаются как выбрали: белая плитка, знак GG, метка цвета контура. Клиентские (видят студенты и клиенты: сайт, Студенческий портал, SAT, IELTS, анкета) получают свою семью. Ниже 4 варианта клиентского стиля, на нулевой вкладке как сейчас без разделения. <b>Вкладка этой страницы меняет фавикон</b> на SAT выбранного варианта. Маяк остаётся с Джи-джи.",
-        foot="напиши номер варианта. Внутренние раскатываются уже сейчас (PR без деплоя), клиентские соберу после выбора.",
-        fav_key="sat", cards=split_cards),
-    "mediakit": dict(
-        file="favicons-mediakit.html", title="Фавиконы GG: палитра медиакита", kick="Вариант {n} из 4",
-        description="Фавиконы GG в палитре медиакита global-generations.com: клиентские и внутренние, 4 варианта.",
-        h1="Палитра медиакита: клиентские и внутренние",
-        intro="Цвета как на global-generations.com/mediakit: Navy #12284c, Blue #2f6bb0, Sky #4b8fd6, Ice #eaf6fc, White. Сайт GG остаётся со своим фавиконом. Внутренние тоже в этой палитре: белая плитка, знак GG navy, метка по типу (менторы navy, операционка blue, ядро sky). Клиентские отличаются плиткой, 4 варианта ниже, на нулевой вкладке внутренние в старых цветах для сравнения. <b>Вкладка этой страницы меняет фавикон</b> на SAT выбранного варианта.",
-        foot="напиши номер варианта и оставляем ли внутренние в палитре медиакита (или «0» = внутренние в старых цветах). После выбора пересоберу assets/favicons и обновлю уже открытые PR сервисов.",
-        fav_key="sat", cards=mk_cards),
+    "client": dict(
+        file="favicons-client-site.html", title="Фавиконы GG: клиентские и внутренние", kick="Вариант {n} из 3",
+        description="Фавиконы GG: клиентские продукты как версии фавикона сайта, внутренние на тёмной плитке.",
+        h1="Клиентские = версии фавикона сайта, внутренние = тёмная плитка",
+        intro="Клиентские GG (сайт, Студенческий портал, анкета, презентация клиенту) делаем версиями фавикона global-generations.com: тот же navy-градиент и белый знак. SAT и IELTS теперь Aura, их тут нет. Маяк остаётся с Джи-джи. Внутренние на тёмной плитке: белый знак GG и цветная метка по типу (менторы оранжевый, операционка синий, ядро белый). Ниже 3 варианта клиентских. <b>Вкладка этой страницы меняет фавикон</b> на Студенческий портал выбранного варианта.",
+        foot="напиши номер варианта для клиентских. Внутренние на тёмной плитке пересоберу в assets/favicons и обновлю уже открытые PR сервисов.",
+        fav_key="portal", cards=client_cards),
 }
 
 
@@ -870,8 +811,7 @@ def main():
     T = Type()
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
-    sets["split"] = build_split()
-    sets["mediakit"] = build_mediakit()
+    sets["client"] = build_client()
 
     for key, n in (("variants", a.apply), ("v9", a.apply_v9)):
         if n:
