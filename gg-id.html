@@ -28,8 +28,11 @@
   --g-head:#13445d; --g-ink:#0f172a; --g-ink-2:#334155; --g-muted:#64748b; --g-faint:#94a3b8;
   --g-line:#e2e8f0; --g-soft:#f1f5f9; --g-surface:#f8fafc;
   --g-logo:#13445d; --g-divider:rgba(19,68,93,.2);
-  --g-primary:#13445d; --g-primary-hi:#1a5a7a; --g-primary-ink:#ffffff;
-  --g-primary-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
+  /* главная кнопка, стиль A (08.10): белая с тонкой рамкой, светлая плитка слева, navy-текст; без navy-заливки */
+  --g-primary:#ffffff; --g-primary-hi:#f7fafd; --g-primary-ink:#0f172a;
+  --g-primary-line:#c9d5e1; --g-primary-line-hi:#94a3b8;
+  --g-primary-shadow:0 1px 2px rgba(15,23,42,.05);
+  --g-tile:linear-gradient(150deg,#8FBADD 0%,#4B8FD6 100%); --g-chev:#64748b; --g-text-btn:#13445d;
   --g-second:#ffffff; --g-second-line:#d5dee8; --g-second-ink:#0f172a; --g-second-hover:#f6f9fc;
   --g-accent:#009CDC; --g-link:#0077a8; --g-ring:rgba(0,156,220,.22);
   --g-field:#ffffff; --g-field-line:#d5dee8; --g-field-hover:#94a3b8; --g-autofill:#f2f8fd;
@@ -38,10 +41,8 @@
   --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
   --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
   --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
-  /* карточка GG ID: лицевая сторона всегда navy, тема меняет глубину, кольцо и тень */
-  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1f6a8f 0%,rgba(31,106,143,0) 55%),linear-gradient(150deg,#174f6c 0%,#0f3a51 52%,#0a2738 100%);
-  --g-idc-ring:rgba(255,255,255,.06);
-  --g-idc-shadow:0 1px 2px rgba(15,23,42,.10),0 28px 60px -30px rgba(13,47,66,.65);
+  /* карточка GG ID (08.10, «Итог»): светлый пластик в обеих темах, тема меняет только тень */
+  --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 18px 30px -18px rgba(13,47,66,.34),0 40px 70px -40px rgba(13,47,66,.4);
   color-scheme:light;
   font-family:var(--g-font);
 }
@@ -56,8 +57,9 @@
   --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
   --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
   --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
-  --g-primary:#ffffff; --g-primary-hi:#e6f5fc; --g-primary-ink:#0d2f42;
-  --g-primary-shadow:0 12px 32px -16px rgba(92,195,236,.6);
+  --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
+  --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
+  --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
   --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
   --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3);
   --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
@@ -66,9 +68,7 @@
   --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
   --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
   --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
-  --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
-  --g-idc-ring:rgba(255,255,255,.14);
-  --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
+  --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
   color-scheme:dark;
 }
 @media (prefers-color-scheme:dark){
@@ -81,8 +81,9 @@
     --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
     --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
     --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
-    --g-primary:#ffffff; --g-primary-hi:#e6f5fc; --g-primary-ink:#0d2f42;
-    --g-primary-shadow:0 12px 32px -16px rgba(92,195,236,.6);
+    --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
+    --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
+    --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
     --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
     --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3);
     --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
@@ -91,9 +92,7 @@
     --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
     --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
     --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
-    --g-idc-face:radial-gradient(130% 100% at 0% 0%,#1d6286 0%,rgba(29,98,134,0) 55%),linear-gradient(150deg,#15455f 0%,#0e3247 52%,#0a2534 100%);
-    --g-idc-ring:rgba(255,255,255,.14);
-    --g-idc-shadow:0 30px 70px -34px rgba(0,0,0,.9);
+    --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
     color-scheme:dark;
   }
 }
@@ -123,7 +122,7 @@
 .gid-frame{display:grid;grid-template-columns:minmax(0,1fr);min-height:inherit}
 .gid-main{display:flex;flex-direction:column;align-items:center;min-height:inherit;min-width:0;
   padding:max(28px,env(safe-area-inset-top)) 20px max(22px,env(safe-area-inset-bottom))}
-.gid-card{width:100%;max-width:428px;margin-block:auto;position:relative;
+.gid-card{width:100%;max-width:428px;margin-block:auto;position:relative;container:gidcol/inline-size;
   background:var(--g-card);border:1px solid var(--g-card-line);border-radius:24px;box-shadow:var(--g-card-shadow);
   -webkit-backdrop-filter:var(--g-card-blur);backdrop-filter:var(--g-card-blur);
   padding:40px 40px 34px;animation:gidIn .42s var(--g-ease) both}
@@ -135,25 +134,41 @@
   -webkit-backdrop-filter:none;backdrop-filter:none;padding:0;max-width:384px}
 .gid[data-layout="minimal"] .gid-h{font-size:34px}
 
-/* сплит: тёмная панель бренда слева, на узком экране прячется */
+/* сплит: navy-панель бренда с картой GG ID на ленте. На компьютере панель слева, на телефоне компактно сверху */
 .gid-aside{display:none}
+.gid[data-layout="split"] .gid-aside{display:flex}
+.gid[data-layout="split"] .gid-card > .gid-lockup{display:none}   /* подпись уже на панели */
 @container gid (min-width:960px){
   .gid[data-layout="split"] .gid-frame{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}
-  .gid[data-layout="split"] .gid-aside{display:flex}
-  .gid[data-layout="split"] .gid-card > .gid-lockup{display:none}
   .gid[data-layout="split"] .gid-h{font-size:32px}
+  .gid-aside-hero{container-type:size}
+  .gid-aside-hero .gid-hero-holder,.gid-aside-hero .gid-hero-hang{max-width:min(var(--gid-hero-w,470px),calc((100cqh - 150px) * 1.585 + 30px))}
 }
-.gid-aside{position:relative;overflow:hidden;isolation:isolate;flex-direction:column;justify-content:space-between;gap:32px;
-  min-height:inherit;padding:44px 52px 48px;color:#fff;
+@container gid (max-width:959px){
+  .gid[data-layout="split"] .gid-frame{grid-template-rows:auto 1fr}
+  .gid[data-layout="split"] .gid-aside{min-height:0;padding:18px 16px 24px;gap:14px}
+  .gid[data-layout="split"] .gid-aside-copy{display:none}
+  .gid[data-layout="split"] .gid-main{min-height:0;padding-top:26px}
+  .gid[data-layout="split"] .gid-main > .gid-card{margin-top:0;margin-bottom:auto}
+  .gid[data-layout="split"] .gid-hero-lan{height:42px;margin-bottom:-14px}
+  .gid[data-layout="split"] .gid-hero-holder{max-width:292px;padding:20px 10px 10px;border-radius:20px}
+  .gid[data-layout="split"] .gid-hero-hang{max-width:292px}
+  .gid[data-layout="split"] .gid-hero{padding-top:6px}
+  .gid[data-layout="split"] .gid-hero-hang{animation-name:gidSwayM}
+}
+@keyframes gidSwayM{from{transform:rotateX(4deg) rotateY(-8deg) rotateZ(-.9deg)}to{transform:rotateX(4deg) rotateY(-5deg) rotateZ(.9deg)}}
+.gid-aside{position:relative;overflow:hidden;isolation:isolate;flex-direction:column;justify-content:space-between;gap:26px;
+  min-height:inherit;padding:40px 52px 44px;color:#fff;
   background:radial-gradient(90% 70% at 0% 0%,#1d6386 0%,rgba(29,99,134,0) 60%),linear-gradient(160deg,#164e6b 0%,#0d2f42 52%,#082231 100%)}
 .gid[data-theme="dark"] .gid-aside{background:radial-gradient(90% 70% at 0% 0%,#154b66 0%,rgba(21,75,102,0) 60%),linear-gradient(160deg,#0f3a51 0%,#0a2433 52%,#06161f 100%)}
 .gid-aside::after{content:"";position:absolute;z-index:-1;width:620px;height:620px;right:-220px;bottom:-260px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(0,156,220,.34),transparent);animation:gidDriftB 22s var(--g-ease) infinite alternate;pointer-events:none}
-.gid-aside .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;position:relative}
+.gid-aside > .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;position:relative}
+.gid-aside-hero{position:relative;flex:1 1 auto;min-height:0;display:grid;place-items:center}
 .gid-aside-copy{position:relative;max-width:540px}
-.gid-aside-title{font-size:40px;line-height:1.08;font-weight:700;letter-spacing:-.03em;color:#fff;text-wrap:balance}
-.gid-aside-sub{margin-top:14px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.68);max-width:400px}
-/* бегущие строки с названиями сервисов: один вход открывает их все */
+.gid-aside-title{font-size:26px;line-height:1.14;font-weight:700;letter-spacing:-.03em;color:#fff;text-wrap:balance}
+.gid-aside-sub{margin-top:8px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.76);max-width:430px}
+/* бегущие строки с названиями сервисов: прежний герой панели (до 08.10), в разметке кита больше не стоят */
 .gid-mq{position:absolute;z-index:-1;inset:-10% -20%;display:flex;flex-direction:column;justify-content:center;gap:6px;
   transform:rotate(-9deg);pointer-events:none;user-select:none;
   -webkit-mask-image:linear-gradient(180deg,transparent 8%,#000 32%,#000 56%,transparent 76%);mask-image:linear-gradient(180deg,transparent 8%,#000 32%,#000 56%,transparent 76%)}
@@ -186,7 +201,7 @@
 .gid-form{display:flex;flex-direction:column;gap:18px;margin-top:28px}
 .gid-form .gid-btn{margin-top:4px}
 .gid-alt{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;margin-top:22px}
-.gid-or{display:flex;align-items:center;gap:14px;margin:22px 0 16px;font-size:12px;font-weight:600;color:var(--g-faint);letter-spacing:.02em}
+.gid-or{display:flex;align-items:center;gap:14px;margin:22px 0 16px;font-size:12px;font-weight:600;color:var(--g-muted);letter-spacing:.02em}
 .gid-or::before,.gid-or::after{content:"";flex:1;height:1px;background:var(--g-line)}
 
 /* ---------- иконки (lucide инлайн) ---------- */
@@ -201,11 +216,28 @@
   transition:background-color .18s var(--g-ease),border-color .18s var(--g-ease),color .18s var(--g-ease),transform .12s var(--g-ease),box-shadow .18s var(--g-ease)}
 .gid-btn:active:not(:disabled){transform:scale(.985)}
 .gid-btn:focus-visible{outline:none;box-shadow:0 0 0 4px var(--g-ring)}
-.gid-btn--primary{background:var(--g-primary);color:var(--g-primary-ink);box-shadow:var(--g-primary-shadow)}
-.gid-btn--primary:hover:not(:disabled){background:var(--g-primary-hi)}
+/* главная кнопка, стиль A: белая (на тёмном полупрозрачная) с тонкой рамкой, иконка в светлой плитке слева, стрелка справа */
+.gid-btn--primary{justify-content:flex-start;gap:14px;min-height:58px;padding:0 14px 0 10px;text-align:left;
+  background:var(--g-primary);color:var(--g-primary-ink);border-color:var(--g-primary-line);box-shadow:var(--g-primary-shadow)}
+.gid-btn--primary:hover:not(:disabled){background:var(--g-primary-hi);border-color:var(--g-primary-line-hi);color:var(--g-primary-ink)}
 .gid-btn--primary:focus-visible{box-shadow:var(--g-primary-shadow),0 0 0 4px var(--g-ring)}
-.gid-btn--secondary{background:var(--g-second);color:var(--g-second-ink);border-color:var(--g-second-line)}
-.gid-btn--secondary:hover:not(:disabled){background:var(--g-second-hover);border-color:var(--g-field-hover)}
+.gid-btn--primary > .gid-ic:first-child,.gid-btn--primary > .gid-scan:first-child{box-sizing:content-box;width:20px;height:20px;padding:8px;
+  border-radius:10px;background:var(--g-tile);color:#fff}
+.gid-btn--primary > .gid-scan:first-child .gid-ic{inset:8px}
+.gid-btn--primary > .gid-scan:first-child::after{left:10px;right:10px;top:10px}
+.gid-btn--primary > .gid-spin:first-child{margin:0 9px}
+.gid-btn--primary::after{content:"";flex:none;width:18px;height:18px;margin-left:auto;background:var(--g-chev);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/18px no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/18px no-repeat}
+.gid-btn--primary.is-busy::after{visibility:hidden}
+/* узкая колонка (раскладка «Карточка» на телефоне): стрелку убираем, длинные подписи остаются в одну строку */
+@container gidcol (max-width:340px){
+  .gid-btn--primary{gap:12px;padding:0 12px 0 9px}
+  .gid-btn--primary::after{display:none}
+}
+/* вторая кнопка: текстом, без рамки и заливки, подчёркивание под курсором */
+.gid-btn--secondary{min-height:48px;background:transparent;border-color:transparent;color:var(--g-text-btn);box-shadow:none}
+.gid-btn--secondary:hover:not(:disabled){background:transparent;border-color:transparent;color:var(--g-text-btn);text-decoration:underline;text-underline-offset:5px}
 .gid-btn--quiet{background:transparent;color:var(--g-muted);font-weight:600}
 .gid-btn--quiet:hover{color:var(--g-ink);background:var(--g-soft)}
 .gid-btn:disabled{opacity:.55;cursor:default}
@@ -236,8 +268,9 @@
 /* ---------- поля ---------- */
 .gid-field{display:flex;flex-direction:column;gap:8px;min-width:0}
 .gid-label{font-size:13px;font-weight:600;color:var(--g-ink-2);letter-spacing:.005em}
-.gid-label-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.gid-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .gid-label-row .gid-link{padding:0}
+.gid-alt .gid-link,.gid-label-row .gid-link{min-height:44px}
 .gid-input-wrap{position:relative}
 .gid-input{display:block;width:100%;height:52px;padding:0 16px;border-radius:14px;border:1.5px solid var(--g-field-line);background:var(--g-field);
   font-size:16px;font-weight:500;color:var(--g-ink);outline:none;-webkit-appearance:none;appearance:none;
@@ -252,7 +285,7 @@
 .gid-input.is-error,.gid-input[aria-invalid="true"]{border-color:var(--g-danger);box-shadow:0 0 0 4px var(--g-danger-ring)}
 .gid-input.is-shake{animation:gidShake .42s var(--g-ease)}
 @keyframes gidShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-.gid-eye{position:absolute;top:6px;right:6px;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:10px;
+.gid-eye{position:absolute;top:4px;right:4px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:10px;
   background:transparent;color:var(--g-faint);cursor:pointer;transition:color .15s,background-color .15s}
 .gid-eye:hover{color:var(--g-ink);background:var(--g-soft)}
 .gid-eye:focus-visible{outline:none;box-shadow:0 0 0 3px var(--g-ring)}
@@ -313,8 +346,8 @@
 .gid-account:active{transform:scale(.99)}
 .gid-account:focus-visible{outline:none;box-shadow:0 0 0 4px var(--g-ring)}
 .gid-account-tx,.gid-who-tx{display:flex;flex-direction:column;min-width:0;flex:1}
-.gid-account-tx b,.gid-who-tx b{font-size:15px;font-weight:600;color:var(--g-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gid-account-tx span,.gid-who-tx span{font-size:13px;color:var(--g-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gid-account-tx b,.gid-who-tx b{font-size:15px;font-weight:600;color:var(--g-ink);overflow-wrap:anywhere}
+.gid-account-tx span,.gid-who-tx span{font-size:13px;color:var(--g-muted);overflow-wrap:anywhere}
 .gid-account > .gid-ic{color:var(--g-faint);transition:transform .16s var(--g-ease),color .16s}
 .gid-account:hover > .gid-ic{color:var(--g-ink);transform:translateX(3px)}
 .gid-who{display:flex;align-items:center;gap:12px;margin-top:24px;padding:12px 14px;border-radius:14px;background:var(--g-surface);border:1px solid var(--g-line)}
@@ -363,24 +396,27 @@
 
 /* ============ компоненты для шапок и экранов сервисов ============ */
 
-/* кнопка «Войти через GG ID»: единственный вход на собственном экране сервиса.
-   Значок = иконка GG ID (белый ключ на светлом градиенте --grad-tile): символ gid-id-icon спрайта или инлайн-SVG (README) */
-.gid-sso{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;max-width:100%;padding:0 22px 0 14px;border-radius:14px;
-  border:1px solid transparent;background:#13445d;color:#fff;font-family:var(--g-font);font-size:15px;font-weight:700;letter-spacing:-.005em;
-  line-height:1.2;text-align:left;text-decoration:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 26px -14px rgba(13,47,66,.75);
+/* кнопка «Войти через GG ID»: единственный вход на собственном экране сервиса. Стиль A (08.10): белая с тонкой рамкой,
+   иконка GG ID (белый ключ на светлом градиенте --grad-tile) слева, navy-текст, без заливки. В тёмной теме кита сама
+   становится полупрозрачной с рамкой; --light и --on-dark задают вид явно, независимо от темы. Высота не меньше 44 px. */
+.gid-sso{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;max-width:100%;padding:0 18px 0 10px;border-radius:14px;
+  border:1px solid var(--g-primary-line,#c9d5e1);background:var(--g-primary,#ffffff);color:var(--g-primary-ink,#0f172a);
+  font-family:var(--g-font);font-size:15px;font-weight:700;letter-spacing:-.005em;line-height:1.2;text-align:left;text-decoration:none;cursor:pointer;
+  box-shadow:var(--g-primary-shadow,0 1px 2px rgba(15,23,42,.05));
   transition:background-color .18s var(--g-ease),transform .12s var(--g-ease),box-shadow .18s var(--g-ease),border-color .18s}
 .gid-sso > span{min-width:0;text-wrap:balance}   /* в узком месте перенос ровный: «Войти через / GG ID» */
 /* цвета под курсором заданы явно: стили страницы сервиса (a:hover и т.п.) не перекрашивают кнопку */
-.gid-sso:hover,.gid-sso:focus-visible{background:#1a5a7a;color:#fff;text-decoration:none}
+.gid-sso:hover,.gid-sso:focus-visible{background:var(--g-primary-hi,#f7fafd);border-color:var(--g-primary-line-hi,#94a3b8);
+  color:var(--g-primary-ink,#0f172a);text-decoration:none}
 .gid-sso:active{transform:scale(.985)}
-.gid-sso:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(0,156,220,.25)}
-.gid-sso-tile{width:28px;height:28px;flex:none;border-radius:7px;display:block}
-.gid-sso--light{background:#fff;color:#0f172a;border-color:#d5dee8;box-shadow:0 1px 2px rgba(15,23,42,.05)}
-.gid-sso--light:hover,.gid-sso--light:focus-visible{background:#f6f9fc;color:#0f172a;border-color:#94a3b8}
-.gid-sso--on-dark{background:#fff;color:#0d2f42;box-shadow:0 12px 32px -16px rgba(92,195,236,.6)}
-.gid-sso--on-dark:hover,.gid-sso--on-dark:focus-visible{background:#e6f5fc;color:#0d2f42}
-.gid-sso--sm{min-height:40px;font-size:13.5px;gap:10px;padding:0 16px 0 9px;border-radius:11px}
-.gid-sso--sm .gid-sso-tile{width:22px;height:22px;border-radius:6px}
+.gid-sso:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(0,156,220,.3)}
+.gid-sso-tile{width:32px;height:32px;flex:none;border-radius:8px;display:block}
+.gid-sso--light{background:#ffffff;color:#0f172a;border-color:#c9d5e1;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.gid-sso--light:hover,.gid-sso--light:focus-visible{background:#f7fafd;color:#0f172a;border-color:#94a3b8}
+.gid-sso--on-dark{background:rgba(255,255,255,.04);color:#ffffff;border-color:rgba(255,255,255,.22);box-shadow:none}
+.gid-sso--on-dark:hover,.gid-sso--on-dark:focus-visible{background:rgba(255,255,255,.08);color:#ffffff;border-color:rgba(255,255,255,.36)}
+.gid-sso--sm{min-height:44px;font-size:13.5px;gap:10px;padding:0 14px 0 7px;border-radius:12px}
+.gid-sso--sm .gid-sso-tile{width:28px;height:28px;border-radius:7px}
 .gid-sso--block{display:flex;width:100%}
 
 /* аккаунт в шапке сервиса: обёртка .gid-acct (чип + выпадающее меню), чип ужимается вместе с шапкой.
@@ -427,58 +463,91 @@
 .gid-dialog .gid-sso{margin-top:24px}
 @media (max-width:420px){.gid-dialog{padding:26px 22px 22px}}
 
-/* ============ карточка GG ID: как студенческий ID в Duke или Stanford ============ */
-/* Лицевая сторона всегда navy (как панель сплита), тема меняет глубину, кольцо и тень: токены --g-idc-*.
-   Пропорции настоящей карты 85,6 x 54 мм. Если данных больше (три длинные должности), карта растёт вниз, без обрезки.
-   Один акцент: точка статуса «Активен». Подпись «логотип | ID» как на экранах входа, логотип белый.
-   Ставится внутри .gid или .gid-kit. Поля data-gid-field и GGID.card(): README.md, раздел «Карточка GG ID». */
-.gid-idcard{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;row-gap:14px;
+/* ============ карточка GG ID (08.10, «Итог»): белый пластик 85,6 x 54 мм, голографический перелив, ключ GG ID ============ */
+/* Светлая в обеих темах (как настоящая карта), без фото и без плашки инициалов; ключ GG ID в голографической печати.
+   Перелив только в голубых и серебряных тонах. Пропорции держит распорка ::before (минимальная высота = ширина x 54 / 85,6),
+   данные могут карту удлинить. Один акцент: точка статуса. Внутри .gid или .gid-kit. Поля data-gid-field: README.md. */
+.gid-idcard{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;row-gap:12px;
   width:100%;max-width:var(--gid-idcard-w,460px);container:gidcard/inline-size;padding:22px 24px;border-radius:18px;
-  background:var(--g-idc-face);color:#fff;font-family:var(--g-font);font-weight:500;line-height:1.4;text-align:left;
-  box-shadow:inset 0 0 0 1px var(--g-idc-ring),var(--g-idc-shadow)}
-/* распорка: минимальная высота = ширина x 54 / 85,6 (с учётом паддингов 22 и 24 px), данные могут карту удлинить.
-   Не aspect-ratio: во flex- и grid-родителях он не даёт карте вырасти и текст вылезает. */
+  color:#0b2433;font-family:var(--g-font);font-weight:500;line-height:1.35;text-align:left;-webkit-font-smoothing:antialiased;
+  background-color:#f5f8fb;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .07 0 0 0 0 .27 0 0 0 0 .36 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),linear-gradient(150deg,#ffffff 0%,#f4f8fb 55%,#ecf2f7 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.9),inset 0 -1px 1px rgba(19,68,93,.08),var(--g-idc-shadow)}
 .gid-idcard::before{content:"";grid-area:1/1/4/2;padding-top:calc(63.084% - 13.72px);pointer-events:none}
-.gid-idcard-top{grid-area:1/1;display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
-.gid-idcard .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;flex:none}
-.gid-idcard .gid-logo{height:28px}
-.gid-idcard-status{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;line-height:1;color:rgba(255,255,255,.88);white-space:nowrap}
-.gid-idcard-status::before{content:"";width:8px;height:8px;flex:none;border-radius:50%;background:#5cc3ec;box-shadow:0 0 0 3px rgba(92,195,236,.2)}
-.gid-idcard-status[data-status="disabled"]{color:rgba(255,255,255,.7)}
-.gid-idcard-status[data-status="disabled"]::before{background:rgba(255,255,255,.42);box-shadow:none}
-
-.gid-idcard-person{grid-area:2/1;align-self:center;display:flex;align-items:center;gap:clamp(12px,4.2cqi,18px);min-width:0}
-.gid-idcard-photo{flex:none;display:grid;place-items:center;width:clamp(54px,16cqi,74px);aspect-ratio:4/5;border-radius:14px;
-  background:linear-gradient(150deg,#2f80a8 0%,#15506e 92%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
-  color:#fff;font-size:clamp(19px,5.6cqi,26px);font-weight:700;letter-spacing:.02em;line-height:1}
-.gid-idcard-who{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
-.gid-idcard-name{font-size:clamp(18px,4.9cqi,22px);font-weight:700;line-height:1.18;letter-spacing:-.02em;color:#fff;
-  text-wrap:balance;overflow-wrap:anywhere}
-.gid-idcard-roles{list-style:none;padding:0;font-size:13.5px;font-weight:600;line-height:1.42;color:rgba(255,255,255,.86);text-wrap:pretty}
+.gid-idcard > *{position:relative;z-index:1}
+.gid-idcard > .gid-idcard-holo{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9;mix-blend-mode:multiply;
+  background:linear-gradient(118deg,rgba(255,255,255,0) 4%,#bfe8f6 17%,#d3e3f7 29%,#c8e9f6 41%,#cddff6 53%,#eaf4fb 64%,#bfe3f5 76%,#d9eefa 88%,rgba(255,255,255,0) 99%);
+  background-size:260% 260%;animation:gidHolo 10s ease-in-out infinite alternate}
+@keyframes gidHolo{from{background-position:0% 30%}to{background-position:100% 70%}}
+.gid-idcard-top{grid-area:1/1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}
+.gid-idcard .gid-lockup{--g-logo:#13445d;--g-divider:rgba(19,68,93,.24);margin:0;flex:none;gap:clamp(9px,3cqi,14px)}
+.gid-idcard .gid-logo{height:clamp(20px,6cqi,28px)}
+.gid-idcard .gid-lockup-name{padding-left:clamp(9px,3cqi,14px);font-size:clamp(12px,3.5cqi,16px)}
+/* ключ GG ID в голографической печати (символ gid-id-icon) */
+.gid-idcard-seal{display:grid;place-items:center;flex:none;width:clamp(46px,14cqi,64px);aspect-ratio:1;border-radius:50%;
+  background:conic-gradient(from 20deg,#bfe9f5,#dce9f7,#cbe8f7,#e7eff8,#bfe0f5,#d5ecf8,#bfe9f5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.9),0 1px 2px rgba(19,68,93,.12)}
+.gid-idcard-key{display:block;width:66%;height:auto;aspect-ratio:1;filter:drop-shadow(0 2px 4px rgba(75,143,214,.32))}
+.gid-idcard-who{grid-area:2/1;align-self:center;display:flex;flex-direction:column;gap:3px;min-width:0}
+.gid-idcard-name{font-size:clamp(18px,5.1cqi,24px);font-weight:700;line-height:1.16;letter-spacing:-.02em;color:#0b2433;text-wrap:balance;overflow-wrap:anywhere}
+.gid-idcard-roles{list-style:none;padding:0;margin:0;font-size:clamp(12.5px,3.1cqi,14.5px);font-weight:600;line-height:1.38;color:#284a5f;text-wrap:pretty}
 .gid-idcard-roles li{display:inline}
-.gid-idcard-roles li + li::before{content:"\00a0\00b7\0020";color:rgba(255,255,255,.55)}
+.gid-idcard-roles li + li::before{content:"\00a0\00b7\0020";color:#6a8496}
 .gid-idcard-roles:empty{display:none}
-.gid-idcard-mail{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.74);overflow-wrap:anywhere}
+.gid-idcard-mail{font-size:12.5px;line-height:1.38;color:#284a5f;overflow-wrap:anywhere}
 .gid-idcard-mail span{white-space:nowrap}   /* домен целиком: адрес переносится только перед @ */
-.gid-idcard-passkey{display:flex;align-items:center;gap:6px;margin-top:1px;font-size:12.5px;font-weight:500;line-height:1.4;color:rgba(255,255,255,.74)}
+.gid-idcard-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:3px}
+.gid-idcard-status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;line-height:1.3;color:#284a5f;white-space:nowrap}
+.gid-idcard-status::before{content:"";width:8px;height:8px;flex:none;border-radius:50%;background:#009CDC;box-shadow:0 0 0 3px rgba(0,156,220,.18)}
+.gid-idcard-status[data-status="disabled"]::before{background:#94a3b8;box-shadow:none}
+.gid-idcard-passkey{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:12.5px;font-weight:500;line-height:1.3;color:#284a5f;white-space:nowrap}
 .gid-idcard-passkey .gid-ic{width:16px;height:16px}
-
 .gid-idcard-facts{grid-area:3/1;align-self:end;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 20px;min-width:0}
 .gid-idcard-fact{display:flex;flex-direction:column;gap:4px;margin:0;min-width:0}
 .gid-idcard-fact + .gid-idcard-fact{text-align:right}
-.gid-idcard-fact dt{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.66)}
-.gid-idcard-fact dd{margin:0;font-size:14.5px;font-weight:600;line-height:1.3;color:#fff;white-space:nowrap}
-.gid-idcard-fact .gid-idcard-num{font-size:16px;line-height:1.2;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.gid-idcard-fact dt{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:#3b5568}
+.gid-idcard-fact dd{margin:0;font-size:14.5px;font-weight:600;line-height:1.3;color:#0b2433;white-space:nowrap}
+.gid-idcard-fact .gid-idcard-num,.gid-idcard-num{font-size:16px;font-weight:600;line-height:1.2;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:#0b2433}
 @container gidcard (max-width:380px){
-  .gid-idcard .gid-lockup{gap:11px}
-  .gid-idcard .gid-lockup-name{padding-left:11px;font-size:15px}
   .gid-idcard-roles{font-size:13px}
-  .gid-idcard-mail,.gid-idcard-passkey{font-size:12px}
+  .gid-idcard-mail,.gid-idcard-passkey,.gid-idcard-status{font-size:12px}
   .gid-idcard-fact dd{font-size:14px}
   .gid-idcard-fact .gid-idcard-num{font-size:15px}
 }
 .gid-sub + .gid-idcard{margin-top:26px}
 .gid-idcard + .gid-stack{margin-top:24px}
+
+/* карта на экране входа (герой сплита): крупное GG ID, имя, должность и номер слева внизу, QR справа. До входа данные-шаблон */
+.gid-idcard--hero{row-gap:2.6cqi;max-width:none}
+.gid-idcard--hero .gid-idcard-seal{width:20cqi}
+.gid-idcard-big{grid-area:2/1;align-self:start;font-size:clamp(28px,11cqi,52px);font-weight:700;line-height:.95;letter-spacing:-.045em;color:#0b2433}
+.gid-idcard-bot{grid-area:3/1;display:flex;align-items:flex-end;justify-content:space-between;gap:4cqi;min-width:0}
+.gid-idcard-bot .gid-idcard-who{align-self:auto}
+.gid-idcard--hero .gid-idcard-num{font-size:clamp(12px,4.1cqi,19px)}
+.gid-idcard-qr{display:block;flex:none;width:max(60px,18cqi);height:auto}
+
+/* герой: карта в прозрачном держателе на ленте с клипсой, лёгкий 3D-наклон и покачивание, блик на пластике держателя */
+.gid-hero{position:relative;display:flex;justify-content:center;width:100%;perspective:1400px}
+.gid-hero-hang{display:flex;flex-direction:column;align-items:center;width:min(100%,var(--gid-hero-w,470px));transform-origin:50% 0;
+  transform:rotateX(5deg) rotateY(-10deg) rotateZ(-.6deg);animation:gidSway 8s ease-in-out infinite alternate}
+@keyframes gidSway{from{transform:rotateX(5deg) rotateY(-11deg) rotateZ(-1.1deg)}to{transform:rotateX(5deg) rotateY(-7deg) rotateZ(1.1deg)}}
+.gid-hero-lan{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;height:96px;margin-bottom:-16px;pointer-events:none}
+.gid-hero-strap{flex:1;width:28px;border-radius:0 0 4px 4px;background:repeating-linear-gradient(90deg,#f2f5f8 0 2px,#e1e7ed 2px 4px);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.8),inset -1px 0 0 rgba(0,0,0,.07);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 42%);mask-image:linear-gradient(180deg,transparent 0,#000 42%)}
+.gid-hero-clip{display:block;width:30px;height:36px;margin-top:-3px}
+.gid-hero-clip rect{fill:none;stroke:#cfd7df;stroke-width:3}
+.gid-hero-clip .bar{fill:#cfd7df;stroke:none}
+.gid-hero-holder{position:relative;width:100%;max-width:var(--gid-hero-w,470px);padding:26px 14px 14px;border-radius:26px;
+  background:linear-gradient(160deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.1) 55%,rgba(255,255,255,.18) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),inset 0 1px 0 rgba(255,255,255,.75),inset 0 -2px 3px rgba(255,255,255,.18),0 26px 50px -26px rgba(0,0,0,.6)}
+.gid-hero-holder::before{content:"";position:absolute;left:50%;top:9px;width:56px;height:9px;margin-left:-28px;border-radius:999px;background:#0e3348;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.45)}
+.gid-hero-gloss{position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:inherit;pointer-events:none}
+.gid-hero-gloss::after{content:"";position:absolute;left:-20%;top:-60%;width:70%;height:140%;transform:rotate(18deg);
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0))}
+.gid-hero .gid-idcard{--g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7)}
+.gid-idcard.is-alive .gid-idcard-name,.gid-idcard.is-alive .gid-idcard-roles,.gid-idcard.is-alive .gid-idcard-num{animation:gidAlive .7s var(--g-ease) both}
+@keyframes gidAlive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.gid-hero-hang,.gid-idcard > .gid-idcard-holo{animation:none!important}}
 
 /* компактная строка GG ID: шапка, меню аккаунта, списки людей. Поверхность по теме, инициалы как у .gid-chip */
 .gid-idrow{display:inline-flex;align-items:center;gap:12px;min-width:0;max-width:100%;padding:8px 16px 8px 8px;border-radius:16px;
@@ -683,22 +752,20 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <section class="sc-sec" id="idcard">
   <div class="wrap">
     <h2>Карточка GG ID</h2>
-    <p class="lead">Как студенческий ID в Duke или Stanford, только для команды Global Generation: имя, должности, рабочая почта и номер GG ID. Один взгляд, и понятно, под каким аккаунтом вы вошли. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
+    <p class="lead">Белая карта с голубым голографическим переливом и ключом GG ID, как студенческий ID в Duke или Stanford: имя, должности, рабочая почта и номер GG ID. На экране входа она висит на ленте в прозрачном держателе на navy-панели. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
     <div class="sc-idc">
       <figure class="sc-idc-cell gid-kit" data-theme="light">
         <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+          <span class="gid-idcard-holo" aria-hidden="true"></span>
           <div class="gid-idcard-top">
             <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
-            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+            <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
           </div>
-          <div class="gid-idcard-person">
-            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
-            <div class="gid-idcard-who">
-              <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
-              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
-              <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
-              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
-            </div>
+          <div class="gid-idcard-who">
+            <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+            <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+            <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+            <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>
           </div>
           <div class="gid-idcard-facts">
             <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
@@ -709,18 +776,16 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       </figure>
       <figure class="sc-idc-cell dark gid-kit" data-theme="dark">
         <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+          <span class="gid-idcard-holo" aria-hidden="true"></span>
           <div class="gid-idcard-top">
             <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
-            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+            <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
           </div>
-          <div class="gid-idcard-person">
-            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
-            <div class="gid-idcard-who">
-              <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
-              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
-              <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
-              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
-            </div>
+          <div class="gid-idcard-who">
+            <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+            <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+            <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+            <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>
           </div>
           <div class="gid-idcard-facts">
             <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
@@ -733,18 +798,16 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     <div class="sc-idc">
       <figure class="sc-idc-cell gid-kit" data-theme="light">
         <article class="gid-idcard" aria-label="Global Generation ID: Александра Образцова-Константинопольская">
+          <span class="gid-idcard-holo" aria-hidden="true"></span>
           <div class="gid-idcard-top">
             <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
-            <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+            <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
           </div>
-          <div class="gid-idcard-person">
-            <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">АО</span>
-            <div class="gid-idcard-who">
-              <p class="gid-idcard-name" data-gid-field="name">Александра Образцова-Константинопольская</p>
-              <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Руководитель направления «Магистратура в Европе»</li><li>Ведущая роликов YouTube-канала</li></ul>
-              <p class="gid-idcard-mail" data-gid-field="email">aleksandra.obraztsova-konstantinopolskaya<wbr><span>@global-generations.com</span></p>
-              <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
-            </div>
+          <div class="gid-idcard-who">
+            <p class="gid-idcard-name" data-gid-field="name">Александра Образцова-Константинопольская</p>
+            <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Руководитель направления «Магистратура в Европе»</li><li>Ведущая роликов YouTube-канала</li></ul>
+            <p class="gid-idcard-mail" data-gid-field="email">aleksandra.obraztsova-konstantinopolskaya<wbr><span>@global-generations.com</span></p>
+            <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>
           </div>
           <div class="gid-idcard-facts">
             <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 9031-55C0E7</dd></dl>
@@ -978,9 +1041,9 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     <a class="gid-sso gid-sso--block" href="https://levauth.global-generations-edu.com/api/auth/authorize?client_id=demo" data-noop data-gid-return="next"><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
   </div>
 </div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="gi-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/> <path d="M19 12H5"/></symbol><symbol id="gi-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></symbol><symbol id="gi-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="gi-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="gi-circle-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/> <line x1="12" x2="12" y1="8" y2="12"/> <line x1="12" x2="12.01" y1="16" y2="16"/></symbol><symbol id="gi-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/> <path d="M12 17h.01"/></symbol><symbol id="gi-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/> <circle cx="12" cy="12" r="3"/></symbol><symbol id="gi-eye-off" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/> <path d="m2 2 20 20"/></symbol><symbol id="gi-fingerprint" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/> <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/> <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/> <path d="M2 12a10 10 0 0 1 18-6"/> <path d="M2 16h.01"/> <path d="M21.8 16c.2-2 .131-5.354 0-6"/> <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/> <path d="M8.65 22c.21-.66.45-1.32.57-2"/> <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol><symbol id="gi-key-round" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/> <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="gi-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/> <rect width="7" height="7" x="14" y="3" rx="1"/> <rect width="7" height="7" x="14" y="14" rx="1"/> <rect width="7" height="7" x="3" y="14" rx="1"/></symbol><symbol id="gi-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/> <polyline points="16 17 21 12 16 7"/> <line x1="21" x2="9" y1="12" y2="12"/></symbol><symbol id="gi-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/> <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol><symbol id="gi-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/> <path d="M21 3v5h-5"/> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/> <path d="M8 16H3v5"/></symbol><symbol id="gi-scan-face" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/> <path d="M17 3h2a2 2 0 0 1 2 2v2"/> <path d="M21 17v2a2 2 0 0 1-2 2h-2"/> <path d="M7 21H5a2 2 0 0 1-2-2v-2"/> <path d="M8 14s1.5 2 4 2 4-2 4-2"/> <path d="M9 9h.01"/> <path d="M15 9h.01"/></symbol><symbol id="gi-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/> <path d="m21.854 2.147-10.94 10.939"/></symbol><symbol id="gi-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/> <path d="m9 12 2 2 4-4"/></symbol><symbol id="gi-user-round-plus" viewBox="0 0 24 24"><path d="M2 21a8 8 0 0 1 13.292-6"/> <circle cx="10" cy="8" r="5"/> <path d="M19 16v6"/> <path d="M22 19h-6"/></symbol><symbol id="gid-logo" viewBox="0 0 777 196"><path d="M376.927 125.512C375.504 127.427 373.512 129.014 370.95 130.273C368.39 131.532 365.064 132.162 360.972 132.162C357.629 132.162 354.64 131.727 352.009 130.859C349.375 129.99 347.144 128.731 345.312 127.082C343.478 125.432 342.084 123.429 341.123 121.071C340.163 118.713 339.683 116.026 339.683 113.01V112C339.683 108.844 340.163 106.06 341.123 103.647C342.084 101.236 343.478 99.206 345.312 97.5564C347.144 95.9081 349.375 94.6666 352.009 93.8332C354.64 92.9998 357.629 92.5824 360.972 92.5824C366.629 92.5824 371.226 93.7348 374.766 96.0411C378.304 98.346 380.465 101.822 381.248 106.468H375.593C375.236 105.084 374.64 103.816 373.804 102.663C372.97 101.511 371.919 100.535 370.656 99.7377C369.394 98.9401 367.953 98.3194 366.335 97.8754C364.716 97.4328 362.929 97.2108 360.972 97.2108C358.375 97.2108 356.09 97.583 354.116 98.3274C352.142 99.0717 350.495 100.119 349.181 101.467C347.863 102.815 346.877 104.419 346.218 106.282C345.56 108.144 345.232 110.209 345.232 112.478C345.232 114.642 345.56 116.647 346.218 118.489C346.877 120.334 347.863 121.921 349.181 123.251C350.495 124.581 352.142 125.627 354.116 126.389C356.09 127.153 358.375 127.533 360.972 127.533C363.462 127.533 365.633 127.25 367.482 126.683C369.331 126.115 370.906 125.335 372.204 124.342C373.503 123.349 374.534 122.206 375.299 120.911C376.064 119.616 376.571 118.242 376.82 116.788H356.598V112H382.156V130.939H376.927V125.512Z"/><path d="M420.839 126.31V130.991H389.145V93.7526H394.374V126.31H420.839Z"/><path d="M445.81 97.2637C443.356 97.2637 441.122 97.5827 439.115 98.2208C437.104 98.8601 435.396 99.8092 433.991 101.068C432.586 102.327 431.502 103.906 430.737 105.803C429.971 107.7 429.59 109.925 429.59 112.48C429.59 114.927 429.971 117.08 430.737 118.942C431.502 120.805 432.586 122.365 433.991 123.624C435.396 124.883 437.104 125.84 439.115 126.496C441.122 127.153 443.356 127.48 445.81 127.48C448.265 127.48 450.496 127.162 452.506 126.523C454.516 125.885 456.223 124.936 457.628 123.677C459.033 122.418 460.118 120.856 460.884 118.995C461.648 117.135 462.03 114.961 462.03 112.48C462.03 110.032 461.648 107.868 460.884 105.989C460.118 104.109 459.033 102.522 457.628 101.228C456.223 99.9342 454.516 98.9492 452.506 98.2753C450.496 97.6014 448.265 97.2637 445.81 97.2637ZM424.04 112C424.148 108.63 424.742 105.723 425.828 103.276C426.913 100.829 428.406 98.8163 430.31 97.2371C432.212 95.6607 434.471 94.4896 437.085 93.7266C439.7 92.965 442.608 92.5835 445.81 92.5835C449.011 92.5835 451.92 92.9822 454.535 93.7798C457.148 94.5773 459.406 95.775 461.31 97.3701C463.213 98.9665 464.707 100.979 465.793 103.409C466.878 105.839 467.473 108.702 467.581 112V112.958C467.473 116.256 466.878 119.12 465.793 121.549C464.707 123.979 463.213 125.974 461.31 127.535C459.406 129.095 457.148 130.255 454.535 131.018C451.92 131.78 449.011 132.162 445.81 132.162C442.608 132.162 439.7 131.78 437.085 131.018C434.471 130.255 432.212 129.086 430.31 127.507C428.406 125.929 426.913 123.934 425.828 121.522C424.742 119.111 424.148 116.256 424.04 112.958V112Z"/><path d="M478.145 126.31H497.726C499.541 126.31 501.016 126.16 502.155 125.858C503.294 125.557 504.174 125.112 504.796 124.529C505.419 123.942 505.845 123.243 506.077 122.427C506.308 121.611 506.424 120.707 506.424 119.714C506.424 118.685 506.317 117.78 506.104 117C505.891 116.221 505.464 115.547 504.824 114.979C504.183 114.412 503.284 113.986 502.13 113.702C500.972 113.419 499.453 113.277 497.566 113.277H478.145V126.31ZM478.145 108.595H495.753C497.282 108.595 498.598 108.524 499.7 108.382C500.803 108.241 501.702 107.976 502.395 107.585C503.09 107.195 503.604 106.653 503.943 105.962C504.281 105.271 504.449 104.392 504.449 103.328C504.449 102.265 504.263 101.405 503.89 100.748C503.516 100.093 502.964 99.596 502.235 99.2584C501.507 98.9221 500.59 98.7001 499.487 98.5937C498.385 98.4874 497.103 98.4342 495.646 98.4342H478.145V108.595ZM512.08 120.139C512.08 124.005 510.861 126.78 508.425 128.464C505.988 130.15 502.422 130.991 497.726 130.991H472.916V93.7526H496.233C498.331 93.7526 500.226 93.8856 501.915 94.1514C503.604 94.4173 505.055 94.8958 506.264 95.5883C507.473 96.2795 508.407 97.202 509.065 98.3545C509.724 99.5069 510.053 100.988 510.053 102.797C510.053 104.712 509.644 106.281 508.825 107.505C508.007 108.728 506.959 109.713 505.677 110.457C507.775 111.202 509.366 112.312 510.453 113.782C511.537 115.253 512.08 117.373 512.08 120.139Z"/><path d="M528.461 115.032H546.655L537.585 96.6245L528.461 115.032ZM526.113 119.713L520.564 130.992H514.747L533.156 93.7534H542.014L560.422 130.992H554.552L549.003 119.713H526.113Z"/><path d="M596.385 126.31V130.991H564.691V93.7526H569.92V126.31H596.385Z"/><path d="M376.927 189.35C375.504 191.265 373.512 192.852 370.95 194.11C368.39 195.369 365.064 196 360.972 196C357.629 196 354.64 195.565 352.009 194.697C349.375 193.828 347.144 192.568 345.312 190.92C343.478 189.27 342.084 187.267 341.123 184.909C340.163 182.549 339.683 179.864 339.683 176.848V175.838C339.683 172.681 340.163 169.898 341.123 167.485C342.084 165.074 343.478 163.043 345.312 161.395C347.144 159.745 349.375 158.503 352.009 157.67C354.64 156.837 357.629 156.421 360.972 156.421C366.629 156.421 371.226 157.573 374.766 159.879C378.304 162.184 380.465 165.66 381.248 170.306H375.593C375.236 168.921 374.64 167.654 373.804 166.5C372.97 165.348 371.919 164.373 370.656 163.576C369.394 162.778 367.953 162.158 366.335 161.714C364.716 161.271 362.929 161.048 360.972 161.048C358.375 161.048 356.09 161.421 354.116 162.165C352.142 162.91 350.495 163.956 349.181 165.304C347.863 166.653 346.877 168.256 346.218 170.118C345.56 171.982 345.232 174.048 345.232 176.317C345.232 178.479 345.56 180.484 346.218 182.326C346.877 184.171 347.863 185.758 349.181 187.089C350.495 188.418 352.142 189.465 354.116 190.227C356.09 190.99 358.375 191.372 360.972 191.372C363.462 191.372 365.633 191.087 367.482 190.521C369.331 189.953 370.906 189.173 372.204 188.179C373.503 187.187 374.534 186.043 375.299 184.749C376.064 183.453 376.571 182.08 376.82 180.625H356.598V175.838H382.156V194.777H376.927V189.35Z"/><path d="M424.787 190.148V194.828H389.145V157.591H423.028V162.272H394.374V172.327H417.639V177.007H394.374V190.148H424.787Z"/><path d="M435.886 161.048V194.829H430.657V157.591H439.782L464.006 191.371V157.591H469.181V194.829H460.003L435.886 161.048Z"/><path d="M512.295 190.148V194.828H476.652V157.591H510.534V162.272H481.881V172.327H505.145V177.007H481.881V190.148H512.295Z"/><path d="M523.394 176.529H541.322C544.416 176.529 546.719 175.925 548.232 174.721C549.744 173.514 550.498 171.759 550.498 169.453C550.498 167.184 549.786 165.42 548.365 164.16C546.941 162.903 544.789 162.272 541.908 162.272H523.394V176.529ZM523.394 181.211V194.828H518.165V157.59H543.083C545.037 157.59 546.817 157.849 548.418 158.362C550.018 158.876 551.38 159.639 552.5 160.648C553.621 161.66 554.491 162.928 555.115 164.454C555.737 165.98 556.049 167.752 556.049 169.773C555.942 172.752 555.222 175.11 553.887 176.848C552.553 178.586 550.713 179.81 548.365 180.519L556.635 194.776H550.498L542.763 181.211H523.394Z"/><path d="M573.549 178.869H591.743L582.673 160.463L573.549 178.869ZM571.201 183.552L565.652 194.829H559.835L578.244 157.591H587.102L605.51 194.829H599.64L594.091 183.552H571.201Z"/><path d="M628.934 162.273V194.829H623.705V162.273H607.11V157.59H645.581V162.273H628.934Z"/><path d="M684.798 190.148V194.828H650.382V190.148H664.843V162.272H650.382V157.591H684.798V162.272H670.072V190.148H684.798Z"/><path d="M711.371 161.102C708.916 161.102 706.683 161.421 704.674 162.059C702.664 162.698 700.957 163.646 699.551 164.905C698.146 166.165 697.062 167.743 696.297 169.639C695.532 171.537 695.15 173.763 695.15 176.317C695.15 178.763 695.532 180.918 696.297 182.779C697.062 184.641 698.146 186.202 699.551 187.46C700.957 188.721 702.664 189.678 704.674 190.333C706.683 190.991 708.916 191.317 711.371 191.317C713.825 191.317 716.057 191 718.066 190.361C720.077 189.723 721.783 188.774 723.188 187.514C724.594 186.256 725.679 184.694 726.444 182.833C727.209 180.972 727.591 178.798 727.591 176.317C727.591 173.869 727.209 171.706 726.444 169.827C725.679 167.946 724.594 166.36 723.188 165.064C721.783 163.771 720.077 162.787 718.066 162.113C716.057 161.439 713.825 161.102 711.371 161.102ZM689.6 175.838C689.707 172.468 690.303 169.56 691.388 167.114C692.473 164.665 693.966 162.653 695.87 161.075C697.773 159.499 700.031 158.327 702.646 157.565C705.26 156.802 708.168 156.421 711.371 156.421C714.572 156.421 717.481 156.82 720.095 157.618C722.708 158.414 724.967 159.612 726.871 161.208C728.773 162.803 730.268 164.817 731.353 167.247C732.438 169.677 733.033 172.538 733.141 175.838V176.796C733.033 180.094 732.438 182.958 731.353 185.387C730.268 187.817 728.773 189.812 726.871 191.371C724.967 192.932 722.708 194.093 720.095 194.856C717.481 195.617 714.572 196 711.371 196C708.168 196 705.26 195.617 702.646 194.856C700.031 194.093 697.773 192.922 695.87 191.345C693.966 189.767 692.473 187.772 691.388 185.359C690.303 182.949 689.707 180.094 689.6 176.796V175.838Z"/><path d="M743.705 161.048V194.829H738.476V157.591H747.601L771.824 191.371V157.591H777V194.829H767.822L743.705 161.048Z"/><path d="M35.4454 188.561V7.4402C11.8298 30.8761 0 60.9781 0 97.7847C0 134.589 11.8218 164.842 35.4454 188.561Z"/><path d="M250.697 64.5839H294.359C291.139 49.8559 284.815 37.4966 275.381 27.506C265.947 17.5181 255.23 10.4093 243.238 6.17701C239.044 4.70022 234.721 3.49593 230.28 2.53488V43.3944C231.212 43.869 232.134 44.3621 233.036 44.8965C241.154 49.7083 247.039 56.2721 250.697 64.5839Z"/><path d="M137.468 92.7451V122.278H187.497C184.858 133.759 179.256 142.493 170.69 148.455C170.235 148.778 169.767 149.089 169.286 149.4C159.928 155.387 149.322 158.367 137.468 158.367C131.047 158.367 125.029 157.551 119.44 155.919C110.277 153.236 102.244 148.377 95.3432 141.314C84.2293 129.936 78.6671 115.5 78.6671 97.993C78.6671 80.3566 84.1907 65.9211 95.2392 54.685C102.076 47.7131 110.147 42.9185 119.453 40.276C125.146 38.6424 131.294 37.8395 137.911 37.8395C148.581 37.8395 157.992 40.2494 166.102 45.0573C167.57 45.9253 168.962 46.8451 170.287 47.8301C176.279 52.2884 180.776 57.9376 183.766 64.7407H227.424C225.332 55.1648 221.926 46.5992 217.196 39.0318C214.675 34.9497 211.749 31.1521 208.448 27.6668C199.012 17.6749 188.302 10.5741 176.305 6.3365C174.356 5.64928 172.367 5.01523 170.366 4.44498C160.045 1.47679 149.01 6.07525e-06 137.247 6.07525e-06C106.976 6.07525e-06 82.4361 9.10929 63.6415 27.3425C44.8468 45.5757 35.4502 69.1219 35.4502 97.993C35.4502 126.58 44.6655 150.061 63.0962 168.436C81.5269 186.812 104.636 195.999 132.425 195.999C144.656 195.999 155.574 194.198 165.179 190.583C168.546 189.326 171.743 187.848 174.771 186.151C186.469 179.594 195.684 170.911 202.417 160.118L202.859 195.947C212.932 195.65 222.082 194.083 230.284 191.257V92.7451H137.468Z"/><path d="M297.209 92.5828V195.837H269.784L269.342 159.955C262.622 170.749 253.407 179.431 241.696 185.989C238.135 187.997 234.3 189.656 230.284 191.042V152.517C232.312 151.532 234.3 150.469 236.211 149.238C245.57 143.264 251.652 134.219 254.421 122.116H230.284V92.5828H297.209Z"/></symbol><symbol id="gid-id-icon" viewBox="0 0 64 64"><defs><radialGradient id="gid-id-icon-g" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse"><stop stop-color="#8FBADD"/><stop offset="1" stop-color="#4B8FD6"/></radialGradient></defs><rect width="64" height="64" rx="14.8" fill="url(#gid-id-icon-g)"/><g transform="translate(10.00 10.00) scale(0.6875)"><path d="M6 23A17 17 0 1 0 40 23A17 17 0 1 0 6 23ZM14.5 23A8.5 8.5 0 1 0 31.5 23A8.5 8.5 0 1 0 14.5 23Z" fill="#ffffff" fill-rule="evenodd"/><path d="M33 33L55 55M44 44L38.5 49.5M51 51L45.5 56.5" fill="none" stroke="#ffffff" stroke-width="7.5" stroke-linecap="round"/><circle cx="23" cy="23" r="4.5" fill="rgba(255,255,255,0.7)"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="gi-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/> <path d="M19 12H5"/></symbol><symbol id="gi-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></symbol><symbol id="gi-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="gi-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="gi-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol><symbol id="gi-circle-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/> <line x1="12" x2="12" y1="8" y2="12"/> <line x1="12" x2="12.01" y1="16" y2="16"/></symbol><symbol id="gi-circle-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/> <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/> <path d="M12 17h.01"/></symbol><symbol id="gi-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/> <circle cx="12" cy="12" r="3"/></symbol><symbol id="gi-eye-off" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/> <path d="m2 2 20 20"/></symbol><symbol id="gi-fingerprint" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/> <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/> <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/> <path d="M2 12a10 10 0 0 1 18-6"/> <path d="M2 16h.01"/> <path d="M21.8 16c.2-2 .131-5.354 0-6"/> <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/> <path d="M8.65 22c.21-.66.45-1.32.57-2"/> <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol><symbol id="gi-key-round" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/> <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="gi-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/> <rect width="7" height="7" x="14" y="3" rx="1"/> <rect width="7" height="7" x="14" y="14" rx="1"/> <rect width="7" height="7" x="3" y="14" rx="1"/></symbol><symbol id="gi-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/> <polyline points="16 17 21 12 16 7"/> <line x1="21" x2="9" y1="12" y2="12"/></symbol><symbol id="gi-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/> <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol><symbol id="gi-refresh-cw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/> <path d="M21 3v5h-5"/> <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/> <path d="M8 16H3v5"/></symbol><symbol id="gi-scan-face" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/> <path d="M17 3h2a2 2 0 0 1 2 2v2"/> <path d="M21 17v2a2 2 0 0 1-2 2h-2"/> <path d="M7 21H5a2 2 0 0 1-2-2v-2"/> <path d="M8 14s1.5 2 4 2 4-2 4-2"/> <path d="M9 9h.01"/> <path d="M15 9h.01"/></symbol><symbol id="gi-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/> <path d="m21.854 2.147-10.94 10.939"/></symbol><symbol id="gi-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/> <path d="m9 12 2 2 4-4"/></symbol><symbol id="gi-user-round-plus" viewBox="0 0 24 24"><path d="M2 21a8 8 0 0 1 13.292-6"/> <circle cx="10" cy="8" r="5"/> <path d="M19 16v6"/> <path d="M22 19h-6"/></symbol><symbol id="gid-logo" viewBox="0 0 777 196"><path d="M376.927 125.512C375.504 127.427 373.512 129.014 370.95 130.273C368.39 131.532 365.064 132.162 360.972 132.162C357.629 132.162 354.64 131.727 352.009 130.859C349.375 129.99 347.144 128.731 345.312 127.082C343.478 125.432 342.084 123.429 341.123 121.071C340.163 118.713 339.683 116.026 339.683 113.01V112C339.683 108.844 340.163 106.06 341.123 103.647C342.084 101.236 343.478 99.206 345.312 97.5564C347.144 95.9081 349.375 94.6666 352.009 93.8332C354.64 92.9998 357.629 92.5824 360.972 92.5824C366.629 92.5824 371.226 93.7348 374.766 96.0411C378.304 98.346 380.465 101.822 381.248 106.468H375.593C375.236 105.084 374.64 103.816 373.804 102.663C372.97 101.511 371.919 100.535 370.656 99.7377C369.394 98.9401 367.953 98.3194 366.335 97.8754C364.716 97.4328 362.929 97.2108 360.972 97.2108C358.375 97.2108 356.09 97.583 354.116 98.3274C352.142 99.0717 350.495 100.119 349.181 101.467C347.863 102.815 346.877 104.419 346.218 106.282C345.56 108.144 345.232 110.209 345.232 112.478C345.232 114.642 345.56 116.647 346.218 118.489C346.877 120.334 347.863 121.921 349.181 123.251C350.495 124.581 352.142 125.627 354.116 126.389C356.09 127.153 358.375 127.533 360.972 127.533C363.462 127.533 365.633 127.25 367.482 126.683C369.331 126.115 370.906 125.335 372.204 124.342C373.503 123.349 374.534 122.206 375.299 120.911C376.064 119.616 376.571 118.242 376.82 116.788H356.598V112H382.156V130.939H376.927V125.512Z"/><path d="M420.839 126.31V130.991H389.145V93.7526H394.374V126.31H420.839Z"/><path d="M445.81 97.2637C443.356 97.2637 441.122 97.5827 439.115 98.2208C437.104 98.8601 435.396 99.8092 433.991 101.068C432.586 102.327 431.502 103.906 430.737 105.803C429.971 107.7 429.59 109.925 429.59 112.48C429.59 114.927 429.971 117.08 430.737 118.942C431.502 120.805 432.586 122.365 433.991 123.624C435.396 124.883 437.104 125.84 439.115 126.496C441.122 127.153 443.356 127.48 445.81 127.48C448.265 127.48 450.496 127.162 452.506 126.523C454.516 125.885 456.223 124.936 457.628 123.677C459.033 122.418 460.118 120.856 460.884 118.995C461.648 117.135 462.03 114.961 462.03 112.48C462.03 110.032 461.648 107.868 460.884 105.989C460.118 104.109 459.033 102.522 457.628 101.228C456.223 99.9342 454.516 98.9492 452.506 98.2753C450.496 97.6014 448.265 97.2637 445.81 97.2637ZM424.04 112C424.148 108.63 424.742 105.723 425.828 103.276C426.913 100.829 428.406 98.8163 430.31 97.2371C432.212 95.6607 434.471 94.4896 437.085 93.7266C439.7 92.965 442.608 92.5835 445.81 92.5835C449.011 92.5835 451.92 92.9822 454.535 93.7798C457.148 94.5773 459.406 95.775 461.31 97.3701C463.213 98.9665 464.707 100.979 465.793 103.409C466.878 105.839 467.473 108.702 467.581 112V112.958C467.473 116.256 466.878 119.12 465.793 121.549C464.707 123.979 463.213 125.974 461.31 127.535C459.406 129.095 457.148 130.255 454.535 131.018C451.92 131.78 449.011 132.162 445.81 132.162C442.608 132.162 439.7 131.78 437.085 131.018C434.471 130.255 432.212 129.086 430.31 127.507C428.406 125.929 426.913 123.934 425.828 121.522C424.742 119.111 424.148 116.256 424.04 112.958V112Z"/><path d="M478.145 126.31H497.726C499.541 126.31 501.016 126.16 502.155 125.858C503.294 125.557 504.174 125.112 504.796 124.529C505.419 123.942 505.845 123.243 506.077 122.427C506.308 121.611 506.424 120.707 506.424 119.714C506.424 118.685 506.317 117.78 506.104 117C505.891 116.221 505.464 115.547 504.824 114.979C504.183 114.412 503.284 113.986 502.13 113.702C500.972 113.419 499.453 113.277 497.566 113.277H478.145V126.31ZM478.145 108.595H495.753C497.282 108.595 498.598 108.524 499.7 108.382C500.803 108.241 501.702 107.976 502.395 107.585C503.09 107.195 503.604 106.653 503.943 105.962C504.281 105.271 504.449 104.392 504.449 103.328C504.449 102.265 504.263 101.405 503.89 100.748C503.516 100.093 502.964 99.596 502.235 99.2584C501.507 98.9221 500.59 98.7001 499.487 98.5937C498.385 98.4874 497.103 98.4342 495.646 98.4342H478.145V108.595ZM512.08 120.139C512.08 124.005 510.861 126.78 508.425 128.464C505.988 130.15 502.422 130.991 497.726 130.991H472.916V93.7526H496.233C498.331 93.7526 500.226 93.8856 501.915 94.1514C503.604 94.4173 505.055 94.8958 506.264 95.5883C507.473 96.2795 508.407 97.202 509.065 98.3545C509.724 99.5069 510.053 100.988 510.053 102.797C510.053 104.712 509.644 106.281 508.825 107.505C508.007 108.728 506.959 109.713 505.677 110.457C507.775 111.202 509.366 112.312 510.453 113.782C511.537 115.253 512.08 117.373 512.08 120.139Z"/><path d="M528.461 115.032H546.655L537.585 96.6245L528.461 115.032ZM526.113 119.713L520.564 130.992H514.747L533.156 93.7534H542.014L560.422 130.992H554.552L549.003 119.713H526.113Z"/><path d="M596.385 126.31V130.991H564.691V93.7526H569.92V126.31H596.385Z"/><path d="M376.927 189.35C375.504 191.265 373.512 192.852 370.95 194.11C368.39 195.369 365.064 196 360.972 196C357.629 196 354.64 195.565 352.009 194.697C349.375 193.828 347.144 192.568 345.312 190.92C343.478 189.27 342.084 187.267 341.123 184.909C340.163 182.549 339.683 179.864 339.683 176.848V175.838C339.683 172.681 340.163 169.898 341.123 167.485C342.084 165.074 343.478 163.043 345.312 161.395C347.144 159.745 349.375 158.503 352.009 157.67C354.64 156.837 357.629 156.421 360.972 156.421C366.629 156.421 371.226 157.573 374.766 159.879C378.304 162.184 380.465 165.66 381.248 170.306H375.593C375.236 168.921 374.64 167.654 373.804 166.5C372.97 165.348 371.919 164.373 370.656 163.576C369.394 162.778 367.953 162.158 366.335 161.714C364.716 161.271 362.929 161.048 360.972 161.048C358.375 161.048 356.09 161.421 354.116 162.165C352.142 162.91 350.495 163.956 349.181 165.304C347.863 166.653 346.877 168.256 346.218 170.118C345.56 171.982 345.232 174.048 345.232 176.317C345.232 178.479 345.56 180.484 346.218 182.326C346.877 184.171 347.863 185.758 349.181 187.089C350.495 188.418 352.142 189.465 354.116 190.227C356.09 190.99 358.375 191.372 360.972 191.372C363.462 191.372 365.633 191.087 367.482 190.521C369.331 189.953 370.906 189.173 372.204 188.179C373.503 187.187 374.534 186.043 375.299 184.749C376.064 183.453 376.571 182.08 376.82 180.625H356.598V175.838H382.156V194.777H376.927V189.35Z"/><path d="M424.787 190.148V194.828H389.145V157.591H423.028V162.272H394.374V172.327H417.639V177.007H394.374V190.148H424.787Z"/><path d="M435.886 161.048V194.829H430.657V157.591H439.782L464.006 191.371V157.591H469.181V194.829H460.003L435.886 161.048Z"/><path d="M512.295 190.148V194.828H476.652V157.591H510.534V162.272H481.881V172.327H505.145V177.007H481.881V190.148H512.295Z"/><path d="M523.394 176.529H541.322C544.416 176.529 546.719 175.925 548.232 174.721C549.744 173.514 550.498 171.759 550.498 169.453C550.498 167.184 549.786 165.42 548.365 164.16C546.941 162.903 544.789 162.272 541.908 162.272H523.394V176.529ZM523.394 181.211V194.828H518.165V157.59H543.083C545.037 157.59 546.817 157.849 548.418 158.362C550.018 158.876 551.38 159.639 552.5 160.648C553.621 161.66 554.491 162.928 555.115 164.454C555.737 165.98 556.049 167.752 556.049 169.773C555.942 172.752 555.222 175.11 553.887 176.848C552.553 178.586 550.713 179.81 548.365 180.519L556.635 194.776H550.498L542.763 181.211H523.394Z"/><path d="M573.549 178.869H591.743L582.673 160.463L573.549 178.869ZM571.201 183.552L565.652 194.829H559.835L578.244 157.591H587.102L605.51 194.829H599.64L594.091 183.552H571.201Z"/><path d="M628.934 162.273V194.829H623.705V162.273H607.11V157.59H645.581V162.273H628.934Z"/><path d="M684.798 190.148V194.828H650.382V190.148H664.843V162.272H650.382V157.591H684.798V162.272H670.072V190.148H684.798Z"/><path d="M711.371 161.102C708.916 161.102 706.683 161.421 704.674 162.059C702.664 162.698 700.957 163.646 699.551 164.905C698.146 166.165 697.062 167.743 696.297 169.639C695.532 171.537 695.15 173.763 695.15 176.317C695.15 178.763 695.532 180.918 696.297 182.779C697.062 184.641 698.146 186.202 699.551 187.46C700.957 188.721 702.664 189.678 704.674 190.333C706.683 190.991 708.916 191.317 711.371 191.317C713.825 191.317 716.057 191 718.066 190.361C720.077 189.723 721.783 188.774 723.188 187.514C724.594 186.256 725.679 184.694 726.444 182.833C727.209 180.972 727.591 178.798 727.591 176.317C727.591 173.869 727.209 171.706 726.444 169.827C725.679 167.946 724.594 166.36 723.188 165.064C721.783 163.771 720.077 162.787 718.066 162.113C716.057 161.439 713.825 161.102 711.371 161.102ZM689.6 175.838C689.707 172.468 690.303 169.56 691.388 167.114C692.473 164.665 693.966 162.653 695.87 161.075C697.773 159.499 700.031 158.327 702.646 157.565C705.26 156.802 708.168 156.421 711.371 156.421C714.572 156.421 717.481 156.82 720.095 157.618C722.708 158.414 724.967 159.612 726.871 161.208C728.773 162.803 730.268 164.817 731.353 167.247C732.438 169.677 733.033 172.538 733.141 175.838V176.796C733.033 180.094 732.438 182.958 731.353 185.387C730.268 187.817 728.773 189.812 726.871 191.371C724.967 192.932 722.708 194.093 720.095 194.856C717.481 195.617 714.572 196 711.371 196C708.168 196 705.26 195.617 702.646 194.856C700.031 194.093 697.773 192.922 695.87 191.345C693.966 189.767 692.473 187.772 691.388 185.359C690.303 182.949 689.707 180.094 689.6 176.796V175.838Z"/><path d="M743.705 161.048V194.829H738.476V157.591H747.601L771.824 191.371V157.591H777V194.829H767.822L743.705 161.048Z"/><path d="M35.4454 188.561V7.4402C11.8298 30.8761 0 60.9781 0 97.7847C0 134.589 11.8218 164.842 35.4454 188.561Z"/><path d="M250.697 64.5839H294.359C291.139 49.8559 284.815 37.4966 275.381 27.506C265.947 17.5181 255.23 10.4093 243.238 6.17701C239.044 4.70022 234.721 3.49593 230.28 2.53488V43.3944C231.212 43.869 232.134 44.3621 233.036 44.8965C241.154 49.7083 247.039 56.2721 250.697 64.5839Z"/><path d="M137.468 92.7451V122.278H187.497C184.858 133.759 179.256 142.493 170.69 148.455C170.235 148.778 169.767 149.089 169.286 149.4C159.928 155.387 149.322 158.367 137.468 158.367C131.047 158.367 125.029 157.551 119.44 155.919C110.277 153.236 102.244 148.377 95.3432 141.314C84.2293 129.936 78.6671 115.5 78.6671 97.993C78.6671 80.3566 84.1907 65.9211 95.2392 54.685C102.076 47.7131 110.147 42.9185 119.453 40.276C125.146 38.6424 131.294 37.8395 137.911 37.8395C148.581 37.8395 157.992 40.2494 166.102 45.0573C167.57 45.9253 168.962 46.8451 170.287 47.8301C176.279 52.2884 180.776 57.9376 183.766 64.7407H227.424C225.332 55.1648 221.926 46.5992 217.196 39.0318C214.675 34.9497 211.749 31.1521 208.448 27.6668C199.012 17.6749 188.302 10.5741 176.305 6.3365C174.356 5.64928 172.367 5.01523 170.366 4.44498C160.045 1.47679 149.01 6.07525e-06 137.247 6.07525e-06C106.976 6.07525e-06 82.4361 9.10929 63.6415 27.3425C44.8468 45.5757 35.4502 69.1219 35.4502 97.993C35.4502 126.58 44.6655 150.061 63.0962 168.436C81.5269 186.812 104.636 195.999 132.425 195.999C144.656 195.999 155.574 194.198 165.179 190.583C168.546 189.326 171.743 187.848 174.771 186.151C186.469 179.594 195.684 170.911 202.417 160.118L202.859 195.947C212.932 195.65 222.082 194.083 230.284 191.257V92.7451H137.468Z"/><path d="M297.209 92.5828V195.837H269.784L269.342 159.955C262.622 170.749 253.407 179.431 241.696 185.989C238.135 187.997 234.3 189.656 230.284 191.042V152.517C232.312 151.532 234.3 150.469 236.211 149.238C245.57 143.264 251.652 134.219 254.421 122.116H230.284V92.5828H297.209Z"/></symbol><symbol id="gid-id-icon" viewBox="0 0 64 64"><defs><radialGradient id="gid-id-icon-g" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse"><stop stop-color="#8FBADD"/><stop offset="1" stop-color="#4B8FD6"/></radialGradient></defs><rect width="64" height="64" rx="14.8" fill="url(#gid-id-icon-g)"/><g transform="translate(10.00 10.00) scale(0.6875)"><path d="M6 23A17 17 0 1 0 40 23A17 17 0 1 0 6 23ZM14.5 23A8.5 8.5 0 1 0 31.5 23A8.5 8.5 0 1 0 14.5 23Z" fill="#ffffff" fill-rule="evenodd"/><path d="M33 33L55 55M44 44L38.5 49.5M51 51L45.5 56.5" fill="none" stroke="#ffffff" stroke-width="7.5" stroke-linecap="round"/><circle cx="23" cy="23" r="4.5" fill="rgba(255,255,255,0.7)"/></g></symbol></svg>
 <template id="tpl-lockup"><div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div></template>
-<template id="tpl-shell"><div class="gid" data-layout="split"><div class="gid-frame"><aside class="gid-aside"><div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div><div class="gid-mq" aria-hidden="true"><div class="gid-mq-row"><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span></div><div class="gid-mq-row"><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span></div><div class="gid-mq-row"><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span></div><div class="gid-mq-row"><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span></div><div class="gid-mq-row"><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span><span>Инфра-косты</span><span>CRM-чаты</span><span>LLM-расходы</span><span>Анкета</span><span>АКБ</span><span>Пульс</span><span>Кабинет ментора</span><span>Студенческий портал</span><span>Юротдел</span><span>Бухгалтерия</span><span>Онбординг</span><span>Репортер</span><span>Стратегия</span><span>Продакшн</span><span>Фабрика роликов</span><span>YouTube-трекер</span><span>Маяк</span><span>Notetaker</span><span>Консультации</span><span>Структура команды</span></div></div><div class="gid-aside-copy"><p class="gid-aside-title">Один вход во все сервисы Global&nbsp;Generation</p><p class="gid-aside-sub">АКБ, Пульс, Кабинет ментора, Юротдел, Продакшн и остальные сервисы команды открываются с одним GG ID. Без отдельного пароля в каждом.</p></div></aside><main class="gid-main"><section class="gid-card" data-gid-screen=""></section><footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer></main></div></div></template>
+<template id="tpl-shell"><div class="gid" data-layout="split"><div class="gid-frame"><aside class="gid-aside"><div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div><div class="gid-aside-hero"><div class="gid-hero" aria-hidden="true"><div class="gid-hero-hang"><div class="gid-hero-lan"><span class="gid-hero-strap"></span><svg class="gid-hero-clip" viewBox="0 0 30 36"><rect x="4" y="2" width="22" height="16" rx="6"/><rect class="bar" x="11.5" y="14" width="7" height="22" rx="2.5"/></svg></div><div class="gid-hero-holder"><span class="gid-hero-gloss"></span><article class="gid-idcard gid-idcard--hero"><span class="gid-idcard-holo" aria-hidden="true"></span><div class="gid-idcard-top"><div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div><span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span></div><p class="gid-idcard-big">GG ID</p><div class="gid-idcard-bot"><div class="gid-idcard-who"><p class="gid-idcard-name" data-gid-field="name">Имя Фамилия</p><ul class="gid-idcard-roles" data-gid-field="positions"><li>Должность</li></ul><p class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</p></div><svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="https://id.global-generations-edu.com/v/GG-0042-7F3A" viewBox="0 0 37 37" role="img" aria-label="QR-код GG ID"><path fill="#13445d" d=""/></svg></div></article></div></div></div></div><div class="gid-aside-copy"><p class="gid-aside-title">Один вход во все сервисы Global&nbsp;Generation</p><p class="gid-aside-sub">АКБ, Пульс, Кабинет ментора, Юротдел, Продакшн и остальные сервисы команды открываются с одним GG ID. Без отдельного пароля в каждом.</p></div></aside><main class="gid-main"><section class="gid-card" data-gid-screen=""></section><footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer></main></div></div></template>
 <template id="scr-login"><h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
   <p class="gid-sub">Один вход GG ID открывает все сервисы команды Global Generation.</p>
   <div class="gid-stack">
@@ -1007,7 +1070,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
       </div>
     </div>
-    <button class="gid-btn gid-btn--primary" type="submit">Войти</button>
+    <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти</span></button>
   </form>
   <div class="gid-or"><span>или</span></div>
   <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button></template>
@@ -1027,7 +1090,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       </div>
     </div>
     <div class="gid-msg gid-msg--error" role="alert" data-gid-error><svg class="gid-ic" aria-hidden="true"><use href="#gi-circle-alert"/></svg><span data-gid-error-text>Неверная почта или пароль. Проверьте раскладку и Caps Lock.</span></div>
-    <button class="gid-btn gid-btn--primary" type="submit">Войти</button>
+    <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти</span></button>
   </form>
   <div class="gid-or"><span>или</span></div>
   <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button></template>
@@ -1049,8 +1112,8 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <template id="scr-continue"><h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
   <p class="gid-sub">Вы уже вошли в GG ID на этом устройстве.</p>
   <a class="gid-account" data-go="done">
-    <span class="gid-avatar" aria-hidden="true">ЛА</span>
-    <span class="gid-account-tx"><b>Лёв Авдошин</b><span>lev@global-generations.com</span></span>
+    <span class="gid-avatar" aria-hidden="true">ИО</span>
+    <span class="gid-account-tx"><b>Иван Образцов</b><span>ivan.obraztsov@global-generations.com</span></span>
     <svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-right"/></svg>
   </a>
   <div class="gid-alt"><a class="gid-link" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-user-round-plus"/></svg>Войти в другой аккаунт</a></div></template>
@@ -1069,7 +1132,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         placeholder="имя@global-generations.com" data-gid-domain="global-generations.com">
       <p class="gid-hint is-error" data-gid-domain-hint hidden>Ссылка приходит только на рабочую почту @global-generations.com</p>
     </div>
-    <button class="gid-btn gid-btn--primary" type="submit">Отправить ссылку</button>
+    <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-send"/></svg><span>Отправить ссылку</span></button>
   </form>
   <div class="gid-alt"><a class="gid-link gid-link--muted" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-left"/></svg>Вернуться ко входу</a></div></template>
 <template id="scr-sent"><h1 class="gid-h">Проверьте почту</h1>
@@ -1103,7 +1166,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         <button class="gid-eye" type="button" data-gid-eye aria-pressed="false" aria-label="Показать пароль"><svg class="gid-ic" data-on aria-hidden="true"><use href="#gi-eye"/></svg><svg class="gid-ic" data-off aria-hidden="true"><use href="#gi-eye-off"/></svg></button>
       </div>
     </div>
-    <button class="gid-btn gid-btn--primary" type="submit">Сохранить пароль</button>
+    <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-check"/></svg><span>Сохранить пароль</span></button>
   </form></template>
 <template id="scr-saved"><h1 class="gid-h">Пароль сохранён</h1>
   <p class="gid-sub">Теперь войдите с новым паролем. После входа на этом устройстве можно будет подключить Face ID.</p>
@@ -1152,18 +1215,16 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <template id="scr-card"><h1 class="gid-h">Ваш GG ID</h1>
   <p class="gid-sub">Один вход во все сервисы Global Generation. Карточка всегда под рукой в «Моих сервисах».</p>
   <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
+    <span class="gid-idcard-holo" aria-hidden="true"></span>
     <div class="gid-idcard-top">
       <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
-      <span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>
+      <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
     </div>
-    <div class="gid-idcard-person">
-      <span class="gid-idcard-photo" data-gid-field="initials" aria-hidden="true">ИО</span>
-      <div class="gid-idcard-who">
-        <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
-        <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
-        <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
-        <p class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</p>
-      </div>
+    <div class="gid-idcard-who">
+      <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
+      <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+      <p class="gid-idcard-mail" data-gid-field="email">ivan.obraztsov<wbr><span>@global-generations.com</span></p>
+      <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>
     </div>
     <div class="gid-idcard-facts">
       <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
@@ -1274,6 +1335,9 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       root.querySelectorAll('[data-gid-passkey]').forEach(function (el) { el.textContent = passkeyText(el.getAttribute('data-gid-passkey'), kind); });
       root.querySelectorAll('[data-gid-passkey-icon] use').forEach(function (u) { u.setAttribute('href', '#gi-' + PASSKEY_ICON[kind]); });
     }
+
+    // QR-код карты GG ID: <svg data-gid-qr="адрес">.
+    root.querySelectorAll('svg[data-gid-qr]').forEach(qrDraw);
 
     // Глаз в поле пароля.
     root.querySelectorAll('[data-gid-eye]').forEach(function (b) {
@@ -1387,6 +1451,144 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     });
   }
 
+  // QR-код карты GG ID (байтовый режим, уровень M, версии 1-10), без зависимостей и без сети.
+  // <svg data-gid-qr="https://..."><path/></svg> рисуется сам при GGID.init; GGID.card(el, {qr}) меняет адрес.
+  var QR = (function () {
+    var LEVEL = { L: [1, 0], M: [0, 1], Q: [3, 2], H: [2, 3] };
+    var ECW = [[-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18], [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26],
+               [-1, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24], [-1, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28]];
+    var NB = [[-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4], [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5],
+              [-1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8], [-1, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8]];
+    function raw(v) { var r = (16 * v + 128) * v + 64; if (v >= 2) { var n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; }
+    function dataCW(v, li) { return Math.floor(raw(v) / 8) - ECW[li][v] * NB[li][v]; }
+    function mul(x, y) { var z = 0; for (var i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; }
+    function rsDiv(deg) {
+      var r = []; for (var k = 0; k < deg; k++) r.push(0); r[deg - 1] = 1; var root = 1;
+      for (var i = 0; i < deg; i++) { for (var j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = mul(root, 2); }
+      return r;
+    }
+    function rsRem(data, div) {
+      var r = div.map(function () { return 0; });
+      data.forEach(function (b) { var f = b ^ r.shift(); r.push(0); div.forEach(function (c, i) { r[i] ^= mul(c, f); }); });
+      return r;
+    }
+    function penalty(M, n) {
+      var r = 0;
+      function add(len, h) { if (h[0] === 0) len += n; h.pop(); h.unshift(len); }
+      function cnt(h) {
+        var k = h[1], core = k > 0 && h[2] === k && h[3] === k * 3 && h[4] === k && h[5] === k;
+        return (core && h[0] >= k * 4 && h[6] >= k ? 1 : 0) + (core && h[6] >= k * 4 && h[0] >= k ? 1 : 0);
+      }
+      function term(c, len, h) { if (c) { add(len, h); len = 0; } len += n; add(len, h); return cnt(h); }
+      for (var pass = 0; pass < 2; pass++) for (var a = 0; a < n; a++) {
+        var c = false, run = 0, h = [0, 0, 0, 0, 0, 0, 0];
+        for (var b = 0; b < n; b++) {
+          var m = pass ? M[b][a] : M[a][b];
+          if (m === c) { run++; if (run === 5) r += 3; else if (run > 5) r++; } else { add(run, h); if (!c) r += cnt(h) * 40; c = m; run = 1; }
+        }
+        r += term(c, run, h) * 40;
+      }
+      for (var y = 0; y < n - 1; y++) for (var x = 0; x < n - 1; x++) {
+        var q = M[y][x]; if (q === M[y][x + 1] && q === M[y + 1][x] && q === M[y + 1][x + 1]) r += 3;
+      }
+      var dark = 0; M.forEach(function (row) { row.forEach(function (v) { if (v) dark++; }); });
+      var total = n * n; r += (Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1) * 10;
+      return r;
+    }
+    function encode(text) {
+      var fb = LEVEL.M[0], li = LEVEL.M[1];
+      var bytes = Array.from(new TextEncoder().encode(text));
+      var v = 1, cap = 0;
+      for (; v <= 10; v++) { cap = dataCW(v, li) * 8; if (4 + (v < 10 ? 8 : 16) + bytes.length * 8 <= cap) break; }
+      if (v > 10) throw new Error('QR: строка слишком длинная');
+      var bits = [];
+      function put(val, len) { for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); }
+      put(4, 4); put(bytes.length, v < 10 ? 8 : 16); bytes.forEach(function (b) { put(b, 8); });
+      put(0, Math.min(4, cap - bits.length)); put(0, (8 - bits.length % 8) % 8);
+      for (var pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+      var data = [];
+      for (var i = 0; i < bits.length; i += 8) { var by = 0; for (var j = 0; j < 8; j++) by = (by << 1) | bits[i + j]; data.push(by); }
+      var nb = NB[li][v], ecl = ECW[li][v], rawCW = Math.floor(raw(v) / 8), nShort = nb - rawCW % nb, shortLen = Math.floor(rawCW / nb);
+      var div = rsDiv(ecl), blocks = [];
+      for (var bi = 0, k = 0; bi < nb; bi++) {
+        var dat = data.slice(k, k + shortLen - ecl + (bi < nShort ? 0 : 1)); k += dat.length;
+        var ecc = rsRem(dat, div); if (bi < nShort) dat.push(0); blocks.push(dat.concat(ecc));
+      }
+      var cw = [];
+      for (var ci = 0; ci < blocks[0].length; ci++) blocks.forEach(function (bl, jj) { if (ci !== shortLen - ecl || jj >= nShort) cw.push(bl[ci]); });
+      var n = v * 4 + 17, M = [], F = [];
+      for (var row = 0; row < n; row++) { M.push([]); F.push([]); for (var col = 0; col < n; col++) { M[row].push(false); F[row].push(false); } }
+      function set(x, y, d) { M[y][x] = d; F[y][x] = true; }
+      for (var t = 0; t < n; t++) { set(6, t, t % 2 === 0); set(t, 6, t % 2 === 0); }
+      function finder(cx, cy) {
+        for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) {
+          var x = cx + dx, y = cy + dy;
+          if (x >= 0 && x < n && y >= 0 && y < n) { var dd = Math.max(Math.abs(dx), Math.abs(dy)); set(x, y, dd !== 2 && dd !== 4); }
+        }
+      }
+      finder(3, 3); finder(n - 4, 3); finder(3, n - 4);
+      var ap = [];
+      if (v > 1) { var na = Math.floor(v / 7) + 2, step = Math.ceil((v * 4 + 4) / (na * 2 - 2)) * 2; ap.push(6); for (var pp = n - 7; ap.length < na; pp -= step) ap.splice(1, 0, pp); }
+      for (var ai = 0; ai < ap.length; ai++) for (var aj = 0; aj < ap.length; aj++) {
+        if ((ai === 0 && aj === 0) || (ai === 0 && aj === ap.length - 1) || (ai === ap.length - 1 && aj === 0)) continue;
+        for (var ey = -2; ey <= 2; ey++) for (var ex = -2; ex <= 2; ex++) set(ap[ai] + ex, ap[aj] + ey, Math.max(Math.abs(ex), Math.abs(ey)) !== 1);
+      }
+      function format(mask) {
+        var d = fb << 3 | mask, rem = d;
+        for (var fi = 0; fi < 10; fi++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+        var b = (d << 10 | rem) ^ 0x5412;
+        function g(q) { return ((b >>> q) & 1) !== 0; }
+        for (var a1 = 0; a1 <= 5; a1++) set(8, a1, g(a1));
+        set(8, 7, g(6)); set(8, 8, g(7)); set(7, 8, g(8));
+        for (var a2 = 9; a2 < 15; a2++) set(14 - a2, 8, g(a2));
+        for (var a3 = 0; a3 < 8; a3++) set(n - 1 - a3, 8, g(a3));
+        for (var a4 = 8; a4 < 15; a4++) set(8, n - 15 + a4, g(a4));
+        set(8, n - 8, true);
+      }
+      format(0);
+      if (v >= 7) {
+        var vr = v; for (var vi = 0; vi < 12; vi++) vr = (vr << 1) ^ ((vr >>> 11) * 0x1F25);
+        var vb = v << 12 | vr;
+        for (var vk = 0; vk < 18; vk++) { var vc = ((vb >>> vk) & 1) !== 0, va = n - 11 + vk % 3, vbb = Math.floor(vk / 3); set(va, vbb, vc); set(vbb, va, vc); }
+      }
+      var bit = 0;
+      for (var right = n - 1; right >= 1; right -= 2) {
+        if (right === 6) right = 5;
+        for (var vert = 0; vert < n; vert++) for (var jx = 0; jx < 2; jx++) {
+          var x2 = right - jx, up = ((right + 1) & 2) === 0, y2 = up ? n - 1 - vert : vert;
+          if (!F[y2][x2] && bit < cw.length * 8) { M[y2][x2] = ((cw[bit >>> 3] >>> (7 - (bit & 7))) & 1) !== 0; bit++; }
+        }
+      }
+      var MASK = [function (x, y) { return (x + y) % 2 === 0; }, function (x, y) { return y % 2 === 0; }, function (x) { return x % 3 === 0; },
+        function (x, y) { return (x + y) % 3 === 0; }, function (x, y) { return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; },
+        function (x, y) { return x * y % 2 + x * y % 3 === 0; }, function (x, y) { return (x * y % 2 + x * y % 3) % 2 === 0; },
+        function (x, y) { return ((x + y) % 2 + x * y % 3) % 2 === 0; }];
+      function apply(m) { for (var yy = 0; yy < n; yy++) for (var xx = 0; xx < n; xx++) if (!F[yy][xx] && MASK[m](xx, yy)) M[yy][xx] = !M[yy][xx]; }
+      var best = 0, bestP = Infinity;
+      for (var mm = 0; mm < 8; mm++) { apply(mm); format(mm); var pen = penalty(M, n); if (pen < bestP) { bestP = pen; best = mm; } apply(mm); }
+      apply(best); format(best);
+      return { size: n, version: v, mask: best, get: function (x, y) { return M[y][x]; } };
+    }
+    return { encode: encode };
+  })();
+  function qrDraw(svg) {
+    var text = svg && svg.getAttribute('data-gid-qr');
+    if (!text) return;
+    var q = QR.encode(text), n = q.size, b = 4, d = '';
+    for (var y = 0; y < n; y++) {
+      var x = 0;
+      while (x < n) {
+        if (q.get(x, y)) { var e = x; while (e < n && q.get(e, y)) e++; d += 'M' + (x + b) + ' ' + (y + b) + 'h' + (e - x) + 'v1h' + (x - e) + 'z'; x = e; }
+        else x++;
+      }
+    }
+    var size = n + 2 * b, path = svg.querySelector('path');
+    if (!path) { path = document.createElementNS('http://www.w3.org/2000/svg', 'path'); path.setAttribute('fill', '#13445d'); svg.appendChild(path); }
+    svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+    svg.setAttribute('shape-rendering', 'crispEdges');
+    path.setAttribute('d', d);
+  }
+
   // Карточка GG ID (.gid-idcard) и компактная строка (.gid-idrow): заполнить поля [data-gid-field] данными хаба.
   // Только textContent, поэтому имя или должность с разметкой остаются текстом. Контракт данных: README.md, «Карточка GG ID».
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -1435,13 +1637,15 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       el.textContent = on ? 'Активен' : 'Отключён';
     });
     each('passkey', function (el) { el.hidden = !d.passkey; });
+    each('qr', function (el) { if (d.qr) { el.setAttribute('data-gid-qr', d.qr); qrDraw(el); } });
     if (root.hasAttribute && root.hasAttribute('aria-label') && d.name) root.setAttribute('aria-label', 'Global Generation ID: ' + d.name);
   }
 
   window.GGID = {
     init: init, busy: busy, shake: shake, error: error,
     passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
-    card: card, cardSince: cardSince, cardInitials: cardInitials
+    card: card, cardSince: cardSince, cardInitials: cardInitials,
+    qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); }
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
@@ -1674,6 +1878,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 (function () {
   'use strict';
   var META = [{"key": "login", "tab": "Вход", "title": "Вход", "lockup": true, "path": "", "when": "Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля.", "api": "GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()"}, {"key": "password", "tab": "По паролю", "title": "Вход по паролю", "lockup": true, "path": "", "when": "Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.", "api": "POST /api/auth/login"}, {"key": "error", "tab": "Ошибка", "title": "Неверный пароль", "lockup": true, "path": "", "when": "401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».", "api": "POST /api/auth/login: 401, 429"}, {"key": "passkey", "tab": "Face ID", "title": "Подтвердите вход", "lockup": true, "path": "", "when": "Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.", "api": "GGPasskey.login()"}, {"key": "done", "tab": "Готово", "title": "Вход выполнен", "lockup": false, "path": "", "when": "Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.", "api": "GET /api/auth/me, переход на next"}, {"key": "continue", "tab": "Продолжить как", "title": "Продолжить", "lockup": true, "path": "", "when": "Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.", "api": "GET /api/auth/authorize"}, {"key": "enroll", "tab": "Подключить Face ID", "title": "Вход без пароля", "lockup": true, "path": "", "when": "После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.", "api": "GGPasskey.register()"}, {"key": "forgot", "tab": "Забыли пароль", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "Восстановление по рабочей почте.", "api": "POST /api/auth/forgot"}, {"key": "sent", "tab": "Письмо отправлено", "title": "Проверьте почту", "lockup": true, "path": "", "when": "Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.", "api": "POST /api/auth/forgot: 200"}, {"key": "setpass", "tab": "Новый пароль", "title": "Задайте пароль", "lockup": true, "path": "", "when": "Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.", "api": "POST /api/auth/set-password/check, POST /api/auth/set-password"}, {"key": "saved", "tab": "Пароль сохранён", "title": "Пароль сохранён", "lockup": true, "path": "", "when": "После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.", "api": "POST /api/auth/set-password: 200"}, {"key": "resetoff", "tab": "Восстановление выключено", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.", "api": "GET /api/auth/capabilities"}, {"key": "expired", "tab": "Ссылка устарела", "title": "Ссылка не работает", "lockup": true, "path": "", "when": "Токен из ссылки устарел или уже использован.", "api": "POST /api/auth/set-password/check: ошибка"}, {"key": "noaccess", "tab": "Нет доступа", "title": "Нет доступа", "lockup": true, "path": "", "when": "Человек вошёл, но роли в этом сервисе у него нет.", "api": "GET /api/auth/me (level), entitlements"}, {"key": "pin", "tab": "Код доступа", "title": "Код доступа", "lockup": true, "path": "", "when": "Переходный вход по коду для сервисов, которые ещё не на GG ID.", "api": "sso-gate: PIN-ворота"}, {"key": "unavailable", "tab": "Недоступен", "title": "Вход временно недоступен", "lockup": true, "path": "", "when": "GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.", "api": "sso-gate: sso-unavailable"}, {"key": "signedout", "tab": "Вы вышли", "title": "Вы вышли", "lockup": true, "path": "", "when": "После «Выйти» в меню аккаунта.", "api": "POST /api/v1/sessions/revoke"}, {"key": "card", "tab": "Карточка GG ID", "title": "Ваш GG ID", "lockup": false, "path": "/cabinet/", "when": "Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.", "api": "GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()"}];
+  var HERO_DEMO = {"name": "Иван Образцов", "positions": ["Ментор", "Продажи"], "id": "GG 0042-7F3A", "qr": "https://id.global-generations-edu.com/v/GG-0042-7F3A"};   // «Продолжить как»: карта в панели оживает именем аккаунта
   var BY = {}; META.forEach(function (m, i) { m.n = ('0' + (i + 1)).slice(-2); BY[m.key] = m; });
   var st = { s: 'login', l: 'split', t: 'light', d: 'desktop', svc: 'АКБ' };
   var lastDevice = 'desktop';
@@ -1715,6 +1920,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     card.setAttribute('data-gid-screen', key);
     if (BY[key].lockup) card.appendChild(document.getElementById('tpl-lockup').content.cloneNode(true));
     card.appendChild(document.getElementById('scr-' + key).content.cloneNode(true));
+    if (key === 'continue') { var hc = g.querySelector('.gid-aside .gid-idcard'); if (hc) { GGID.card(hc, HERO_DEMO); hc.classList.add('is-alive'); } }
     g.querySelectorAll('[data-svc]').forEach(function (e) { e.textContent = st.svc; });
     g.querySelectorAll('a[data-go]').forEach(function (a) { a.setAttribute('href', '#' + a.getAttribute('data-go')); });
     return g;
