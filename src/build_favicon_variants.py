@@ -195,6 +195,19 @@ def pictogram(key, m, acc=SKY):
         return (f'<path d="{circ(32, 32, 29)}{circ(32, 32, 23)}" fill="{m}" fill-rule="evenodd"/>'
                 f'<path d="M45 19L36.95 36.95L27.05 27.05Z" fill="{acc}"/>'
                 f'<path d="M19 45L27.05 27.05L36.95 36.95Z" fill="{m}"/>'), ""
+    if key == "sat":  # лист теста и карандаш
+        lines = rr(17, 16, 20, 4.5, 2.25) + rr(17, 26, 20, 4.5, 2.25) + rr(17, 36, 12, 4.5, 2.25)
+        return (f'<path d="{rr(9, 6, 36, 50, 7)}{lines}" fill="{m}" fill-rule="evenodd"/>'
+                f'<path d="M37 53L55 35" stroke="{acc}" stroke-width="10" stroke-linecap="round"/>'), ""
+    if key == "ielts":  # реплика с тремя точками
+        dots = circ(18, 26, 3.6) + circ(30, 26, 3.6) + circ(42, 26, 3.6)
+        return (f'<path d="{rr(4, 8, 52, 36, 11)}{dots}" fill="{m}" fill-rule="evenodd"/>'
+                f'<path d="M15 40L12 57L30 40Z" fill="{m}"/>'
+                f'<circle cx="54" cy="50" r="7" fill="{acc}"/>'), ""
+    if key == "apply":  # анкета на планшете
+        rows = rr(20, 27, 24, 4.5, 2.25) + rr(20, 37, 24, 4.5, 2.25) + rr(20, 47, 15, 4.5, 2.25)
+        return (f'<path d="{rr(11, 9, 42, 52, 8)}{rows}" fill="{m}" fill-rule="evenodd"/>'
+                f'<path d="{rr(22, 3, 20, 12, 4)}" fill="{acc}"/>'), ""
     if key == "llm":
         defs = '<mask id="c"><rect width="64" height="64" fill="#fff"/><circle cx="40" cy="38" r="22" fill="#000"/></mask>'
         return (f'<circle cx="24" cy="26" r="18" fill="{m}" mask="url(#c)"/>'
@@ -393,6 +406,76 @@ def build_v9_icons(variants):
     ]
 
 
+# ---------- клиентские и внутренние: две семьи ----------
+
+CLIENT_SERVICES = [
+    dict(key="site", name="Сайт GG", note="global-generations.com", contour="student", color=GRAPHITE, client=True),
+    dict(key="portal", name="Студенческий портал", note="кабинет студента", contour="student", color="#2F9E62", client=True),
+    dict(key="sat", name="SAT", note="клиентский продукт", contour="student", color="#E5484D", client=True),
+    dict(key="ielts", name="IELTS", note="клиентский продукт", contour="student", color="#0F9488", client=True),
+    dict(key="apply", name="Анкета", note="apply.*, после оплаты", contour="student", color="#3E63DD", client=True),
+]
+INTERNAL_SERVICES = [s for s in SERVICES if s["key"] != "portal"]
+ALL_BY_KEY = {**BY_KEY, **{s["key"]: s for s in CLIENT_SERVICES}}
+INTERNAL_FN = v9_icons(dict(tile=WHITE, border=HAIR, mark=GRAPHITE, badge=lambda s: CONTOUR_COL[s["contour"]]))
+
+
+def client_style(kind):
+    """Внутренние = палитра 5 как есть; клиентские рисуются стилем kind."""
+    def fn(s, m):
+        if not s.get("client"):
+            return INTERNAL_FN(s, m)
+        c, only_mark = s["color"], s["key"] == "site"
+        if kind == "same":
+            return INTERNAL_FN(BY_KEY["root"] if only_mark else s, m)
+        if kind == "mark" or only_mark:
+            bg = GRAPHITE if kind == "dark" else c
+            return svg(tile(bg) + mark(32, 32, 42, WHITE))
+        if kind == "icon":
+            k = 38 / 64
+            body, defs = pictogram(s["key"], WHITE, rgba(WHITE, 0.6))
+            return svg(tile(c) + f'<g transform="translate({32 - 32 * k:.2f} {32 - 32 * k:.2f}) scale({k:.4f})">{body}</g>', defs)
+        k, cc = 21 / 64, 45.5
+        if kind == "inverse":
+            bg, badge, icon, acc = c, WHITE, c, rgba(c, 0.5)
+        else:  # dark
+            bg, badge, icon, acc = GRAPHITE, c, WHITE, rgba(WHITE, 0.62)
+        body, defs = pictogram(s["key"], icon, acc)
+        return svg(tile(bg) + mark(19, 20, 30, WHITE) + f'<circle cx="{cc}" cy="{cc}" r="17" fill="{badge}"/>'
+                   + f'<g transform="translate({cc - 32 * k:.2f} {cc - 32 * k:.2f}) scale({k:.4f})">{body}</g>', defs)
+    return fn
+
+
+def build_split():
+    return [
+        dict(n=0, label="0", slug="same", title="Без разделения", fn=client_style("same"), adaptive=False,
+             idea="Как сейчас в палитре 5: клиентские выглядят так же, как внутренние, только метка зелёная.",
+             plus="", minus=""),
+        dict(n=1, slug="inverse", title="Цветная плитка", fn=client_style("inverse"), adaptive=False,
+             idea="Клиентские = та же схема, но наоборот: плитка цвета продукта, знак GG белый, метка белая с цветной иконкой. Внутренние белые, клиентские цветные.",
+             plus="разделение видно сразу, семья общая", minus="на 16 px метка в цветной плитке мельче читается"),
+        dict(n=2, slug="mark", title="Только знак", fn=client_style("mark"), adaptive=False,
+             idea="Клиент видит бренд, а не устройство компании: плитка цвета продукта и крупный белый знак GG, без меток и иконок.",
+             plus="самый чистый для клиента, знак GG крупный", minus="продукты различаются только цветом"),
+        dict(n=3, slug="icon", title="Иконка продукта", fn=client_style("icon"), adaptive=False,
+             idea="Как приложения на телефоне: плитка цвета продукта и крупная белая иконка, знак GG остаётся в шапке сайта.",
+             plus="продукт узнаётся по картинке, крупно даже на 16 px", minus="во вкладке не видно, что это GG"),
+        dict(n=4, slug="dark", title="Тёмная плитка", fn=client_style("dark"), adaptive=False,
+             idea="Клиентские на графитовой плитке: белый знак GG и метка цвета продукта с белой иконкой. Внутренние светлые, клиентские тёмные.",
+             plus="премиально, контраст светлое и тёмное", minus="в тёмной теме браузера плитка сливается с панелью"),
+    ]
+
+
+def split_cards(v):
+    tabs = [("site", "Global Generation"), ("portal", "Мой кабинет · GG"), ("sat", "SAT · Global Generation"),
+            ("accounting", "Бухгалтерия"), ("ielts", "IELTS · Global Generation"), ("onboarding", "Онбординг"), ("apply", "Анкета")]
+    return (f'<div class="card"><h3>Во вкладках Chrome <span>клиентские и внутренние вперемешку, 16 px</span></h3>'
+            f'{chrome(v, False, ["root", "akb", "legal"], tabs)}{chrome(v, True, ["root", "akb", "legal"], tabs)}</div>'
+            f'<div class="card"><h3>Клиентские <span>видят студенты и клиенты; Маяк остаётся с Джи-джи</span></h3>{grid(v, CLIENT_SERVICES)}</div>'
+            f'<div class="card"><h3>Внутренние <span>видит команда, без изменений: палитра 5</span></h3>{grid(v, INTERNAL_SERVICES)}</div>'
+            f'<div class="card"><h3>Размеры <span>Портал, SAT, Анкета: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v, ("portal", "sat", "apply"))}</div>')
+
+
 def render(v, s, dark=False):
     return v["fn"](s, WHITE if dark else NAVY)
 
@@ -432,14 +515,14 @@ OPEN_TABS = [("akb", "АКБ - Маяк"), ("gigi", "Маяк · Джи-джи")
              ("strategy", "Стратегия"), ("llm", "LLM-расходы"), ("onboarding", "Онбординг")]
 
 
-def chrome(v, dark):
+def chrome(v, dark, pinned=PINNED, open_tabs=OPEN_TABS):
     def fav(key):
         if key == "gigi":
             return '<span class="fav gigi"></span>'
-        return f'<span class="fav">{inline(render(v, BY_KEY[key], dark), 16)}</span>'
+        return f'<span class="fav">{inline(render(v, ALL_BY_KEY[key], dark), 16)}</span>'
 
-    tabs = [f'<div class="t pin" title="{BY_KEY[k]["name"]}">{fav(k)}</div>' for k in PINNED]
-    for i, (k, title) in enumerate(OPEN_TABS):
+    tabs = [f'<div class="t pin" title="{ALL_BY_KEY[k]["name"]}">{fav(k)}</div>' for k in pinned]
+    for i, (k, title) in enumerate(open_tabs):
         on = " on" if i == 0 else ""
         tabs.append(f'<div class="t{on}">{fav(k)}<span class="tt">{html.escape(title)}</span>{X_ICON}</div>')
     theme = "d" if dark else "l"
@@ -448,9 +531,9 @@ def chrome(v, dark):
             f'<div class="bar"><span class="dot"></span><span class="dot"></span><div class="omni"></div></div></div>')
 
 
-def grid(v):
+def grid(v, services=SERVICES):
     cards = []
-    for s in SERVICES:
+    for s in services:
         sub = s.get("note") or CONTOUR_NAMES[s["contour"]]
         cards.append(
             f'<div class="svc"><div class="big">{inline(render(v, s), 64)}</div>'
@@ -461,12 +544,12 @@ def grid(v):
     return '<div class="svcgrid">' + "".join(cards) + "</div>"
 
 
-def sizes(v):
+def sizes(v, keys=("akb", "legal", "levauth")):
     rows = []
     for dark in (False, True):
         cells = []
-        for key in ("akb", "legal", "levauth"):
-            s = BY_KEY[key]
+        for key in keys:
+            s = ALL_BY_KEY[key]
             icons = "".join(f'<span class="sz"><span class="art">{inline(render(v, s, dark), px)}</span><small>{px}</small></span>'
                             for px in (16, 20, 24, 32, 48, 64))
             cells.append(f'<div class="szrow">{icons}</div>')
@@ -618,6 +701,14 @@ CHECK = ('<svg viewBox="0 0 24 24" stroke="currentColor"><path d="M20 6 9 17l-5-
 MINUS = ('<svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9.5"/></svg>')
 
 
+def default_cards(v):
+    return (f'<div class="card"><h3>Во вкладках Chrome <span>реальный размер 16 px, закреплённые вкладки слева</span></h3>'
+            f'{chrome(v, False)}{chrome(v, True)}</div>'
+            f'<div class="card"><h3>Все сервисы <span>64 px, 16 px на светлом и тёмном, 32 px</span></h3>{grid(v)}</div>'
+            f'<div class="card"><h3>Экран входа <span>вместо замка в бледной плашке</span></h3>{login(v)}</div>'
+            f'<div class="card"><h3>Размеры <span>АКБ, Юротдел, Сервисы: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v)}</div>')
+
+
 PAGES = {
     "variants": dict(
         file="favicons-variants.html", title="Фавиконы GG", kick="Вариант {n} из 10",
@@ -631,6 +722,13 @@ PAGES = {
         h1="Вариант 9 с иконками: светлее и чище",
         intro="Знак GG на каждой вкладке, в углу круглая метка сервиса с иконкой. Navy и голубой убрал, плитка белая, знак и метка больше не налезают друг на друга. Иконки свои, толстые и залитые: тонкие lucide в метке такого размера не видны. <b>Вкладка этой страницы меняет фавикон</b> на выбранную палитру. На первой вкладке исходный 9 для сравнения.",
         foot="напиши номер палитры или комбинацию, например «1, но метка как в 6». После выбора соберу финальные SVG, PNG и ICO в assets/favicons, поменяю замок на экране входа и раскатаю по сервисам."),
+    "split": dict(
+        file="favicons-client-vs-internal.html", title="Фавиконы GG: клиентские и внутренние", kick="Вариант {n} из 4",
+        description="Фавиконы GG: клиентские продукты отдельной семьёй от внутренних сервисов, 4 варианта.",
+        h1="Клиентские отдельно, внутренние отдельно",
+        intro="Внутренние (видит команда) остаются как выбрали: белая плитка, знак GG, метка цвета контура. Клиентские (видят студенты и клиенты: сайт, Студенческий портал, SAT, IELTS, анкета) получают свою семью. Ниже 4 варианта клиентского стиля, на нулевой вкладке как сейчас без разделения. <b>Вкладка этой страницы меняет фавикон</b> на SAT выбранного варианта. Маяк остаётся с Джи-джи.",
+        foot="напиши номер варианта. Внутренние раскатываются уже сейчас (PR без деплоя), клиентские соберу после выбора.",
+        fav_key="sat", cards=split_cards),
 }
 
 
@@ -653,17 +751,13 @@ def page(variants, meta):
         if v["plus"]:
             pm = (f'<div class="pm"><div class="p">{CHECK}<span><b>Плюс:</b> {html.escape(v["plus"])}</span></div>'
                   f'<div class="m">{MINUS}<span><b>Минус:</b> {html.escape(v["minus"])}</span></div></div>')
-        fav = html.escape(export(v, BY_KEY["akb"]) if n else render(v, BY_KEY["akb"]))
+        fav_s = ALL_BY_KEY[meta.get("fav_key", "akb")]
+        fav = html.escape(export(v, fav_s) if n else render(v, fav_s))
         secs.append(
             f'<section id="v-{v["slug"]}" data-v="{n}" data-fav="{fav}" role="tabpanel">'
             f'<div class="vh"><div><div class="kick">{kick}</div><h2>{html.escape(v["title"])}</h2>'
             f'<p>{html.escape(v["idea"])}</p></div>{pm}</div>'
-            f'<div class="card"><h3>Во вкладках Chrome <span>реальный размер 16 px, закреплённые вкладки слева</span></h3>'
-            f'{chrome(v, False)}{chrome(v, True)}</div>'
-            f'<div class="card"><h3>Все сервисы <span>64 px, 16 px на светлом и тёмном, 32 px</span></h3>{grid(v)}</div>'
-            f'<div class="card"><h3>Экран входа <span>вместо замка в бледной плашке</span></h3>{login(v)}</div>'
-            f'<div class="card"><h3>Размеры <span>АКБ, Юротдел, Сервисы: 16, 20, 24, 32, 48, 64</span></h3>{sizes(v)}</div>'
-            "</section>")
+            + meta.get("cards", default_cards)(v) + "</section>")
 
     css = CSS.replace("@GIGI@", gigi)
     return f"""<!doctype html>
@@ -703,6 +797,7 @@ def main():
     T = Type()
     sets = {"variants": build_variants(T)}
     sets["v9"] = build_v9_icons(sets["variants"])
+    sets["split"] = build_split()
 
     for key, n in (("variants", a.apply), ("v9", a.apply_v9)):
         if n:
