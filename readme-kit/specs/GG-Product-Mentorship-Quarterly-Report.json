@@ -1,0 +1,12 @@
+{
+ "title": "Квартальный отчёт ментора",
+ "tagline": "Ментор раз в квартал заполняет анкету по каждому текущему клиенту, Лёв и Рената видят все отчёты и собирают клиентам персональные планы.",
+ "body": "replace",
+ "body_md": "## Что это\n\nЗамена анкеты Qualtrics «Январь начинается в октябре» на нашем домене и в нашем дизайне. Одна анкета = один текущий клиент: куда поступает, готовность заявки, план работ по месяцам до января, продлит ли сопровождение и что поможет его удержать.\n\n- **Ментор**: входит через GG ID или по личной ссылке, видит только своих клиентов, анкета сохраняется сама, отчёт можно дополнять до конца квартала.\n- **Админ** (Лёв, Рената): все отчёты с фильтрами (ментор, статус, продлит ли), карточка отчёта, выгрузка CSV, выдача и отзыв личных ссылок.\n- **Квартал** = файл `app/surveys/<год>-q<N>.json`, старые отчёты остаются.\n\n## Запуск локально\n\n```bash\nuv venv --python 3.12 && uv pip install -r pyproject.toml --extra dev\n.venv/bin/python -m pytest\nSECRET_KEY=dev COOKIE_SECURE=0 ADMIN_BOOTSTRAP_CODE=dev PUBLIC_URL=http://127.0.0.1:8000 .venv/bin/uvicorn app.main:app\n```\n\nРезервный вход админа на `/login`: любая почта @global-generations.com и код из `ADMIN_BOOTSTRAP_CODE`.\n\n## Документация\n\n- `CLAUDE.md`: устройство, вход, правила.\n- `docs/OPERATIONS.md`: первый запуск на EC2, GG ID, новый квартал, откат.\n- `docs/AKB.md`: список текущих клиентов из АКБ (необязательно).\n",
+ "badges": [
+  {"label": "FastAPI", "message": "0.115", "color": "009688", "logo": "fastapi"},
+  {"label": "Postgres", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "EC2", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "report.global-generations-edu.com", "color": "13445d", "href": "https://report.global-generations-edu.com"}
+ ]
+}
