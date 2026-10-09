@@ -706,7 +706,7 @@ SITES = [
     ("anel", "Асхат и Анель (дека)", "anel.*", "client", "Client-Ashat-Anel", "свой старый"),
     ("task", "Тестовое задание", "task.*", "client", "Ops-Dev-Hiring", "свой старый"),
     ("demoitaly", "Демо-карта Италия", "demo.italy.*", "client", "GG-Product-Italy-Portal", "свой старый"),
-    ("akb", "АКБ и Пульс", "hub.*", "internal", "GG-Product-Mentorship-AKB", "ok: выкачен 08.10"),
+    ("akb", "АКБ и Пульс", "akb.*", "internal", "GG-Product-Mentorship-AKB", "ok: выкачен 08.10"),
     ("cabinet", "Кабинет ментора", "cabinet.*", "internal", "GG-Product-Mentorship-Mentor-Cabinet", "ok: выкачен 08.10"),
     ("legal", "Юротдел", "legal.*", "internal", "Ops-Legal", "ok: выкачен 08.10"),
     ("accounting", "Бухгалтерия", "accounting.*", "internal", "Ops-Accounting", "ok: выкачен 08.10"),
