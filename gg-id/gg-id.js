@@ -1,4 +1,4 @@
-/* GG ID: поведение экранов входа (2026-10-08). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-08.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
@@ -380,13 +380,16 @@
       });
       el.hidden = !el.children.length;
     });
-    each('email', function (el) {   // перенос строки только перед @: домен в <span> не рвётся на дефисе
+    each('email', function (el) {   // перенос строки перед @ (и после точек в длинном имени): домен в <span> не рвётся на дефисе
       var v = String(d.email || ''), at = v.lastIndexOf('@');
       el.textContent = '';
       if (at > 0) {
-        var dom = document.createElement('span');
+        var dom = document.createElement('span'), name = v.slice(0, at), from = 0;
         dom.textContent = v.slice(at);
-        el.appendChild(document.createTextNode(v.slice(0, at)));
+        for (var i = 0; i < name.length; i++) {
+          if ('._-'.indexOf(name.charAt(i)) !== -1) { el.appendChild(document.createTextNode(name.slice(from, i + 1))); el.appendChild(document.createElement('wbr')); from = i + 1; }
+        }
+        el.appendChild(document.createTextNode(name.slice(from)));
         el.appendChild(document.createElement('wbr'));
         el.appendChild(dom);
       } else el.textContent = v;
@@ -407,7 +410,8 @@
     init: init, busy: busy, shake: shake, error: error,
     passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
     card: card, cardSince: cardSince, cardInitials: cardInitials,
-    qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); }
+    qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
+    version: '2026-10-08.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);

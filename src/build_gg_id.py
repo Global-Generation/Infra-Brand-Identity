@@ -7,6 +7,7 @@ gg-id/email-card.html + gg-id/email/gg-id-lockup-2x.png (the e-mail card, checke
 Run: python3 src/build_gg_id.py
 """
 import base64
+import hashlib
 import html as htmlmod
 import json
 import os
@@ -53,11 +54,25 @@ for subset, b64 in woff.items():
 kit_css = read(KIT, 'gg-id.css')
 kit_js = read(KIT, 'gg-id.js')
 service_js = read(KIT, 'gg-id-service.js')   # поведение компонентов в сервисах: меню аккаунта, окно, 401
+# версия кита: gg-id/VERSION, её же отдают GGID.version и GGIDService.version (сервис видит, какая копия у него). Поднимать при каждой правке кита
+KIT_VERSION = read(KIT, 'VERSION').strip()
+assert re.fullmatch(r'\d{4}-\d{2}-\d{2}(\.\d+)?', KIT_VERSION), f'gg-id/VERSION: дата релиза кита, например 2026-10-08.2, а не {KIT_VERSION!r}'
+for _name, _src in (('gg-id.js', kit_js), ('gg-id-service.js', service_js)):
+    _v = re.findall(r"version: '([^']+)'", _src)
+    assert _v == [KIT_VERSION], f'{_name}: version {_v} должна быть равна gg-id/VERSION ({KIT_VERSION})'
 for subset in woff:
     assert f'url(fonts/montserrat-{subset}.woff2)' in kit_css, f'gg-id.css must load fonts/montserrat-{subset}.woff2'
+# латиница с диакритикой и знаки валют (₽ U+20BD): подмножество latin-ext того же Montserrat v31 (Version 9.000, Google Fonts),
+# что cyrillic и latin выше (они байт в байт равны v31). Файл лежит в ките как есть, sha256 закреплён: подменить его незаметно нельзя
+LATIN_EXT = os.path.join(KIT, 'fonts', 'montserrat-latin-ext.woff2')
+LATIN_EXT_SHA256 = '920711de9ae96c18970fa4faca73cd302b93ac5ed57ebeb6bfec2ddeff930082'
+assert hashlib.sha256(open(LATIN_EXT, 'rb').read()).hexdigest() == LATIN_EXT_SHA256, 'gg-id/fonts/montserrat-latin-ext.woff2 changed'
+assert 'url(fonts/montserrat-latin-ext.woff2)' in kit_css, 'gg-id.css must load fonts/montserrat-latin-ext.woff2'
 inline_css = kit_css
 for subset, b64 in woff.items():
     inline_css = inline_css.replace(f'url(fonts/montserrat-{subset}.woff2)', f'url(data:font/woff2;base64,{b64})')
+# витрина лежит рядом с gg-id/: latin-ext грузится файлом, только если на странице есть такие знаки (как у хаба)
+inline_css = inline_css.replace('url(fonts/montserrat-latin-ext.woff2)', 'url(gg-id/fonts/montserrat-latin-ext.woff2)')
 
 # ---- logo, mark, root favicon ----
 logo_paths = re.findall(r'<path d="([^"]+)"', read(HERE, 'global-logo.svg'))
@@ -99,7 +114,7 @@ LONG = {'name': 'Александра Образцова-Константино�
         'positions': ['Ментор', 'Руководитель направления «Магистратура в Европе»', 'Ведущая роликов YouTube-канала'],
         'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': '2025-09',
         'status': 'active', 'passkey': True}
-TPL = {'name': 'Имя Фамилия', 'positions': ['Должность'], 'id': 'GG 0042-7F3A'}   # карта на экране входа до входа
+TPL = {'name': 'Имя Фамилия', 'positions': ['Должность'], 'id': 'GG 0042-7F3A', 'sample': True}   # карта на экране входа до входа
 VERIFY = 'https://id.global-generations-edu.com/v/'   # QR карты = адрес проверки: VERIFY + номер через дефис (как в варианте «Итог»)
 
 
@@ -141,7 +156,7 @@ def idcard(d, indent=''):
         '  <div class="gid-idcard-who">',
         f'    <p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>',
         f'    <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"{"" if roles else " hidden"}>{roles}</ul>',
-        f'    <p class="gid-idcard-mail" data-gid-field="email">{e(local)}<wbr><span>@{e(dom)}</span></p>',
+        f'    <p class="gid-idcard-mail" data-gid-field="email">{re.sub(r"([._-])", r"\1<wbr>", e(local))}<wbr><span>@{e(dom)}</span></p>',
         '    <p class="gid-idcard-meta">'
         f'<span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>'
         '<span class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
@@ -156,9 +171,11 @@ def idcard(d, indent=''):
 
 
 def herocard(d, qr=None):
-    """The sign-in hero card: big GG ID, name, position and number bottom left, QR bottom right (gg-id.js draws it)."""
+    """The sign-in hero card: big GG ID, name, position and number bottom left, QR bottom right (gg-id.js draws it).
+    The sample card (before sign-in, public pages) encodes the sample number as plain text, no address of the hub;
+    a known account («Продолжить как») encodes the verification address."""
     e = htmlmod.escape
-    qr = qr or verify_url(d['id'])
+    qr = qr or (d['id'] if d.get('sample') else verify_url(d['id']))
     roles = ''.join(f'<li>{e(p)}</li>' for p in d['positions'])
     return ('<article class="gid-idcard gid-idcard--hero">' + HOLO +
             f'<div class="gid-idcard-top">{LOCKUP}{KEY_SEAL}</div><p class="gid-idcard-big">GG ID</p>'
@@ -177,9 +194,11 @@ def hero(d=TPL):
             f'<div class="gid-hero-holder"><span class="gid-hero-gloss"></span>{herocard(d)}</div></div></div></div>')
 
 
+# Текст панели (правило 08.10): без списка внутренних сервисов, страницы входа публичные. «GG ID» и «Global Generation» не рвутся (&nbsp;)
 ASIDE_COPY = ('<div class="gid-aside-copy"><p class="gid-aside-title">Один вход во все сервисы Global&nbsp;Generation</p>'
-              '<p class="gid-aside-sub">АКБ, Пульс, Кабинет ментора, Юротдел, Продакшн и остальные сервисы команды открываются '
-              'с одним GG ID. Без отдельного пароля в каждом.</p></div>')
+              '<p class="gid-aside-sub">Все рабочие сервисы команды открываются с одним GG&nbsp;ID, без отдельного пароля в каждом.</p></div>')
+for _svc in ('АКБ', 'Пульс', 'Кабинет ментора', 'Юротдел', 'Продакшн', 'Бухгалтерия', 'Репортер', 'Онбординг'):
+    assert _svc not in ASIDE_COPY, f'панель входа публичная: без списка внутренних сервисов ({_svc})'
 
 
 def aside(d=TPL):
@@ -296,8 +315,8 @@ def brand_check(name, text):
     emoji = re.findall('[\U0001F000-\U0001FAFF☀-➿⬀-⯿️]', text)
     if emoji:
         problems.append(f'emoji-like chars: {emoji[:10]}')
-    ext = [u for u in re.findall(r'(?:src|href)="(https?://[^"]+)"', text) 
-           if u != 'https://mail.google.com/' and not u.startswith('https://levauth.global-generations-edu.com/')]
+    ext = [u for u in re.findall(r'(?:src|href)="(https?://[^"]+)"', text)    # хаб GG ID (id.*, старый адрес levauth пока алиас)
+           if u != 'https://mail.google.com/' and not u.startswith(('https://id.global-generations-edu.com/', 'https://levauth.global-generations-edu.com/'))]
     if ext:
         problems.append(f'external resources: {ext}')
     if problems:
@@ -397,11 +416,14 @@ for fn in os.listdir(os.path.join(KIT, 'screens')):
     if fn.endswith('.html') and fn[:-5] not in KEYS:
         os.remove(os.path.join(KIT, 'screens', fn))
 
-# ---- карточка GG ID в письме: gg-id/email-card.html (правится руками) + подпись gg-id/email/gg-id-lockup-2x.png ----
+# ---- карточка GG ID и кнопки письма: gg-id/email-card.html (правится руками, стиль «Итог», как письмо Infra-AWS #93) ----
+# логотип письма: gg-id/email/gg-logo-navy-2x.png (src/rasterize_gg_id_email.py), хаб отдаёт его из /assets/gg-id/email/
 EMAIL_PATH = os.path.join(KIT, 'email-card.html')
-EMAIL_PNG = os.path.join(KIT, 'email', 'gg-id-lockup-2x.png')
-EMAIL_PNG_URL = 'https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png'
-EMAIL_FIELDS = ('name', 'initials', 'positions', 'email', 'id', 'since')
+EMAIL_PNG = os.path.join(KIT, 'email', 'gg-logo-navy-2x.png')
+EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png'
+EMAIL_FIELDS = ('name', 'positions', 'email', 'id')            # карта
+EMAIL_ACTION_FIELDS = ('link', 'guide_url')                   # кнопка «Задать пароль» и ссылка «Инструкция: как войти»
+GUIDE_URL = 'https://id.global-generations-edu.com/instructions/'
 email_html = read(EMAIL_PATH)
 brand_check('gg-id/email-card.html', email_html)
 
@@ -410,35 +432,43 @@ def email_problems(text):
     """What would break the card in mail clients (Gmail drops SVG, data: images, flex; Outlook drops rgba and variables)."""
     problems = []
     m = re.search(r'<!-- gg-id-card:start -->(.*?)<!-- gg-id-card:end -->', text, flags=re.S)
-    if not m:
-        return ['no <!-- gg-id-card:start --> ... <!-- gg-id-card:end --> block']
-    block = m.group(1)
-    found = set(re.findall(r'\{\{([a-z_]+)\}\}', block))
-    if found != set(EMAIL_FIELDS):
-        problems.append(f'placeholders {sorted(found)}, expected {sorted(EMAIL_FIELDS)}')
+    a = re.search(r'<!-- gg-id-actions:start -->(.*?)<!-- gg-id-actions:end -->', text, flags=re.S)
+    if not m or not a:
+        return ['no <!-- gg-id-card:start/end --> or <!-- gg-id-actions:start/end --> block']
+    block, actions = m.group(1), a.group(1)
+    for part, want, label in ((block, EMAIL_FIELDS, 'card'), (actions, EMAIL_ACTION_FIELDS, 'actions')):
+        found = set(re.findall(r'\{\{([a-z_]+)\}\}', part))
+        if found != set(want):
+            problems.append(f'{label}: placeholders {sorted(found)}, expected {sorted(want)}')
     for bad, why in [('<link', 'external stylesheet'), ('@import', '@import'), ('@font-face', 'web font'), ('<script', 'script'),
                      ('<svg', 'inline SVG (Gmail drops it)'), ('data:', 'data: URI (Gmail blocks it)'), ('display:flex', 'flex'),
                      ('display:grid', 'grid'), ('position:', 'position'), ('var(--', 'CSS variables'), ('class="gid-', 'kit classes')]:
         if bad in text:
             problems.append(f'{why}: {bad}')
-    if 'rgba(' in block:
-        problems.append('rgba() inside the card (Outlook): use solid colours')
+    for part, label in ((block, 'card'), (actions, 'actions')):
+        if 'rgba(' in part:
+            problems.append(f'rgba() inside the {label} (Outlook): use solid colours')
+        texts = re.findall(r'<(td|div|a)\b([^>]*)>([^<]+)<', part)
+        bare = [t[2].strip() for t in texts if t[2].strip() and 'font-family:' not in t[1] and t[0] != 'a']
+        if bare:
+            problems.append(f'{label}: text without an inline font-family: {bare[:4]}')
     for img in re.findall(r'<img [^>]*>', block):
-        if not re.search(r'src="https://[^"]+"', img) or not all(f'{a}="' in img for a in ('alt', 'width', 'height')):
+        if not re.search(r'src="https://[^"]+"', img) or not all(f'{x}="' in img for x in ('alt', 'width', 'height')):
             problems.append(f'img needs https src, alt, width, height: {img[:90]}')
     if EMAIL_PNG_URL not in block:
-        problems.append(f'the lockup image is not {EMAIL_PNG_URL}')
-    texts = re.findall(r'<(td|div)\b([^>]*)>([^<]+)<', block)
-    bare = [t[2].strip() for t in texts if t[2].strip() and 'font-family:' not in t[1]]
-    if bare:
-        problems.append(f'text without an inline font-family: {bare[:4]}')
+        problems.append(f'the logo image is not {EMAIL_PNG_URL}')
+    for want in ('Задать пароль', 'Инструкция: как войти', 'Войти через GG&nbsp;ID', 'border:1px solid #c9d5e1'):
+        if want not in actions:
+            problems.append(f'actions: no {want!r} (white button with the thin border, text link, «Войти через GG ID»)')
+    if 'Номер GG ID' not in block or 'Активен' not in block:
+        problems.append('card: the number «Номер GG ID» and the status «Активен» are part of the card')
     png = open(EMAIL_PNG, 'rb').read()
     pw, ph = int.from_bytes(png[16:20], 'big'), int.from_bytes(png[20:24], 'big')
     tag = re.search(r'<img [^>]*' + re.escape(EMAIL_PNG_URL) + r'[^>]*>', block)
     if tag:
         w, h = int(re.search(r'width="(\d+)"', tag.group(0)).group(1)), int(re.search(r'height="(\d+)"', tag.group(0)).group(1))
-        if (pw, ph) != (2 * w, 2 * h):
-            problems.append(f'lockup PNG is {pw}x{ph}, the tag says {w}x{h} (expected exactly 2x)')
+        if pw < 2 * w or ph < 2 * h or abs(pw / ph - w / h) > 0.05:
+            problems.append(f'logo PNG is {pw}x{ph}, the tag says {w}x{h} (expected at least 2x, same proportions)')
     return problems
 
 
@@ -451,9 +481,9 @@ if bad_mail:
 
 
 def email_filled(d, logo_src=EMAIL_PNG_URL):
-    """The e-mail card with the values of d, every value HTML-escaped, the way the hub fills it."""
-    vals = {'name': d['name'], 'initials': initials(d['name']), 'positions': ' · '.join(d['positions']), 'email': d['email'],
-            'id': d['id'], 'since': since_text(d['since'])}
+    """The e-mail card and buttons with the values of d, every value HTML-escaped, the way the hub fills it."""
+    vals = {'name': d['name'], 'positions': ' · '.join(d['positions']), 'email': d['email'], 'id': d['id'],
+            'link': 'https://id.global-generations-edu.com/set-password.html#token=demo&invite=1', 'guide_url': GUIDE_URL}
     out = re.sub(r'\{\{([a-z_]+)\}\}', lambda mm: htmlmod.escape(vals[mm.group(1)], quote=True), email_html)
     return out.replace(EMAIL_PNG_URL, logo_src)
 
@@ -503,7 +533,7 @@ readme = re.sub(r'<!-- screens:start -->.*?<!-- screens:end -->',
 card_md = '```html\n' + IDCARD + '\n\n<!-- компактная строка -->\n' + idrow(DEMO) + '\n```'
 assert '<!-- idcard:start -->' in readme, 'gg-id/README.md: add <!-- idcard:start --><!-- idcard:end --> markers'
 icon_md = '```html\n<!-- кнопка в сервисе (свой origin): иконка инлайном, спрайт хаба не нужен -->\n' + \
-    '<a class="gid-sso" href="https://levauth.global-generations-edu.com/api/auth/authorize?...">' + ID_ICON_INLINE + \
+    '<a class="gid-sso" href="https://id.global-generations-edu.com/api/auth/authorize?...">' + ID_ICON_INLINE + \
     '<span>Войти через GG&nbsp;ID</span></a>\n\n<!-- на хабе (тот же origin): символ спрайта -->\n' + \
     '<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gid-id-icon"/></svg>\n```'
 assert '<!-- idicon:start -->' in readme, 'gg-id/README.md: add <!-- idicon:start --><!-- idicon:end --> markers'
@@ -514,4 +544,4 @@ readme = re.sub(r'<!-- idcard:start -->.*?<!-- idcard:end -->',
 brand_check('gg-id/README.md', readme)
 kit_rules_check('gg-id/README.md', readme)
 write_if_changed(readme_path, readme)
-print('ok gg-id.html', f'{len(page) / 1024:.0f} KB', '| screens:', len(SCREENS), '| fonts:', ', '.join(sorted(woff)))
+print('ok gg-id.html', f'{len(page) / 1024:.0f} KB', '| screens:', len(SCREENS), '| fonts:', ', '.join(sorted(woff) + ['latin-ext']), '| version:', KIT_VERSION)

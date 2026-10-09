@@ -25,7 +25,7 @@
       <label class="gid-label" for="gid-email">Рабочая почта</label>
       <input class="gid-input" id="gid-email" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
         placeholder="имя@global-generations.com" data-gid-domain="global-generations.com" value="lev@global-generations.com">
-      <p class="gid-hint is-error" data-gid-domain-hint hidden>Войти можно только с рабочей почтой @global-generations.com</p>
+      <p class="gid-hint is-error" data-gid-domain-hint hidden>Войти можно только с рабочей почтой <span class="gid-nowrap">@global-generations.com</span></p>
     </div>
     <div class="gid-field">
       <div class="gid-label-row"><label class="gid-label" for="gid-pass">Пароль</label><a class="gid-link gid-link--sm" data-go="forgot">Забыли пароль?</a></div>
@@ -89,7 +89,7 @@
   <p class="gid-sub">Вы уже вошли в GG ID на этом устройстве.</p>
   <a class="gid-account" data-go="done">
     <span class="gid-avatar" aria-hidden="true">ИО</span>
-    <span class="gid-account-tx"><b>Иван Образцов</b><span>ivan.obraztsov@global-generations.com</span></span>
+    <span class="gid-account-tx"><b>Иван Образцов</b><span>ivan.<wbr>obraztsov<wbr><span class="gid-nowrap">@global-generations.com</span></span></span>
     <svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-right"/></svg>
   </a>
   <div class="gid-alt"><a class="gid-link" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-user-round-plus"/></svg>Войти в другой аккаунт</a></div>
@@ -112,7 +112,7 @@
       <label class="gid-label" for="gid-email-f">Рабочая почта</label>
       <input class="gid-input" id="gid-email-f" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
         placeholder="имя@global-generations.com" data-gid-domain="global-generations.com">
-      <p class="gid-hint is-error" data-gid-domain-hint hidden>Ссылка приходит только на рабочую почту @global-generations.com</p>
+      <p class="gid-hint is-error" data-gid-domain-hint hidden>Ссылка приходит только на рабочую почту <span class="gid-nowrap">@global-generations.com</span></p>
     </div>
     <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-send"/></svg><span>Отправить ссылку</span></button>
   </form>
@@ -121,7 +121,7 @@
 
 <template data-key="sent" data-tab="Письмо отправлено" data-title="Проверьте почту">
   <h1 class="gid-h">Проверьте почту</h1>
-  <p class="gid-sub">Если <b>lev@global-generations.com</b> есть в GG ID, ссылка уже в пути. Она действует недолго, лучше не откладывать.</p>
+  <p class="gid-sub">Если <b>lev<wbr><span class="gid-nowrap">@global-generations.com</span></b> есть в GG ID, ссылка уже в пути. Она действует недолго, лучше не откладывать.</p>
   <div class="gid-stack">
     <a class="gid-btn gid-btn--primary" href="https://mail.google.com/" target="_blank" rel="noopener"><svg class="gid-ic" aria-hidden="true"><use href="#gi-mail"/></svg><span>Открыть почту</span></a>
   </div>
@@ -187,7 +187,7 @@
   <p class="gid-sub">Вы вошли в GG ID, но сервис «<span data-svc>АКБ</span>» пока не открыт для вашего аккаунта. Если он нужен для работы, напишите Лёве: он откроет доступ.</p>
   <div class="gid-who">
     <span class="gid-avatar gid-avatar--sm" aria-hidden="true">МИ</span>
-    <span class="gid-who-tx"><b>Мария Иванова</b><span>maria@global-generations.com</span></span>
+    <span class="gid-who-tx"><b>Мария Иванова</b><span>maria<wbr><span class="gid-nowrap">@global-generations.com</span></span></span>
     <a class="gid-link gid-link--sm" data-go="login">Сменить</a>
   </div>
   <div class="gid-stack">
