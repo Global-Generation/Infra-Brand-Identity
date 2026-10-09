@@ -7,6 +7,10 @@ for the e-mail card on low contrast in light, dark (Apple Mail) and inverted (Gm
 Layout everywhere (screens and every component of the showcase at 1440, 1024 and 390, both themes): every element inside
 its component card, no cut content, no overlapping siblings, avatars with white centred initials, one-line button labels.
 gg-id-service.js: account menu (mouse, keyboard, Esc, click outside), «Сессия истекла» (401, focus trap, Esc, backdrop).
+QA 08.10: screens in the split layout at 360, 768, 1024 px and at 200 % zoom; short windows down to 400 px tall and the 320 px phone
+(the card on the panel never overlaps the logo or the text, is never clipped, never narrower than 240 px, long data stays inside);
+a visible keyboard focus ring on every stop of every screen; no endless motion with «reduce motion»; readable placeholders;
+the panel in the system dark theme equals data-theme="dark".
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).
 """
@@ -101,13 +105,15 @@ EMPTY = {'name': 'Лёв', 'positions': [], 'email': 'lev.demo@global-generation
 
 # e-mail card: the hub fills the placeholders (escaped), Gmail on iPhone inverts colours but not images
 EMAIL = os.path.join(ROOT, 'gg-id', 'email-card.html')
-EMAIL_PNG = os.path.join(ROOT, 'gg-id', 'email', 'gg-id-lockup-2x.png')
-EMAIL_PNG_URL = 'https://levauth.global-generations-edu.com/assets/gg-id/email/gg-id-lockup-2x.png'
-EMAIL_DEMO = {'name': 'Иван Образцов', 'initials': 'ИО', 'positions': 'Ментор · Продажи',
-              'email': 'ivan.obraztsov@global-generations.com', 'id': 'GG 0042-7F3A', 'since': 'марта 2024'}
-EMAIL_LONG = {'name': 'Александра Образцова-Константинопольская', 'initials': 'АО',
+EMAIL_PNG = os.path.join(ROOT, 'gg-id', 'email', 'gg-logo-navy-2x.png')
+EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png'
+EMAIL_LINKS = {'link': 'https://id.global-generations-edu.com/set-password.html#token=demo&invite=1',
+               'guide_url': 'https://id.global-generations-edu.com/instructions/'}
+EMAIL_DEMO = {'name': 'Иван Образцов', 'positions': 'Ментор · Продажи', 'email': 'ivan.obraztsov@global-generations.com',
+              'id': 'GG 0042-7F3A', **EMAIL_LINKS}
+EMAIL_LONG = {'name': 'Александра Образцова-Константинопольская',
               'positions': 'Ментор · Руководитель направления «Магистратура в Европе» · Ведущая роликов YouTube-канала',
-              'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': 'сентября 2025'}
+              'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', **EMAIL_LINKS}
 INVERT = '''() => {   // like Gmail on iPhone in dark mode: lightness of every colour flipped, images untouched
   const parse = v => { const m = v.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(',').map(Number); return {r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1}; };
   const flip = c => { let r = c.r / 255, g = c.g / 255, b = c.b / 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0, l = (mx + mn) / 2;
@@ -140,10 +146,11 @@ CONTRAST = '''() => {
     if (cr < 4.5) low.push(t.slice(0, 24) + ' ' + cr.toFixed(2));
   }
   const img = document.querySelector('img'), card = document.querySelector('.gidm-card');
-  const plate = {r: 19, g: 68, b: 93, a: 1};   // the navy plate baked into the PNG
+  const plate = {r: 19, g: 68, b: 93, a: 1};   // the navy logo in the PNG (transparent around it): against the light card
   const cb = card.getBoundingClientRect();
   return {low, img: img.complete && img.naturalWidth > 0, plate: ratio(plate, bgOf(card)), bodyLum: lum(bgOf(document.body)),
     scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, cardW: cb.width,
+    actions: [...document.querySelectorAll('a')].some(a => a.textContent.trim() === 'Задать пароль') && [...document.querySelectorAll('a')].some(a => a.textContent.trim() === 'Инструкция: как войти'),
     left: (document.body.innerText.match(/\\{\\{|\\}\\}/g) || []).length,
     dashes: (document.body.innerText.match(/[\\u2014\\u2013]/g) || []).length};
 }'''
@@ -179,6 +186,8 @@ LAYOUT = r'''async (sel) => {
     const boxScrolls = scrolls(box);   // лента вкладок и т.п.: содержимое листается, это не вылезание
     [box, ...box.querySelectorAll('*')].forEach(e => {
       if (e.closest('svg') && e.tagName.toLowerCase() !== 'svg') return;
+      const shut = e.parentElement && e.parentElement.closest('details:not([open])');   // свёрнутый «Резервный вход»: виден только summary
+      if (shut && !e.closest('summary')) return;
       const st = getComputedStyle(e);
       if (st.visibility === 'hidden' || !e.getClientRects().length) return;
       // content cut by overflow:hidden (not a scroll box, not an ellipsis, not an intentional crop)
@@ -201,6 +210,7 @@ LAYOUT = r'''async (sel) => {
       const kids = [...parent.children].filter(k => {
         const t = k.tagName.toLowerCase();
         if (t === 'template' || t === 'script' || t === 'style') return false;
+        if (parent.matches('details:not([open])') && t !== 'summary') return false;
         const s = getComputedStyle(k);
         if (/absolute|fixed/.test(s.position) || /none|inline|contents/.test(s.display) && s.display !== 'inline-block' && s.display !== 'inline-flex' && s.display !== 'inline-grid' || s.visibility === 'hidden') return false;
         const r = k.getBoundingClientRect(); return r.width > 0 && r.height > 0;
@@ -279,8 +289,67 @@ def layout_issues(label, r):
     return found
 
 
+# ---- QA 08.10 ----
+# экраны в сплите на других ширинах: 360 (маленький телефон), 768 (планшет), 1024 и масштаб 200 % окна 1440 x 900 (720 x 450 при 2x)
+WIDTHS = [(360, 740, 2, '360'), (768, 1024, 1, '768'), (1024, 768, 1, '1024'), (720, 450, 2, 'zoom200')]
+# низкие окна (масштаб 200 % на 1920 x 1080, маленькие ноутбуки) и самый узкий телефон
+SHORT = [(1280, 560), (1280, 450), (1024, 500), (960, 480), (1366, 640), (1440, 600), (1920, 400), (320, 568), (360, 640), (390, 664), (844, 390), (740, 360)]
+LONG_HERO = {'name': 'Константин Александрович Преображенский',
+             'positions': ['Руководитель направления «Магистратура в Европе»', 'Ведущий роликов YouTube-канала', 'Старший ментор по поступлению'],
+             'id': 'GG 9031-55C0E7', 'qr': 'https://id.global-generations-edu.com/v/GG-9031-55C0E7'}
+# панель сплита: карта не наезжает на подпись и текст, не обрезана панелью, не уже 240 px, её содержимое внутри полей, имя не длиннее 2 строк
+PANEL = '''() => {
+  const a = document.querySelector('.gid-aside'); if (!a || getComputedStyle(a).display === 'none') return [];
+  const A = a.getBoundingClientRect(), out = [];
+  const vis = e => e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+  const R = e => e.getBoundingClientRect();
+  const lock = a.querySelector(':scope > .gid-lockup'), hold = a.querySelector('.gid-hero-holder'), lan = a.querySelector('.gid-hero-lan'),
+        card = a.querySelector('.gid-idcard--hero'), copy = a.querySelector('.gid-aside-copy');
+  const over = (p, q) => vis(p) && vis(q) && Math.min(R(p).right, R(q).right) - Math.max(R(p).left, R(q).left) > 1 && Math.min(R(p).bottom, R(q).bottom) - Math.max(R(p).top, R(q).top) > 1;
+  if (over(hold, copy)) out.push('the card overlaps the panel text');
+  if (over(hold, lock) || over(lan, lock)) out.push('the card overlaps the logo');
+  [['logo', lock], ['strap', lan], ['holder', hold], ['card', card], ['text', copy]].forEach(([n, e]) => {
+    if (!vis(e)) return; const r = R(e);
+    if (r.left < A.left - .5 || r.right > A.right + .5 || r.top < A.top - .5 || r.bottom > A.bottom + .5) out.push(n + ' clipped by the panel');
+  });
+  const badge = getComputedStyle(a.querySelector('.gid-hero')).transform !== 'none';   // бейдж: та же карта, уменьшенная
+  if (badge && vis(card) && over(card, lock)) out.push('the badge overlaps the logo');
+  if (vis(card) && !badge) {
+    const C = R(card), cs = getComputedStyle(card);
+    if (C.width < 240) out.push('card narrower than 240 px: ' + Math.round(C.width));
+    card.querySelectorAll('.gid-lockup, .gid-idcard-seal, .gid-idcard-big, .gid-idcard-name, .gid-idcard-roles, .gid-idcard-num, .gid-idcard-qr').forEach(e => {
+      const q = R(e); if (!q.width) return;
+      if (q.left < C.left + parseFloat(cs.paddingLeft) * .9 - 1 || q.right > C.right - parseFloat(cs.paddingRight) * .9 + 1 || q.bottom > C.bottom - parseFloat(cs.paddingBottom) * .9 + 1)
+        out.push('card content outside its padding: ' + (e.className.baseVal !== undefined ? e.className.baseVal : e.className));
+    });
+    const nm = card.querySelector('.gid-idcard-name');
+    if (nm && R(nm).height > parseFloat(getComputedStyle(nm).lineHeight) * 2.5) out.push('name on the card longer than 2 lines');
+  }
+  return out;
+}'''
+FOCUS = '''() => {
+  const a = document.activeElement; if (!a || a === document.body) return null;
+  if (!a.dataset.qaFocus) a.dataset.qaFocus = String(Math.random());
+  const s = getComputedStyle(a);
+  return {id: a.dataset.qaFocus, tag: a.tagName.toLowerCase(), cls: String(a.className && a.className.baseVal === undefined ? a.className : ''),
+          text: (a.innerText || a.getAttribute('aria-label') || '').trim().slice(0, 30), input: a.matches('input'),
+          outline: [s.outlineStyle, parseFloat(s.outlineWidth), s.outlineColor], border: s.borderTopColor, shadow: s.boxShadow};
+}'''
+ACCENT = {'light': 'rgb(0, 156, 220)', 'dark': 'rgb(92, 195, 236)'}
+MOTION = '''() => document.getAnimations().filter(a => a.playState === 'running' && a.effect.getComputedTiming().iterations === Infinity)
+  .map(a => { const t = a.effect.target; return (t.className && t.className.baseVal === undefined ? String(t.className).split(' ')[0] : t.tagName) + (a.effect.pseudoElement || '') + ' ' + a.animationName; })'''
+PLACEHOLDER = '''() => {
+  const parse = v => { const m = v.match(/rgba?\\(([^)]+)\\)/); const p = m[1].split(',').map(Number); return {r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1}; };
+  const lum = c => { const f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }; return .2126 * f(c.r) + .7152 * f(c.g) + .0722 * f(c.b); };
+  const over = (t, b) => ({r: t.r * t.a + b.r * (1 - t.a), g: t.g * t.a + b.g * (1 - t.a), b: t.b * t.a + b.b * (1 - t.a), a: 1});
+  const i = document.querySelector('.gid-main input[placeholder]');
+  const page = parse(getComputedStyle(document.querySelector('.gid')).backgroundColor);
+  const bg = over(parse(getComputedStyle(i).backgroundColor), page), fg = over(parse(getComputedStyle(i, '::placeholder').color), bg);
+  const x = lum(fg), y = lum(bg); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+}'''
+
 problems = []
-counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0}
+counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0, 'widths': 0, 'short': 0, 'focus': 0, 'motion': 0}
 with sync_playwright() as p:
     b = p.chromium.launch()
     _new_context = b.new_context
@@ -329,7 +398,8 @@ with sync_playwright() as p:
                         h = pg.evaluate('''() => { const a = document.querySelector('.gid-aside'), hc = a.querySelector('.gid-idcard--hero'),
                             q = a.querySelector('svg[data-gid-qr]'), m = GGID.qrMatrix(q.getAttribute('data-gid-qr'));
                             const ar = a.getBoundingClientRect(), hr = hc.getBoundingClientRect();
-                            return {hero: !!hc && hr.width > 150, inside: hr.top >= ar.top - 1 && hr.bottom <= ar.bottom + 1 && hr.left >= ar.left - 1 && hr.right <= ar.right + 1,
+                            const badge = getComputedStyle(a.querySelector('.gid-hero')).transform !== 'none';   // телефон в низком окне: бейдж карты в строке над формой
+                            return {hero: !!hc && hr.width > (badge ? 60 : 150), inside: hr.top >= ar.top - 1 && hr.bottom <= ar.bottom + 1 && hr.left >= ar.left - 1 && hr.right <= ar.right + 1,
                               qr: (q.querySelector('path').getAttribute('d') || '').length > 500 && m.size === m.version * 4 + 17 && m.get(0, 0) && m.get(6, 6) && !m.get(7, 7) && m.get(8, m.size - 8),
                               key: !!a.querySelector('.gid-idcard-seal use[href="#gid-id-icon"]')}; }''')
                         if not (h['hero'] and h['inside'] and h['qr'] and h['key']):
@@ -387,6 +457,119 @@ with sync_playwright() as p:
                 problems.append(f'card/{tag}/{theme}: GGID.card inserted markup from data')
             ctx.close()
 
+    # ---- QA 08.10: ширины 360/768/1024 и масштаб 200 %, низкие окна, кольцо фокуса, «меньше движения», подсказки в полях ----
+    for scheme in ('light', 'dark'):
+        for vw, vh, dpr, tag in WIDTHS:
+            ctx = b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=dpr, color_scheme=scheme)
+            pg = ctx.new_page()
+            errs = []
+            pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type in ('error', 'warning') else None)
+            pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}'))
+            for fn in sorted(os.listdir(SCREENS)):
+                key = fn[:-5]
+                errs.clear()
+                pg.goto('file://' + os.path.join(SCREENS, fn) + '?layout=split')
+                pg.wait_for_timeout(250)
+                label = f'{tag}/{scheme}/split/{key}'
+                r = pg.evaluate(PROBE)
+                counts['widths'] += 1
+                problems.extend(layout_issues(label, pg.evaluate(LAYOUT, SCREEN_BOXES)))
+                if r['scrollW'] > r['clientW']:
+                    problems.append(f'{label}: horizontal scroll {r["scrollW"]} > {r["clientW"]}')
+                if r['wide']:
+                    problems.append(f'{label}: sticks out {r["wide"]}')
+                if not r['font'] or 'Montserrat' not in r['usedFont']:
+                    problems.append(f'{label}: font {r["usedFont"]}')
+                if errs:
+                    problems.append(f'{label}: console {errs[:3]}')
+                problems.extend(f'{label}: {x}' for x in pg.evaluate(PANEL))
+            ctx.close()
+        # низкие окна (масштаб 200 %, маленький ноутбук) и телефон 320 px: панель с картой, образец и длинные данные
+        for vw, vh in SHORT:
+            ctx = b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=2 if vw < 500 else 1, color_scheme=scheme)
+            pg = ctx.new_page()
+            for key, data in (('login', None), ('continue', LONG_HERO)):
+                pg.goto('file://' + os.path.join(SCREENS, key + '.html') + '?layout=split')
+                pg.wait_for_timeout(250)
+                if data:
+                    pg.evaluate('(d) => GGID.card(document.querySelector(".gid-aside .gid-idcard"), d)', data)
+                    pg.wait_for_timeout(900)    # «оживание» данных на карте
+                counts['short'] += 1
+                problems.extend(f'short/{vw}x{vh}/{scheme}/{key}{"-long" if data else ""}: {x}' for x in pg.evaluate(PANEL))
+                cta = pg.evaluate('''() => { const b = document.querySelector('.gid-card .gid-btn--primary'); return b ? b.getBoundingClientRect().bottom : 0; }''')
+                if vw < 960 and vh >= 560 and cta > vh + 0.5:
+                    problems.append(f'short/{vw}x{vh}/{scheme}/{key}: the main button is below the first screen ({cta:.0f} > {vh})')
+                hs = pg.evaluate('[document.documentElement.scrollWidth, document.documentElement.clientWidth]')
+                if hs[0] > hs[1]:
+                    problems.append(f'short/{vw}x{vh}/{scheme}/{key}: horizontal scroll {hs}')
+            ctx.close()
+        # кольцо фокуса с клавиатуры: на каждом экране Tab по всем элементам; у кнопок и ссылок сплошная линия 2 px акцентом,
+        # у полей рамка акцентом и кольцо 1 px (видно и без мягкого ореола, и в режиме высокой контрастности Windows)
+        ctx = b.new_context(viewport={'width': 1440, 'height': 900}, color_scheme=scheme)
+        pg = ctx.new_page()
+        for fn in sorted(os.listdir(SCREENS)):
+            key = fn[:-5]
+            pg.goto('file://' + os.path.join(SCREENS, fn) + '?layout=split')
+            pg.wait_for_timeout(450)
+            pg.add_style_tag(content='*,*::before,*::after{transition:none!important}')   # конечный вид фокуса, без середины перехода
+            pg.mouse.click(3, 3)
+            seen = set()
+            for _ in range(20):
+                pg.keyboard.press('Tab')
+                pg.wait_for_timeout(30)
+                f = pg.evaluate(FOCUS)
+                if not f or f['id'] in seen:
+                    break
+                seen.add(f['id'])
+                counts['focus'] += 1
+                acc = ACCENT[scheme]
+                ring = re.search(r'rgb\([^)]*\) 0px 0px 0px 1px', f['shadow'])   # сплошное кольцо 1 px поверх рамки (акцент, у поля с ошибкой красное)
+                ok = bool(ring) if f['input'] else (f['outline'][0] == 'solid' and f['outline'][1] >= 2 and f['outline'][2] == acc)
+                if not ok:
+                    problems.append(f'focus/{scheme}/{key}: {f["tag"]}.{f["cls"].split(" ")[0]} "{f["text"]}" without a visible ring ({f["outline"]}, {f["shadow"][:60]})')
+        ctx.close()
+        # «меньше движения»: ни одна бесконечная анимация не идёт (пятна, покачивание карты, перелив, линия Face ID, пульс кнопки)
+        ctx = b.new_context(viewport={'width': 1440, 'height': 900}, color_scheme=scheme, reduced_motion='reduce')
+        pg = ctx.new_page()
+        for fn in sorted(os.listdir(SCREENS)):
+            for layout in ('split', 'card'):
+                pg.goto('file://' + os.path.join(SCREENS, fn) + f'?layout={layout}')
+                pg.wait_for_timeout(300)
+                counts['motion'] += 1
+                run = pg.evaluate(MOTION)
+                if run:
+                    problems.append(f'motion/{scheme}/{layout}/{fn[:-5]}: runs with «reduce motion»: {sorted(set(run))[:5]}')
+        # подсказка в поле (placeholder) читается: от 4,5 к фону поля
+        pg.goto('file://' + os.path.join(SCREENS, 'forgot.html') + '?layout=split')
+        pg.wait_for_timeout(300)
+        ph = pg.evaluate(PLACEHOLDER)
+        if ph < 4.5:
+            problems.append(f'placeholder/{scheme}: contrast {ph:.2f} < 4.5')
+        ctx.close()
+    # тёмная тема по системе = data-theme="dark": панель та же (страницы хаба темы не ставят)
+    ctx = b.new_context(viewport={'width': 1440, 'height': 900}, color_scheme='dark')
+    pg = ctx.new_page()
+    bgs = []
+    for q in ('?layout=split', '?layout=split&theme=dark'):
+        pg.goto('file://' + os.path.join(SCREENS, 'login.html') + q)
+        pg.wait_for_timeout(200)
+        bgs.append(pg.evaluate('getComputedStyle(document.querySelector(".gid-aside")).backgroundImage'))
+    if bgs[0] != bgs[1]:
+        problems.append('dark theme by system: the split panel differs from data-theme="dark"')
+    # ₽ и латиница с диакритикой рисуются Montserrat (подмножество latin-ext), а не системным шрифтом
+    pg.goto('file://' + os.path.join(SCREENS, 'login.html') + '?layout=split')
+    pg.evaluate('''() => { const s = document.createElement('p'); s.id = 'qaRub'; s.className = 'gid-sub'; s.textContent = '1 990 ₽ Łódź';
+        document.querySelector('.gid-card').appendChild(s); return document.fonts.load('500 15px Montserrat', '₽Łó'); }''')
+    pg.wait_for_timeout(300)
+    cdp = ctx.new_cdp_session(pg)
+    cdp.send('DOM.enable')
+    cdp.send('CSS.enable')
+    node = cdp.send('DOM.querySelector', {'nodeId': cdp.send('DOM.getDocument', {'depth': -1})['root']['nodeId'], 'selector': '#qaRub'})['nodeId']
+    rub = cdp.send('CSS.getPlatformFontsForNode', {'nodeId': node})['fonts']
+    if not rub or any('Montserrat' not in f['familyName'] or not f['isCustomFont'] for f in rub):
+        problems.append(f'₽ and latin-ext letters are not drawn with the kit Montserrat: {rub}')
+    ctx.close()
+
     # e-mail card: 600 and 375 px; light, dark (Apple Mail honours color-scheme), inverted (Gmail on iPhone)
     for vw, vh, tag in [(600, 900, 'wide'), (375, 812, 'phone')]:
         for mode in ('light', 'dark', 'gmail-ios'):
@@ -397,7 +580,7 @@ with sync_playwright() as p:
                 errs = []
                 pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type in ('error', 'warning') else None)
                 pg.route(EMAIL_PNG_URL, lambda route: route.fulfill(path=EMAIL_PNG, content_type='image/png'))
-                pg.route(re.compile(r'^https?://(?!levauth\.global-generations-edu\.com/assets/gg-id/email/).*'),
+                pg.route(re.compile(r'^https?://(?!id\.global-generations-edu\.com/assets/gg-id/email/).*'),
                          lambda route: (errs.append(f'network: {route.request.url}'), route.abort()))
                 pg.set_content(email_page(data), wait_until='load')
                 if mode == 'gmail-ios':
@@ -411,12 +594,12 @@ with sync_playwright() as p:
                     problems.append(f'{label}: low contrast {r["low"][:4]}')
                 if not r['img']:
                     problems.append(f'{label}: lockup image did not load')
-                if mode == 'gmail-ios' and r['plate'] < 3:     # inverted card: the navy plate keeps the white logo readable
-                    problems.append(f'{label}: lockup plate lost on the inverted card ({r["plate"]:.2f})')
-                if mode != 'gmail-ios' and r['plate'] > 1.05:  # normal card: the plate is the card colour, no visible box
-                    problems.append(f'{label}: lockup plate differs from the card colour ({r["plate"]:.2f})')
-                if mode == 'dark' and r['bodyLum'] > 0.1:
-                    problems.append(f'{label}: light page around the card in dark mode (luminance {r["bodyLum"]:.2f})')
+                if mode != 'gmail-ios' and r['plate'] < 3:     # the navy logo reads on the light card (Gmail on iPhone inverts the card, not the image)
+                    problems.append(f'{label}: the navy logo has low contrast on the card ({r["plate"]:.2f})')
+                if mode == 'dark' and r['bodyLum'] < 0.5:      # color-scheme light: Apple Mail keeps the letter light
+                    problems.append(f'{label}: the letter went dark although it says color-scheme light (luminance {r["bodyLum"]:.2f})')
+                if not r['actions']:
+                    problems.append(f'{label}: no «Задать пароль» button or «Инструкция: как войти» link in the letter')
                 if r['left']:
                     problems.append(f'{label}: placeholders left in text')
                 if r['dashes']:
@@ -650,7 +833,9 @@ with sync_playwright() as p:
         ctx.close()
     b.close()
 
-summary = (f'{counts["screens"]} screen renders, {counts["layout"]} showcase layout states, {counts["service"]} gg-id-service.js tests, '
+summary = (f'{counts["screens"]} screen renders, {counts["widths"]} renders at 360/768/1024 px and 200 %, {counts["short"]} short windows, '
+           f'{counts["focus"]} focus stops, {counts["motion"]} reduced-motion renders, '
+           f'{counts["layout"]} showcase layout states, {counts["service"]} gg-id-service.js tests, '
            f'{counts["card"]} card renders, {counts["email"]} e-mail renders, '
            f'{counts["showcase"]} showcase states')
 if problems:

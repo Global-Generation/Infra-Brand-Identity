@@ -22,7 +22,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
 .sc-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:26px;flex-wrap:wrap}
 .sc-top .gid-lockup{margin:0}
-.sc-top .meta{font-size:12.5px;font-weight:600;color:var(--mfg)}
+.sc-top .meta{font-size:12.5px;font-weight:600;color:var(--sfg)}
 .sc-hero{padding-top:46px}
 .sc-hero h1{margin:0;font-size:64px;line-height:.95;font-weight:700;letter-spacing:-.045em;color:var(--navy)}
 .sc-hero p{margin:16px 0 0;max-width:720px;font-size:16px;line-height:1.6;color:var(--sfg)}
@@ -39,7 +39,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-tabs{display:flex;gap:6px;margin-top:14px;padding-bottom:6px;overflow-x:auto;scrollbar-width:thin}
 .sc-tab{flex:none;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:#fff;padding:9px 13px;border-radius:999px;
   font:600 12.5px/1 var(--font);color:var(--sfg);cursor:pointer;transition:border-color .15s,background-color .15s,color .15s}
-.sc-tab i{font-style:normal;font-weight:700;color:var(--lfg)}
+.sc-tab i{font-style:normal;font-weight:700;color:var(--mfg)}
 .sc-tab:hover{border-color:var(--border-hi);color:var(--fg)}
 .sc-tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 .sc-tab[aria-selected="true"] i{color:rgba(255,255,255,.6)}
@@ -50,7 +50,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-chrome{height:42px;display:flex;align-items:center;gap:14px;padding:0 14px;background:#f5f8fb;border-bottom:1px solid var(--border)}
 .sc-dots{display:flex;gap:7px;flex:none}.sc-dots i{width:11px;height:11px;border-radius:50%;background:#d6dee8}
 .sc-url{flex:1;min-width:0;max-width:540px;margin:0 auto;height:28px;border-radius:8px;background:#fff;border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;gap:7px;padding:0 10px;font:600 12px var(--font);color:var(--mfg);white-space:nowrap;overflow:hidden}
+  display:flex;align-items:center;justify-content:center;gap:7px;padding:0 10px;font:600 12px var(--font);color:var(--sfg);white-space:nowrap;overflow:hidden}
 .sc-url svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .sc-url span{overflow:hidden;text-overflow:ellipsis}
 .sc-viewport{position:relative;overflow:hidden}
@@ -84,7 +84,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-sec{padding-top:72px}
 .sc-sec h2{margin:0;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.03em;color:var(--navy)}
 .sc-sec > .wrap > p,.sc-sec .lead{margin:10px 0 0;max-width:760px;font-size:15px;line-height:1.6;color:var(--sfg)}
-.sc-sec .lead a{color:var(--sky-ink);font-weight:600;text-underline-offset:3px}
+.sc-sec .lead a{color:var(--navy);font-weight:600;text-underline-offset:3px}
 .sc-comp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
 .sc-card--wide{grid-column:1/-1}
 .sc-card{min-width:0;display:flex;flex-direction:column;gap:14px;padding:22px;border-radius:20px;background:#fff;border:1px solid var(--border)}
@@ -100,7 +100,8 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-hdr-row{display:flex;flex-wrap:wrap;gap:12px;width:100%}
 .sc-hdr-row .sc-hdr{flex:0 1 auto;width:auto;min-width:0}.sc-hdr-row .sc-hdr--m{flex:0 1 330px}.sc-hdr-row .sc-hdr--s{flex:0 1 260px}
 .sc-menu-slot .gid-menu{width:100%;max-width:300px}
-.sc-open{font:600 13px var(--font);color:var(--sky-ink);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.sc-fb-demo{align-items:stretch;background:#fff;border:1px solid var(--border)}
+.sc-open{margin-top:8px;font:600 13px var(--font);color:var(--navy);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
 
 .sc-how{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;margin-top:26px;align-items:start}
 .sc-rules{margin:0;padding:22px 22px 22px 44px;border-radius:20px;background:#fff;border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55;color:var(--sfg)}
@@ -113,17 +114,17 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 .sc-api td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--sfg);line-height:1.5;overflow-wrap:anywhere}
 .sc-api tr:last-child td{border-bottom:0}
 .sc-api td b{display:block;color:var(--fg);font-size:13.5px}
-.sc-api td span{display:block;font:500 11.5px var(--mono);color:var(--lfg);margin-top:2px}
+.sc-api td span{display:block;font:500 11.5px var(--mono);color:var(--mfg);margin-top:2px}
 .sc-api th:first-child{width:24%}.sc-api th:last-child{width:34%}
 .sc-api td code{display:inline-block;max-width:100%;overflow-wrap:anywhere}
-.sc-foot{padding:64px 0 48px;font-size:12.5px;color:var(--mfg)}
+.sc-foot{padding:64px 0 48px;font-size:12.5px;color:var(--sfg)}
 
 /* карточка GG ID */
 .sc-idc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:26px}
 .sc-idc-cell{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 28px 22px;
   border-radius:20px;background:#f3f7fb;border:1px solid var(--border)}
 .sc-idc-cell.dark{background:#081b26;border-color:#081b26}
-.sc-idc-cell figcaption,.sc-idc-cell > p{margin:0;font-size:12.5px;font-weight:600;color:var(--mfg);text-align:center}
+.sc-idc-cell figcaption,.sc-idc-cell > p{margin:0;font-size:12.5px;font-weight:600;color:var(--sfg);text-align:center}
 .sc-idc-cell.dark figcaption{color:#8ea4b7}
 .sc-idc-rows{align-items:stretch;padding:28px}
 .sc-row-demo{display:flex;justify-content:center;padding:22px 16px;border-radius:14px;background:#fff;border:1px solid var(--border)}
@@ -165,7 +166,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
 <section class="wrap sc-hero">
   <h1>GG ID</h1>
-  <p>Единый вход во все сервисы Global Generation: @N_LOGIN@ экранов входа, карточка GG ID, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе levauth.</p>
+  <p>Единый вход во все сервисы Global Generation: @N_LOGIN@ экранов входа, карточка GG ID, три раскладки, светлая и тёмная тема, компоненты для шапок сервисов. Кит лежит в <code>gg-id/</code>, экраны живут в хабе GG ID.</p>
 </section>
 
 <section class="wrap">
@@ -219,7 +220,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     <h3 class="sc-sub">Где показываем</h3>
     <div class="sc-where">
       <div><b>Кабинет «Мои сервисы»</b><span>Вверху /cabinet/ хаба, над списком сервисов: человек сразу видит, что вошёл под своим аккаунтом.</span></div>
-      <div><b>Письмо-приглашение</b><span>В письме «Ваш единый вход готов»: письмо-безопасная копия <code>gg-id/email-card.html</code>.</span></div>
+      <div><b>Письмо-приглашение</b><span>В письме «Ваш Global Generation ID готов»: письмо-безопасная копия <code>gg-id/email-card.html</code>.</span></div>
       <div><b>Онбординг</b><span>Первый вход после приглашения и первый день в команде: «Ваш GG ID» рядом с чек-листом доступов.</span></div>
       <div><b>Инструкция «Как войти»</b><span>Образец карточки в <code>kak-voyti.html</code> хаба: так выглядит ваш GG ID.</span></div>
     </div>
@@ -228,10 +229,10 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     <div class="sc-mail">
       <div class="sc-mail-frame"><iframe title="Карточка GG ID в письме" id="mailFrame" srcdoc="@EMAIL_SRCDOC@"></iframe></div>
       <div class="sc-mail-notes">
-        <p><b>Файл:</b> <code>gg-id/email-card.html</code>. Таблицы и встроенные стили, системный шрифт, без внешних шрифтов и скриптов. Хаб вставляет в своё письмо блок между метками <code>gg-id-card:start</code> и <code>gg-id-card:end</code>.</p>
-        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{initials}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> <code>{{since}}</code>. Каждое значение экранируется как HTML.</p>
-        <p><b>Тёмная тема:</b> Apple Mail оставляет карточку navy. Gmail на Android тёмный фон не трогает. Gmail на iPhone инвертирует цвета: текст остаётся контрастным, подпись с логотипом на своей navy-плашке.</p>
-        <p><b>Подпись:</b> картинка <code>gg-id/email/gg-id-lockup-2x.png</code> по https из <code>/assets/gg-id/</code> хаба: почта не рисует SVG.</p>
+        <p><b>Файл:</b> <code>gg-id/email-card.html</code>, стиль «Итог», как письмо-приглашение Infra-AWS #93: светлая карта, как в «Мои сервисы», с номером GG ID, белая кнопка «Задать пароль» с тонкой рамкой, ссылка текстом «Инструкция: как войти», вход в сервисах «Войти через GG ID». Таблицы и встроенные стили, системный шрифт, без внешних шрифтов и скриптов. Хаб вставляет в письмо блоки между метками <code>gg-id-card</code> и <code>gg-id-actions</code>.</p>
+        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> в карте, <code>{{link}}</code> <code>{{guide_url}}</code> в кнопках. Каждое значение экранируется как HTML. Фото и плашки инициалов нет, как в ките.</p>
+        <p><b>Тёмная тема:</b> письмо светлое (<code>color-scheme: light</code>), Apple Mail его не перекрашивает. Gmail на iPhone инвертирует цвета, но не картинки: текст остаётся контрастным.</p>
+        <p><b>Логотип:</b> картинка <code>gg-id/email/gg-logo-navy-2x.png</code> по https из <code>/assets/gg-id/</code> хаба: почта не рисует SVG.</p>
       </div>
     </div>
   </div>
@@ -252,7 +253,17 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         <div class="sc-demo dark gid-kit" data-theme="dark">
           <a class="gid-sso gid-sso--on-dark" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
         </div>
-        <p>Значок = иконка GG ID: белый ключ на светлом градиенте, как фавикон экранов входа. Ведёт на <code>/api/auth/authorize</code> хаба, возврат на ту же страницу.</p>
+        <div class="sc-demo gid-kit sc-fb-demo" data-theme="light">
+          <a class="gid-sso gid-sso--block" href="#" data-noop><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
+          <details class="gid-fb" id="scFb">
+            <summary class="gid-link gid-link--muted gid-link--sm"><span>Резервный вход</span><svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-down"/></svg></summary>
+            <form class="gid-form" novalidate data-noop-form>
+              <div class="gid-field"><label class="gid-label" for="scFbPass">Пароль</label><input class="gid-input" id="scFbPass" type="password" autocomplete="current-password"></div>
+              <button class="gid-btn gid-btn--secondary" type="submit"><span>Войти по паролю</span></button>
+            </form>
+          </details>
+        </div>
+        <p>Значок = иконка GG ID: белый ключ на светлом градиенте, как фавикон экранов входа. Ведёт на <code>/api/auth/authorize</code> хаба, возврат на ту же страницу. Прежний вход сервиса, пока он нужен, свёрнут под кнопкой как «Резервный вход» (<code>details.gid-fb</code>): раскрывается мышью и с клавиатуры.</p>
       </div>
       <div class="sc-card">
         <h3>Сессия истекла</h3>
@@ -275,7 +286,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           </div>
           <div class="sc-menu-slot" id="menuSlot">
             <div class="gid-menu" role="menu" aria-label="Аккаунт" id="scAcctMenu">
-              <div class="gid-menu-head"><span class="gid-avatar" aria-hidden="true">ЛА</span><div class="gid-menu-head-tx"><b>Лёв Авдошин</b><span>lev@global-generations.com</span></div></div>
+              <div class="gid-menu-head"><span class="gid-avatar" aria-hidden="true">ЛА</span><div class="gid-menu-head-tx"><b>Лёв Авдошин</b><span>lev<wbr><span class="gid-nowrap">@global-generations.com</span></span></div></div>
               <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg>Мои сервисы</a>
               <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-shield-check"/></svg>Аккаунт GG ID<span class="gid-menu-meta">Face ID, пароль</span></a>
               <div class="gid-menu-sep"></div>
@@ -296,7 +307,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <section class="sc-sec">
   <div class="wrap">
     <h2>Как подключить</h2>
-    <p class="lead">Экраны входа один раз собираются в хабе levauth (Lambda gg-portal-auth), сервисы только отправляют туда человека и показывают аккаунт. Подробно: <code>gg-id/README.md</code>.</p>
+    <p class="lead">Экраны входа один раз собираются в хабе GG ID (id.global-generations-edu.com, Lambda gg-portal-auth), сервисы только отправляют туда человека и показывают аккаунт. Подробно: <code>gg-id/README.md</code>.</p>
     <div class="sc-how">
       <div>
         <ol class="sc-rules">
@@ -334,7 +345,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   <div class="gid-dialog" aria-labelledby="dlgT2">
     <h2 class="gid-h" id="dlgT2">Сессия истекла</h2>
     <p class="gid-sub">Войдите снова, и мы вернём вас на эту же страницу.</p>
-    <a class="gid-sso gid-sso--block" href="https://levauth.global-generations-edu.com/api/auth/authorize?client_id=demo" data-noop data-gid-return="next"><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
+    <a class="gid-sso gid-sso--block" href="https://id.global-generations-edu.com/api/auth/authorize?client_id=demo" data-noop data-gid-return="next"><svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="true"><use href="#gid-id-icon"/></svg><span>Войти через GG&nbsp;ID</span></a>
   </div>
 </div>
 <!--@SPRITE@-->
@@ -435,7 +446,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     if (st.d === 'desktop') {
       var br = document.createElement('div'); br.className = 'sc-browser';
       br.innerHTML = '<div class="sc-chrome"><div class="sc-dots"><i></i><i></i><i></i></div><div class="sc-url"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span></span></div><div style="width:47px"></div></div><div class="sc-viewport"><div class="sc-screen"></div></div>';
-      br.querySelector('.sc-url span').textContent = 'levauth.global-generations-edu.com' +
+      br.querySelector('.sc-url span').textContent = 'id.global-generations-edu.com' +
         (m.path || '/login' + (svcSel.value === 'hub' ? '' : '?client=' + svcSel.value));
       var vp = br.querySelector('.sc-viewport'), scr = br.querySelector('.sc-screen');
       var g = build(st.s); g.style.setProperty('--gid-h', '800px'); scr.appendChild(g); wire(g);
@@ -496,6 +507,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
   // компоненты: ссылки-заглушки, меню аккаунта, окно поверх страницы
   document.querySelectorAll('[data-noop]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
+  document.querySelectorAll('[data-noop-form]').forEach(function (f) { f.addEventListener('submit', function (e) { e.preventDefault(); }); });
   // меню аккаунта и окно «Сессия истекла» оживляет gg-id-service.js, как в сервисах
   document.getElementById('openDlg').addEventListener('click', function () { GGIDService.sessionExpired(); });
 

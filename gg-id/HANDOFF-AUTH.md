@@ -1,8 +1,8 @@
 # Хэндов: дизайн GG ID → AUTH-агенту
 
-Кому: агент, который ведёт вход GG (хаб levauth, Lambda `gg-portal-auth`, sso-gate, SSO сервисов).
+Кому: агент, который ведёт вход GG (хаб GG ID `https://id.global-generations-edu.com`, старый адрес `levauth.global-generations-edu.com` пока алиас; Lambda `gg-portal-auth`, sso-gate, SSO сервисов).
 От кого: агент дизайна GG ID (сессия «gg-id login block»), 08.10.2026.
-Статус: кит готов и проверен, лежит в PR [Infra-Brand-Identity#21](https://github.com/Global-Generation/Infra-Brand-Identity/pull/21) (ветка `feat/gg-id-auth`, не смержен). В хабе ничего не менялось. Лёв посмотрел витрину: «прикольно».
+Статус на 08.10 (вечер): всё из этого хэндова сделано. Кит смержен (Infra-Brand-Identity #21, #24-#27) и доведён QA-правкой «2026-10-08.2» (версия кита = `gg-id/VERSION`, она же `GGID.version` и `GGIDService.version`): видимое кольцо фокуса, «меньше движения» без бесконечных анимаций, карта на панели в низком окне и на телефоне, «Резервный вход», latin-ext шрифт (₽), письмо в стиле «Итог». Хаб на ките (Infra-Services-Portal #140, #145, #149): в хабе `assets/gg-id/VERSION` = полный sha коммита кита, обновлять только `scripts/sync-gg-id.sh <sha>`. Ниже исходный план, адреса обновлены на `id.*`.
 
 ---
 
@@ -91,7 +91,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 
 ### PR 4. sso-gate: PIN, «нет доступа», «выбор входа», «недоступен», ошибки
 
-Раздел 4.5. Это другие хосты (не levauth), поэтому кит там встраивается иначе.
+Раздел 4.5. Это другие хосты (не хаб GG ID), поэтому кит там встраивается иначе.
 
 ### PR 5+. Сервисы: кнопка «Войти через GG ID», аккаунт, «сессия истекла»
 
@@ -143,7 +143,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 </html>
 ```
 
-- Иконки: `<svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-eye"/></svg>`. Внешний спрайт работает только с того же origin, на levauth это так. Иконку GG ID (`gid-id-icon`, в ней градиент) в сервисах надёжнее вставлять инлайн: готовый SVG в README кита, раздел «Иконка GG ID».
+- Иконки: `<svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-eye"/></svg>`. Внешний спрайт работает только с того же origin, на хабе GG ID это так. Иконку GG ID (`gid-id-icon`, в ней градиент) в сервисах надёжнее вставлять инлайн: готовый SVG в README кита, раздел «Иконка GG ID».
 - Разметку каждого вида брать из `gg-id/screens/<экран>.html` (внутри `<section class="gid-card">`), убрать `data-go` (это демо-переходы) и `href="<экран>.html"`.
 - `gg-id.js` сам вызывает `GGID.init(document)` на загрузке. Если вид появляется позже или в нём меняется разметка, вызвать `GGID.init(узел)` ещё раз (повторно уже обработанные элементы не трогаются).
 - Показ видов: атрибут `hidden` (кит его не переопределяет). Скрытые виды не фокусируются.
@@ -160,7 +160,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 6. `GET /api/auth/capabilities`: `password_reset === true` показывает «Забыли пароль?». Ссылки «Войти через Aura» на экранах GG ID нет (решение Лёва 08.10: Aura и GG раздельно), `aura_login` экраны входа не читают.
 7. Face ID доступен, только если `GGPasskey.supported` и `platformAvailable()` и `enabled().enabled`.
 8. `NotAllowedError` от `GGPasskey.login()` (человек закрыл системное окно) = тихо вернуть вид, **без** текста ошибки. Любая другая ошибка = «Face ID не сработал, войдите по паролю» и вид пароля.
-9. Супер-админ: тот же `POST /api/auth/login` с `email: 'superadmin'`, поле почты скрыто. В ките отдельного экрана нет: тихая ссылка «Войти как супер-админ» в `.gid-alt` под формой пароля (`gid-link gid-link--muted gid-link--sm`), по нажатию `form.classList.toggle('sa')`, почту прятать, подзаголовок «Супер-админ. Введите пароль».
+9. Резервный вход (вход Лёва на крайний случай, прежний «супер-админ»): тот же `POST /api/auth/login` с `email: 'superadmin'`, поле почты скрыто. На публичной странице слова «супер-админ» нет: под формой пароля свёрнутый блок кита `details.gid-fb` с подписью «Резервный вход» (`summary.gid-link.gid-link--muted.gid-link--sm` и стрелка), раскрыт = резервный вход (`form.classList.toggle('sa')`, почту прятать, подзаголовок «Резервный вход. Введите пароль.»), свёрнут = обычный. Раскрывается мышью и с клавиатуры.
 10. Ошибки: 401 = «Неверная почта или пароль. Проверьте раскладку и Caps Lock.» (для супер-админа «Неверный пароль»), 429 = «Слишком много попыток, подождите минуту», сеть = «Сеть недоступна», прочее = «Не получилось войти (ошибка N). Попробуйте ещё раз». Пароль очистить, фокус в пароль.
 
 **Виды и что показывать первым**
@@ -204,7 +204,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
   </form>
   <div id="pkAltWrap"><div class="gid-or"><span>или</span></div>
     <button class="gid-btn gid-btn--secondary" type="button" id="pkAlt">...Войти с Face ID</button></div>
-  <div class="gid-alt"><button class="gid-link gid-link--muted gid-link--sm" type="button" id="saToggle">Войти как супер-админ</button></div>
+  <div class="gid-alt"><details class="gid-fb" id="saBox"><summary class="gid-link gid-link--muted gid-link--sm" id="saToggle"><span>Резервный вход</span><svg class="gid-ic" aria-hidden="true"><use href="/assets/gg-id/sprite.svg#gi-chevron-down"/></svg></summary></details></div>
 </div>
 
 <div data-view="enroll" hidden>... id="enrollBtn" (primary), id="enrollSkip" (gid-btn--quiet «Не сейчас») ...</div>
@@ -269,10 +269,10 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
   $('pkBtn').addEventListener('click', face);
   $('pkAlt').addEventListener('click', face);
   $('pwBtn').addEventListener('click', function () { view('password'); $('email').focus(); });
-  $('saToggle').addEventListener('click', function () {                          // 9
-    var on = $('form').classList.toggle('sa');
+  $('saBox').addEventListener('toggle', function () {                            // 9: «Резервный вход» раскрыт = вход без почты
+    var on = this.open;
+    $('form').classList.toggle('sa', on);
     $('email').closest('.gid-field').hidden = on;
-    this.textContent = on ? 'Обычный вход' : 'Войти как супер-админ';
     GGID.error(card, '');
     (on ? $('password') : $('email')).focus();
   });
@@ -360,7 +360,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 | `unavailable_page(pin=False)` → `sso-unavailable-gate.html` | `unavailable` | без PIN (гейт лежит, PIN проверяет он же) |
 | `error_page(title, body)` | общий: `gid-h` + `gid-sub` + главная «Войти заново» | заголовки и тексты оставить как в `gate.py` («Вход не подтверждён», «Вход не удался», «Сессия уже закончилась...») |
 
-Особенность: это не levauth, `/assets/gg-id/` там не отдаётся, а шрифт с чужого origin браузер не загрузит без CORS. Два варианта:
+Особенность: это не хаб GG ID, `/assets/gg-id/` там не отдаётся, а шрифт с чужого origin браузер не загрузит без CORS. Два варианта:
 - **А (проще, как сейчас с логотипом)**: `gate.py` встраивает CSS кита и шрифты `data:` прямо в страницу. Объём ~110 КБ на страницу, для редких страниц ошибок нормально. Лимит nginx 4096 байт касается только встраивания строкой в конфиг, а у тебя страницы отдаются файлами и из Python.
 - **Б**: класть кит в `/var/www/gg-gate/gg-id/` тем же `sso-gate/deploy.sh --apply` и отдавать через существующий `location ^~ /__gate/` (проверить, что он отдаёт подпапку и не требует PIN для статики). Тогда страницы ссылаются на `/__gate/gg-id/gg-id.css`.
 
@@ -372,8 +372,8 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 
 Правило для всех сервисов GG: своей формы пароля и PIN нет. На экране сервиса одна кнопка, в шапке аккаунт, на 401 окно. Разметка целиком в витрине (раздел «Компоненты для сервисов») и в `gg-id/README.md`.
 
-1. **Кнопка «Войти через GG ID»** (`.gid-sso`): ведёт на `https://levauth.global-generations-edu.com/api/auth/authorize?...` (параметры по твоему SSO-контракту). Варианты: обычная navy, `--light` (на белом), `--on-dark` (на navy), `--sm` (в шапке), `--block` (во всю ширину). Значок = иконка GG ID: белый ключ на светлом градиенте `--grad-tile` (`gid-id-icon`, инлайн SVG из README кита: у сервиса свой origin, поэтому внешний спрайт хаба не подойдёт). Тёмную плитку корня GG не ставить (правило 4a).
-2. **Аккаунт в шапке** (`.gid-acct` = `.gid-chip` + `.gid-menu`, поведение в `gg-id-service.js`): инициалы на navy-градиенте (без фото), имя; в меню имя и почта, «Мои сервисы» → `https://levauth.global-generations-edu.com/cabinet/`, «Аккаунт GG ID» (Face ID и пароль) → страница хаба для ключей (если её нет, пока убрать пункт), «Выйти» → выход сервиса + отзыв сессии (`/api/v1/sessions/revoke` по контракту), затем экран `signedout`.
+1. **Кнопка «Войти через GG ID»** (`.gid-sso`): ведёт на `https://id.global-generations-edu.com/api/auth/authorize?...` (параметры по твоему SSO-контракту). Стиль A: белая с тонкой рамкой `#c9d5e1`, без navy-заливки. Варианты: `--light` (на белом), `--on-dark` (на navy), `--sm` (в шапке), `--block` (во всю ширину). Прежний вход сервиса, пока он нужен, сворачивать под кнопку как «Резервный вход» (`details.gid-fb`). Значок = иконка GG ID: белый ключ на светлом градиенте `--grad-tile` (`gid-id-icon`, инлайн SVG из README кита: у сервиса свой origin, поэтому внешний спрайт хаба не подойдёт). Тёмную плитку корня GG не ставить (правило 4a).
+2. **Аккаунт в шапке** (`.gid-acct` = `.gid-chip` + `.gid-menu`, поведение в `gg-id-service.js`): инициалы на navy-градиенте (без фото), имя; в меню имя и почта, «Мои сервисы» → `https://id.global-generations-edu.com/cabinet/`, «Аккаунт GG ID» (Face ID и пароль) → страница хаба для ключей (если её нет, пока убрать пункт), «Выйти» → выход сервиса + отзыв сессии (`/api/v1/sessions/revoke` по контракту), затем экран `signedout`.
 3. **Сессия истекла** (`.gid-scrim` + `.gid-dialog`): на 401 от API сервиса вместо внезапного выброса на логин. Текст «Войдите снова, и мы вернём вас на эту же страницу.», кнопка GG ID с возвратом на текущий URL. Esc и клик по фону закрывают.
 
 Подключение в сервисе: обёртка с классом `gid-kit` (даёт токены, тема по системе или `data-theme`), `gg-id.css` копией в статику сервиса (или только нужные блоки), Montserrat у сервисов GG и так самохостом из бренд-репо.
@@ -407,7 +407,7 @@ uv run --with playwright python src/check_gg_id.py   # 17 x 3 x 2 x 2 = 204 ре
 
 ## 8. Решения Лёва (не решать за него)
 
-1. **Раскладка**: по умолчанию «Сплит» (тёмная панель с бегущими названиями сервисов). Альтернативы «Карточка» и «Минимал» переключаются одним атрибутом `data-layout`.
+1. **Раскладка**: по умолчанию «Сплит» (navy-панель с картой GG ID на ленте, с 08.10 «Итог»; на телефоне в низком окне бейдж карты в строке над формой). Альтернативы «Карточка» и «Минимал» переключаются одним атрибутом `data-layout`. Текст панели без списка внутренних сервисов (страницы публичные).
 2. **Шапка «GG × Aura»** на входе хаба: решено 08.10, только GG, без логотипа и без ссылки Aura.
 3. **Подпись у логотипа**: сейчас «ID» (= Global Generation ID). Если хочет буквально «GG ID», это одна строка в ките.
 4. **Предложение Face ID** после входа по паролю: показывать (рекомендую) и как часто после «Не сейчас» (в эскизе 7 дней).
