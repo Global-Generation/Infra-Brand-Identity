@@ -23,7 +23,7 @@ VARIANTS = [
     ("v9", "Воздух", "Больше расстояние, название крупнее и легче. Для экранов входа и обложек."),
     ("v10", "В тон логотипу", "Название капсом с широкой разрядкой, эхом надписи GLOBAL GENERATION."),
 ]
-SERVICES = [("АКБ", "hub.global-generations-edu.com"), ("Пульс", "pulse.global-generations-edu.com"),
+SERVICES = [("АКБ", "akb.global-generations-edu.com"), ("Пульс", "pulse.global-generations-edu.com"),
             ("Кабинет ментора", "cabinet.global-generations-edu.com"), ("Студенческий портал", "students.global-generations-edu.com")]
 
 

@@ -18,7 +18,7 @@ ICONS = {"akb": "people", "pulse": "pulse", "cabinet": "briefcase", "legal": "sc
 
 rows = [("root", "Global Generation: сайт, каталог, письма", "-", "root", "-")]
 rows += [(k, n, h, f, r) for k, n, h, f, r, _ in b.SITES if k != "root"]
-rows.insert(1, ("pulse", "Пульс (вкладка АКБ)", "hub.*", "internal", "GG-Product-Mentorship-AKB"))
+rows.insert(1, ("pulse", "Пульс (вкладка АКБ)", "akb.*", "internal", "GG-Product-Mentorship-AKB"))
 out = []
 for key, name, host, fam, repo in rows:
     if key == "site":

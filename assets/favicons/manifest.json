@@ -19,7 +19,7 @@
  {
   "key": "pulse",
   "name": "Пульс (вкладка АКБ)",
-  "host": "hub.*",
+  "host": "akb.*",
   "repo": "GG-Product-Mentorship-AKB",
   "family": "internal",
   "favicon": "assets/favicons/pulse.svg",
@@ -206,7 +206,7 @@
  {
   "key": "akb",
   "name": "АКБ и Пульс",
-  "host": "hub.*",
+  "host": "akb.*",
   "repo": "GG-Product-Mentorship-AKB",
   "family": "internal",
   "favicon": "assets/favicons/akb.svg",
