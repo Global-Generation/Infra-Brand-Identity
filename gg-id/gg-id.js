@@ -8,7 +8,8 @@
   // Правило (Лёв, 09.10.2026): Touch ID, Windows Hello, «отпечаток» и «палец» только когда в ЭТОМ браузере уже срабатывал ключ самого устройства.
   // По виду устройства нельзя: у MacBook есть датчик, а ключ GG ID может лежать только в iPhone, и тогда Chrome показывает один QR-код.
   // Иначе Face ID (он на телефоне и верен везде) и подсказка про оба пути. Исключение: enroll, ключ создаётся здесь. HANDOFF-AUTH.md, раздел 6.1.
-  // Память в localStorage, имена общие со входом хаба и страницей Face ID для админов (один origin): менять только везде сразу. Всё в try/catch.
+  // Память в localStorage, имена общие со входом хаба и страницами Face ID для админов (Infra-AWS, Infra-Auth): менять только везде сразу.
+  // Каждое обращение в try/catch. Пока на странице нет разметки входа по ключу, кит хранилища не трогает.
   var PK_LOCAL = 'gg-id-local-key';    // '1': в этом браузере работает ключ устройства
   var PK_LAST = 'gg-id-last-method';   // platform (ключ устройства) или cross-platform (телефон, ключ безопасности): чем подтвердили в последний раз
   var PK_MISS = 'gg-id-local-miss';    // '1': при ключе устройства был NotAllowedError; если следом вошли с телефона, ключа уже нет
@@ -45,10 +46,11 @@
   var PASSKEY_ICON = { faceid: 'scan-face', hello: 'scan-face', touchid: 'fingerprint', finger: 'fingerprint', key: 'key-round' };
 
   // own = ключ устройства подтверждён и в последний раз вошли им: только тогда можно сказать «Touch ID».
+  // Время «Не сейчас» из будущего (часы сдвигали, мусор в хранилище) паузой не считается.
   function passkeyMemory() {
-    var last = lsGet(PK_LAST), skip = +lsGet(PK_SKIP) || 0, local = lsGet(PK_LOCAL) === '1';
+    var last = lsGet(PK_LAST), age = Date.now() - (+lsGet(PK_SKIP) || 0), local = lsGet(PK_LOCAL) === '1';
     last = last === 'platform' || last === 'cross-platform' ? last : '';
-    return { local: local, last: last, own: local && last === 'platform', miss: lsGet(PK_MISS) === '1', snoozed: Date.now() - skip < 7 * 864e5 };
+    return { local: local, last: last, own: local && last === 'platform', miss: lsGet(PK_MISS) === '1', snoozed: age >= 0 && age < 7 * 864e5 };
   }
   // Вход или создание ключа удались: how = чем подтвердили. cross-platform после осечки (miss) снимает ключ устройства. Иное: ничего не узнали.
   function passkeyRemember(how) {
@@ -66,15 +68,17 @@
 
   // Чем браузер подтвердил последний вызов navigator.credentials: platform, cross-platform или '' (не сказал). GGPasskey этого не отдаёт, знает браузер
   // (authenticatorAttachment): passkeyWatch() оборачивает get и create, запрос и ответ идут как шли. Один раз при загрузке.
-  var seen = '', watching = false;
+  // mine: метка обёрток этой копии кита. Чужую обёртку (другая копия кита на странице) за свою не считаем: у каждой копии свой seen.
+  var seen = '', watching = false, mine = {};
   function passkeySeen() { return seen; }
   function passkeyWatch() {
+    watching = false;
     try {
-      var creds = navigator.credentials, wrapped = 0;
+      var creds = navigator.credentials;
       ['get', 'create'].forEach(function (m) {
         var orig = creds && creds[m];
         if (typeof orig !== 'function') return;
-        if (!orig._gidWatch) {
+        if (orig._gidWatch !== mine) {
           var wrap = function () {
             seen = '';
             var p = orig.apply(creds, arguments);
@@ -84,49 +88,51 @@
               return cred;
             }) : p;
           };
-          wrap._gidWatch = true;
+          wrap._gidWatch = mine;
           creds[m] = wrap;
         }
-        wrapped++;
+        if (m === 'create') watching = creds[m]._gidWatch === mine;
       });
-      watching = wrapped === 2;
-    } catch (e) {}
+    } catch (e) { watching = false; }
   }
-  // Ключ создан здесь (GGPasskey.register): страница просила ключ устройства, поэтому молчание браузера = ключ устройства. Без passkeyWatch() не пишем.
+  // Ключ создан здесь (GGPasskey.register): страница просила ключ устройства, поэтому молчание браузера = ключ устройства. Без create в passkeyWatch() не пишем.
   function passkeyCreated() { if (watching) passkeyRemember(seen === 'cross-platform' ? 'cross-platform' : 'platform'); }
 
-  function passkeyText(phrase, kind) {
-    if (phrase === 'wait') return PASSKEY_WAIT;
-    kind = kind || passkeyKind();
+  // Какой способ назвать: слово устройства только при подтверждённом ключе (own), иначе Face ID (на Android фраза про ключ); enroll всегда по устройству.
+  function labelKind(phrase, kind, own) {
     if (!PASSKEY_TEXT[kind]) kind = 'key';
-    if (!/^enroll/.test(phrase) && !passkeyMemory().own) kind = kind === 'finger' ? 'key' : 'faceid';
-    return PASSKEY_TEXT[kind][phrase] || PASSKEY_TEXT[kind].login;
+    return own || /^enroll/.test(phrase) ? kind : (kind === 'finger' ? 'key' : 'faceid');
   }
-  function passkeyIcon(phrase, kind) {
-    kind = kind || passkeyKind();
-    if (!/^enroll/.test(phrase) && !passkeyMemory().own) return kind === 'finger' ? 'key-round' : 'scan-face';
-    return PASSKEY_ICON[kind] || 'key-round';
+  function textFor(phrase, kind, own) {
+    if (phrase === 'wait') return PASSKEY_WAIT;
+    var k = labelKind(phrase, kind, own);
+    return PASSKEY_TEXT[k][phrase] || PASSKEY_TEXT[k].login;
   }
+  function iconFor(phrase, kind, own) { return PASSKEY_ICON[labelKind(phrase, kind, own)]; }
   // Подсказка, пока открыто окно браузера. На iPhone, iPad и Android QR-кода нет.
-  function passkeyHint(kind) {
-    kind = kind || passkeyKind();
-    var m = passkeyMemory();
+  function hintFor(kind, m) {
     if (m.own) return 'Подтвердите вход: ' + (PASSKEY_WORD[kind] || PASSKEY_WORD.key) + ' на этом устройстве.';
     if (kind === 'faceid') return 'Подтвердите вход Face ID в системном окне. Это займёт секунду.';
     if (kind === 'finger') return 'Подтвердите вход в системном окне. Это займёт секунду.';
     if (m.last === 'cross-platform') return 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID.';
     return 'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.';
   }
+  function passkeyText(phrase, kind) { return textFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyIcon(phrase, kind) { return iconFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyHint(kind) { return hintFor(kind || passkeyKind(), passkeyMemory()); }
   // Разметка: data-gid-passkey="login|enroll|enroll-lead|wait", data-gid-passkey-icon на <svg> (по подписи в той же кнопке, путь к спрайту
-  // сохраняется), data-gid-passkey-hint.
+  // сохраняется), data-gid-passkey-hint. Нет такой разметки: хранилище не читаем.
   function paintPasskey(root) {
-    var kind = passkeyKind();
-    root.querySelectorAll('[data-gid-passkey]').forEach(function (el) { el.textContent = passkeyText(el.getAttribute('data-gid-passkey'), kind); });
-    root.querySelectorAll('[data-gid-passkey-icon] use').forEach(function (u) {
+    var labels = root.querySelectorAll('[data-gid-passkey]'), icons = root.querySelectorAll('[data-gid-passkey-icon] use'),
+        hints = root.querySelectorAll('[data-gid-passkey-hint]');
+    if (!labels.length && !icons.length && !hints.length) return;
+    var kind = passkeyKind(), m = passkeyMemory();
+    labels.forEach(function (el) { el.textContent = textFor(el.getAttribute('data-gid-passkey'), kind, m.own); });
+    icons.forEach(function (u) {
       var btn = u.closest('button, a'), label = btn && btn.querySelector('[data-gid-passkey]');
-      u.setAttribute('href', (u.getAttribute('href') || '').split('#')[0] + '#gi-' + passkeyIcon(label ? label.getAttribute('data-gid-passkey') : 'login', kind));
+      u.setAttribute('href', (u.getAttribute('href') || '').split('#')[0] + '#gi-' + iconFor(label ? label.getAttribute('data-gid-passkey') : 'login', kind, m.own));
     });
-    root.querySelectorAll('[data-gid-passkey-hint]').forEach(function (el) { el.textContent = passkeyHint(kind); });
+    hints.forEach(function (el) { el.textContent = hintFor(kind, m); });
   }
 
   function shake(el) {

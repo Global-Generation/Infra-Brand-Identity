@@ -4,7 +4,8 @@ The rule: Touch ID, Windows Hello, «отпечаток» and «палец» are
 (localStorage gg-id-local-key + gg-id-last-method = platform). Until then the kit says what is true everywhere: Face ID on the phone
 (QR code) or a key on this device. The offer to create a key here (enroll) may name the method of the device: the key is made on this
 device and the page shows the offer only after the browser said it can. The four localStorage names are shared with the sign-in page of
-the hub and with the Face ID confirmation page of the admins (Infra-Services-Portal #168, Infra-AWS #98): one origin, one memory.
+the hub and with the Face ID confirmation page of the admins (Infra-Services-Portal #168, Infra-AWS #98 and its port Infra-Auth #17): one
+origin, one memory.
 
 What is checked (Chromium):
   1. the sources: the four storage names, the sentences and the phrases word for word, no network calls, the docs carry the same;
@@ -14,7 +15,7 @@ What is checked (Chromium):
   4. the rules of the memory: what a confirmation by the device, by the phone, a miss, a cancelled attempt and «Не сейчас» change; nothing
      but the four names is ever written;
   5. storage that throws, a blocked localStorage getter and a browser without WebAuthn: nothing breaks, nothing is promised;
-  6. demo mode of the showcase keeps the words of the markup;
+  6. demo mode of the showcase keeps the words of the markup; a page without passkey markup is not touched (no storage reads);
   7. the real WebAuthn of Chromium (virtual authenticators over CDP, navigator.credentials is not replaced): a key of the device says
      «platform», a USB key says «cross-platform», GGID.passkeyWatch() reads it and the next load words the screen accordingly.
 Run alone: uv run --with playwright python src/check_gg_id_passkey.py   (it also runs inside src/check_gg_id.py)
@@ -29,7 +30,7 @@ KIT = os.path.join(ROOT, 'gg-id')
 SCREENS = os.path.join(KIT, 'screens')
 ORIGIN = 'http://localhost'          # a secure context for WebAuthn without a certificate; the pages are served from the repo by a route
 
-# shared with Infra-Services-Portal (login.tpl.html) and Infra-AWS (portal-auth, step_up.py): rename only in all three at once
+# shared with Infra-Services-Portal (login.tpl.html), Infra-AWS (portal-auth, step_up.py) and Infra-Auth (step_up.py): rename only in all four at once
 KEYS = {'PK_LOCAL': 'gg-id-local-key', 'PK_LAST': 'gg-id-last-method', 'PK_MISS': 'gg-id-local-miss', 'PK_SKIP': 'gg-id-enroll-skip'}
 L, S, M, Z = KEYS['PK_LOCAL'], KEYS['PK_LAST'], KEYS['PK_MISS'], KEYS['PK_SKIP']
 BANNED = re.compile(r'Touch ID|Windows Hello|отпечат|палец|пальц', re.I)
@@ -177,7 +178,7 @@ def run(b, problems, counts):
         for fn in ('passkeyText', 'passkeyIcon', 'passkeyHint', 'passkeyMemory', 'passkeyWatch', 'passkeySeen', 'passkeyRemember', 'passkeyCreated',
                    'passkeyMissed', 'passkeySnooze', 'data-gid-passkey-hint', 'enroll-lead'):
             ok(f'docs: README.md describes {fn}', fn in readme)
-        for name in sorted(os.listdir(SCREENS)):
+        for name in sorted(n for n in os.listdir(SCREENS) if n.endswith('.html')):
             text = open(os.path.join(SCREENS, name), encoding='utf-8').read()
             text = re.sub(r'<(script|style)\b.*?</\1>|<!--.*?-->', ' ', text, flags=re.S)
             ok(f'markup: screens/{name} names no method of the device', not BANNED.search(text), BANNED.findall(text))
@@ -327,9 +328,13 @@ def run(b, problems, counts):
         for ago, want in ((0, True), (6, True), (8, False)):
             pg.evaluate(SET_STORE, {Z: str(pg.evaluate('Date.now()') - ago * 86400000)})
             eq(f'snoozed {ago} days after «Не сейчас»', pg.evaluate('() => GGID.passkeyMemory().snoozed'), want)
-        for junk in ('', 'abc', '0'):
+        for junk in ('', 'abc', '0', '1e21'):
             pg.evaluate(SET_STORE, {Z: junk})
             eq(f'snoozed with {junk!r} in the box', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
+        # a time from the future (junk in the box, a clock that was set ahead) is not a pause
+        for ahead in (3600000, 6 * 86400000, 30 * 86400000, 400 * 86400000):
+            pg.evaluate(SET_STORE, {Z: str(pg.evaluate('Date.now()') + ahead)})
+            eq(f'snoozed when the stored time is {ahead // 3600000} hours ahead', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
         pg.evaluate(SET_STORE, {})
         eq('snoozed in an empty browser', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
         # a whole life of a browser: phone first, then the key of the device appears, fails once, and the phone answers
@@ -422,10 +427,10 @@ def run(b, problems, counts):
         errs = []
         ctx, pg = secure_page(['internal'], errs)
         eq('webauthn: the page is a secure context with navigator.credentials', pg.evaluate('() => typeof navigator.credentials.create'), 'function')
-        pg.evaluate('() => GGID.passkeyWatch()')
-        pg.evaluate('() => GGID.passkeyWatch()')      # twice: wrapped once
-        eq('webauthn: GGID.passkeyWatch is idempotent (one wrapper)',
-           pg.evaluate('() => [navigator.credentials.get._gidWatch, navigator.credentials.create._gidWatch]'), [True, True])
+        pg.evaluate('() => { GGID.passkeyWatch(); window.__g = navigator.credentials.get; window.__c = navigator.credentials.create; GGID.passkeyWatch(); }')
+        eq('webauthn: GGID.passkeyWatch is idempotent (the second call wraps nothing again)',
+           pg.evaluate('() => [navigator.credentials.get === window.__g, navigator.credentials.create === window.__c]'), [True, True])
+        eq('webauthn: the wrapper carries the mark of this copy of the kit', pg.evaluate('() => typeof navigator.credentials.get._gidWatch'), 'object')
         eq('webauthn: nothing seen before the first call', pg.evaluate('() => GGID.passkeySeen()'), '')
         eq('webauthn: a key made on the internal authenticator says platform', pg.evaluate(CREATE, 'platform'), 'platform')
         eq('webauthn: GGID.passkeySeen() read platform from the real answer', pg.evaluate('() => GGID.passkeySeen()'), 'platform')
@@ -491,6 +496,54 @@ def run(b, problems, counts):
         ok('stub: console and exceptions clean', not errs, errs[:3])
         ctx.close()
 
+    def two_copies():
+        # two copies of the kit on one page (say the hub's and a service's): each keeps its own `seen`, and a copy never takes the wrapper of another for its own
+        errs = []
+        ctx, pg = secure_page(['usb'], errs)
+        src = open(os.path.join(KIT, 'gg-id.js'), encoding='utf-8').read()
+        pg.evaluate('(src) => { const a = window.GGID; (0, eval)(src); window.GGID_B = window.GGID; window.GGID = a; }', src)
+        ok('two copies: the second copy is a separate object', pg.evaluate('() => window.GGID_B && window.GGID_B !== window.GGID && !!GGID_B.passkeyWatch'))
+        pg.evaluate('() => { GGID.passkeyWatch(); GGID_B.passkeyWatch(); }')
+        eq('two copies: a key made on a USB authenticator says cross-platform', pg.evaluate(CREATE, 'cross-platform'), 'cross-platform')
+        eq('two copies: both copies saw the answer', pg.evaluate('() => [GGID.passkeySeen(), GGID_B.passkeySeen()]'), ['cross-platform', 'cross-platform'])
+        pg.evaluate(SET_STORE, {})
+        pg.evaluate('() => GGID_B.passkeyCreated()')
+        eq('two copies: the second copy does not claim a key of the device for a key made elsewhere', pg.evaluate(STORE), {S: 'cross-platform'})
+        pg.evaluate(SET_STORE, {})
+        pg.evaluate('() => GGID.passkeyCreated()')
+        eq('two copies: nor does the first one', pg.evaluate(STORE), {S: 'cross-platform'})
+        ok('two copies: console and exceptions clean', not errs, errs[:3])
+        ctx.close()
+
+    def partial_credentials():
+        # a browser whose navigator.credentials has no create: the answer to a key made here cannot be seen, so the created key is not written down;
+        # without get only the sign-in cannot be seen, and a created key (its answer is visible) still counts
+        for missing, want in (('create', {}), ('get', {L: '1', S: 'platform'})):
+            ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+            errs = []
+            pg = page_in(ctx, errs, query='?layout=minimal')
+            pg.evaluate("""(m) => { const c = { get() { return Promise.resolve({ authenticatorAttachment: 'platform' }); },
+                create() { return Promise.resolve({ authenticatorAttachment: 'platform' }); } };
+              delete c[m]; Object.defineProperty(navigator, 'credentials', { configurable: true, value: c }); GGID.passkeyWatch(); }""", missing)
+            pg.evaluate(SET_STORE, {})
+            pg.evaluate('async () => { if (navigator.credentials.create) await navigator.credentials.create(); GGID.passkeyCreated(); }')
+            eq(f'navigator.credentials without {missing}: what a created key writes down', pg.evaluate(STORE), want)
+            ok(f'navigator.credentials without {missing}: console and exceptions clean', not errs, errs[:3])
+            ctx.close()
+
+    def no_markup_no_storage():
+        # a page without passkey markup (the PIN gate pages of the hub inline the whole kit) is left alone: the kit does not even read the storage there
+        for screen, reads in (('forgot.html', False), ('pin.html', False), ('login.html', True), ('enroll.html', True)):
+            ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+            ctx.add_init_script("""(() => { window.__reads = 0; const g = Storage.prototype.getItem;
+              Storage.prototype.getItem = function () { window.__reads++; return g.apply(this, arguments); }; })()""")
+            errs = []
+            pg = page_in(ctx, errs, file=screen, query='?layout=split')
+            n = pg.evaluate('() => window.__reads')
+            ok(f'{screen}: the kit reads the storage only where there is passkey markup ({n} reads)', (n > 0) == reads, n)
+            ok(f'{screen}: console and exceptions clean', not errs, errs[:3])
+            ctx.close()
+
     def no_watch():
         ctx = b.new_context(viewport={'width': 1280, 'height': 800})
         errs = []
@@ -502,7 +555,8 @@ def run(b, problems, counts):
         ok('page: console and exceptions clean (no watch)', not errs, errs[:3])
         ctx.close()
 
-    for fn in (sources, explicit_kinds, devices, icon_path, memory_rules, degraded, demo_mode, webauthn_device_key, webauthn_phone_key, webauthn_stub, no_watch):
+    for fn in (sources, explicit_kinds, devices, icon_path, memory_rules, degraded, demo_mode, webauthn_device_key, webauthn_phone_key, two_copies,
+               webauthn_stub, partial_credentials, no_markup_no_storage, no_watch):
         section(fn)
 
 

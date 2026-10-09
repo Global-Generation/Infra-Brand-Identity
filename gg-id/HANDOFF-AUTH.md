@@ -2,7 +2,7 @@
 
 Кому: агент, который ведёт вход GG (хаб GG ID `https://id.global-generations-edu.com`, старый адрес `levauth.global-generations-edu.com` пока алиас; Lambda `gg-portal-auth`, sso-gate, SSO сервисов).
 От кого: агент дизайна GG ID (сессия «gg-id login block»), 08.10.2026.
-Статус на 08.10 (вечер): всё из этого хэндова сделано. Кит смержен (Infra-Brand-Identity #21, #24-#27) и доведён QA-правкой «2026-10-08.2» (версия кита = `gg-id/VERSION`, она же `GGID.version` и `GGIDService.version`): видимое кольцо фокуса, «меньше движения» без бесконечных анимаций, карта на панели в низком окне и на телефоне, «Резервный вход», latin-ext шрифт (₽), письмо в стиле «Итог». Хаб на ките (Infra-Services-Portal #140, #145, #149): в хабе `assets/gg-id/VERSION` = полный sha коммита кита, обновлять только `scripts/sync-gg-id.sh <sha>`. 09.10: подписи входа по ключу больше не угадывают устройство по виду браузера (раздел 6.1, кит «2026-10-09.2»); страница входа хаба (Infra-Services-Portal #168) и страница подтверждения Face ID для админов (Infra-AWS #98) уже работают по этому правилу. Ниже исходный план, адреса обновлены на `id.*`.
+Статус на 08.10 (вечер): всё из этого хэндова сделано. Кит смержен (Infra-Brand-Identity #21, #24-#27) и доведён QA-правкой «2026-10-08.2» (версия кита = `gg-id/VERSION`, она же `GGID.version` и `GGIDService.version`): видимое кольцо фокуса, «меньше движения» без бесконечных анимаций, карта на панели в низком окне и на телефоне, «Резервный вход», latin-ext шрифт (₽), письмо в стиле «Итог». Хаб на ките (Infra-Services-Portal #140, #145, #149): в хабе `assets/gg-id/VERSION` = полный sha коммита кита, обновлять только `scripts/sync-gg-id.sh <sha>`. 09.10: подписи входа по ключу больше не угадывают устройство по виду браузера (раздел 6.1, кит «2026-10-09.2»); страница входа хаба (Infra-Services-Portal #168) и страница подтверждения Face ID для админов (Infra-AWS #98, порт в Infra-Auth #17) уже работают по этому правилу. Ниже исходный план, адреса обновлены на `id.*`.
 
 ---
 
@@ -265,7 +265,13 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
   function face() {
     GGID.error(card, '');
     waiting(true);
-    GGPasskey.login().then(function () { GGID.passkeyRemember(GGID.passkeySeen()); return go(); }, function (e) {   // 6.1, 8
+    GGPasskey.login().then(function () {
+      var how = GGID.passkeySeen();
+      GGID.passkeyRemember(how);                                                  // 6.1: чем подтвердили, свой ключ или телефон
+      var m = GGID.passkeyMemory();
+      if (how === 'cross-platform' && canEnroll && !m.local && !m.snoozed) { view('enroll'); return forever(); }   // с телефона, своего ключа тут нет: предложить добавить
+      return go();
+    }, function (e) {                                                             // 8
       waiting(false);
       GGID.passkeyMissed(e);
       if (!(e && e.name === 'NotAllowedError')) { view('password'); GGID.error(card, 'Face ID не сработал, войдите по паролю'); }
@@ -303,12 +309,13 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
     }, function () { GGID.busy(submit, false); GGID.error(card, 'Сеть недоступна'); });
   });
 
-  // предложить Face ID после входа по паролю (после входа с телефона то же предложение, раздел 6.1)
+  // предложить Face ID после входа по паролю, пока у человека нет ни одного рабочего ключа (сервер разрешает первый ключ из сессии по паролю)
   function afterPassword() {
-    var m = GGID.passkeyMemory();
-    if (!canEnroll || m.local || m.snoozed) return go();
-    view('enroll');
-    return forever();
+    if (!canEnroll || GGID.passkeyMemory().snoozed) return go();
+    return GGPasskey.list().then(function (j) {
+      if (j && Array.isArray(j.passkeys) && !j.passkeys.some(function (p) { return p && !p.stale; })) { view('enroll'); return forever(); }
+      return go();
+    }, function () { return go(); });
   }
   $('enrollBtn').addEventListener('click', function () {
     GGID.busy($('enrollBtn'), true, GGID.passkeyText('wait'));
@@ -322,7 +329,7 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
 
 Замечания к эскизу:
 - Память про ключ (`localStorage`) ведёт кит, каждое обращение в нём в try/catch (приватный режим Safari может кидать). Своих флагов в странице не заводить: имя `gg-id-pk` из первой версии этого эскиза снято, оно ставилось после любого входа по ключу, в том числе с телефона, и по нему нельзя было отличить свой ключ от чужого.
-- Предложение после пароля стоит показывать, только пока у человека нет ни одного рабочего ключа (`GGPasskey.list()`, ключи с `stale: true` не считаются): сервер разрешает первый ключ из сессии по паролю, а второй и дальше только из сессии по Face ID. Живой эталон целиком, с этим и с предложением после входа с телефона: Infra-Services-Portal, `scripts/gg-id-pages/templates/login.tpl.html` (PR #168).
+- Предложение после пароля показываем, только пока у человека нет ни одного рабочего ключа (`GGPasskey.list()`, ключи с `stale: true` не считаются): сервер разрешает первый ключ из сессии по паролю, а второй и дальше только из сессии по Face ID (поэтому после входа с телефона предложение тоже есть, в `face()`). В режиме «добавить» заголовок «Добавить вход по Touch ID на этом устройстве?» и подпись собирает страница (раздел 6.1). Живой эталон целиком: Infra-Services-Portal, `scripts/gg-id-pages/templates/login.tpl.html` (PR #168).
 - Экран `continue` («Продолжить как Лёв») нужен, только если `/api/auth/authorize` при живой сессии **не** уводит сразу обратно в сервис. Если уводит, экран не делать.
 - На экранах входа только GG: ни шапки «Global Generation × Aura», ни логотипа Aura, ни ссылки «Войти через Aura» (решение Лёва 08.10: GG и Aura раздельно).
 
@@ -402,7 +409,7 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
 
 **Правило.** «Touch ID», «Windows Hello», «отпечаток» и «палец» говорим, только когда в ЭТОМ браузере подтверждён ключ самого устройства. Иначе то, что верно всегда: Face ID на телефоне (QR-код) или ключ на этом устройстве. Одно исключение: предложение завести ключ здесь (`enroll` и `enroll-lead`, начало его подзаголовка) называет способ устройства, потому что ключ создаётся на нём; показывать его только после `GGPasskey.platformAvailable()`.
 
-**Память браузера** лежит в `localStorage` (каждое обращение в try/catch, без хранилища всё работает). Страницы, где человек подтверждает ключ, стоят на одном origin (хаб GG ID): страница входа (Infra-Services-Portal #168, эталон), страница подтверждения Face ID для админов (Infra-AWS #98) и всё, что рисует кит. Память у браузера для этого origin одна, поэтому имена общие; переименовать можно только везде сразу. На origin сервиса память своя: там кит подписей входа по ключу не показывает, сервис только ведёт на хаб.
+**Память браузера** лежит в `localStorage` (каждое обращение в try/catch, без хранилища всё работает). Страницы, где человек подтверждает ключ, стоят на одном origin (хаб GG ID): страница входа (Infra-Services-Portal #168, эталон), страница подтверждения Face ID для админов (Infra-AWS #98 и её порт Infra-Auth #17) и всё, что рисует кит. Память у браузера для этого origin одна, поэтому имена общие; переименовать можно только везде сразу. На origin сервиса память своя: там кит подписей входа по ключу не показывает, сервис только ведёт на хаб.
 
 | Имя | Значение | Когда |
 |---|---|---|
@@ -424,6 +431,8 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
 **Как это делает кит.** `GGID.init` подписывает кнопки, значки и подсказку сам (`data-gid-passkey`, `data-gid-passkey-icon`, `data-gid-passkey-hint`). Чем закончился вход, сообщает страница: `GGID.passkeyWatch()` один раз при загрузке (читает `authenticatorAttachment` из ответов браузера, `GGPasskey` не трогаем), после входа `GGID.passkeyRemember(GGID.passkeySeen())`, после создания ключа `GGID.passkeyCreated()`, при ошибке входа `GGID.passkeyMissed(e)`, при «Не сейчас» и `InvalidStateError` `GGID.passkeySnooze()`. Эскиз в 4.1 уже на этом, справочник в `gg-id/README.md`, «Вход по ключу».
 
 **Предложение ключа после входа с телефона.** Вошли с `cross-platform`, своего ключа в этом браузере нет (`!GGID.passkeyMemory().local`), `platformAvailable()` истинно, неделю не отказывались: показать `enroll` с заголовком «Добавить вход по Touch ID на этом устройстве?» (слово по устройству, текст собирает страница; эталон в #168). Второй ключ сервер разрешает из сессии по Face ID, а она у человека только что появилась.
+
+**Пределы** (те же, что у страницы входа хаба и подтверждения Face ID). Память не знает, что ключ устройства удалили вне страницы (браузер, связка ключей): подпись остаётся «Touch ID», пока ключ не даст осечку и следом не пройдёт вход с телефона. Закрытое окно тоже `NotAllowedError`, поэтому отмена и один вход с телефона снимают ключ устройства и вернут предложение «Добавить вход…»; если ключ на самом деле есть, ответ `InvalidStateError` отложит предложение на неделю. На iPhone и iPad «Face ID» стоит без проверки модели (у части из них Touch ID).
 
 Проверки: `src/check_gg_id_passkey.py` (идёт и в `src/check_gg_id.py`), сборка не пускает слова про способ устройства в разметку экранов.
 

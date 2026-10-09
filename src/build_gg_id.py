@@ -60,6 +60,8 @@ assert re.fullmatch(r'\d{4}-\d{2}-\d{2}(\.\d+)?', KIT_VERSION), f'gg-id/VERSION:
 for _name, _src in (('gg-id.js', kit_js), ('gg-id-service.js', service_js)):
     _v = re.findall(r"version: '([^']+)'", _src)
     assert _v == [KIT_VERSION], f'{_name}: version {_v} должна быть равна gg-id/VERSION ({KIT_VERSION})'
+for _name, _src in (('gg-id.js', kit_js), ('gg-id.css', kit_css)):   # и версия в шапке файла, её копируют руками
+    assert f'версия {KIT_VERSION}' in _src.split('\n', 1)[0], f'{_name}: в первой строке должно быть «версия {KIT_VERSION}» (gg-id/VERSION)'
 for subset in woff:
     assert f'url(fonts/montserrat-{subset}.woff2)' in kit_css, f'gg-id.css must load fonts/montserrat-{subset}.woff2'
 # латиница с диакритикой и знаки валют (₽ U+20BD): подмножество latin-ext того же Montserrat v31 (Version 9.000, Google Fonts),
