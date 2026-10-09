@@ -350,14 +350,17 @@ def kit_rules_check(name, text):
         sys.exit(1)
 
 
-DEVICE_WORDS = re.compile(r'Touch ID|Windows Hello|отпечат|палец|пальц', re.I)
+# any space between the words (a plain one, &nbsp;, U+00A0) and TouchID count too; the same pattern lives in src/check_gg_id_passkey.py (BANNED), the check compares them
+DEVICE_WORDS = re.compile(r'(?<![a-z])(?:Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц', re.I)
 
 
 def passkey_words_check(name, text):
     """Rule 09.10.2026 (HANDOFF-AUTH.md, 6.1): the markup of a screen never names the method of the device. gg-id.js words the buttons, icons and the hint
-    from what this browser has seen work; in the markup stays Face ID, which is true on every device (the phone does it by QR code)."""
+    from what this browser has seen work; in the markup stays Face ID, which is true on every device (the phone does it by QR code).
+    The words are looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens and zero-width characters dropped."""
     shown = re.sub(r'<(script|style)\b.*?</\1>|<!--.*?-->', ' ', text, flags=re.S)
-    found = sorted({m.lower() for m in DEVICE_WORDS.findall(shown)})
+    shown = re.sub('[\u00ad\u200b-\u200d\u2060\ufeff]', '', htmlmod.unescape(shown))
+    found = sorted({re.sub(r'\s+', ' ', m).lower() for m in DEVICE_WORDS.findall(shown)})
     if found:
         print('PASSKEY WORDS FAILED in', name)
         print(' - the method of the device is named in the markup (Touch ID, Windows Hello, fingerprint) although it is guessed from the kind of device:', found)

@@ -53,7 +53,7 @@
 
 | Атрибут | Что делает |
 |---|---|
-| `data-gid-passkey="login\|enroll\|wait"` | подпись кнопки входа по ключу по памяти браузера (раздел «Вход по ключу» ниже). `login`: «Войти с Face ID» (на Android «Войти по ключу доступа»), а «Войти с Touch ID», «Войти с Windows Hello», «Войти по отпечатку» только если в этом браузере уже входили своим ключом. `wait`: «Ждём подтверждения». `enroll` и `enroll-lead` (начало подзаголовка: «Подключите Touch ID, и вход займёт секунду.»): способ устройства, экран показывать только после `GGPasskey.platformAvailable()` |
+| `data-gid-passkey="login\|enroll\|enroll-lead\|wait"` | подпись кнопки входа по ключу по памяти браузера (раздел «Вход по ключу» ниже). `login`: «Войти с Face ID» (на Android «Войти по ключу доступа»), а «Войти с Touch ID», «Войти с Windows Hello», «Войти по отпечатку» только если в этом браузере уже входили своим ключом. `wait`: «Ждём подтверждения». `enroll` и `enroll-lead` (начало подзаголовка: «Подключите Touch ID, и вход займёт секунду.»): способ устройства, экран показывать только после `GGPasskey.platformAvailable()` |
 | `data-gid-passkey-icon` на `<svg>` | значок к подписи в той же кнопке: лицо, отпечаток или ключ (путь к спрайту в `href` сохраняется) |
 | `data-gid-passkey-hint` | подсказка под заголовком, пока открыто окно браузера (три текста по памяти браузера) |
 | `data-gid-eye` | кнопка «показать пароль» в `.gid-input-wrap` |
@@ -79,7 +79,7 @@ GGID.passkeyCreated()               // ключ создан здесь: platfor
 GGID.passkeyMissed(err)             // NotAllowedError при ключе устройства = осечка; снимает ключ, если следом вход выйдет с телефона
 GGID.passkeySnooze()                // «Не сейчас», InvalidStateError, already_registered: неделю не предлагать ключ
 GGID.passkeyMemory()                // { local, last, own, miss, snoozed }; own = ключ устройства подтверждён и в последний раз вошли им
-GGID.passkeyText('login|enroll|wait'), GGID.passkeyIcon('login|enroll|wait'), GGID.passkeyHint()   // подпись, значок и подсказка по памяти
+GGID.passkeyText('login|enroll|enroll-lead|wait'), GGID.passkeyIcon('login|enroll|enroll-lead|wait'), GGID.passkeyHint()   // подпись, значок и подсказка по памяти
 ```
 
 ## Как связать со входом хаба

@@ -8,7 +8,8 @@ the hub and with the Face ID confirmation page of the admins (Infra-Services-Por
 origin, one memory.
 
 What is checked (Chromium):
-  1. the sources: the four storage names, the sentences and the phrases word for word, no network calls, the docs carry the same;
+  1. the sources: the four storage names, the sentences and the phrases word for word, no network calls, the docs carry the same; the guard
+     against the words of a device (it also sees Touch&nbsp;ID, Touch U+00A0 ID, TouchID) and the same pattern in the build;
   2. every kind of device x every memory state x every phrase through the API (explicit kind);
   3. 7 devices x 8 memory states x 3 screens (login, passkey, enroll) loaded fresh with the memory already in localStorage: label, icon and
      hint; without a confirmed key no method of the device on the sign-in and the waiting screens at all, on any device (the case of Lev's Mac);
@@ -20,6 +21,7 @@ What is checked (Chromium):
      «platform», a USB key says «cross-platform», GGID.passkeyWatch() reads it and the next load words the screen accordingly.
 Run alone: uv run --with playwright python src/check_gg_id_passkey.py   (it also runs inside src/check_gg_id.py)
 """
+import html
 import json
 import os
 import re
@@ -33,7 +35,27 @@ ORIGIN = 'http://localhost'          # a secure context for WebAuthn without a c
 # shared with Infra-Services-Portal (login.tpl.html), Infra-AWS (portal-auth, step_up.py) and Infra-Auth (step_up.py): rename only in all four at once
 KEYS = {'PK_LOCAL': 'gg-id-local-key', 'PK_LAST': 'gg-id-last-method', 'PK_MISS': 'gg-id-local-miss', 'PK_SKIP': 'gg-id-enroll-skip'}
 L, S, M, Z = KEYS['PK_LOCAL'], KEYS['PK_LAST'], KEYS['PK_MISS'], KEYS['PK_SKIP']
-BANNED = re.compile(r'Touch ID|Windows Hello|отпечат|палец|пальц', re.I)
+
+
+class Banned:
+    """The words that name a method of the device. Looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens and zero-width
+    characters dropped, any space (a non-breaking one too) between «Touch» and «ID», so a typographic variant does not slip through.
+    The same pattern is DEVICE_WORDS in src/build_gg_id.py (the build refuses it in the markup of the screens); the check compares the two."""
+    pattern = r'(?<![a-z])(?:Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц'
+    _re = re.compile(pattern, re.I)
+
+    @staticmethod
+    def plain(text):
+        return re.sub('[\u00ad\u200b-\u200d\u2060\ufeff]', '', html.unescape('' if text is None else str(text)))
+
+    def search(self, text):
+        return self._re.search(self.plain(text))
+
+    def findall(self, text):
+        return self._re.findall(self.plain(text))
+
+
+BANNED = Banned()
 
 HINT_UNKNOWN = 'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.'
 HINT_PHONE = 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID.'
@@ -183,6 +205,17 @@ def run(b, problems, counts):
             text = re.sub(r'<(script|style)\b.*?</\1>|<!--.*?-->', ' ', text, flags=re.S)
             ok(f'markup: screens/{name} names no method of the device', not BANNED.search(text), BANNED.findall(text))
 
+    # ---- 1b. the guard itself: the words it looks for are found in the typographic variants this repo uses, and nothing true is taken for a method of the device ----
+    def guard_words():
+        for text in ('Войти с Touch ID', 'touch id', 'TOUCH ID', 'Touch&nbsp;ID', 'Touch&#160;ID', 'Touch\u00a0ID', 'Touch\u202fID', 'TouchID', 'Tou\u200bch ID',
+                     'Windows Hello', 'Windows&nbsp;Hello', 'Windows\u00a0Hello', 'Войти по отпечатку', 'Приложите палец', 'пальцем'):
+            ok(f'guard: {text!r} names a method of the device', bool(BANNED.search(text)), text)
+        for text in ('Войти с Face ID', 'Face&nbsp;ID', 'Face\u00a0ID', 'Войти по ключу доступа', 'Ждём подтверждения', 'touch ideas', 'Windows Helloween',
+                     'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.'):
+            ok(f'guard: {text!r} is not one', not BANNED.search(text), BANNED.findall(text))
+        build = open(os.path.join(ROOT, 'src', 'build_gg_id.py'), encoding='utf-8').read()
+        ok('guard: the build refuses the same words as this check (DEVICE_WORDS = BANNED.pattern)', "DEVICE_WORDS = re.compile(r'" + BANNED.pattern + "', re.I)" in build)
+
     # ---- 2. explicit kind: every kind x every memory state x every phrase, in one page ----
     def explicit_kinds():
         ctx = b.new_context(viewport={'width': 1280, 'height': 800})
@@ -324,10 +357,11 @@ def run(b, problems, counts):
                 got = {k: v for k, v in got.items() if k != Z}
                 after = {k: v for k, v in after.items() if k != Z}
             eq(f'memory: {name}', got, after)
-        # the week: «Не сейчас» 6 days ago still holds, 8 days ago does not; garbage and zero are not a pause
-        for ago, want in ((0, True), (6, True), (8, False)):
-            pg.evaluate(SET_STORE, {Z: str(pg.evaluate('Date.now()') - ago * 86400000)})
-            eq(f'snoozed {ago} days after «Не сейчас»', pg.evaluate('() => GGID.passkeyMemory().snoozed'), want)
+        # the week: «Не сейчас» an hour short of 7 days ago still holds, an hour past 7 days does not (so neither a shorter nor a longer pause passes);
+        # garbage and zero are not a pause
+        for hours, want in ((0, True), (144, True), (167, True), (169, False), (192, False)):
+            pg.evaluate(SET_STORE, {Z: str(pg.evaluate('Date.now()') - hours * 3600000)})
+            eq(f'snoozed {hours} hours after «Не сейчас»', pg.evaluate('() => GGID.passkeyMemory().snoozed'), want)
         for junk in ('', 'abc', '0', '1e21'):
             pg.evaluate(SET_STORE, {Z: junk})
             eq(f'snoozed with {junk!r} in the box', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
@@ -493,6 +527,11 @@ def run(b, problems, counts):
         pg.evaluate('async () => { window.__answer = "platform"; await navigator.credentials.get(); GGID.passkeyRemember(GGID.passkeySeen()); }')
         eq('stub: sign-in says platform -> the key of the device', pg.evaluate(STORE), {L: '1', S: 'platform'})
         eq('stub: the wrapper passes the call through (one call each)', pg.evaluate('() => window.__calls'), 4)
+        # an attachment the specification does not know (junk, a future value) is not seen: it teaches nothing and is not handed on as an answer
+        pg.evaluate(SET_STORE, {})
+        pg.evaluate('async () => { window.__answer = "security-key"; await navigator.credentials.get(); GGID.passkeyRemember(GGID.passkeySeen()); }')
+        eq('stub: an unknown authenticatorAttachment is not seen', pg.evaluate('() => GGID.passkeySeen()'), '')
+        eq('stub: an unknown authenticatorAttachment teaches nothing', pg.evaluate(STORE), {})
         ok('stub: console and exceptions clean', not errs, errs[:3])
         ctx.close()
 
@@ -542,6 +581,19 @@ def run(b, problems, counts):
         eq('navigator.credentials.create that cannot be wrapped: a created key is not written down', pg.evaluate(STORE), {})
         ok('navigator.credentials.create that cannot be wrapped: console and exceptions clean', not errs, errs[:3])
         ctx.close()
+        # passkeyWatch() again on a navigator.credentials that has lost create meanwhile: the earlier verdict does not stay, a created key is not written down
+        ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+        errs = []
+        pg = page_in(ctx, errs, query='?layout=minimal')
+        pg.evaluate("""() => { const mk = () => ({ get() { return Promise.resolve({ authenticatorAttachment: 'platform' }); },
+            create() { return Promise.resolve({ authenticatorAttachment: 'platform' }); } });
+          Object.defineProperty(navigator, 'credentials', { configurable: true, value: mk() }); GGID.passkeyWatch();
+          const c = mk(); delete c.create; Object.defineProperty(navigator, 'credentials', { configurable: true, value: c }); GGID.passkeyWatch(); }""")
+        pg.evaluate(SET_STORE, {})
+        pg.evaluate('() => GGID.passkeyCreated()')
+        eq('passkeyWatch() again without create: a created key is not written down', pg.evaluate(STORE), {})
+        ok('passkeyWatch() again without create: console and exceptions clean', not errs, errs[:3])
+        ctx.close()
 
     def no_markup_no_storage():
         # a page without passkey markup (the PIN gate pages of the hub inline the whole kit) is left alone: the kit does not even read the storage there
@@ -567,7 +619,7 @@ def run(b, problems, counts):
         ok('page: console and exceptions clean (no watch)', not errs, errs[:3])
         ctx.close()
 
-    for fn in (sources, explicit_kinds, devices, icon_path, memory_rules, degraded, demo_mode, webauthn_device_key, webauthn_phone_key, two_copies,
+    for fn in (sources, guard_words, explicit_kinds, devices, icon_path, memory_rules, degraded, demo_mode, webauthn_device_key, webauthn_phone_key, two_copies,
                webauthn_stub, partial_credentials, no_markup_no_storage, no_watch):
         section(fn)
 
