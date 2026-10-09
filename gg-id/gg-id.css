@@ -343,6 +343,12 @@
 /* поле с ошибкой в фокусе: красная рамка остаётся (ошибка видна), а снаружи через зазор кольцо фокуса акцентом, как у других полей:
    иначе с клавиатуры не видно, что фокус пришёл в поле, которое и так красное */
 .gid-input.is-error:focus,.gid-input[aria-invalid="true"]:focus{box-shadow:0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus)}
+/* Автозаполнение браузера: своя подложка держится и в фокусе, и в ошибке. Иначе тени фокуса и ошибки затирают её,
+   и проступает жёлтый фон Safari с белым текстом тёмной темы (iPhone, 09.10). */
+.gid-input:-webkit-autofill,.gid-input:-webkit-autofill:hover{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset;box-shadow:0 0 0 40px var(--g-autofill) inset;-webkit-text-fill-color:var(--g-ink);caret-color:var(--g-ink);transition:background-color 9999s ease-out 0s}
+.gid-input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-accent),0 0 0 4px var(--g-ring);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-accent),0 0 0 4px var(--g-ring)}
+.gid-input.is-error:-webkit-autofill,.gid-input[aria-invalid="true"]:-webkit-autofill{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 4px var(--g-danger-ring);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 4px var(--g-danger-ring)}
+.gid-input.is-error:-webkit-autofill:focus,.gid-input[aria-invalid="true"]:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus)}
 .gid-input.is-shake{animation:gidShake .42s var(--g-ease)}
 @keyframes gidShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .gid-eye{position:absolute;top:4px;right:4px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:10px;
