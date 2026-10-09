@@ -530,6 +530,18 @@ def run(b, problems, counts):
             eq(f'navigator.credentials without {missing}: what a created key writes down', pg.evaluate(STORE), want)
             ok(f'navigator.credentials without {missing}: console and exceptions clean', not errs, errs[:3])
             ctx.close()
+        # a create that cannot be wrapped (an accessor whose setter swallows the assignment): the answer to a key made here cannot be seen either
+        ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+        errs = []
+        pg = page_in(ctx, errs, query='?layout=minimal')
+        pg.evaluate("""() => { const f = () => Promise.resolve({ authenticatorAttachment: 'platform' }); const c = { get: f };
+          Object.defineProperty(c, 'create', { get() { return f; }, set() {} });
+          Object.defineProperty(navigator, 'credentials', { configurable: true, value: c }); GGID.passkeyWatch(); }""")
+        pg.evaluate(SET_STORE, {})
+        pg.evaluate('async () => { await navigator.credentials.create(); GGID.passkeyCreated(); }')
+        eq('navigator.credentials.create that cannot be wrapped: a created key is not written down', pg.evaluate(STORE), {})
+        ok('navigator.credentials.create that cannot be wrapped: console and exceptions clean', not errs, errs[:3])
+        ctx.close()
 
     def no_markup_no_storage():
         # a page without passkey markup (the PIN gate pages of the hub inline the whole kit) is left alone: the kit does not even read the storage there
