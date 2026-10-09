@@ -8,7 +8,8 @@
 - Экран входа: над «Вход для команды» никакой иконки (ни замка, ни плашки). Сервис подписан у логотипа.
 - Джи-джи: только `assets/gigi/gigi-mascot.png` как есть. Никогда не превращать в плитку/иконку/градиент.
 - Правка страницы: `src/template.html` → `python3 src/build.py` → `python3 src/check.py` (0 горизонтальной прокрутки, 0 ошибок, 0 длинных тире). Большие HTML не редактировать строковыми заменами в `index.html`: он генерируется.
-- Экраны входа и кнопка «Войти через GG ID»: только кит `gg-id/` (правила в `gg-id/README.md`). Правка: `gg-id/gg-id.css` или `src/gg_id/screens.html` → `python3 src/build_gg_id.py` → `uv run --with playwright python src/check_gg_id.py`. `gg-id/screens/*` и `gg-id.html` генерируются.
+- Экраны входа и кнопка «Войти через GG ID»: только кит `gg-id/` (правила в `gg-id/README.md`). Правка: `gg-id/gg-id.css` или `src/gg_id/screens.html` → `python3 src/build_gg_id.py` → `uv run --with playwright python src/check_gg_id.py`. `gg-id/screens/*` и `gg-id.html` генерируются. Правка кита = новая версия: `gg-id/VERSION`, `version` в `gg-id.js` и `gg-id-service.js` (сборка сверяет).
+- Подписи входа по ключу не угадывают устройство по браузеру (Лёв 09.10): Touch ID, Windows Hello, «отпечаток» и «палец» только когда в ЭТОМ браузере уже входили своим ключом (localStorage `gg-id-local-key`, `gg-id-last-method`, `gg-id-local-miss`, `gg-id-enroll-skip`; имена общие со страницей входа хаба и страницей подтверждения Face ID для админов, переименовать можно только везде сразу). Иначе: Face ID на телефоне (QR-код) или ключ на этом устройстве. В разметке экранов слов про способ устройства нет (сборка не пустит), слова ставит `gg-id.js`. Правило и API: `gg-id/HANDOFF-AUTH.md`, раздел 6.1. Проверка: `src/check_gg_id_passkey.py` (идёт и в `check_gg_id.py`).
 - Язык текстов страницы - русский, кода и коммитов - английский. Без эмодзи и длинных тире.
 - Внешние CDN шрифтов запрещены (Montserrat самохостом в `src/fonts.css`).
 

@@ -245,16 +245,20 @@ for s in SCREENS:
 
 # when each screen shows and what it calls on the hub (levauth, Lambda gg-portal-auth)
 INFO = {
-    'login': ('Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля.',
+    'login': ('Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. '
+              'Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере.',
               'GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()'),
     'password': ('Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.', 'POST /api/auth/login'),
     'error': ('401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».',
               'POST /api/auth/login: 401, 429'),
-    'passkey': ('Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.',
+    'passkey': ('Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: '
+                'свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки.',
                 'GGPasskey.login()'),
     'done': ('Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.', 'GET /api/auth/me, переход на next'),
     'continue': ('Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.', 'GET /api/auth/authorize'),
-    'enroll': ('После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.',
+    'enroll': ('После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. '
+               'Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. '
+               'Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.',
                'GGPasskey.register()'),
     'forgot': ('Восстановление по рабочей почте.', 'POST /api/auth/forgot'),
     'sent': ('Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.', 'POST /api/auth/forgot: 200'),
@@ -344,6 +348,21 @@ def kit_rules_check(name, text):
         sys.exit(1)
 
 
+DEVICE_WORDS = re.compile(r'Touch ID|Windows Hello|отпечат|палец|пальц', re.I)
+
+
+def passkey_words_check(name, text):
+    """Rule 09.10.2026 (HANDOFF-AUTH.md, 6.1): the markup of a screen never names the method of the device. gg-id.js words the buttons, icons and the hint
+    from what this browser has seen work; in the markup stays Face ID, which is true on every device (the phone does it by QR code)."""
+    shown = re.sub(r'<(script|style)\b.*?</\1>|<!--.*?-->', ' ', text, flags=re.S)
+    found = sorted({m.lower() for m in DEVICE_WORDS.findall(shown)})
+    if found:
+        print('PASSKEY WORDS FAILED in', name)
+        print(' - the method of the device is named in the markup (Touch ID, Windows Hello, fingerprint) although it is guessed from the kind of device:', found)
+        print('   write Face ID (data-gid-passkey) and let gg-id.js word it from the memory of the browser')
+        sys.exit(1)
+
+
 brand_check('gg-id.css', kit_css)
 brand_check('gg-id.js', kit_js)
 brand_check('gg-id-service.js', service_js)
@@ -397,6 +416,7 @@ for s in SCREENS:
 """
     brand_check(f'screens/{s["key"]}.html', page)
     kit_rules_check(f'screens/{s["key"]}.html', page)
+    passkey_words_check(f'screens/{s["key"]}.html', page)
     write_if_changed(os.path.join(KIT, 'screens', s['key'] + '.html'), page)
 
 # full sprite for the hub: every symbol any screen or service component uses (<use href="/assets/gg-id/sprite.svg#gi-eye">)
