@@ -2,7 +2,9 @@
      Один <template> = одно состояние. data-key = имя файла, data-tab = вкладка витрины, data-title = <title> страницы.
      data-lockup="off" = без подписи «логотип | ID». data-go="ключ" = демо-переход на другой экран (в бою = вызов API).
      data-path = адрес в строке браузера витрины (по умолчанию /login). @IDCARD@ = карточка GG ID из src/build_gg_id.py.
-     data-svc = название сервиса, куда входит человек (из client_id); пишется так, чтобы не склонялось. -->
+     data-svc = название сервиса, куда входит человек (из client_id); пишется так, чтобы не склонялось.
+     Слова про способ устройства (Touch ID, Windows Hello, отпечаток, палец) в разметку экранов не писать: подписи, значки и подсказку входа по ключу ставит
+     gg-id.js по тому, что браузер помнит про ключ (data-gid-passkey, data-gid-passkey-icon, data-gid-passkey-hint), в разметке остаётся Face ID. Сборка это проверяет. -->
 
 <template data-key="login" data-tab="Вход" data-title="Вход">
   <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
@@ -65,10 +67,10 @@
 
 <template data-key="passkey" data-tab="Face ID" data-title="Подтвердите вход">
   <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
-  <p class="gid-sub">Подтвердите вход в системном окне на этом устройстве. Это займёт секунду.</p>
+  <p class="gid-sub" data-gid-passkey-hint>Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary is-busy" type="button" aria-busy="true" data-go="done">
-      <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Подтвердите Face ID</span>
+      <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Ждём подтверждения</span>
     </button>
     <a class="gid-btn gid-btn--secondary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-key-round"/></svg><span>Войти по паролю</span></a>
   </div>
@@ -97,7 +99,7 @@
 
 <template data-key="enroll" data-tab="Подключить Face ID" data-title="Вход без пароля">
   <h1 class="gid-h">В следующий раз без пароля</h1>
-  <p class="gid-sub">Подключите Face ID, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
+  <p class="gid-sub"><span data-gid-passkey="enroll-lead">Подключите Face ID</span>, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary" type="button" data-go="done"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="enroll">Подключить Face ID</span></button>
     <a class="gid-btn gid-btn--quiet" data-go="done">Не сейчас</a>

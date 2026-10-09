@@ -315,6 +315,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           <li><b>Заголовок называет сервис:</b> «Вход в АКБ». Над заголовком ничего: ни замка, ни значка, ни плашки.</li>
           <li><b>Подпись «логотип | ID»</b>, логотип одного цвета, не меньше 28 px в высоту (110 px в ширину).</li>
           <li><b>Одно главное действие.</b> Face ID, если ключ на устройстве есть; иначе пароль.</li>
+          <li><b>Устройство не угадываем.</b> «Touch ID», «Windows Hello» и «отпечаток» только если в этом браузере уже входили своим ключом; иначе «Face ID» и подсказка про QR-код телефона. Правило и память браузера: <code>gg-id/HANDOFF-AUTH.md</code>, раздел 6.1.</li>
           <li><b>Только рабочая почта</b> @global-generations.com, подсказка ещё до отправки.</li>
           <li><b>Ошибки человеческим языком</b>, без кодов: «Неверная почта или пароль», «Слишком много попыток, подождите минуту», «Сеть недоступна».</li>
           <li><b>Поля 16 px</b> (iPhone не приближает), autocomplete <code>username</code>, <code>current-password</code>, <code>new-password</code>, <code>one-time-code</code>.</li>
@@ -322,7 +323,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         </ol>
         <div class="sc-files">
           <div><code>gg-id/gg-id.css</code><span>токены, три раскладки, все компоненты</span></div>
-          <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи Face ID</span></div>
+          <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи входа по ключу</span></div>
           <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
           <div><code>gg-id/screens/</code><span>@N_SCREENS@ эталонных страниц для хаба</span></div>
           <div><code>gg-id/email-card.html</code><span>карточка GG ID для писем</span></div>

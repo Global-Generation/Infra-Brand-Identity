@@ -7,7 +7,7 @@
 <title>GG ID</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22sg%22%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2232%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20stop-color%3D%22%238FBADD%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%234B8FD6%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214.8%22%20fill%3D%22url%28%23sg%29%22%2F%3E%3Cg%20transform%3D%22translate%2810.00%2010.00%29%20scale%280.6875%29%22%3E%3Cpath%20d%3D%22M6%2023A17%2017%200%201%200%2040%2023A17%2017%200%201%200%206%2023ZM14.5%2023A8.5%208.5%200%201%200%2031.5%2023A8.5%208.5%200%201%200%2014.5%2023Z%22%20fill%3D%22%23ffffff%22%20fill-rule%3D%22evenodd%22%2F%3E%3Cpath%20d%3D%22M33%2033L55%2055M44%2044L38.5%2049.5M51%2051L45.5%2056.5%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%227.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2223%22%20cy%3D%2223%22%20r%3D%224.5%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" type="image/svg+xml">
 <style>
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-08.2 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-09.2 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -352,6 +352,12 @@
 /* поле с ошибкой в фокусе: красная рамка остаётся (ошибка видна), а снаружи через зазор кольцо фокуса акцентом, как у других полей:
    иначе с клавиатуры не видно, что фокус пришёл в поле, которое и так красное */
 .gid-input.is-error:focus,.gid-input[aria-invalid="true"]:focus{box-shadow:0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus)}
+/* Автозаполнение браузера: своя подложка держится и в фокусе, и в ошибке. Иначе тени фокуса и ошибки затирают её,
+   и проступает жёлтый фон Safari с белым текстом тёмной темы (iPhone, 09.10). */
+.gid-input:-webkit-autofill,.gid-input:-webkit-autofill:hover{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset;box-shadow:0 0 0 40px var(--g-autofill) inset;-webkit-text-fill-color:var(--g-ink);caret-color:var(--g-ink);transition:background-color 9999s ease-out 0s}
+.gid-input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-accent),0 0 0 4px var(--g-ring);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-accent),0 0 0 4px var(--g-ring)}
+.gid-input.is-error:-webkit-autofill,.gid-input[aria-invalid="true"]:-webkit-autofill{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 4px var(--g-danger-ring);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 4px var(--g-danger-ring)}
+.gid-input.is-error:-webkit-autofill:focus,.gid-input[aria-invalid="true"]:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus);box-shadow:0 0 0 40px var(--g-autofill) inset,0 0 0 1px var(--g-danger),0 0 0 3px var(--g-solid),0 0 0 5px var(--g-focus)}
 .gid-input.is-shake{animation:gidShake .42s var(--g-ease)}
 @keyframes gidShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .gid-eye{position:absolute;top:4px;right:4px;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:10px;
@@ -1092,6 +1098,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           <li><b>Заголовок называет сервис:</b> «Вход в АКБ». Над заголовком ничего: ни замка, ни значка, ни плашки.</li>
           <li><b>Подпись «логотип | ID»</b>, логотип одного цвета, не меньше 28 px в высоту (110 px в ширину).</li>
           <li><b>Одно главное действие.</b> Face ID, если ключ на устройстве есть; иначе пароль.</li>
+          <li><b>Устройство не угадываем.</b> «Touch ID», «Windows Hello» и «отпечаток» только если в этом браузере уже входили своим ключом; иначе «Face ID» и подсказка про QR-код телефона. Правило и память браузера: <code>gg-id/HANDOFF-AUTH.md</code>, раздел 6.1.</li>
           <li><b>Только рабочая почта</b> @global-generations.com, подсказка ещё до отправки.</li>
           <li><b>Ошибки человеческим языком</b>, без кодов: «Неверная почта или пароль», «Слишком много попыток, подождите минуту», «Сеть недоступна».</li>
           <li><b>Поля 16 px</b> (iPhone не приближает), autocomplete <code>username</code>, <code>current-password</code>, <code>new-password</code>, <code>one-time-code</code>.</li>
@@ -1099,7 +1106,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         </ol>
         <div class="sc-files">
           <div><code>gg-id/gg-id.css</code><span>токены, три раскладки, все компоненты</span></div>
-          <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи Face ID</span></div>
+          <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи входа по ключу</span></div>
           <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
           <div><code>gg-id/screens/</code><span>18 эталонных страниц для хаба</span></div>
           <div><code>gg-id/email-card.html</code><span>карточка GG ID для писем</span></div>
@@ -1108,7 +1115,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       <div class="sc-api">
         <table>
           <thead><tr><th>Экран</th><th>Когда</th><th>Хаб</th></tr></thead>
-          <tbody><tr><td><b>Вход</b><span>screens/login.html</span></td><td>Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities,<br>GGPasskey.enabled(),<br>GGPasskey.login()</code></td></tr><tr><td><b>По паролю</b><span>screens/password.html</span></td><td>Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login</code></td></tr><tr><td><b>Ошибка</b><span>screens/error.html</span></td><td>401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login: 401,<br>429</code></td></tr><tr><td><b>Face ID</b><span>screens/passkey.html</span></td><td>Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.</td><td><code>GGPasskey.login()</code></td></tr><tr><td><b>Готово</b><span>screens/done.html</span></td><td>Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me,<br>переход на next</code></td></tr><tr><td><b>Продолжить как</b><span>screens/continue.html</span></td><td>Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>authorize</code></td></tr><tr><td><b>Подключить Face ID</b><span>screens/enroll.html</span></td><td>После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.</td><td><code>GGPasskey.register()</code></td></tr><tr><td><b>Забыли пароль</b><span>screens/forgot.html</span></td><td>Восстановление по рабочей почте.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot</code></td></tr><tr><td><b>Письмо отправлено</b><span>screens/sent.html</span></td><td>Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot: 200</code></td></tr><tr><td><b>Новый пароль</b><span>screens/setpass.html</span></td><td>Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check,<br>POST /<wbr>api/<wbr>auth/<wbr>set-password</code></td></tr><tr><td><b>Пароль сохранён</b><span>screens/saved.html</span></td><td>После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password: 200</code></td></tr><tr><td><b>Восстановление выключено</b><span>screens/resetoff.html</span></td><td>capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities</code></td></tr><tr><td><b>Ссылка устарела</b><span>screens/expired.html</span></td><td>Токен из ссылки устарел или уже использован.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check: ошибка</code></td></tr><tr><td><b>Нет доступа</b><span>screens/noaccess.html</span></td><td>Человек вошёл, но роли в этом сервисе у него нет.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me (level),<br>entitlements</code></td></tr><tr><td><b>Код доступа</b><span>screens/pin.html</span></td><td>Переходный вход по коду для сервисов, которые ещё не на GG ID.</td><td><code>sso-gate: PIN-ворота</code></td></tr><tr><td><b>Недоступен</b><span>screens/unavailable.html</span></td><td>GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.</td><td><code>sso-gate: sso-unavailable</code></td></tr><tr><td><b>Вы вышли</b><span>screens/signedout.html</span></td><td>После «Выйти» в меню аккаунта.</td><td><code>POST /<wbr>api/<wbr>v1/<wbr>sessions/<wbr>revoke</code></td></tr><tr><td><b>Карточка GG ID</b><span>screens/card.html</span></td><td>Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me: display_name,<br>email (уже есть); positions,<br>gg_id,<br>since,<br>status (добавить); GGPasskey.list()</code></td></tr></tbody>
+          <tbody><tr><td><b>Вход</b><span>screens/login.html</span></td><td>Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities,<br>GGPasskey.enabled(),<br>GGPasskey.login()</code></td></tr><tr><td><b>По паролю</b><span>screens/password.html</span></td><td>Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login</code></td></tr><tr><td><b>Ошибка</b><span>screens/error.html</span></td><td>401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>login: 401,<br>429</code></td></tr><tr><td><b>Face ID</b><span>screens/passkey.html</span></td><td>Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки.</td><td><code>GGPasskey.login()</code></td></tr><tr><td><b>Готово</b><span>screens/done.html</span></td><td>Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me,<br>переход на next</code></td></tr><tr><td><b>Продолжить как</b><span>screens/continue.html</span></td><td>Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>authorize</code></td></tr><tr><td><b>Подключить Face ID</b><span>screens/enroll.html</span></td><td>После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.</td><td><code>GGPasskey.register()</code></td></tr><tr><td><b>Забыли пароль</b><span>screens/forgot.html</span></td><td>Восстановление по рабочей почте.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot</code></td></tr><tr><td><b>Письмо отправлено</b><span>screens/sent.html</span></td><td>Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>forgot: 200</code></td></tr><tr><td><b>Новый пароль</b><span>screens/setpass.html</span></td><td>Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check,<br>POST /<wbr>api/<wbr>auth/<wbr>set-password</code></td></tr><tr><td><b>Пароль сохранён</b><span>screens/saved.html</span></td><td>После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password: 200</code></td></tr><tr><td><b>Восстановление выключено</b><span>screens/resetoff.html</span></td><td>capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>capabilities</code></td></tr><tr><td><b>Ссылка устарела</b><span>screens/expired.html</span></td><td>Токен из ссылки устарел или уже использован.</td><td><code>POST /<wbr>api/<wbr>auth/<wbr>set-password/<wbr>check: ошибка</code></td></tr><tr><td><b>Нет доступа</b><span>screens/noaccess.html</span></td><td>Человек вошёл, но роли в этом сервисе у него нет.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me (level),<br>entitlements</code></td></tr><tr><td><b>Код доступа</b><span>screens/pin.html</span></td><td>Переходный вход по коду для сервисов, которые ещё не на GG ID.</td><td><code>sso-gate: PIN-ворота</code></td></tr><tr><td><b>Недоступен</b><span>screens/unavailable.html</span></td><td>GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.</td><td><code>sso-gate: sso-unavailable</code></td></tr><tr><td><b>Вы вышли</b><span>screens/signedout.html</span></td><td>После «Выйти» в меню аккаунта.</td><td><code>POST /<wbr>api/<wbr>v1/<wbr>sessions/<wbr>revoke</code></td></tr><tr><td><b>Карточка GG ID</b><span>screens/card.html</span></td><td>Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.</td><td><code>GET /<wbr>api/<wbr>auth/<wbr>me: display_name,<br>email (уже есть); positions,<br>gg_id,<br>since,<br>status (добавить); GGPasskey.list()</code></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1179,10 +1186,10 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   <div class="gid-or"><span>или</span></div>
   <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button></template>
 <template id="scr-passkey"><h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
-  <p class="gid-sub">Подтвердите вход в системном окне на этом устройстве. Это займёт секунду.</p>
+  <p class="gid-sub" data-gid-passkey-hint>Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary is-busy" type="button" aria-busy="true" data-go="done">
-      <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Подтвердите Face ID</span>
+      <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Ждём подтверждения</span>
     </button>
     <a class="gid-btn gid-btn--secondary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-key-round"/></svg><span>Войти по паролю</span></a>
   </div>
@@ -1202,7 +1209,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   </a>
   <div class="gid-alt"><a class="gid-link" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-user-round-plus"/></svg>Войти в другой аккаунт</a></div></template>
 <template id="scr-enroll"><h1 class="gid-h">В следующий раз без пароля</h1>
-  <p class="gid-sub">Подключите Face ID, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
+  <p class="gid-sub"><span data-gid-passkey="enroll-lead">Подключите Face ID</span>, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary" type="button" data-go="done"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="enroll">Подключить Face ID</span></button>
     <a class="gid-btn gid-btn--quiet" data-go="done">Не сейчас</a>
@@ -1320,13 +1327,27 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   </div></template>
 <script>window.GGID_MANUAL = true;</script>
 <script>
-/* GG ID: поведение экранов входа (версия 2026-10-08.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-09.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
   'use strict';
 
-  // Вход по ключу (passkey) называем так, как его зовёт устройство человека: Face ID, Touch ID, Windows Hello.
+  // ---- Вход по ключу (passkey): как его называем ----
+  // Правило (Лёв, 09.10.2026): Touch ID, Windows Hello, «отпечаток» и «палец» только когда в ЭТОМ браузере уже срабатывал ключ самого устройства.
+  // По виду устройства нельзя: у MacBook есть датчик, а ключ GG ID может лежать только в iPhone, и тогда Chrome показывает один QR-код.
+  // Иначе Face ID (он на телефоне и верен везде) и подсказка про оба пути. Исключение: enroll, ключ создаётся здесь. HANDOFF-AUTH.md, раздел 6.1.
+  // Память в localStorage, имена общие со входом хаба и страницами Face ID для админов (Infra-AWS, Infra-Auth): менять только везде сразу.
+  // Каждое обращение в try/catch. Пока на странице нет разметки входа по ключу, кит хранилища не трогает.
+  var PK_LOCAL = 'gg-id-local-key';    // '1': в этом браузере работает ключ устройства
+  var PK_LAST = 'gg-id-last-method';   // platform (ключ устройства) или cross-platform (телефон, ключ безопасности): чем подтвердили в последний раз
+  var PK_MISS = 'gg-id-local-miss';    // '1': при ключе устройства был NotAllowedError; если следом вошли с телефона, ключа уже нет
+  var PK_SKIP = 'gg-id-enroll-skip';   // время (мс) «Не сейчас»: неделю ключ не предлагаем
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+
+  // Догадка об устройстве по браузеру, слов сама не даёт: нужна при подтверждённом ключе и для enroll.
   function passkeyKind(ua, platform, touch) {
     ua = ua || navigator.userAgent || '';
     platform = platform || (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
@@ -1337,20 +1358,111 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     if (/Win/.test(platform) || /Windows/.test(ua)) return 'hello';
     return 'key';
   }
-  // Целые фразы, а не одно слово: по-русски «войти с Face ID», но «войти по отпечатку».
+  // Целые фразы: по-русски «войти с Face ID», но «войти по отпечатку». login по устройству только при подтверждённом ключе, иначе Face ID
+  // (на Android фраза про ключ); enroll и enroll-lead (начало подзаголовка предложения) всегда по устройству.
   var PASSKEY_TEXT = {
-    faceid:  { login: 'Войти с Face ID', enroll: 'Подключить Face ID', wait: 'Подтвердите Face ID' },
-    touchid: { login: 'Войти с Touch ID', enroll: 'Подключить Touch ID', wait: 'Приложите палец к Touch ID' },
-    hello:   { login: 'Войти с Windows Hello', enroll: 'Подключить Windows Hello', wait: 'Подтвердите Windows Hello' },
-    finger:  { login: 'Войти по отпечатку', enroll: 'Подключить вход по отпечатку', wait: 'Приложите палец к сканеру' },
-    key:     { login: 'Войти по ключу доступа', enroll: 'Создать ключ доступа', wait: 'Подтвердите ключ доступа' }
+    faceid:  { login: 'Войти с Face ID', enroll: 'Подключить Face ID', 'enroll-lead': 'Подключите Face ID' },
+    touchid: { login: 'Войти с Touch ID', enroll: 'Подключить Touch ID', 'enroll-lead': 'Подключите Touch ID' },
+    hello:   { login: 'Войти с Windows Hello', enroll: 'Подключить Windows Hello', 'enroll-lead': 'Подключите Windows Hello' },
+    finger:  { login: 'Войти по отпечатку', enroll: 'Подключить вход по отпечатку', 'enroll-lead': 'Подключите отпечаток' },
+    key:     { login: 'Войти по ключу доступа', enroll: 'Создать ключ доступа', 'enroll-lead': 'Создайте ключ доступа' }
   };
-  function passkeyText(phrase, kind) {
-    var t = PASSKEY_TEXT[kind || passkeyKind()] || PASSKEY_TEXT.key;
-    return t[phrase] || t.login;
-  }
-  // Значок к фразе: лицо для Face ID и Windows Hello, отпечаток для Touch ID и Android, ключ для остальных.
+  // Ключ может быть на телефоне (QR-код), поэтому ждём без слов про устройство.
+  var PASSKEY_WAIT = 'Ждём подтверждения';
+  // Слово в подсказке: «Подтвердите вход: Touch ID на этом устройстве.»
+  var PASSKEY_WORD = { faceid: 'Face ID', touchid: 'Touch ID', hello: 'Windows Hello', finger: 'отпечаток пальца', key: 'ключ доступа' };
+  // Значок: лицо для Face ID и Windows Hello, отпечаток для Touch ID и Android, ключ для остальных.
   var PASSKEY_ICON = { faceid: 'scan-face', hello: 'scan-face', touchid: 'fingerprint', finger: 'fingerprint', key: 'key-round' };
+
+  // own = ключ устройства подтверждён и в последний раз вошли им: только тогда можно сказать «Touch ID».
+  // Время «Не сейчас» из будущего (часы сдвигали, мусор в хранилище) паузой не считается.
+  function passkeyMemory() {
+    var last = lsGet(PK_LAST), age = Date.now() - (+lsGet(PK_SKIP) || 0), local = lsGet(PK_LOCAL) === '1';
+    last = last === 'platform' || last === 'cross-platform' ? last : '';
+    return { local: local, last: last, own: local && last === 'platform', miss: lsGet(PK_MISS) === '1', snoozed: age >= 0 && age < 7 * 864e5 };
+  }
+  // Вход или создание ключа удались: how = чем подтвердили. cross-platform после осечки (miss) снимает ключ устройства. Иное: ничего не узнали.
+  function passkeyRemember(how) {
+    if (how === 'platform') { lsSet(PK_LOCAL, '1'); lsSet(PK_LAST, 'platform'); lsDel(PK_MISS); }
+    else if (how === 'cross-platform') {
+      if (lsGet(PK_MISS) === '1') lsDel(PK_LOCAL);
+      lsDel(PK_MISS);
+      lsSet(PK_LAST, 'cross-platform');
+    }
+  }
+  // NotAllowedError при ключе устройства = осечка. AbortError и InvalidStateError про ключ ничего не говорят.
+  function passkeyMissed(err) { if (err && err.name === 'NotAllowedError' && lsGet(PK_LOCAL) === '1') lsSet(PK_MISS, '1'); }
+  // «Не сейчас», InvalidStateError, already_registered (ключ человека уже стоит, например в телефоне): неделю ключ не предлагаем.
+  function passkeySnooze() { lsSet(PK_SKIP, String(Date.now())); }
+
+  // Чем браузер подтвердил последний вызов navigator.credentials: platform, cross-platform или '' (не сказал). GGPasskey этого не отдаёт, знает браузер
+  // (authenticatorAttachment): passkeyWatch() оборачивает get и create, запрос и ответ идут как шли. Один раз при загрузке.
+  // mine: метка обёрток этой копии кита. Чужую обёртку (другая копия кита на странице) за свою не считаем: у каждой копии свой seen.
+  var seen = '', watching = false, mine = {};
+  function passkeySeen() { return seen; }
+  function passkeyWatch() {
+    watching = false;
+    try {
+      var creds = navigator.credentials;
+      ['get', 'create'].forEach(function (m) {
+        var orig = creds && creds[m];
+        if (typeof orig !== 'function') return;
+        if (orig._gidWatch !== mine) {
+          var wrap = function () {
+            seen = '';
+            var p = orig.apply(creds, arguments);
+            return p && typeof p.then === 'function' ? p.then(function (cred) {
+              var a = cred && cred.authenticatorAttachment;
+              seen = a === 'platform' || a === 'cross-platform' ? a : '';
+              return cred;
+            }) : p;
+          };
+          wrap._gidWatch = mine;
+          creds[m] = wrap;
+        }
+        if (m === 'create') watching = creds[m]._gidWatch === mine;
+      });
+    } catch (e) { watching = false; }
+  }
+  // Ключ создан здесь (GGPasskey.register): страница просила ключ устройства, поэтому молчание браузера = ключ устройства. Без create в passkeyWatch() не пишем.
+  function passkeyCreated() { if (watching) passkeyRemember(seen === 'cross-platform' ? 'cross-platform' : 'platform'); }
+
+  // Какой способ назвать: слово устройства только при подтверждённом ключе (own), иначе Face ID (на Android фраза про ключ); enroll всегда по устройству.
+  function labelKind(phrase, kind, own) {
+    if (!PASSKEY_TEXT[kind]) kind = 'key';
+    return own || /^enroll/.test(phrase) ? kind : (kind === 'finger' ? 'key' : 'faceid');
+  }
+  function textFor(phrase, kind, own) {
+    if (phrase === 'wait') return PASSKEY_WAIT;
+    var k = labelKind(phrase, kind, own);
+    return PASSKEY_TEXT[k][phrase] || PASSKEY_TEXT[k].login;
+  }
+  function iconFor(phrase, kind, own) { return PASSKEY_ICON[labelKind(phrase, kind, own)]; }
+  // Подсказка, пока открыто окно браузера. На iPhone, iPad и Android QR-кода нет.
+  function hintFor(kind, m) {
+    if (m.own) return 'Подтвердите вход: ' + (PASSKEY_WORD[kind] || PASSKEY_WORD.key) + ' на этом устройстве.';
+    if (kind === 'faceid') return 'Подтвердите вход Face ID в системном окне. Это займёт секунду.';
+    if (kind === 'finger') return 'Подтвердите вход в системном окне. Это займёт секунду.';
+    if (m.last === 'cross-platform') return 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID.';
+    return 'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.';
+  }
+  function passkeyText(phrase, kind) { return textFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyIcon(phrase, kind) { return iconFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyHint(kind) { return hintFor(kind || passkeyKind(), passkeyMemory()); }
+  // Разметка: data-gid-passkey="login|enroll|enroll-lead|wait", data-gid-passkey-icon на <svg> (по подписи в той же кнопке, путь к спрайту
+  // сохраняется), data-gid-passkey-hint. Нет такой разметки: хранилище не читаем.
+  function paintPasskey(root) {
+    var labels = root.querySelectorAll('[data-gid-passkey]'), icons = root.querySelectorAll('[data-gid-passkey-icon] use'),
+        hints = root.querySelectorAll('[data-gid-passkey-hint]');
+    if (!labels.length && !icons.length && !hints.length) return;
+    var kind = passkeyKind(), m = passkeyMemory();
+    labels.forEach(function (el) { el.textContent = textFor(el.getAttribute('data-gid-passkey'), kind, m.own); });
+    icons.forEach(function (u) {
+      var btn = u.closest('button, a'), label = btn && btn.querySelector('[data-gid-passkey]');
+      u.setAttribute('href', (u.getAttribute('href') || '').split('#')[0] + '#gi-' + iconFor(label ? label.getAttribute('data-gid-passkey') : 'login', kind, m.own));
+    });
+    hints.forEach(function (el) { el.textContent = hintFor(kind, m); });
+  }
 
   function shake(el) {
     if (!el) return;
@@ -1413,12 +1525,8 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     root = root || document;
     opts = opts || {};
 
-    // Подписи входа по ключу: data-gid-passkey="login|enroll|wait". В витрине (opts.demo) остаётся Face ID из разметки.
-    if (!opts.demo) {
-      var kind = passkeyKind();
-      root.querySelectorAll('[data-gid-passkey]').forEach(function (el) { el.textContent = passkeyText(el.getAttribute('data-gid-passkey'), kind); });
-      root.querySelectorAll('[data-gid-passkey-icon] use').forEach(function (u) { u.setAttribute('href', '#gi-' + PASSKEY_ICON[kind]); });
-    }
+    // Подписи входа по ключу, значки и подсказка по тому, что этот браузер помнит про ключ (правило в начале файла). В витрине (opts.demo) остаются слова из разметки.
+    if (!opts.demo) paintPasskey(root);
 
     // QR-код карты GG ID: <svg data-gid-qr="адрес">.
     root.querySelectorAll('svg[data-gid-qr]').forEach(qrDraw);
@@ -1730,10 +1838,13 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 
   window.GGID = {
     init: init, busy: busy, shake: shake, error: error,
-    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
+    passkeyKind: passkeyKind, passkeyText: passkeyText, passkeyIcon: passkeyIcon, passkeyHint: passkeyHint,
+    passkeyMemory: passkeyMemory, passkeyRemember: passkeyRemember, passkeyCreated: passkeyCreated, passkeyMissed: passkeyMissed,
+    passkeySnooze: passkeySnooze, passkeyWatch: passkeyWatch, passkeySeen: passkeySeen,
+    passwordChecks: passwordChecks, passwordLevel: passwordLevel,
     card: card, cardSince: cardSince, cardInitials: cardInitials,
     qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
-    version: '2026-10-08.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
+    version: '2026-10-09.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
@@ -1950,7 +2061,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     sessionExpired: function () { if (dialog.el) showExpired(); else fire(doc, 'gid:session-expired'); },
     closeSessionExpired: hideExpired,
     watchFetch: watchFetch,                                            // fetch: 401 со своего origin = окно
-    version: '2026-10-08.2'                                            // = gg-id/VERSION
+    version: '2026-10-09.2'                                            // = gg-id/VERSION
   };
 
   function auto() {
@@ -1965,7 +2076,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <script>
 (function () {
   'use strict';
-  var META = [{"key": "login", "tab": "Вход", "title": "Вход", "lockup": true, "path": "", "when": "Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля.", "api": "GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()"}, {"key": "password", "tab": "По паролю", "title": "Вход по паролю", "lockup": true, "path": "", "when": "Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.", "api": "POST /api/auth/login"}, {"key": "error", "tab": "Ошибка", "title": "Неверный пароль", "lockup": true, "path": "", "when": "401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».", "api": "POST /api/auth/login: 401, 429"}, {"key": "passkey", "tab": "Face ID", "title": "Подтвердите вход", "lockup": true, "path": "", "when": "Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки.", "api": "GGPasskey.login()"}, {"key": "done", "tab": "Готово", "title": "Вход выполнен", "lockup": false, "path": "", "when": "Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.", "api": "GET /api/auth/me, переход на next"}, {"key": "continue", "tab": "Продолжить как", "title": "Продолжить", "lockup": true, "path": "", "when": "Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.", "api": "GET /api/auth/authorize"}, {"key": "enroll", "tab": "Подключить Face ID", "title": "Вход без пароля", "lockup": true, "path": "", "when": "После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.", "api": "GGPasskey.register()"}, {"key": "forgot", "tab": "Забыли пароль", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "Восстановление по рабочей почте.", "api": "POST /api/auth/forgot"}, {"key": "sent", "tab": "Письмо отправлено", "title": "Проверьте почту", "lockup": true, "path": "", "when": "Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.", "api": "POST /api/auth/forgot: 200"}, {"key": "setpass", "tab": "Новый пароль", "title": "Задайте пароль", "lockup": true, "path": "", "when": "Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.", "api": "POST /api/auth/set-password/check, POST /api/auth/set-password"}, {"key": "saved", "tab": "Пароль сохранён", "title": "Пароль сохранён", "lockup": true, "path": "", "when": "После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.", "api": "POST /api/auth/set-password: 200"}, {"key": "resetoff", "tab": "Восстановление выключено", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.", "api": "GET /api/auth/capabilities"}, {"key": "expired", "tab": "Ссылка устарела", "title": "Ссылка не работает", "lockup": true, "path": "", "when": "Токен из ссылки устарел или уже использован.", "api": "POST /api/auth/set-password/check: ошибка"}, {"key": "noaccess", "tab": "Нет доступа", "title": "Нет доступа", "lockup": true, "path": "", "when": "Человек вошёл, но роли в этом сервисе у него нет.", "api": "GET /api/auth/me (level), entitlements"}, {"key": "pin", "tab": "Код доступа", "title": "Код доступа", "lockup": true, "path": "", "when": "Переходный вход по коду для сервисов, которые ещё не на GG ID.", "api": "sso-gate: PIN-ворота"}, {"key": "unavailable", "tab": "Недоступен", "title": "Вход временно недоступен", "lockup": true, "path": "", "when": "GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.", "api": "sso-gate: sso-unavailable"}, {"key": "signedout", "tab": "Вы вышли", "title": "Вы вышли", "lockup": true, "path": "", "when": "После «Выйти» в меню аккаунта.", "api": "POST /api/v1/sessions/revoke"}, {"key": "card", "tab": "Карточка GG ID", "title": "Ваш GG ID", "lockup": false, "path": "/cabinet/", "when": "Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.", "api": "GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()"}];
+  var META = [{"key": "login", "tab": "Вход", "title": "Вход", "lockup": true, "path": "", "when": "Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере.", "api": "GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()"}, {"key": "password", "tab": "По паролю", "title": "Вход по паролю", "lockup": true, "path": "", "when": "Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.", "api": "POST /api/auth/login"}, {"key": "error", "tab": "Ошибка", "title": "Неверный пароль", "lockup": true, "path": "", "when": "401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».", "api": "POST /api/auth/login: 401, 429"}, {"key": "passkey", "tab": "Face ID", "title": "Подтвердите вход", "lockup": true, "path": "", "when": "Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки.", "api": "GGPasskey.login()"}, {"key": "done", "tab": "Готово", "title": "Вход выполнен", "lockup": false, "path": "", "when": "Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.", "api": "GET /api/auth/me, переход на next"}, {"key": "continue", "tab": "Продолжить как", "title": "Продолжить", "lockup": true, "path": "", "when": "Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.", "api": "GET /api/auth/authorize"}, {"key": "enroll", "tab": "Подключить Face ID", "title": "Вход без пароля", "lockup": true, "path": "", "when": "После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю.", "api": "GGPasskey.register()"}, {"key": "forgot", "tab": "Забыли пароль", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "Восстановление по рабочей почте.", "api": "POST /api/auth/forgot"}, {"key": "sent", "tab": "Письмо отправлено", "title": "Проверьте почту", "lockup": true, "path": "", "when": "Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде.", "api": "POST /api/auth/forgot: 200"}, {"key": "setpass", "tab": "Новый пароль", "title": "Задайте пароль", "lockup": true, "path": "", "when": "Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере.", "api": "POST /api/auth/set-password/check, POST /api/auth/set-password"}, {"key": "saved", "tab": "Пароль сохранён", "title": "Пароль сохранён", "lockup": true, "path": "", "when": "После сохранения пароля. Сессии нет, человек идёт ко входу, браузер сам подставит новый пароль.", "api": "POST /api/auth/set-password: 200"}, {"key": "resetoff", "tab": "Восстановление выключено", "title": "Восстановить пароль", "lockup": true, "path": "", "when": "capabilities.password_reset не true: восстановление по почте выключено, вместо формы эта плашка.", "api": "GET /api/auth/capabilities"}, {"key": "expired", "tab": "Ссылка устарела", "title": "Ссылка не работает", "lockup": true, "path": "", "when": "Токен из ссылки устарел или уже использован.", "api": "POST /api/auth/set-password/check: ошибка"}, {"key": "noaccess", "tab": "Нет доступа", "title": "Нет доступа", "lockup": true, "path": "", "when": "Человек вошёл, но роли в этом сервисе у него нет.", "api": "GET /api/auth/me (level), entitlements"}, {"key": "pin", "tab": "Код доступа", "title": "Код доступа", "lockup": true, "path": "", "when": "Переходный вход по коду для сервисов, которые ещё не на GG ID.", "api": "sso-gate: PIN-ворота"}, {"key": "unavailable", "tab": "Недоступен", "title": "Вход временно недоступен", "lockup": true, "path": "", "when": "GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.", "api": "sso-gate: sso-unavailable"}, {"key": "signedout", "tab": "Вы вышли", "title": "Вы вышли", "lockup": true, "path": "", "when": "После «Выйти» в меню аккаунта.", "api": "POST /api/v1/sessions/revoke"}, {"key": "card", "tab": "Карточка GG ID", "title": "Ваш GG ID", "lockup": false, "path": "/cabinet/", "when": "Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.", "api": "GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()"}];
   var HERO_DEMO = {"name": "Иван Образцов", "positions": ["Ментор", "Продажи"], "id": "GG 0042-7F3A", "qr": "https://id.global-generations-edu.com/v/GG-0042-7F3A"};   // «Продолжить как»: карта в панели оживает именем аккаунта
   var BY = {}; META.forEach(function (m, i) { m.n = ('0' + (i + 1)).slice(-2); BY[m.key] = m; });
   var st = { s: 'login', l: 'split', t: 'light', d: 'desktop', svc: 'АКБ' };

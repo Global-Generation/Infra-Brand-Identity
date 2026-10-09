@@ -11,6 +11,9 @@ QA 08.10: screens in the split layout at 360, 768, 1024 px and at 200 % zoom; sh
 (the card on the panel never overlaps the logo or the text, is never clipped, never narrower than 240 px, long data stays inside);
 a visible keyboard focus ring on every stop of every screen; no endless motion with «reduce motion»; readable placeholders;
 the panel in the system dark theme equals data-theme="dark".
+Passkey wording (rule of 09.10.2026, src/check_gg_id_passkey.py, also runnable alone): Touch ID, Windows Hello, «отпечаток» and «палец» only when
+this browser has a confirmed key of the device; 7 devices x 8 memory states x 3 screens, the rules of the shared localStorage memory, the real
+WebAuthn of Chromium (virtual authenticators), a browser without storage or WebAuthn.
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).
 """
@@ -20,6 +23,8 @@ import re
 import shutil
 import sys
 from playwright.sync_api import sync_playwright
+
+import check_gg_id_passkey   # src/ is on sys.path when this file is run as a script
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCREENS = os.path.join(ROOT, 'gg-id', 'screens')
@@ -349,7 +354,7 @@ PLACEHOLDER = '''() => {
 }'''
 
 problems = []
-counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0, 'widths': 0, 'short': 0, 'focus': 0, 'motion': 0}
+counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0, 'widths': 0, 'short': 0, 'focus': 0, 'motion': 0, 'passkey': 0}
 with sync_playwright() as p:
     b = p.chromium.launch()
     _new_context = b.new_context
@@ -831,13 +836,16 @@ with sync_playwright() as p:
         if errs:
             problems.append(f'showcase/{tag}: console {errs[:5]}')
         ctx.close()
+
+    # how the kit words a sign-in with a passkey: no method of the device without a confirmed key of this browser (src/check_gg_id_passkey.py)
+    check_gg_id_passkey.run(b, problems, counts)
     b.close()
 
 summary = (f'{counts["screens"]} screen renders, {counts["widths"]} renders at 360/768/1024 px and 200 %, {counts["short"]} short windows, '
            f'{counts["focus"]} focus stops, {counts["motion"]} reduced-motion renders, '
            f'{counts["layout"]} showcase layout states, {counts["service"]} gg-id-service.js tests, '
            f'{counts["card"]} card renders, {counts["email"]} e-mail renders, '
-           f'{counts["showcase"]} showcase states')
+           f'{counts["showcase"]} showcase states, {counts["passkey"]} passkey wording checks')
 if problems:
     print('GG ID CHECK FAILED', '|', summary)
     for x in problems:

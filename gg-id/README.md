@@ -10,7 +10,7 @@
 | Файл | Что внутри |
 |---|---|
 | `gg-id.css` | токены (светлая и тёмная тема), раскладки `split`, `card`, `minimal`, все компоненты |
-| `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи Face ID / Touch ID / Windows Hello |
+| `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи входа по ключу (Face ID; Touch ID, Windows Hello и «отпечаток» только при подтверждённом ключе этого браузера) и память браузера про ключ |
 | `fonts/` | Montserrat v31 (переменный, 400-700) самохостом: кириллица, латиница и `latin-ext` (латиница с диакритикой и знаки валют, в том числе ₽; sha256 `920711de…0082`, грузится, только если на странице есть такие знаки) |
 | `gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 своего origin (раздел «Поведение в сервисе») |
 | `sprite.svg` | логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя) и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
@@ -20,7 +20,7 @@
 | `email/gg-logo-navy-2x.png` | navy-логотип для писем на светлом фоне (302 x 76), генерируется `src/rasterize_gg_id_email.py` |
 | `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-08.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-09.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
 Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`.
 
@@ -53,8 +53,9 @@
 
 | Атрибут | Что делает |
 |---|---|
-| `data-gid-passkey="login\|enroll\|wait"` | текст кнопки по устройству: «Войти с Face ID», «Войти с Touch ID», «Войти с Windows Hello», «Войти по отпечатку», «Войти по ключу доступа» |
-| `data-gid-passkey-icon` на `<svg>` | значок к ней: лицо, отпечаток или ключ |
+| `data-gid-passkey="login\|enroll\|enroll-lead\|wait"` | подпись кнопки входа по ключу по памяти браузера (раздел «Вход по ключу» ниже). `login`: «Войти с Face ID» (на Android «Войти по ключу доступа»), а «Войти с Touch ID», «Войти с Windows Hello», «Войти по отпечатку» только если в этом браузере уже входили своим ключом. `wait`: «Ждём подтверждения». `enroll` и `enroll-lead` (начало подзаголовка: «Подключите Touch ID, и вход займёт секунду.»): способ устройства, экран показывать только после `GGPasskey.platformAvailable()` |
+| `data-gid-passkey-icon` на `<svg>` | значок к подписи в той же кнопке: лицо, отпечаток или ключ (путь к спрайту в `href` сохраняется) |
+| `data-gid-passkey-hint` | подсказка под заголовком, пока открыто окно браузера (три текста по памяти браузера) |
 | `data-gid-eye` | кнопка «показать пароль» в `.gid-input-wrap` |
 | `data-gid-domain="global-generations.com"` + `[data-gid-domain-hint]` | подсказка «только рабочая почта» сразу после ввода, до сервера |
 | `data-gid-newpass`, `data-gid-repeat`, `[data-gid-meter]`, `[data-gid-rules] [data-rule=len\|mix\|case]` | шкала и галочки нового пароля вживую (правила как на сервере: 12-256 символов, буквы и цифры, заглавные и строчные) |
@@ -62,7 +63,24 @@
 | `data-gid-countdown="42"` + `data-gid-countdown-done="enable:#id\|reload"` | обратный отсчёт «через 0:42», по нулю включает кнопку или перезагружает страницу |
 | `[data-gid-error]` + `[data-gid-error-text]` | блок ошибки над кнопкой |
 
-JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кнопка занята, второй запрос не уходит), `GGID.error(root, 'Неверная почта или пароль', [email, password])` (текст, подсветка, встряска), `GGID.shake(el)`, `GGID.passkeyKind()`, `GGID.passwordChecks(v)`, `GGID.version` (версия кита, = `gg-id/VERSION`). Если разметка появляется позже, вызвать `GGID.init(root)`.
+JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кнопка занята, второй запрос не уходит), `GGID.error(root, 'Неверная почта или пароль', [email, password])` (текст, подсветка, встряска), `GGID.shake(el)`, `GGID.passkeyKind()` (догадка об устройстве, подписей сама не даёт), `GGID.passwordChecks(v)`, `GGID.version` (версия кита, = `gg-id/VERSION`). Если разметка появляется позже, вызвать `GGID.init(root)`.
+
+### Вход по ключу: подписи и память браузера
+
+Правило 09.10.2026 (полностью: `HANDOFF-AUTH.md`, раздел 6.1). «Touch ID», «Windows Hello», «отпечаток» и «палец» кит говорит, только когда в ЭТОМ браузере уже входили ключом самого устройства: у MacBook есть датчик Touch ID, а ключ GG ID может лежать только в iPhone, и тогда Chrome на маке показывает один QR-код телефона. Иначе кнопка зовёт Face ID, пока ждём «Ждём подтверждения», а подсказка называет оба пути. Память живёт в `localStorage` (`gg-id-local-key`, `gg-id-last-method`, `gg-id-local-miss`, `gg-id-enroll-skip`); имена общие со страницей входа хаба и страницами подтверждения Face ID для админов (Infra-AWS и её порт Infra-Auth), переименовать можно только во всех местах сразу. `GGID.init` подписывает размеченные элементы сам, страница лишь сообщает киту, чем закончился вход:
+
+```js
+GGID.passkeyWatch()                 // один раз при загрузке: читает authenticatorAttachment из ответов navigator.credentials.get и create (запрос и ответ идут как шли)
+GGPasskey.login().then(function () { GGID.passkeyRemember(GGID.passkeySeen()); }, function (e) { GGID.passkeyMissed(e); })
+GGPasskey.register().then(function () { GGID.passkeyCreated(); }, function (e) { if (e && (e.name === 'InvalidStateError' || e.message === 'already_registered')) GGID.passkeySnooze(); })
+GGID.passkeySeen()                  // 'platform' | 'cross-platform' | '': чем подтвердил последний ответ браузера
+GGID.passkeyRemember(how)           // how = 'platform' (ключ устройства) или 'cross-platform' (телефон по QR-коду, ключ безопасности); остальное игнорируется
+GGID.passkeyCreated()               // ключ создан здесь: platform, если браузер не назвал его чужим (без passkeyWatch ничего не пишет)
+GGID.passkeyMissed(err)             // NotAllowedError при ключе устройства = осечка; снимает ключ, если следом вход выйдет с телефона
+GGID.passkeySnooze()                // «Не сейчас», InvalidStateError, already_registered: неделю не предлагать ключ
+GGID.passkeyMemory()                // { local, last, own, miss, snoozed }; own = ключ устройства подтверждён и в последний раз вошли им
+GGID.passkeyText('login|enroll|enroll-lead|wait'), GGID.passkeyIcon('login|enroll|enroll-lead|wait'), GGID.passkeyHint()   // подпись, значок и подсказка по памяти
+```
 
 ## Как связать со входом хаба
 
@@ -70,9 +88,9 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 1. `GET /api/auth/capabilities`: `password_reset` показывает «Забыли пароль?». Входа через Aura на экранах GG ID нет (`aura_login` экраны не читают).
 2. `GGPasskey.platformAvailable()` и `GGPasskey.enabled()`: если ключ есть, первый экран `login` (Face ID главной кнопкой); если нет, сразу `password`.
-3. Face ID: `GGID.busy(btn, true)` и состояние `passkey`, затем `GGPasskey.login()`. `NotAllowedError` (человек отменил) = тихо назад, без ошибки. Другая ошибка = «Face ID не сработал, войдите по паролю» и экран `password`.
+3. Face ID: `GGID.busy(btn, true)` и состояние `passkey` (подпись `GGID.passkeyText('wait')`, подсказка `GGID.passkeyHint()`), затем `GGPasskey.login()`. Удалось: `GGID.passkeyRemember(GGID.passkeySeen())`. `NotAllowedError` (человек отменил) = тихо назад, без ошибки (и `GGID.passkeyMissed(e)`). Другая ошибка = «Face ID не сработал, войдите по паролю» и экран `password`.
 4. Пароль: `POST /api/auth/login`. 401 = «Неверная почта или пароль. Проверьте раскладку и Caps Lock.», 429 = «Слишком много попыток, подождите минуту», сеть = «Сеть недоступна». Поле пароля очистить, фокус в него.
-5. Успех: экран `done` (сборка знака) и `location.replace(next)`. После входа по паролю на устройстве без ключа сначала `enroll` (`GGPasskey.register()`), «Не сейчас» идёт дальше.
+5. Успех: экран `done` (сборка знака) и `location.replace(next)`. После входа по паролю на устройстве без ключа сначала `enroll` (`GGPasskey.register()`, затем `GGID.passkeyCreated()`), «Не сейчас» (`GGID.passkeySnooze()`) идёт дальше. Тот же экран после входа с телефона (`passkeySeen()` = `cross-platform`), если своего ключа в этом браузере нет (`!passkeyMemory().local`), браузер умеет свой (`platformAvailable()`) и неделю не отказывались (`!passkeyMemory().snoozed`).
 6. `next` проверять как сейчас: только тот же origin, не `/login.html`.
 
 <!-- screens:start -->
@@ -80,13 +98,13 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 | Экран | Файл | Когда | Хаб |
 |---|---|---|---|
-| Вход | `screens/login.html` | Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. | `GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()` |
+| Вход | `screens/login.html` | Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере. | `GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()` |
 | По паролю | `screens/password.html` | Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID. | `POST /api/auth/login` |
 | Ошибка | `screens/error.html` | 401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна». | `POST /api/auth/login: 401, 429` |
-| Face ID | `screens/passkey.html` | Открыто системное окно Face ID. Кнопка занята, второй запрос не уходит. Отмена в системном окне возвращает на первый экран без ошибки. | `GGPasskey.login()` |
+| Face ID | `screens/passkey.html` | Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки. | `GGPasskey.login()` |
 | Готово | `screens/done.html` | Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда. | `GET /api/auth/me, переход на next` |
 | Продолжить как | `screens/continue.html` | Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт. | `GET /api/auth/authorize` |
-| Подключить Face ID | `screens/enroll.html` | После входа по паролю, если ключа на этом устройстве нет. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю. | `GGPasskey.register()` |
+| Подключить Face ID | `screens/enroll.html` | После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю. | `GGPasskey.register()` |
 | Забыли пароль | `screens/forgot.html` | Восстановление по рабочей почте. | `POST /api/auth/forgot` |
 | Письмо отправлено | `screens/sent.html` | Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде. | `POST /api/auth/forgot: 200` |
 | Новый пароль | `screens/setpass.html` | Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере. | `POST /api/auth/set-password/check, POST /api/auth/set-password` |
@@ -203,7 +221,7 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-08.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-09.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
@@ -348,7 +366,8 @@ GGID.card(document.querySelector('.gid-idcard'), {
 
 ```
 python3 src/build_gg_id.py                                  # gg-id.html, gg-id/screens/*.html, gg-id/fonts/*, проверка email-card.html
-uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px, карточка, письмо, витрина
+uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px, карточка, письмо, витрина, подписи входа по ключу
+uv run --with playwright python src/check_gg_id_passkey.py  # только подписи входа по ключу и память браузера (около 15 секунд, входит в полный прогон)
 uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась подпись: email/gg-id-lockup-2x.png
 ```
 

@@ -1,10 +1,24 @@
-/* GG ID: поведение экранов входа (версия 2026-10-08.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-09.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
   'use strict';
 
-  // Вход по ключу (passkey) называем так, как его зовёт устройство человека: Face ID, Touch ID, Windows Hello.
+  // ---- Вход по ключу (passkey): как его называем ----
+  // Правило (Лёв, 09.10.2026): Touch ID, Windows Hello, «отпечаток» и «палец» только когда в ЭТОМ браузере уже срабатывал ключ самого устройства.
+  // По виду устройства нельзя: у MacBook есть датчик, а ключ GG ID может лежать только в iPhone, и тогда Chrome показывает один QR-код.
+  // Иначе Face ID (он на телефоне и верен везде) и подсказка про оба пути. Исключение: enroll, ключ создаётся здесь. HANDOFF-AUTH.md, раздел 6.1.
+  // Память в localStorage, имена общие со входом хаба и страницами Face ID для админов (Infra-AWS, Infra-Auth): менять только везде сразу.
+  // Каждое обращение в try/catch. Пока на странице нет разметки входа по ключу, кит хранилища не трогает.
+  var PK_LOCAL = 'gg-id-local-key';    // '1': в этом браузере работает ключ устройства
+  var PK_LAST = 'gg-id-last-method';   // platform (ключ устройства) или cross-platform (телефон, ключ безопасности): чем подтвердили в последний раз
+  var PK_MISS = 'gg-id-local-miss';    // '1': при ключе устройства был NotAllowedError; если следом вошли с телефона, ключа уже нет
+  var PK_SKIP = 'gg-id-enroll-skip';   // время (мс) «Не сейчас»: неделю ключ не предлагаем
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+
+  // Догадка об устройстве по браузеру, слов сама не даёт: нужна при подтверждённом ключе и для enroll.
   function passkeyKind(ua, platform, touch) {
     ua = ua || navigator.userAgent || '';
     platform = platform || (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
@@ -15,20 +29,111 @@
     if (/Win/.test(platform) || /Windows/.test(ua)) return 'hello';
     return 'key';
   }
-  // Целые фразы, а не одно слово: по-русски «войти с Face ID», но «войти по отпечатку».
+  // Целые фразы: по-русски «войти с Face ID», но «войти по отпечатку». login по устройству только при подтверждённом ключе, иначе Face ID
+  // (на Android фраза про ключ); enroll и enroll-lead (начало подзаголовка предложения) всегда по устройству.
   var PASSKEY_TEXT = {
-    faceid:  { login: 'Войти с Face ID', enroll: 'Подключить Face ID', wait: 'Подтвердите Face ID' },
-    touchid: { login: 'Войти с Touch ID', enroll: 'Подключить Touch ID', wait: 'Приложите палец к Touch ID' },
-    hello:   { login: 'Войти с Windows Hello', enroll: 'Подключить Windows Hello', wait: 'Подтвердите Windows Hello' },
-    finger:  { login: 'Войти по отпечатку', enroll: 'Подключить вход по отпечатку', wait: 'Приложите палец к сканеру' },
-    key:     { login: 'Войти по ключу доступа', enroll: 'Создать ключ доступа', wait: 'Подтвердите ключ доступа' }
+    faceid:  { login: 'Войти с Face ID', enroll: 'Подключить Face ID', 'enroll-lead': 'Подключите Face ID' },
+    touchid: { login: 'Войти с Touch ID', enroll: 'Подключить Touch ID', 'enroll-lead': 'Подключите Touch ID' },
+    hello:   { login: 'Войти с Windows Hello', enroll: 'Подключить Windows Hello', 'enroll-lead': 'Подключите Windows Hello' },
+    finger:  { login: 'Войти по отпечатку', enroll: 'Подключить вход по отпечатку', 'enroll-lead': 'Подключите отпечаток' },
+    key:     { login: 'Войти по ключу доступа', enroll: 'Создать ключ доступа', 'enroll-lead': 'Создайте ключ доступа' }
   };
-  function passkeyText(phrase, kind) {
-    var t = PASSKEY_TEXT[kind || passkeyKind()] || PASSKEY_TEXT.key;
-    return t[phrase] || t.login;
-  }
-  // Значок к фразе: лицо для Face ID и Windows Hello, отпечаток для Touch ID и Android, ключ для остальных.
+  // Ключ может быть на телефоне (QR-код), поэтому ждём без слов про устройство.
+  var PASSKEY_WAIT = 'Ждём подтверждения';
+  // Слово в подсказке: «Подтвердите вход: Touch ID на этом устройстве.»
+  var PASSKEY_WORD = { faceid: 'Face ID', touchid: 'Touch ID', hello: 'Windows Hello', finger: 'отпечаток пальца', key: 'ключ доступа' };
+  // Значок: лицо для Face ID и Windows Hello, отпечаток для Touch ID и Android, ключ для остальных.
   var PASSKEY_ICON = { faceid: 'scan-face', hello: 'scan-face', touchid: 'fingerprint', finger: 'fingerprint', key: 'key-round' };
+
+  // own = ключ устройства подтверждён и в последний раз вошли им: только тогда можно сказать «Touch ID».
+  // Время «Не сейчас» из будущего (часы сдвигали, мусор в хранилище) паузой не считается.
+  function passkeyMemory() {
+    var last = lsGet(PK_LAST), age = Date.now() - (+lsGet(PK_SKIP) || 0), local = lsGet(PK_LOCAL) === '1';
+    last = last === 'platform' || last === 'cross-platform' ? last : '';
+    return { local: local, last: last, own: local && last === 'platform', miss: lsGet(PK_MISS) === '1', snoozed: age >= 0 && age < 7 * 864e5 };
+  }
+  // Вход или создание ключа удались: how = чем подтвердили. cross-platform после осечки (miss) снимает ключ устройства. Иное: ничего не узнали.
+  function passkeyRemember(how) {
+    if (how === 'platform') { lsSet(PK_LOCAL, '1'); lsSet(PK_LAST, 'platform'); lsDel(PK_MISS); }
+    else if (how === 'cross-platform') {
+      if (lsGet(PK_MISS) === '1') lsDel(PK_LOCAL);
+      lsDel(PK_MISS);
+      lsSet(PK_LAST, 'cross-platform');
+    }
+  }
+  // NotAllowedError при ключе устройства = осечка. AbortError и InvalidStateError про ключ ничего не говорят.
+  function passkeyMissed(err) { if (err && err.name === 'NotAllowedError' && lsGet(PK_LOCAL) === '1') lsSet(PK_MISS, '1'); }
+  // «Не сейчас», InvalidStateError, already_registered (ключ человека уже стоит, например в телефоне): неделю ключ не предлагаем.
+  function passkeySnooze() { lsSet(PK_SKIP, String(Date.now())); }
+
+  // Чем браузер подтвердил последний вызов navigator.credentials: platform, cross-platform или '' (не сказал). GGPasskey этого не отдаёт, знает браузер
+  // (authenticatorAttachment): passkeyWatch() оборачивает get и create, запрос и ответ идут как шли. Один раз при загрузке.
+  // mine: метка обёрток этой копии кита. Чужую обёртку (другая копия кита на странице) за свою не считаем: у каждой копии свой seen.
+  var seen = '', watching = false, mine = {};
+  function passkeySeen() { return seen; }
+  function passkeyWatch() {
+    watching = false;
+    try {
+      var creds = navigator.credentials;
+      ['get', 'create'].forEach(function (m) {
+        var orig = creds && creds[m];
+        if (typeof orig !== 'function') return;
+        if (orig._gidWatch !== mine) {
+          var wrap = function () {
+            seen = '';
+            var p = orig.apply(creds, arguments);
+            return p && typeof p.then === 'function' ? p.then(function (cred) {
+              var a = cred && cred.authenticatorAttachment;
+              seen = a === 'platform' || a === 'cross-platform' ? a : '';
+              return cred;
+            }) : p;
+          };
+          wrap._gidWatch = mine;
+          creds[m] = wrap;
+        }
+        if (m === 'create') watching = creds[m]._gidWatch === mine;
+      });
+    } catch (e) { watching = false; }
+  }
+  // Ключ создан здесь (GGPasskey.register): страница просила ключ устройства, поэтому молчание браузера = ключ устройства. Без create в passkeyWatch() не пишем.
+  function passkeyCreated() { if (watching) passkeyRemember(seen === 'cross-platform' ? 'cross-platform' : 'platform'); }
+
+  // Какой способ назвать: слово устройства только при подтверждённом ключе (own), иначе Face ID (на Android фраза про ключ); enroll всегда по устройству.
+  function labelKind(phrase, kind, own) {
+    if (!PASSKEY_TEXT[kind]) kind = 'key';
+    return own || /^enroll/.test(phrase) ? kind : (kind === 'finger' ? 'key' : 'faceid');
+  }
+  function textFor(phrase, kind, own) {
+    if (phrase === 'wait') return PASSKEY_WAIT;
+    var k = labelKind(phrase, kind, own);
+    return PASSKEY_TEXT[k][phrase] || PASSKEY_TEXT[k].login;
+  }
+  function iconFor(phrase, kind, own) { return PASSKEY_ICON[labelKind(phrase, kind, own)]; }
+  // Подсказка, пока открыто окно браузера. На iPhone, iPad и Android QR-кода нет.
+  function hintFor(kind, m) {
+    if (m.own) return 'Подтвердите вход: ' + (PASSKEY_WORD[kind] || PASSKEY_WORD.key) + ' на этом устройстве.';
+    if (kind === 'faceid') return 'Подтвердите вход Face ID в системном окне. Это займёт секунду.';
+    if (kind === 'finger') return 'Подтвердите вход в системном окне. Это займёт секунду.';
+    if (m.last === 'cross-platform') return 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID.';
+    return 'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.';
+  }
+  function passkeyText(phrase, kind) { return textFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyIcon(phrase, kind) { return iconFor(phrase, kind || passkeyKind(), passkeyMemory().own); }
+  function passkeyHint(kind) { return hintFor(kind || passkeyKind(), passkeyMemory()); }
+  // Разметка: data-gid-passkey="login|enroll|enroll-lead|wait", data-gid-passkey-icon на <svg> (по подписи в той же кнопке, путь к спрайту
+  // сохраняется), data-gid-passkey-hint. Нет такой разметки: хранилище не читаем.
+  function paintPasskey(root) {
+    var labels = root.querySelectorAll('[data-gid-passkey]'), icons = root.querySelectorAll('[data-gid-passkey-icon] use'),
+        hints = root.querySelectorAll('[data-gid-passkey-hint]');
+    if (!labels.length && !icons.length && !hints.length) return;
+    var kind = passkeyKind(), m = passkeyMemory();
+    labels.forEach(function (el) { el.textContent = textFor(el.getAttribute('data-gid-passkey'), kind, m.own); });
+    icons.forEach(function (u) {
+      var btn = u.closest('button, a'), label = btn && btn.querySelector('[data-gid-passkey]');
+      u.setAttribute('href', (u.getAttribute('href') || '').split('#')[0] + '#gi-' + iconFor(label ? label.getAttribute('data-gid-passkey') : 'login', kind, m.own));
+    });
+    hints.forEach(function (el) { el.textContent = hintFor(kind, m); });
+  }
 
   function shake(el) {
     if (!el) return;
@@ -91,12 +196,8 @@
     root = root || document;
     opts = opts || {};
 
-    // Подписи входа по ключу: data-gid-passkey="login|enroll|wait". В витрине (opts.demo) остаётся Face ID из разметки.
-    if (!opts.demo) {
-      var kind = passkeyKind();
-      root.querySelectorAll('[data-gid-passkey]').forEach(function (el) { el.textContent = passkeyText(el.getAttribute('data-gid-passkey'), kind); });
-      root.querySelectorAll('[data-gid-passkey-icon] use').forEach(function (u) { u.setAttribute('href', '#gi-' + PASSKEY_ICON[kind]); });
-    }
+    // Подписи входа по ключу, значки и подсказка по тому, что этот браузер помнит про ключ (правило в начале файла). В витрине (opts.demo) остаются слова из разметки.
+    if (!opts.demo) paintPasskey(root);
 
     // QR-код карты GG ID: <svg data-gid-qr="адрес">.
     root.querySelectorAll('svg[data-gid-qr]').forEach(qrDraw);
@@ -408,10 +509,13 @@
 
   window.GGID = {
     init: init, busy: busy, shake: shake, error: error,
-    passkeyKind: passkeyKind, passkeyText: passkeyText, passwordChecks: passwordChecks, passwordLevel: passwordLevel,
+    passkeyKind: passkeyKind, passkeyText: passkeyText, passkeyIcon: passkeyIcon, passkeyHint: passkeyHint,
+    passkeyMemory: passkeyMemory, passkeyRemember: passkeyRemember, passkeyCreated: passkeyCreated, passkeyMissed: passkeyMissed,
+    passkeySnooze: passkeySnooze, passkeyWatch: passkeyWatch, passkeySeen: passkeySeen,
+    passwordChecks: passwordChecks, passwordLevel: passwordLevel,
     card: card, cardSince: cardSince, cardInitials: cardInitials,
     qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
-    version: '2026-10-08.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
+    version: '2026-10-09.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
