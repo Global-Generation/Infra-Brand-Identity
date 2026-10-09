@@ -252,7 +252,7 @@ def run(b, problems, counts):
                 if not own:    # Lev's Mac: not a word about Touch ID, Windows Hello or a finger on the sign-in and the waiting screens
                     for screen in ('login', 'passkey'):
                         ok(f'no method of the device on the {screen} screen {tag}', not BANNED.search(shown[screen]['page']), BANNED.findall(shown[screen]['page']))
-                    rest = shown['enroll']['page'].replace(shown['enroll']['text'], '').replace(shown['enroll']['lead'], '')
+                    rest = shown['enroll']['page'].replace(shown['enroll']['text'] or '', '').replace(shown['enroll']['lead'] or '', '')
                     ok(f'enroll screen names the method only on its button and in the lead of its sub line {tag}', not BANNED.search(rest), BANNED.findall(rest))
             ok(f'page: console and exceptions clean on {dev}', not errs, errs[:3])
             ctx.close()
