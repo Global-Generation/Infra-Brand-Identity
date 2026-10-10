@@ -13,6 +13,7 @@
 | `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи входа по ключу (Face ID; Touch ID, Windows Hello и «отпечаток» только при подтверждённом ключе этого браузера) и память браузера про ключ |
 | `fonts/` | Montserrat v31 (переменный, 400-700) самохостом: кириллица, латиница и `latin-ext` (латиница с диакритикой и знаки валют, в том числе ₽; sha256 `920711de…0082`, грузится, только если на странице есть такие знаки) |
 | `gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 своего origin (раздел «Поведение в сервисе») |
+| `account-menu/` | **меню аккаунта сервиса** (`GGAccountMenu`): чип с инициалами и карточка со значком Add to Apple Wallet, «Мои сервисы» (список сервисов человека, переход в любой одним нажатием), «Профиль GG ID», свои пункты сервиса, «Выйти». Один вид во всех сервисах, как у АКБ: `gg-account-menu.js`, `gg-account-menu.css` (генерируется из `gg-id.css`), `demo.html`, подробности и сниппеты для Jinja, React и статики в `account-menu/README.md` |
 | `sprite.svg` | логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя) и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
 | `gg-id-icon.svg` | иконка GG ID отдельным файлом (копия `assets/favicons/gg-id.svg`) |
 | `screens/` | 18 эталонных страниц (17 экранов входа и карточка GG ID), генерируются, руками не править |
@@ -20,7 +21,7 @@
 | `email/gg-logo-navy-2x.png` | navy-логотип для писем на светлом фоне (302 x 76), генерируется `src/rasterize_gg_id_email.py` |
 | `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-09.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-10.1`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
 Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`.
 
@@ -221,10 +222,22 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-09.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-10.1' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
+
+## Меню аккаунта сервиса: `account-menu/`
+
+Меню аккаунта в шапке (чип с инициалами и карточка) во всех сервисах команды рисует один компонент, `GGAccountMenu`, а не разметка, переписанная руками в каждом сервисе. Вид тот же, что у АКБ (те же классы `.gid-chip`, `.gid-menu`, `.gid-menu-item`, стили копируются из `gg-id.css` байт в байт), сверху добавлено то, чего у кита не было: **«Мои сервисы» как переключатель** (раскрывается в этой же карточке списком сервисов человека, нажатие ведёт прямо в сервис), **«Профиль GG ID»** (профиль, Face ID / Touch ID, пароль), значок **Add to Apple Wallet** (английский, чёрный, карта GG ID; по умолчанию на iPhone, iPad и в Safari на Mac, как в кабинете) и раскрывающиеся пункты сервиса.
+
+```js
+GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: 'settings', label: 'Настройки', icon: 'settings', href: '/settings' }] })
+```
+
+Адреса хаба (кабинет, профиль, список сервисов, карта для Wallet) по умолчанию боевые, сервис их не передаёт; `hubOrigin` (из `GG_AUTH_ORIGIN`) нужен только для стенда. Список сервисов компонент берёт один раз, при первом открытии: `GET /api/auth/service-links` хаба с кукой (CORS с куками для origin клиентов хаба, как у `/api/auth/card`). Не загрузился = «Мои сервисы» остаётся ссылкой на кабинет хаба (`/cabinet/`). «Выйти» не новый путь выхода, а прежний выход сервиса (он же завершает сессию хаба; страница самого хаба выходит из хаба сама). Параметры, события, клавиатура, безопасность, три сниппета (Jinja, React и Next, статика) и чек-лист подключения: `account-menu/README.md`; демо: `account-menu/demo.html`.
+
+Обёртка называется `.gam`, не `.gid-acct`: `gg-id-service.js` оживляет всё `.gid-acct` на странице, и второй обработчик на том же чипе открывал бы и закрывал меню одним кликом. Окно «Сессия истекла» и перехват 401 из `gg-id-service.js` работают рядом как раньше.
 
 ## Карточка GG ID
 
@@ -349,6 +362,7 @@ GGID.card(document.querySelector('.gid-idcard'), {
 
 ## Правила
 
+- Меню аккаунта в шапке сервиса: только `account-menu/` (`GGAccountMenu`), свою разметку чипа и карточки не рисуем. «Выйти» в нём = прежний выход сервиса, который заканчивает и сессию хаба.
 - Иконка GG ID = белый ключ на светлом градиенте `--grad-tile` (`assets/favicons/gg-id.svg`): в кнопке «Войти через GG ID», в окне «Сессия истекла» и в фавиконе экранов GG ID. Тёмных градиентных плиток нет (правило 4a).
 - Над заголовком ничего: ни замка, ни значка, ни плашки (правило 07.10). Заголовок называет сервис: «Вход в АКБ». Названия сервисов пишем так, чтобы не склонять («сервис «Пульс»»).
 - Подпись «логотип | ID»: логотип один, одного цвета (navy на светлом, белый на тёмном), высота 28 px (ширина не меньше 110 px).
@@ -369,6 +383,8 @@ python3 src/build_gg_id.py                                  # gg-id.html, gg-id/
 uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px, карточка, письмо, витрина, подписи входа по ключу
 uv run --with playwright python src/check_gg_id_passkey.py  # только подписи входа по ключу и память браузера (около 15 секунд, входит в полный прогон)
 uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась подпись: email/gg-id-lockup-2x.png
+python3 src/build_account_menu.py                           # account-menu/gg-account-menu.css из gg-id.css и src/account_menu/local.css (--check: только сверить)
+uv run --with playwright python src/check_account_menu.py   # меню аккаунта: вид против разметки АКБ, клавиатура, список сервисов с настоящим CORS, безопасность, 390 px
 ```
 
 Правки вида: `gg-id/gg-id.css`. Тексты и экраны: `src/gg_id/screens.html` (подписи «когда» и «API» в `INFO` внутри `src/build_gg_id.py`). Разметка карточки: `idcard()` в `src/build_gg_id.py`. Письмо: `gg-id/email-card.html`. Витрина: `src/gg_id/showcase.html`.

@@ -1,0 +1,60 @@
+/* ============ gg-account-menu: what the kit blocks above do not have (hand-written: src/account_menu/local.css) ============ */
+
+/* Wrapper: the same as .gid-acct of the kit, under its own name. gg-id-service.js wires every .gid-acct it finds; a menu that this file
+   draws and runs itself must not be taken by it a second time (two handlers on one chip open and close the menu in the same click). */
+.gam{position:relative;display:inline-flex;min-width:40px;max-width:100%;vertical-align:middle}
+.gam > .gid-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:var(--gam-z,60)}
+.gam--start > .gid-menu{right:auto;left:0;transform-origin:top left}
+.gam > .gid-menu{overscroll-behavior:contain}
+
+/* Narrow screen (and variant "avatar" at any width): only the round initials remain, the name and the arrow go. As in the AKB header. */
+@media (max-width:600px){.gam .gid-chip{column-gap:0}.gam .gid-chip > span:not(.gid-avatar):not(.gam-sr),.gam .gid-chip .gid-ic{display:none}}
+.gam--avatar .gid-chip{column-gap:0}
+.gam--avatar .gid-chip > span:not(.gid-avatar):not(.gam-sr),.gam--avatar .gid-chip .gid-ic{display:none}
+/* The name of the chip for screen readers ("Аккаунт: Лёв Авдошин"): out of the flex flow, no box, still in the accessibility tree in the narrow chip too */
+.gam .gid-chip > .gam-sr{position:absolute;width:1px;height:1px;min-width:0;max-width:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap}
+
+/* A row with no action (shown only) and a list inside an item of the menu: as in the AKB menu */
+.gid-menu-item--static{cursor:default}
+.gid-menu-item--static:hover{background:none}
+.gid-menu-sub{margin:2px 0 4px;padding:4px;max-height:240px;overflow-y:auto;border-radius:11px;background:var(--g-surface)}
+
+/* Sections that open inside the menu: "Мои сервисы" (the services of the person, one click into a service) and any item of the service with a panel.
+   The arrow at the right turns down when the section is open. */
+.gam .gid-menu-item .gam-chev{width:14px;height:14px;margin-left:auto;transition:transform .15s var(--g-ease)}
+.gam .gid-menu-meta + .gam-chev{margin-left:8px}
+.gam [aria-expanded="true"] > .gam-chev{transform:rotate(90deg)}
+.gam-sub{max-height:272px;overscroll-behavior:contain}
+.gam-sub .gid-menu-item:hover,.gam-sub .gid-menu-item:focus-visible{background:var(--g-soft)}
+.gam-note{padding:10px;font-size:12.5px;line-height:1.4;color:var(--g-muted)}
+
+/* A service in the list: the light tile of the kit (rule 4a: #8FBADD to #4B8FD6, white icon, no dark shadow) and the name on one line */
+.gam-svc{padding:8px 10px;font-size:13.5px}
+.gam-tile{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:8px;background:var(--g-tile);color:#fff}
+.gam .gid-menu-item .gam-tile .gid-ic{width:16px;height:16px;color:#fff}
+.gam-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gam-svc .gid-menu-meta{flex:none}
+.gam-all{padding:8px 10px;font-size:13px;color:var(--g-muted)}
+.gam-all .gid-ic{width:16px;height:16px;margin:0 6px}
+
+/* Apple Wallet badge: the last row of the header block (name, e-mail, then the badge). The header becomes a two-column grid only when the badge is there;
+   without it the header is the kit's own flex row, as in AKB. The badge is black with the thin grey outline of Apple's badge and white text; no shadow, no dimming,
+   no animation (Apple's rules for the badge), clear space around it at least 0.1 of its height. This drawn badge is interim: Apple's own SVG file replaces it through
+   the option walletImage (README, "Значок Apple Wallet"); that file is shown as it comes, with no frame of ours. */
+.gam .gam-head--wallet{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;row-gap:12px}
+.gam .gam-head--wallet > .gam-wallet{grid-column:1 / -1;justify-self:start}
+.gam .gam-wallet{display:inline-flex;align-items:center;gap:8px;height:36px;max-width:100%;padding:0 12px 0 9px;border:1px solid #a6a6a6;border-radius:6px;background:#000;color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;
+  box-shadow:none;filter:none;opacity:1;transition:none;animation:none}
+.gam .gam-wallet:hover,.gam .gam-wallet:visited{background:#000;color:#fff;text-decoration:none}
+.gam .gam-wallet:focus-visible{outline:2px solid var(--g-focus);outline-offset:3px;box-shadow:none}
+.gam .gam-wallet .gid-ic{width:20px;height:20px;flex:none;margin:0;color:#fff}
+.gam-wallet-tx{display:flex;flex-direction:column;justify-content:center;gap:1px;text-align:left;line-height:1}
+.gam-wallet-tx small{font-size:8.5px;font-weight:500;letter-spacing:.015em;line-height:1;color:#fff}
+.gam-wallet-tx b{font-size:15px;font-weight:600;letter-spacing:-.012em;line-height:1;color:#fff}
+.gam .gam-wallet--art{padding:0;border:0;border-radius:0;background:none}
+.gam .gam-wallet--art img{display:block;height:36px;width:auto;max-width:100%}
+
+@media (prefers-reduced-motion:reduce){
+  .gam *,.gam *::before,.gam *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}

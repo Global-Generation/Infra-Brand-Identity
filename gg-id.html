@@ -7,7 +7,7 @@
 <title>GG ID</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22sg%22%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2232%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20stop-color%3D%22%238FBADD%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%234B8FD6%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214.8%22%20fill%3D%22url%28%23sg%29%22%2F%3E%3Cg%20transform%3D%22translate%2810.00%2010.00%29%20scale%280.6875%29%22%3E%3Cpath%20d%3D%22M6%2023A17%2017%200%201%200%2040%2023A17%2017%200%201%200%206%2023ZM14.5%2023A8.5%208.5%200%201%200%2031.5%2023A8.5%208.5%200%201%200%2014.5%2023Z%22%20fill%3D%22%23ffffff%22%20fill-rule%3D%22evenodd%22%2F%3E%3Cpath%20d%3D%22M33%2033L55%2055M44%2044L38.5%2049.5M51%2051L45.5%2056.5%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%227.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2223%22%20cy%3D%2223%22%20r%3D%224.5%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" type="image/svg+xml">
 <style>
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-09.2 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-10.1 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -1327,7 +1327,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   </div></template>
 <script>window.GGID_MANUAL = true;</script>
 <script>
-/* GG ID: поведение экранов входа (версия 2026-10-09.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-10.1, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
@@ -1844,7 +1844,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     passwordChecks: passwordChecks, passwordLevel: passwordLevel,
     card: card, cardSince: cardSince, cardInitials: cardInitials,
     qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
-    version: '2026-10-09.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
+    version: '2026-10-10.1'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
@@ -2061,7 +2061,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     sessionExpired: function () { if (dialog.el) showExpired(); else fire(doc, 'gid:session-expired'); },
     closeSessionExpired: hideExpired,
     watchFetch: watchFetch,                                            // fetch: 401 со своего origin = окно
-    version: '2026-10-09.2'                                            // = gg-id/VERSION
+    version: '2026-10-10.1'                                            // = gg-id/VERSION
   };
 
   function auto() {

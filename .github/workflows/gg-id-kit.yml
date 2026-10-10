@@ -1,0 +1,41 @@
+name: gg-id kit
+
+# Кит GG ID (gg-id/): сборка в ногу с исходниками и проверка меню аккаунта (GGAccountMenu) в настоящем браузере на каждый pull request.
+# Полная проверка экранов входа (src/check_gg_id.py) долгая и гоняется руками перед PR (gg-id/README.md, раздел «Пересобрать и проверить»).
+
+on:
+  pull_request:
+    paths:
+      - "gg-id/**"
+      - "src/**"
+      - ".github/workflows/gg-id-kit.yml"
+  push:
+    branches: [main]
+    paths:
+      - "gg-id/**"
+      - "src/**"
+      - ".github/workflows/gg-id-kit.yml"
+
+concurrency:
+  group: gg-id-kit-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  account-menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: build is in step with the sources
+        run: |
+          python3 src/build_gg_id.py
+          python3 src/build_account_menu.py
+          git diff --exit-code
+      - name: browser
+        run: uv run --with playwright python -m playwright install --with-deps chromium
+      - name: account menu check
+        run: uv run --with playwright python src/check_account_menu.py
