@@ -1,6 +1,7 @@
 """Build GG ID (единый вход): gg-id/fonts/*.woff2, gg-id/screens/*.html and the showcase gg-id.html.
 
-Sources: gg-id/gg-id.css + gg-id/gg-id.js (the kit, edited by hand), src/gg_id/screens.html (screens),
+Sources: gg-id/gg-id.css + gg-id/gg-id.js (the kit, edited by hand), gg-id/gg-id-stage.css (the scene of the sign-in screen: one contract of the hub, the gates
+and every service, pinned by sha256 below, linked after gg-id.css on every screen), src/gg_id/screens.html (screens),
 src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/gg-id.svg,
 gg-id/email-card.html + gg-id/email/gg-id-lockup-2x.png (the e-mail card, checked here, PNG from src/rasterize_gg_id_email.py).
 
@@ -70,6 +71,15 @@ LATIN_EXT = os.path.join(KIT, 'fonts', 'montserrat-latin-ext.woff2')
 LATIN_EXT_SHA256 = '920711de9ae96c18970fa4faca73cd302b93ac5ed57ebeb6bfec2ddeff930082'
 assert hashlib.sha256(open(LATIN_EXT, 'rb').read()).hexdigest() == LATIN_EXT_SHA256, 'gg-id/fonts/montserrat-latin-ext.woff2 changed'
 assert 'url(fonts/montserrat-latin-ext.woff2)' in kit_css, 'gg-id.css must load fonts/montserrat-latin-ext.woff2'
+# сцена экрана входа (10.10.2026): один добавочный файл ПОСЛЕ gg-id.css на каждой странице раскладки split. Контракт общий для хаба, ворот и сервисов GG:
+# они кладут к себе копию БАЙТ В БАЙТ и сверяют sha256 в своих тестах, поэтому файл закреплён и здесь. Правка сцены = новый файл, новый sha256 в этой строке,
+# в gg-id/README.md и в src/check_gg_id_stage.py, новая версия кита и PR во все копии; незаметно подменить его нельзя (gg-id/README.md, «Сцена экрана входа»)
+STAGE_FILE = 'gg-id-stage.css'
+STAGE_SHA256 = '451ecc726041580570e0d11c6951c271519ae734fddeeee44d650044e65ffbf0'
+_stage_bytes = open(os.path.join(KIT, STAGE_FILE), 'rb').read()
+assert hashlib.sha256(_stage_bytes).hexdigest() == STAGE_SHA256, \
+    f'gg-id/{STAGE_FILE} changed: the scene is a contract of every service; a new file needs a new sha256 here, in gg-id/README.md, in src/check_gg_id_stage.py and a new kit version'
+stage_css = _stage_bytes.decode('utf-8')
 inline_css = kit_css
 for subset, b64 in woff.items():
     inline_css = inline_css.replace(f'url(fonts/montserrat-{subset}.woff2)', f'url(data:font/woff2;base64,{b64})')
@@ -162,7 +172,7 @@ def idcard(d, indent=''):
         '    <p class="gid-idcard-meta">'
         f'<span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>'
         '<span class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
-        '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>',
+        '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID / Touch ID подключён</span></p>',
         '  </div>',
         '  <div class="gid-idcard-facts">',
         f'    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</dd></dl>',
@@ -208,7 +218,13 @@ def aside(d=TPL):
 
 
 ASIDE = aside()
-FOOT = '<footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer>'
+# инструкция «Как войти»: ссылка в подвале каждой страницы входа (как у входа хаба) и в письме-приглашении. Адрес один на всех: хаб, ворота, сервисы
+GUIDE_URL = 'https://id.global-generations-edu.com/instructions/'
+# подвал сцены в две строки: подпись и ссылка на инструкцию (на карточке 384 px они не помещаются в одну). Тот же подвал, что у входа хаба: первая строка подвала
+# стоит на одной высоте на всех страницах входа (gg-id/README.md, «Сцена экрана входа»). Иконка книги из спрайта, у сервисов она лежит инлайном
+FOOT = ('<footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span>'
+        f'<a class="gid-link gid-link--muted gid-link--sm" href="{GUIDE_URL}" target="_blank" rel="noopener">'
+        '<svg class="gid-ic" aria-hidden="true"><use href="#gi-book-open"/></svg>Как войти: инструкция</a></footer>')
 # экран «Продолжить как»: аккаунт известен, на карте его имя, должности и номер
 SIDE_FOR = {'continue': aside({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id']})}
 
@@ -247,10 +263,10 @@ for s in SCREENS:
 
 # when each screen shows and what it calls on the hub (levauth, Lambda gg-portal-auth)
 INFO = {
-    'login': ('Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. '
-              'Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере.',
+    'login': ('Первый экран. Главная кнопка Face ID / Touch ID, если на устройстве есть passkey; если нет, сразу экран пароля. '
+              'Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере.',
               'GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()'),
-    'password': ('Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID.', 'POST /api/auth/login'),
+    'password': ('Почта и пароль. После входа без passkey на устройстве предлагаем подключить Face ID / Touch ID.', 'POST /api/auth/login'),
     'error': ('401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна».',
               'POST /api/auth/login: 401, 429'),
     'passkey': ('Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: '
@@ -350,27 +366,34 @@ def kit_rules_check(name, text):
         sys.exit(1)
 
 
-# any space between the words (a plain one, &nbsp;, U+00A0) and TouchID count too; the same pattern lives in src/check_gg_id_passkey.py (BANNED), the check compares them
-DEVICE_WORDS = re.compile(r'(?<![a-z])(?:Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц', re.I)
+# Rule 10.10.2026 (Лёв: «Face ID это не всегда Face ID, иногда Touch ID», «пиши всегда слеш»): the sensor of Apple is always one phrase, the pair «Face ID / Touch ID»;
+# a lone «Face ID» or a lone «Touch ID» is never written, and Windows Hello, «отпечаток», «палец» are words of one device that only gg-id.js may set (rule 09.10.2026).
+# Any space between the words (a plain one, &nbsp;, U+00A0), TouchID, a slash with or without spaces all count; the same two patterns live in
+# src/check_gg_id_passkey.py (PAIR, BANNED), the check compares them
+PAIR_WORDS = re.compile(r'(?<![a-z])Face\s*ID\s*/\s*Touch\s*ID(?![a-z])', re.I)
+DEVICE_WORDS = re.compile(r'(?<![a-z])(?:Face\s*ID|Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц', re.I)
 
 
 def passkey_words_check(name, text):
-    """Rule 09.10.2026 (HANDOFF-AUTH.md, 6.1): the markup of a screen never names the method of the device. gg-id.js words the buttons, icons and the hint
-    from what this browser has seen work; in the markup stays Face ID, which is true on every device (the phone does it by QR code).
-    The words are looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens and zero-width characters dropped."""
+    """Rules 09.10.2026 and 10.10.2026 (HANDOFF-AUTH.md, 6.1): the markup of a screen names the sign-in with a passkey only as «Face ID / Touch ID», which is true
+    on every device (the phone does it by QR code); the method of one device (Windows Hello, fingerprint) and a lone Face ID or Touch ID never stand in the markup.
+    gg-id.js words the buttons, icons and the hint from what this browser has seen work.
+    The words are looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens and zero-width characters dropped, the pair taken out first."""
     shown = re.sub(r'<(script|style)\b.*?</\1>|<!--.*?-->', ' ', text, flags=re.S)
     shown = re.sub('[\u00ad\u200b-\u200d\u2060\ufeff]', '', htmlmod.unescape(shown))
+    shown = PAIR_WORDS.sub(' ', shown)
     found = sorted({re.sub(r'\s+', ' ', m).lower() for m in DEVICE_WORDS.findall(shown)})
     if found:
         print('PASSKEY WORDS FAILED in', name)
-        print(' - the method of the device is named in the markup (Touch ID, Windows Hello, fingerprint) although it is guessed from the kind of device:', found)
-        print('   write Face ID (data-gid-passkey) and let gg-id.js word it from the memory of the browser')
+        print(' - a lone Face ID or Touch ID, or the method of one device (Windows Hello, fingerprint), stands in the markup:', found)
+        print('   write «Face ID / Touch ID» with a slash (data-gid-passkey) and let gg-id.js word the rest from the memory of the browser')
         sys.exit(1)
 
 
 brand_check('gg-id.css', kit_css)
 brand_check('gg-id.js', kit_js)
 brand_check('gg-id-service.js', service_js)
+brand_check(STAGE_FILE, stage_css)
 
 # ---- standalone screens: gg-id/screens/<key>.html (reference for the hub, demo navigation only) ----
 DEMO_NAV = """<script>
@@ -409,6 +432,7 @@ for s in SCREENS:
 <link rel="icon" href="../../assets/favicons/gg-id.svg" type="image/svg+xml">
 <link rel="icon" href="../../assets/favicons/ico/gg-id.ico" sizes="any">
 <link rel="stylesheet" href="../gg-id.css">
+<link rel="stylesheet" href="../{STAGE_FILE}">
 </head>
 <body class="gid-body">
 <!-- Эталон GG ID, экран «{s['tab']}». Генерируется src/build_gg_id.py из src/gg_id/screens.html, руками не править. -->
@@ -425,7 +449,7 @@ for s in SCREENS:
     write_if_changed(os.path.join(KIT, 'screens', s['key'] + '.html'), page)
 
 # full sprite for the hub: every symbol any screen or service component uses (<use href="/assets/gg-id/sprite.svg#gi-eye">)
-all_text = (''.join(s['body'] for s in SCREENS) + LOCKUP + IDCARD + idrow(DEMO) + read(HERE, 'gg_id', 'showcase.html') +
+all_text = (''.join(s['body'] for s in SCREENS) + LOCKUP + FOOT + IDCARD + idrow(DEMO) + read(HERE, 'gg_id', 'showcase.html') +   # FOOT: книга «Как войти: инструкция»
             ' data-gid-passkey-icon #gid-id-icon #gid-tile ')   # gid-tile = старое имя иконки GG ID, для старой разметки
 full = sprite(all_text).replace('<svg width="0" height="0" style="position:absolute" aria-hidden="true">',
                                 '<svg xmlns="http://www.w3.org/2000/svg">', 1)
@@ -447,8 +471,7 @@ EMAIL_PATH = os.path.join(KIT, 'email-card.html')
 EMAIL_PNG = os.path.join(KIT, 'email', 'gg-logo-navy-2x.png')
 EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png'
 EMAIL_FIELDS = ('name', 'positions', 'email', 'id')            # карта
-EMAIL_ACTION_FIELDS = ('link', 'guide_url')                   # кнопка «Задать пароль» и ссылка «Инструкция: как войти»
-GUIDE_URL = 'https://id.global-generations-edu.com/instructions/'
+EMAIL_ACTION_FIELDS = ('link', 'guide_url')                   # кнопка «Задать пароль» и ссылка «Инструкция: как войти» (GUIDE_URL выше, как в подвале экранов)
 email_html = read(EMAIL_PATH)
 brand_check('gg-id/email-card.html', email_html)
 
@@ -528,6 +551,7 @@ api_rows = ''.join(
     f'<td><code>{htmlmod.escape(m["api"]).replace("/", "/<wbr>").replace(", ", ",<br>")}</code></td></tr>' for m in meta)
 page = (tpl
         .replace('/*@GID_CSS@*/', inline_css)
+        .replace('/*@GID_STAGE_CSS@*/', stage_css)   # сразу после кита и до правил витрины, как на страницах входа: gg-id.css, затем gg-id-stage.css
         .replace('/*@GID_JS@*/', kit_js.replace('</script', '<\\/script'))
         .replace('/*@GID_SERVICE_JS@*/', service_js.replace('</script', '<\\/script'))
         .replace('/*@META@*/', json.dumps(meta, ensure_ascii=False).replace('</', '<\\/'))
@@ -550,6 +574,9 @@ write_if_changed(os.path.join(ROOT, 'gg-id.html'), page)
 # ---- gg-id/README.md: the screens table between markers, from the same INFO ----
 readme_path = os.path.join(KIT, 'README.md')
 readme = read(readme_path)
+# сцена экрана входа описана в README вместе с контрольной суммой файла: описание и файл не расходятся незаметно
+assert '## Сцена экрана входа' in readme and STAGE_SHA256 in readme, \
+    f'gg-id/README.md: в разделе «Сцена экрана входа» должен стоять sha256 {STAGE_SHA256} файла {STAGE_FILE}'
 table = ['## Экраны', '', '| Экран | Файл | Когда | Хаб |', '|---|---|---|---|']
 table += [f'| {m["tab"]} | `screens/{m["key"]}.html` | {m["when"]} | `{m["api"]}` |' for m in meta]
 readme = re.sub(r'<!-- screens:start -->.*?<!-- screens:end -->',

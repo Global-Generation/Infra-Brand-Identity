@@ -7,13 +7,16 @@ for the e-mail card on low contrast in light, dark (Apple Mail) and inverted (Gm
 Layout everywhere (screens and every component of the showcase at 1440, 1024 and 390, both themes): every element inside
 its component card, no cut content, no overlapping siblings, avatars with white centred initials, one-line button labels.
 gg-id-service.js: account menu (mouse, keyboard, Esc, click outside), «Сессия истекла» (401, focus trap, Esc, backdrop).
-QA 08.10: screens in the split layout at 360, 768, 1024 px and at 200 % zoom; short windows down to 400 px tall and the 320 px phone
+QA 08.10: screens in the split layout at 360, 375, 768, 1024 px and at 200 % zoom; short windows down to 400 px tall and the 320 px phone
 (the card on the panel never overlaps the logo or the text, is never clipped, never narrower than 240 px, long data stays inside);
 a visible keyboard focus ring on every stop of every screen; no endless motion with «reduce motion»; readable placeholders;
 the panel in the system dark theme equals data-theme="dark".
-Passkey wording (rule of 09.10.2026, src/check_gg_id_passkey.py, also runnable alone): Touch ID, Windows Hello, «отпечаток» and «палец» only when
-this browser has a confirmed key of the device; 7 devices x 8 memory states x 3 screens, the rules of the shared localStorage memory, the real
-WebAuthn of Chromium (virtual authenticators), a browser without storage or WebAuthn.
+Passkey wording (rules of 09.10.2026 and 10.10.2026, src/check_gg_id_passkey.py, also runnable alone): the sensor of Apple is always the pair «Face ID / Touch ID»,
+Windows Hello, «отпечаток» and «палец» only when this browser has a confirmed key of the device; 7 devices x 8 memory states x 3 screens, the rules of the shared
+localStorage memory, the real WebAuthn of Chromium (virtual authenticators), a browser without storage or WebAuthn.
+The scene of the sign-in screen (rule of 10.10.2026, src/check_gg_id_stage.py, also runnable alone): on login, password, forgot, error and noaccess in the four windows of
+the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, (window height - 560 px) / 2) and does not move between the screens, the card,
+the panel and the footer stand on the numbers of the sign-in page of the hub; the footer links the instruction; the tabs of the showcase change the screen in place.
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).
 """
@@ -25,6 +28,7 @@ import sys
 from playwright.sync_api import sync_playwright
 
 import check_gg_id_passkey   # src/ is on sys.path when this file is run as a script
+import check_gg_id_stage
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCREENS = os.path.join(ROOT, 'gg-id', 'screens')
@@ -295,8 +299,9 @@ def layout_issues(label, r):
 
 
 # ---- QA 08.10 ----
-# экраны в сплите на других ширинах: 360 (маленький телефон), 768 (планшет), 1024 и масштаб 200 % окна 1440 x 900 (720 x 450 при 2x)
-WIDTHS = [(360, 740, 2, '360'), (768, 1024, 1, '768'), (1024, 768, 1, '1024'), (720, 450, 2, 'zoom200')]
+# экраны в сплите на других ширинах: 360 (маленький телефон), 375 (iPhone SE и mini: колонка 343 px, самая длинная подпись главной кнопки «Подключить Face ID / Touch ID»
+# со стрелкой в неё не входит, поэтому в колонке до 355 px кегль 14 px), 768 (планшет), 1024 и масштаб 200 % окна 1440 x 900 (720 x 450 при 2x)
+WIDTHS = [(360, 740, 2, '360'), (375, 812, 2, '375'), (768, 1024, 1, '768'), (1024, 768, 1, '1024'), (720, 450, 2, 'zoom200')]
 # низкие окна (масштаб 200 % на 1920 x 1080, маленькие ноутбуки) и самый узкий телефон
 SHORT = [(1280, 560), (1280, 450), (1024, 500), (960, 480), (1366, 640), (1440, 600), (1920, 400), (320, 568), (360, 640), (390, 664), (844, 390), (740, 360)]
 LONG_HERO = {'name': 'Константин Александрович Преображенский',
@@ -354,7 +359,7 @@ PLACEHOLDER = '''() => {
 }'''
 
 problems = []
-counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0, 'widths': 0, 'short': 0, 'focus': 0, 'motion': 0, 'passkey': 0}
+counts = {'screens': 0, 'card': 0, 'email': 0, 'showcase': 0, 'layout': 0, 'service': 0, 'widths': 0, 'short': 0, 'focus': 0, 'motion': 0, 'passkey': 0, 'stage': 0}
 with sync_playwright() as p:
     b = p.chromium.launch()
     _new_context = b.new_context
@@ -462,7 +467,7 @@ with sync_playwright() as p:
                 problems.append(f'card/{tag}/{theme}: GGID.card inserted markup from data')
             ctx.close()
 
-    # ---- QA 08.10: ширины 360/768/1024 и масштаб 200 %, низкие окна, кольцо фокуса, «меньше движения», подсказки в полях ----
+    # ---- QA 08.10: ширины 360/375/768/1024 и масштаб 200 %, низкие окна, кольцо фокуса, «меньше движения», подсказки в полях ----
     for scheme in ('light', 'dark'):
         for vw, vh, dpr, tag in WIDTHS:
             ctx = b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=dpr, color_scheme=scheme)
@@ -839,13 +844,15 @@ with sync_playwright() as p:
 
     # how the kit words a sign-in with a passkey: no method of the device without a confirmed key of this browser (src/check_gg_id_passkey.py)
     check_gg_id_passkey.run(b, problems, counts)
+    # the scene of the sign-in screen: one geometry in every view and every service (src/check_gg_id_stage.py)
+    check_gg_id_stage.run(b, problems, counts)
     b.close()
 
-summary = (f'{counts["screens"]} screen renders, {counts["widths"]} renders at 360/768/1024 px and 200 %, {counts["short"]} short windows, '
+summary = (f'{counts["screens"]} screen renders, {counts["widths"]} renders at 360/375/768/1024 px and 200 %,{counts["short"]} short windows, '
            f'{counts["focus"]} focus stops, {counts["motion"]} reduced-motion renders, '
            f'{counts["layout"]} showcase layout states, {counts["service"]} gg-id-service.js tests, '
            f'{counts["card"]} card renders, {counts["email"]} e-mail renders, '
-           f'{counts["showcase"]} showcase states, {counts["passkey"]} passkey wording checks')
+           f'{counts["showcase"]} showcase states, {counts["passkey"]} passkey wording checks, {counts["stage"]} stage checks')
 if problems:
     print('GG ID CHECK FAILED', '|', summary)
     for x in problems:

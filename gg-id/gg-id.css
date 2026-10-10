@@ -1,4 +1,4 @@
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-10.1 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-10.2 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -280,6 +280,11 @@
 @container gidcol (max-width:340px){
   .gid-btn--primary{gap:12px;padding:0 12px 0 9px}
   .gid-btn--primary::after{display:none}
+}
+/* самая длинная подпись главной кнопки, «Подключить Face ID / Touch ID» (247 px кеглем 15), вместе со стрелкой занимает колонку в 355 px; в колонке уже (iPhone 375,
+   раскладка «Карточка» на компьютере) кегль 14 px, и подпись остаётся в одну строку */
+@container gidcol (max-width:355px){
+  .gid-btn--primary{font-size:14px}
 }
 /* вторая кнопка: текстом, без рамки и заливки, подчёркивание под курсором */
 .gid-btn--secondary{min-height:48px;background:transparent;border-color:transparent;color:var(--g-text-btn);box-shadow:none}

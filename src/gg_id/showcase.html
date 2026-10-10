@@ -8,8 +8,15 @@
 <link rel="icon" href="@FAVICON_URI@" type="image/svg+xml">
 <style>
 /*@GID_CSS@*/
+/*@GID_STAGE_CSS@*/
 
 /* ---------- витрина ---------- */
+/* Сцена (gg-id-stage.css) считает высоту по окну браузера (100dvh), а в витрине «окно» это рамка 1280 x 800 (--gid-h, ставит скрипт ниже): внутри рамки берём высоту из неё.
+   И сама витрина не страница входа: html не красим и полосу прокрутки не резервируем, иначе сцена перекрасила бы фон витрины, пока на странице стоит экран split. */
+@container gid (min-width:960px){
+  .sc-screen .gid[data-layout="split"] .gid-main{padding-top:max(28px,calc((var(--gid-h) - 560px) / 2))}
+}
+html:has(.gid[data-layout="split"]){scrollbar-gutter:auto;background:none}
 :root{--navy:#13445d;--navy-deep:#0d2f42;--sky:#009CDC;--sky-ink:#0077a8;--fg:#0f172a;--sfg:#334155;--mfg:#64748b;--lfg:#94a3b8;
   --border:#e2e8f0;--border-hi:#cbd5e1;--card:#fff;--bg:#eef3f9;--font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -288,7 +295,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
             <div class="gid-menu" role="menu" aria-label="Аккаунт" id="scAcctMenu">
               <div class="gid-menu-head"><span class="gid-avatar" aria-hidden="true">ЛА</span><div class="gid-menu-head-tx"><b>Лёв Авдошин</b><span>lev<wbr><span class="gid-nowrap">@global-generations.com</span></span></div></div>
               <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-layout-grid"/></svg>Мои сервисы</a>
-              <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-shield-check"/></svg>Аккаунт GG ID<span class="gid-menu-meta">Face ID, пароль</span></a>
+              <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-shield-check"/></svg>Аккаунт GG ID<span class="gid-menu-meta">Face ID / Touch ID, пароль</span></a>
               <div class="gid-menu-sep"></div>
               <a class="gid-menu-item" role="menuitem" href="#" data-noop><svg class="gid-ic" aria-hidden="true"><use href="#gi-log-out"/></svg>Выйти</a>
             </div>
@@ -314,8 +321,9 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
           <li><b>Формы входа только в хабе.</b> Сервис рисует одну кнопку «Войти через GG ID», свои пароли и PIN не спрашивает.</li>
           <li><b>Заголовок называет сервис:</b> «Вход в АКБ». Над заголовком ничего: ни замка, ни значка, ни плашки.</li>
           <li><b>Подпись «логотип | ID»</b>, логотип одного цвета, не меньше 28 px в высоту (110 px в ширину).</li>
-          <li><b>Одно главное действие.</b> Face ID, если ключ на устройстве есть; иначе пароль.</li>
-          <li><b>Устройство не угадываем.</b> «Touch ID», «Windows Hello» и «отпечаток» только если в этом браузере уже входили своим ключом; иначе «Face ID» и подсказка про QR-код телефона. Правило и память браузера: <code>gg-id/HANDOFF-AUTH.md</code>, раздел 6.1.</li>
+          <li><b>Одно главное действие.</b> Face ID / Touch ID, если passkey на устройстве есть; иначе пароль.</li>
+          <li><b>Устройство не угадываем.</b> Вход по ключу везде называется «Face ID / Touch ID», со слэшем (Лёв 10.10); «Windows Hello» и «отпечаток» только если в этом браузере уже входили своим ключом; в подсказке QR-код телефона. Правило и память браузера: <code>gg-id/HANDOFF-AUTH.md</code>, раздел 6.1.</li>
+          <li><b>Сцена входа одна.</b> На компьютере заголовок стоит на одной высоте на каждом экране и у каждого сервиса, как на входе хаба: <code>gg-id/gg-id-stage.css</code> после <code>gg-id.css</code> и подвал со ссылкой «Как войти: инструкция». Подробно: <code>gg-id/README.md</code>, «Сцена экрана входа».</li>
           <li><b>Только рабочая почта</b> @global-generations.com, подсказка ещё до отправки.</li>
           <li><b>Ошибки человеческим языком</b>, без кодов: «Неверная почта или пароль», «Слишком много попыток, подождите минуту», «Сеть недоступна».</li>
           <li><b>Поля 16 px</b> (iPhone не приближает), autocomplete <code>username</code>, <code>current-password</code>, <code>new-password</code>, <code>one-time-code</code>.</li>
@@ -323,6 +331,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
         </ol>
         <div class="sc-files">
           <div><code>gg-id/gg-id.css</code><span>токены, три раскладки, все компоненты</span></div>
+          <div><code>gg-id/gg-id-stage.css</code><span>сцена экрана входа, одна геометрия на всех</span></div>
           <div><code>gg-id/gg-id.js</code><span>глаз пароля, правила, код, отсчёт, подписи входа по ключу</span></div>
           <div><code>gg-id/fonts/</code><span>Montserrat самохостом, 2 файла</span></div>
           <div><code>gg-id/screens/</code><span>@N_SCREENS@ эталонных страниц для хаба</span></div>

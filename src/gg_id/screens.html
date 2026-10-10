@@ -3,15 +3,18 @@
      data-lockup="off" = без подписи «логотип | ID». data-go="ключ" = демо-переход на другой экран (в бою = вызов API).
      data-path = адрес в строке браузера витрины (по умолчанию /login). @IDCARD@ = карточка GG ID из src/build_gg_id.py.
      data-svc = название сервиса, куда входит человек (из client_id); пишется так, чтобы не склонялось.
-     Слова про способ устройства (Touch ID, Windows Hello, отпечаток, палец) в разметку экранов не писать: подписи, значки и подсказку входа по ключу ставит
-     gg-id.js по тому, что браузер помнит про ключ (data-gid-passkey, data-gid-passkey-icon, data-gid-passkey-hint), в разметке остаётся Face ID. Сборка это проверяет. -->
+     Вход по ключу в разметке называется только «Face ID / Touch ID» со слэшем (правило Лёва 10.10: «Face ID это не всегда Face ID, иногда Touch ID», «пиши всегда слеш»);
+     одинокий Face ID или Touch ID, слова про способ одного устройства (Windows Hello, отпечаток, палец) в разметку экранов не писать: подписи, значки и подсказку входа
+     по ключу ставит gg-id.js по тому, что браузер помнит про ключ (data-gid-passkey, data-gid-passkey-icon, data-gid-passkey-hint). Сборка это проверяет.
+     Подсказка про чужой домен стоит в строке подписи поля (.gid-label-row), не под полем: сцена (gg-id-stage.css) выносит её из потока, чтобы кнопка «Войти» не уезжала
+     между нажатием и отпусканием. Подвал со ссылкой «Как войти: инструкция» делает src/build_gg_id.py (FOOT), в экранах его нет. -->
 
 <template data-key="login" data-tab="Вход" data-title="Вход">
   <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
   <p class="gid-sub">Один вход GG ID открывает все сервисы команды Global Generation.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary" type="button" data-go="passkey">
-      <svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span>
+      <svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID / Touch ID</span>
     </button>
     <a class="gid-btn gid-btn--secondary" data-go="password">
       <svg class="gid-ic" aria-hidden="true"><use href="#gi-key-round"/></svg><span>Войти по паролю</span>
@@ -24,10 +27,9 @@
   <p class="gid-sub">Рабочая почта и пароль GG ID.</p>
   <form class="gid-form" novalidate data-go-submit="enroll">
     <div class="gid-field">
-      <label class="gid-label" for="gid-email">Рабочая почта</label>
+      <div class="gid-label-row"><label class="gid-label" for="gid-email">Рабочая почта</label><p class="gid-hint is-error" data-gid-domain-hint hidden>Нужна рабочая почта <span class="gid-nowrap">@global-generations.com</span></p></div>
       <input class="gid-input" id="gid-email" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
         placeholder="имя@global-generations.com" data-gid-domain="global-generations.com" value="lev@global-generations.com">
-      <p class="gid-hint is-error" data-gid-domain-hint hidden>Войти можно только с рабочей почтой <span class="gid-nowrap">@global-generations.com</span></p>
     </div>
     <div class="gid-field">
       <div class="gid-label-row"><label class="gid-label" for="gid-pass">Пароль</label><a class="gid-link gid-link--sm" data-go="forgot">Забыли пароль?</a></div>
@@ -39,7 +41,7 @@
     <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти</span></button>
   </form>
   <div class="gid-or"><span>или</span></div>
-  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button>
+  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID / Touch ID</span></button>
 </template>
 
 <template data-key="error" data-tab="Ошибка" data-title="Неверный пароль">
@@ -62,12 +64,12 @@
     <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Войти</span></button>
   </form>
   <div class="gid-or"><span>или</span></div>
-  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID</span></button>
+  <button class="gid-btn gid-btn--secondary" type="button" data-go="passkey"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="login">Войти с Face ID / Touch ID</span></button>
 </template>
 
-<template data-key="passkey" data-tab="Face ID" data-title="Подтвердите вход">
+<template data-key="passkey" data-tab="Face ID / Touch ID" data-title="Подтвердите вход">
   <h1 class="gid-h">Вход в <span data-svc>АКБ</span></h1>
-  <p class="gid-sub" data-gid-passkey-hint>Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.</p>
+  <p class="gid-sub" data-gid-passkey-hint>Подтвердите вход в окне браузера: Face ID / Touch ID на телефоне (QR-код) или ключ на этом устройстве.</p>
   <div class="gid-stack">
     <button class="gid-btn gid-btn--primary is-busy" type="button" aria-busy="true" data-go="done">
       <span class="gid-scan" aria-hidden="true"><svg class="gid-ic" data-gid-passkey-icon><use href="#gi-scan-face"/></svg></span><span data-gid-passkey="wait">Ждём подтверждения</span>
@@ -97,11 +99,11 @@
   <div class="gid-alt"><a class="gid-link" data-go="login"><svg class="gid-ic" aria-hidden="true"><use href="#gi-user-round-plus"/></svg>Войти в другой аккаунт</a></div>
 </template>
 
-<template data-key="enroll" data-tab="Подключить Face ID" data-title="Вход без пароля">
+<template data-key="enroll" data-tab="Подключить Face ID / Touch ID" data-title="Вход без пароля">
   <h1 class="gid-h">В следующий раз без пароля</h1>
-  <p class="gid-sub"><span data-gid-passkey="enroll-lead">Подключите Face ID</span>, и вход займёт секунду. Ключ входа хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
+  <p class="gid-sub"><span data-gid-passkey="enroll-lead">Подключите Face ID / Touch ID</span>, и вход займёт секунду. Passkey хранится только на этом устройстве: его нельзя подсмотреть или выманить письмом.</p>
   <div class="gid-stack">
-    <button class="gid-btn gid-btn--primary" type="button" data-go="done"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="enroll">Подключить Face ID</span></button>
+    <button class="gid-btn gid-btn--primary" type="button" data-go="done"><svg class="gid-ic" aria-hidden="true" data-gid-passkey-icon><use href="#gi-scan-face"/></svg><span data-gid-passkey="enroll">Подключить Face ID / Touch ID</span></button>
     <a class="gid-btn gid-btn--quiet" data-go="done">Не сейчас</a>
   </div>
 </template>
@@ -111,10 +113,9 @@
   <p class="gid-sub">Напишите рабочую почту. Если она есть в GG ID, пришлём ссылку, чтобы задать новый пароль.</p>
   <form class="gid-form" novalidate data-go-submit="sent">
     <div class="gid-field">
-      <label class="gid-label" for="gid-email-f">Рабочая почта</label>
+      <div class="gid-label-row"><label class="gid-label" for="gid-email-f">Рабочая почта</label><p class="gid-hint is-error" data-gid-domain-hint hidden>Нужна рабочая почта <span class="gid-nowrap">@global-generations.com</span></p></div>
       <input class="gid-input" id="gid-email-f" type="email" name="email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="off"
         placeholder="имя@global-generations.com" data-gid-domain="global-generations.com">
-      <p class="gid-hint is-error" data-gid-domain-hint hidden>Ссылка приходит только на рабочую почту <span class="gid-nowrap">@global-generations.com</span></p>
     </div>
     <button class="gid-btn gid-btn--primary" type="submit"><svg class="gid-ic" aria-hidden="true"><use href="#gi-send"/></svg><span>Отправить ссылку</span></button>
   </form>
@@ -162,7 +163,7 @@
 
 <template data-key="saved" data-tab="Пароль сохранён" data-title="Пароль сохранён">
   <h1 class="gid-h">Пароль сохранён</h1>
-  <p class="gid-sub">Теперь войдите с новым паролем. После входа на этом устройстве можно будет подключить Face ID.</p>
+  <p class="gid-sub">Теперь войдите с новым паролем. После входа на этом устройстве можно будет подключить Face ID / Touch ID.</p>
   <div class="gid-stack">
     <a class="gid-btn gid-btn--primary" data-go="password"><svg class="gid-ic" aria-hidden="true"><use href="#gi-arrow-right"/></svg><span>Перейти ко входу</span></a>
   </div>
