@@ -122,7 +122,9 @@ def scene_conflicts(css, strict):
 
 
 def expected(w, h, cw):
-    """The numbers of the contract; on a desktop with a classic scroll bar (the scene keeps its place from 975 px) the widths follow the client width."""
+    """The numbers of the contract; cw is the width of the layout (the width of .gid). From 975 px the scene keeps the place of a classic scroll bar (15 px), so on Windows, Linux
+    and a Mac with a mouse the widths follow the layout without it. The numbers of the table were measured where the scroll bar has no width (headless Chromium on a Mac); headless
+    Chromium on Linux, which CI uses, reserves the 15 px of the gutter although clientWidth of html does not show it, hence the layout is measured on .gid, not on html."""
     c = dict(CONTRACT[(w, h)])
     if w >= GUTTER_FROM and abs(cw - w) > 0.5:
         aside = cw * 1.08 / 2.08
@@ -224,7 +226,7 @@ READ = '''() => {
   const card = document.querySelector('.gid-card'), de = document.documentElement, foot = document.querySelector('.gid-foot'), main = document.querySelector('.gid-main');
   const h1 = card && card.querySelector('h1,.gid-h');
   return { h1: r(h1), card: r(card), aside: r(document.querySelector('.gid-aside')), foot: r(foot), footFirst: r(foot && foot.firstElementChild), link: r(foot && foot.querySelector('a')),
-    cw: de.clientWidth, over: de.scrollWidth - de.clientWidth, scrollH: de.scrollHeight, innerH: window.innerHeight,
+    cw: (document.querySelector('.gid') || de).getBoundingClientRect().width, over: de.scrollWidth - de.clientWidth, scrollH: de.scrollHeight, innerH: window.innerHeight,
     gutter: cs(de, 'scrollbarGutter'), htmlBg: cs(de, 'backgroundColor'), cardAnim: cs(card, 'animationName'), mainAnim: cs(main, 'animationName'),
     hint: [...document.querySelectorAll('.gid-label-row > .gid-hint')].map((e) => cs(e, 'position')) };
 }'''
@@ -300,8 +302,9 @@ def browser(b, problems, counts):
     others = sorted(n[:-5] for n in os.listdir(SCREENS) if n.endswith('.html') and n[:-5] not in SCREENS5 and n[:-5] != 'done')
     for key in others:
         r = load(pg, key)
-        near(f'1440x900 [{key}] title y', r['h1']['y'], 170)
-        near(f'1440x900 [{key}] card x', r['card']['x'], 901.84)
+        c = expected(1440, 900, r['cw'])
+        near(f'1440x900 [{key}] title y', r['h1']['y'], c['h1'])
+        near(f'1440x900 [{key}] card x', r['card']['x'], c['card_x'])
     ctx.close()
 
     # ---- 5b. the fade of the right column opens the page once, unless the person asks for less motion ----
