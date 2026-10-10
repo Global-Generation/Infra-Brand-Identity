@@ -134,12 +134,14 @@ export function AccountMenu({ onSelect, ...options }: Options & { onSelect?: (id
 
 `el`: элемент или селектор. Элемент становится обёрткой (`.gid-kit.gam`), его содержимое заменяется (запасная разметка для случая «без JS» внутри допустима). Повторный `mount` на том же элементе обновляет меню и возвращает тот же объект.
 
+Те же параметры атрибутами элемента с `data-gg-account-menu`: `data-name`, `data-email`, `data-subtitle`, `data-hub-origin`, `data-services-url`, `data-services-api`, `data-services`, `data-profile-url`, `data-profile`, `data-wallet`, `data-wallet-url`, `data-wallet-image`, `data-logout-url`, `data-logout-method`, `data-logout-next`, `data-current-key`, `data-gam-theme`, `data-gam-placement`, `data-gam-variant`; свои пункты JSON-ом в `data-gam-items`, весь конфиг JSON-ом в самом `data-gg-account-menu='{...}'`. Строка `false` становится булевым значением в `data-hub-origin`, `data-services`, `data-services-api`, `data-profile`, `data-wallet-url` и `data-wallet`; строка `true` только в `data-wallet`.
+
 | Параметр | По умолчанию | Что |
 |---|---|---|
 | `name` | `Аккаунт` | полное имя; инициалы из первых букв двух первых слов, в чипе первое слово |
 | `email` | нет | почта под именем; нет почты, показывается `subtitle` |
 | `subtitle` | нет | вторая строка, если почты нет (например роль) |
-| `hubOrigin` | `https://id.global-generations-edu.com` | origin хаба GG ID. Из него и путей из раздела «Адреса хаба»: `servicesUrl`, `profileUrl`, `servicesApi`, `walletUrl`. Не задан = боевой хаб. Другой хаб (стенд, переезд): `GG_AUTH_ORIGIN` сервиса. `false` или `''` = адресов хаба нет совсем (нет «Мои сервисы», «Профиль GG ID» и значка Wallet, остаются свои пункты и «Выйти») |
+| `hubOrigin` | `https://id.global-generations-edu.com` | origin хаба GG ID. Из него и путей из раздела «Адреса хаба»: `servicesUrl`, `profileUrl`, `servicesApi`, `walletUrl`. Не задан = боевой хаб. Другой хаб (стенд, переезд): `GG_AUTH_ORIGIN` сервиса. Нужен абсолютный адрес `https://...` (или `http://localhost...`). Пустое значение (настройка не задана) и всё, что не абсолютный адрес, дают боевой хаб (во втором случае ещё предупреждение в консоли): ошибка в настройке не отнимает у меню «Мои сервисы», а относительный адрес не превращается молча в «этот же сервис». `false` (в атрибуте `data-hub-origin="false"`) = адресов хаба нет совсем (нет «Мои сервисы», «Профиль GG ID» и значка Wallet, остаются свои пункты и «Выйти») |
 | `servicesUrl`, `profileUrl` | из `hubOrigin` | явные адреса вместо вычисленных |
 | `servicesApi` | из `hubOrigin` | откуда брать список сервисов; `false` = не спрашивать, «Мои сервисы» сразу ссылка на кабинет |
 | `services` | список из хаба | `false` убирает пункт совсем (так делает сам кабинет хаба); массив `[{key, title, url, icon}]` рисуется как есть, без запроса |

@@ -1156,6 +1156,22 @@ def hub_defaults(b):
     check('defaults', 'the services list is asked once, at the canonical address, by GET', seen == [{'url': HUB_URL + '/api/auth/service-links', 'method': 'GET'}], seen)
     pg.keyboard.press('Escape')
 
+    # an empty (an unset setting), null or unusable hubOrigin is the production hub too, not "no hub": a mistake in a setting must not take «Мои сервисы» away
+    warns = []
+    pg.on('console', lambda m: warns.append(m.text) if m.type == 'warning' else None)
+    for pid, opt, warned in (('d-empty', "hubOrigin: ''", False), ('d-null', 'hubOrigin: null', False), ('d-bad', "hubOrigin: 'javascript:window.__pwned=31'", True),
+                             ('d-text', "hubOrigin: 'not an address'", True), ('d-noscheme', "hubOrigin: 'id.global-generations-edu.com'", True), ('d-rel', "hubOrigin: '/cabinet'", True)):
+        warns.clear()
+        goto(pg, pid, page(f"window.menu = GGAccountMenu.mount('#account', {{name: 'Лёв Авдошин', {opt}, wallet: true, logoutUrl: '/logout'}});"))
+        pg.click(CHIP)
+        pg.wait_for_function('document.querySelector("#account a[data-gam-id=services]") && document.querySelector("#account a[data-gam-id=services]").getClientRects().length > 0', timeout=6000)
+        hrefs = pg.evaluate("""() => [document.querySelector('#account a[data-gam-id="services"]').getAttribute('href'), (document.querySelector('#account a.gam-wallet') || {getAttribute: () => null}).getAttribute('href')]""")
+        check('defaults', f'{opt}: the production hub (the cabinet and the pass at the canonical addresses), not "this very service", nothing runs',
+              hrefs == [HUB_URL + '/cabinet/', HUB_URL + WALLET_PATH] and not pg.evaluate('window.__pwned || 0'), hrefs)
+        check('defaults', f'{opt}: ' + ('a warning in the console says why' if warned else 'no warning (an unset setting is not a mistake)'),
+              bool([w for w in warns if 'not an absolute address' in w]) == warned, warns)
+        pg.keyboard.press('Escape')
+
     # hubOrigin false and the attribute "false": no hub addresses at all
     goto(pg, 'd-none', page('', manual=False, body='<div id="auto" data-gg-account-menu data-name="Лёв" data-hub-origin="false" data-logout-url="/logout"></div>'))
     pg.click('#auto .gid-chip')

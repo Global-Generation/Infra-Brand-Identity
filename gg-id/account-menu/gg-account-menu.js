@@ -184,6 +184,7 @@
     try { el.dispatchEvent(new win.CustomEvent(name, { bubbles: true, detail: detail || {} })); } catch (e) { /* old browser: no event */ }
   }
   function oops(e) { if (win.console && win.console.error) win.console.error(e); }
+  function warn(m) { if (win.console && win.console.warn) win.console.warn(m); }
 
   /* ---------- the services list: one GET to the hub, cached for the page ---------- */
   var cache = {};     // address -> promise of the normalised list (a failure is cached too: the page falls back to the link)
@@ -290,8 +291,19 @@
   /* options -> everything the render needs */
   Instance.prototype.resolve = function () {
     var c = this.cfg, o;
-    if (c.hubOrigin === undefined || c.hubOrigin === null) o = HUB.origin;     // not said: the production hub, the canonical addresses
-    else o = c.hubOrigin ? origin(safeUrl(c.hubOrigin)) : '';                  // another hub (staging); false or '': no hub addresses at all
+    if (c.hubOrigin === false) o = '';                                          // false: no hub addresses at all (a page that has nothing to do with the hub)
+    else {
+      // another hub (staging): an absolute http(s) address; a relative one would silently mean "this very service". Not said, empty (an unset setting)
+      // or not usable: the production hub (a warning in the console when something was said and cannot be used)
+      o = (typeof c.hubOrigin === 'string' && /^https?:\/\//i.test(c.hubOrigin.trim())) ? origin(safeUrl(c.hubOrigin)) : '';
+      if (!o) {
+        if (c.hubOrigin && !this.warnedHub) {                                   // once per menu, not on every update
+          this.warnedHub = true;
+          warn('GGAccountMenu: hubOrigin ' + JSON.stringify(str(c.hubOrigin).slice(0, 80)) + ' is not an absolute address, the production hub is used');
+        }
+        o = HUB.origin;
+      }
+    }
     this.L = {};
     for (var k in LABELS) this.L[k] = (c.labels && typeof c.labels[k] === 'string') ? c.labels[k] : LABELS[k];
     this.hub = o;
