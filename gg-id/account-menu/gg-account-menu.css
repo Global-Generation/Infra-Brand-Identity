@@ -1,0 +1,213 @@
+/* GG account menu: styles of the account chip and its dropdown. Kit version 2026-10-10.1 (gg-id/VERSION).
+   GENERATED, do not edit by hand: python3 src/build_account_menu.py (Global-Generation/Infra-Brand-Identity).
+   The blocks marked "kit" are copied byte for byte from gg-id/gg-id.css, so the menu looks exactly like the kit chip and menu of AKB;
+   the last block is src/account_menu/local.css (services list, sections, narrow screen). A change of the look is a PR to the kit.
+   No @font-face: the page loads Montserrat itself (gg-id/fonts/); without it the menu falls back to system-ui. No external addresses. */
+
+/* kit: tokens: light theme, dark theme, dark by the system */
+/* ---------- токены: светлая тема ---------- */
+.gid,.gid-kit{
+  --g-font:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --g-ease:cubic-bezier(.22,.61,.36,1); --g-pop:cubic-bezier(.34,1.3,.64,1);
+  --g-page:#eef3f9;
+  --g-page-bg:radial-gradient(1100px 560px at 50% -8%,#f8fbff 0%,rgba(248,251,255,0) 62%),linear-gradient(180deg,#e7eff8 0%,#eef3f9 100%);
+  --g-solid:#ffffff;
+  --g-card:#ffffff; --g-card-line:rgba(19,68,93,.08); --g-card-blur:none;
+  --g-card-shadow:0 1px 2px rgba(15,23,42,.04),0 34px 80px -44px rgba(19,68,93,.5);
+  --g-head:#13445d; --g-ink:#0f172a; --g-ink-2:#334155; --g-muted:#64748b; --g-faint:#94a3b8;
+  --g-line:#e2e8f0; --g-soft:#f1f5f9; --g-surface:#f8fafc;
+  --g-logo:#13445d; --g-divider:rgba(19,68,93,.2);
+  /* главная кнопка, стиль A (08.10): белая с тонкой рамкой, светлая плитка слева, navy-текст; без navy-заливки */
+  --g-primary:#ffffff; --g-primary-hi:#f7fafd; --g-primary-ink:#0f172a;
+  --g-primary-line:#c9d5e1; --g-primary-line-hi:#94a3b8;
+  --g-primary-shadow:0 1px 2px rgba(15,23,42,.05);
+  --g-tile:linear-gradient(150deg,#8FBADD 0%,#4B8FD6 100%); --g-chev:#64748b; --g-text-btn:#13445d;
+  --g-second:#ffffff; --g-second-line:#d5dee8; --g-second-ink:#0f172a; --g-second-hover:#f6f9fc;
+  --g-accent:#009CDC; --g-link:#0077a8; --g-ring:rgba(0,156,220,.22);
+  /* кольцо фокуса с клавиатуры: сплошная линия 2 px акцентом (от 3:1 к белому фону), видна и в режиме высокой контрастности Windows */
+  --g-focus:#009CDC;
+  --g-field:#ffffff; --g-field-line:#d5dee8; --g-field-hover:#94a3b8; --g-autofill:#f2f8fd;
+  --g-danger:#dc2626; --g-danger-ink:#b91c1c; --g-danger-soft:#fef2f2; --g-danger-ring:rgba(220,38,38,.14);
+  --g-success:#16a34a; --g-warn:#d97706;
+  --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
+  --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
+  /* карточка GG ID (08.10, «Итог»): светлый пластик в обеих темах, тема меняет только тень */
+  --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 18px 30px -18px rgba(13,47,66,.34),0 40px 70px -40px rgba(13,47,66,.4);
+  color-scheme:light;
+  font-family:var(--g-font);
+}
+
+/* ---------- токены: тёмная тема (явно или по системе) ---------- */
+.gid[data-theme="dark"],.gid-kit[data-theme="dark"]{
+  --g-page:#081b26;
+  --g-page-bg:radial-gradient(1100px 620px at 50% -12%,#15425c 0%,rgba(21,66,92,0) 62%),linear-gradient(180deg,#0b2433 0%,#071721 100%);
+  --g-solid:#0a1f2c;
+  --g-card:rgba(8,27,38,.6); --g-card-line:rgba(255,255,255,.10); --g-card-blur:blur(22px) saturate(140%);
+  --g-card-shadow:0 34px 90px -44px rgba(0,0,0,.75);
+  --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
+  --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
+  --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+  --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
+  --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
+  --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
+  --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
+  --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3); --g-focus:#5cc3ec;
+  --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
+  --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
+  --g-success:#4ade80; --g-warn:#fbbf24;
+  --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+  --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
+  --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+  --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){
+  .gid:not([data-theme="light"]),.gid-kit:not([data-theme="light"]){
+    --g-page:#081b26;
+    --g-page-bg:radial-gradient(1100px 620px at 50% -12%,#15425c 0%,rgba(21,66,92,0) 62%),linear-gradient(180deg,#0b2433 0%,#071721 100%);
+    --g-solid:#0a1f2c;
+    --g-card:rgba(8,27,38,.6); --g-card-line:rgba(255,255,255,.10); --g-card-blur:blur(22px) saturate(140%);
+    --g-card-shadow:0 34px 90px -44px rgba(0,0,0,.75);
+    --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
+    --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
+    --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+    --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
+    --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
+    --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
+    --g-second:rgba(255,255,255,.03); --g-second-line:rgba(255,255,255,.16); --g-second-ink:#e8eff5; --g-second-hover:rgba(255,255,255,.07);
+    --g-accent:#5cc3ec; --g-link:#5cc3ec; --g-ring:rgba(92,195,236,.3); --g-focus:#5cc3ec;
+    --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
+    --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
+    --g-success:#4ade80; --g-warn:#fbbf24;
+    --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+    --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
+    --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
+    --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+
+/* kit: box-sizing */
+.gid,.gid *,.gid *::before,.gid *::after,.gid-kit *,.gid-kit *::before,.gid-kit *::after{box-sizing:border-box}
+
+/* kit: resets and [hidden] */
+/* сбросы с нулевой специфичностью: классы кита и сервиса всегда сильнее */
+:where(.gid,.gid-kit) :where(h1,h2,p,ul){margin:0}
+:where(.gid,.gid-kit) :where(button,input){font:inherit;color:inherit}
+:where(.gid,.gid-kit) a{color:inherit;text-decoration:none}
+/* атрибут hidden прячет всегда, даже кнопки и плашки с display:flex */
+.gid [hidden],.gid-kit [hidden]{display:none!important}
+
+/* kit: no break inside the domain of an e-mail */
+.gid-nowrap{white-space:nowrap}
+
+/* kit: icons */
+.gid-ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gid-ic--sm{width:16px;height:16px}
+.gid-ic--fill{fill:currentColor;stroke:none}
+
+/* kit: avatar */
+/* аватар: инициалы белым по центру круга в любом контейнере. Селектор (0,2,0) сильнее правил вида «.контейнер span»,
+   а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
+:is(.gid,.gid-kit) .gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;margin:0;padding:0;border-radius:50%;
+  background:var(--g-avatar);color:#fff;font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
+  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+:is(.gid,.gid-kit) .gid-avatar--sm{width:36px;height:36px;font-size:13px}
+:is(.gid,.gid-kit) .gid-avatar--xs{width:28px;height:28px;font-size:11px}
+
+/* kit: account chip and menu */
+/* аккаунт в шапке сервиса: обёртка .gid-acct (чип + выпадающее меню), чип ужимается вместе с шапкой.
+   Места мало: сначала уходит стрелка, потом имя обрезается многоточием; когда на имя остаётся меньше 2,4 em, имя уходит
+   на скрытую вторую строку и в чипе остаются только инициалы (круг 40 px). Ничего не вылезает за край шапки. */
+.gid-acct{position:relative;display:inline-flex;min-width:40px;max-width:100%;vertical-align:middle}
+.gid-chip{display:inline-flex;flex-wrap:wrap;align-items:center;align-content:flex-start;column-gap:9px;row-gap:0;
+  height:40px;min-width:40px;max-width:100%;padding:0 5px;overflow:hidden;border-radius:999px;border:1px solid var(--g-line);
+  background:var(--g-second);color:var(--g-ink);font-family:var(--g-font);font-size:13.5px;font-weight:600;line-height:38px;
+  text-align:left;cursor:pointer;transition:border-color .15s,background-color .15s}
+.gid-chip:hover,.gid-chip[aria-expanded="true"]{border-color:var(--g-field-hover);background:var(--g-second-hover);color:var(--g-ink)}
+.gid-chip:focus-visible{outline:2px solid var(--g-focus);outline-offset:2px;box-shadow:none}
+.gid-chip > .gid-avatar{margin-block:5px}
+.gid-chip-name,.gid-chip > span:not(.gid-avatar){flex:1 1 0;min-width:2.4em;max-width:max-content;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gid-chip .gid-ic{width:16px;height:16px;margin:11px 4px 11px 0;color:var(--g-faint);transition:transform .18s var(--g-ease)}
+.gid-chip[aria-expanded="true"] .gid-ic{transform:rotate(180deg)}
+.gid-menu{width:300px;max-width:calc(100vw - 32px);padding:8px;border-radius:18px;border:1px solid var(--g-card-line);background:var(--g-solid);
+  box-shadow:var(--g-menu-shadow);font-family:var(--g-font);color:var(--g-ink);text-align:left;transform-origin:top right;animation:gidMenu .2s var(--g-pop) both}
+@keyframes gidMenu{from{opacity:0;transform:scale(.96) translateY(-4px)}to{opacity:1;transform:none}}
+/* выпадающее меню под чипом у правого края; --start: шапка переносится и аккаунт стоит слева */
+.gid-acct > .gid-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:60}
+.gid-menu[hidden]{display:none!important}
+.gid-acct--start > .gid-menu{right:auto;left:0;transform-origin:top left}
+.gid-menu-head{display:flex;align-items:center;gap:12px;padding:10px 10px 14px;margin-bottom:6px;border-bottom:1px solid var(--g-line)}
+/* текст шапки меню только через свой класс: правило не задевает аватар рядом. Длинные имя и почта переносятся, а не режутся */
+.gid-menu-head-tx,.gid-menu-head > div{display:flex;flex-direction:column;min-width:0}
+.gid-menu-head-tx b,.gid-menu-head > div > b{display:block;font-size:14.5px;font-weight:600;line-height:1.35;color:var(--g-ink);overflow-wrap:anywhere}
+.gid-menu-head-tx > span,.gid-menu-head > div > span{display:block;font-size:12.5px;line-height:1.4;color:var(--g-muted);overflow-wrap:anywhere}
+.gid-menu-item{display:flex;align-items:center;gap:12px;width:100%;min-width:0;padding:10px;border:0;border-radius:11px;background:none;
+  font:inherit;font-size:14px;font-weight:600;color:var(--g-ink);text-decoration:none;cursor:pointer;text-align:left;transition:background-color .14s}
+.gid-menu-item:hover,.gid-menu-item:focus-visible{background:var(--g-soft);color:var(--g-ink);text-decoration:none;outline:none}
+.gid-menu-item:focus-visible{outline:2px solid var(--g-focus);outline-offset:-2px}
+.gid-menu-item .gid-ic{width:18px;height:18px;color:var(--g-muted)}
+.gid-menu-meta{margin-left:auto;padding-left:8px;font-size:12px;font-weight:500;color:var(--g-muted);white-space:nowrap}
+.gid-menu-sep{height:1px;margin:6px 4px;background:var(--g-line)}
+
+/* ============ gg-account-menu: what the kit blocks above do not have (hand-written: src/account_menu/local.css) ============ */
+
+/* Wrapper: the same as .gid-acct of the kit, under its own name. gg-id-service.js wires every .gid-acct it finds; a menu that this file
+   draws and runs itself must not be taken by it a second time (two handlers on one chip open and close the menu in the same click). */
+.gam{position:relative;display:inline-flex;min-width:40px;max-width:100%;vertical-align:middle}
+.gam > .gid-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:var(--gam-z,60)}
+.gam--start > .gid-menu{right:auto;left:0;transform-origin:top left}
+.gam > .gid-menu{overscroll-behavior:contain}
+
+/* Narrow screen (and variant "avatar" at any width): only the round initials remain, the name and the arrow go. As in the AKB header. */
+@media (max-width:600px){.gam .gid-chip{column-gap:0}.gam .gid-chip > span:not(.gid-avatar):not(.gam-sr),.gam .gid-chip .gid-ic{display:none}}
+.gam--avatar .gid-chip{column-gap:0}
+.gam--avatar .gid-chip > span:not(.gid-avatar):not(.gam-sr),.gam--avatar .gid-chip .gid-ic{display:none}
+/* The name of the chip for screen readers ("Аккаунт: Лёв Авдошин"): out of the flex flow, no box, still in the accessibility tree in the narrow chip too */
+.gam .gid-chip > .gam-sr{position:absolute;width:1px;height:1px;min-width:0;max-width:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap}
+
+/* A row with no action (shown only) and a list inside an item of the menu: as in the AKB menu */
+.gid-menu-item--static{cursor:default}
+.gid-menu-item--static:hover{background:none}
+.gid-menu-sub{margin:2px 0 4px;padding:4px;max-height:240px;overflow-y:auto;border-radius:11px;background:var(--g-surface)}
+
+/* Sections that open inside the menu: "Мои сервисы" (the services of the person, one click into a service) and any item of the service with a panel.
+   The arrow at the right turns down when the section is open. */
+.gam .gid-menu-item .gam-chev{width:14px;height:14px;margin-left:auto;transition:transform .15s var(--g-ease)}
+.gam .gid-menu-meta + .gam-chev{margin-left:8px}
+.gam [aria-expanded="true"] > .gam-chev{transform:rotate(90deg)}
+.gam-sub{max-height:272px;overscroll-behavior:contain}
+.gam-sub .gid-menu-item:hover,.gam-sub .gid-menu-item:focus-visible{background:var(--g-soft)}
+.gam-note{padding:10px;font-size:12.5px;line-height:1.4;color:var(--g-muted)}
+
+/* A service in the list: the light tile of the kit (rule 4a: #8FBADD to #4B8FD6, white icon, no dark shadow) and the name on one line */
+.gam-svc{padding:8px 10px;font-size:13.5px}
+.gam-tile{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:8px;background:var(--g-tile);color:#fff}
+.gam .gid-menu-item .gam-tile .gid-ic{width:16px;height:16px;color:#fff}
+.gam-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gam-svc .gid-menu-meta{flex:none}
+.gam-all{padding:8px 10px;font-size:13px;color:var(--g-muted)}
+.gam-all .gid-ic{width:16px;height:16px;margin:0 6px}
+
+/* Apple Wallet badge: the last row of the header block (name, e-mail, then the badge). The header becomes a two-column grid only when the badge is there;
+   without it the header is the kit's own flex row, as in AKB. The badge is black with the thin grey outline of Apple's badge and white text; no shadow, no dimming,
+   no animation (Apple's rules for the badge), clear space around it at least 0.1 of its height. This drawn badge is interim: Apple's own SVG file replaces it through
+   the option walletImage (README, "Значок Apple Wallet"); that file is shown as it comes, with no frame of ours. */
+.gam .gam-head--wallet{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;row-gap:12px}
+.gam .gam-head--wallet > .gam-wallet{grid-column:1 / -1;justify-self:start}
+.gam .gam-wallet{display:inline-flex;align-items:center;gap:8px;height:36px;max-width:100%;padding:0 12px 0 9px;border:1px solid #a6a6a6;border-radius:6px;background:#000;color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;
+  box-shadow:none;filter:none;opacity:1;transition:none;animation:none}
+.gam .gam-wallet:hover,.gam .gam-wallet:visited{background:#000;color:#fff;text-decoration:none}
+.gam .gam-wallet:focus-visible{outline:2px solid var(--g-focus);outline-offset:3px;box-shadow:none}
+.gam .gam-wallet .gid-ic{width:20px;height:20px;flex:none;margin:0;color:#fff}
+.gam-wallet-tx{display:flex;flex-direction:column;justify-content:center;gap:1px;text-align:left;line-height:1}
+.gam-wallet-tx small{font-size:8.5px;font-weight:500;letter-spacing:.015em;line-height:1;color:#fff}
+.gam-wallet-tx b{font-size:15px;font-weight:600;letter-spacing:-.012em;line-height:1;color:#fff}
+.gam .gam-wallet--art{padding:0;border:0;border-radius:0;background:none}
+.gam .gam-wallet--art img{display:block;height:36px;width:auto;max-width:100%}
+
+@media (prefers-reduced-motion:reduce){
+  .gam *,.gam *::before,.gam *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
