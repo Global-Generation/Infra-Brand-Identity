@@ -1,18 +1,21 @@
-"""GG ID: how the kit words a sign-in with a passkey (rule of 09.10.2026).
+"""GG ID: how the kit words a sign-in with a passkey (rules of 09.10.2026 and 10.10.2026).
 
-The rule: Touch ID, Windows Hello, «отпечаток» and «палец» are named only when THIS browser has a confirmed key of the device
-(localStorage gg-id-local-key + gg-id-last-method = platform). Until then the kit says what is true everywhere: Face ID on the phone
-(QR code) or a key on this device. The offer to create a key here (enroll) may name the method of the device: the key is made on this
-device and the page shows the offer only after the browser said it can. The four localStorage names are shared with the sign-in page of
-the hub and with the Face ID confirmation page of the admins (Infra-Services-Portal #168, Infra-AWS #98 and its port Infra-Auth #17): one
-origin, one memory.
+The rules: (10.10, Lev: «Face ID это не всегда Face ID, иногда Touch ID», «пиши всегда слеш») the sensor of Apple is always ONE phrase, the pair
+«Face ID / Touch ID», with a slash, in every text; a lone «Face ID» or a lone «Touch ID» is never written. (09.10) Windows Hello, «отпечаток»
+and «палец» are named only when THIS browser has a confirmed key of the device (localStorage gg-id-local-key + gg-id-last-method = platform).
+Until then the kit says what is true everywhere: «Face ID / Touch ID» on the phone (QR code) or a key on this device. The offer to create a key
+here (enroll) may name the method of the device: the key is made on this device and the page shows the offer only after the browser said it can.
+The four localStorage names are shared with the sign-in page of the hub and with the Face ID / Touch ID confirmation page of the admins
+(Infra-Services-Portal #168, Infra-AWS #98 and its port Infra-Auth #17): one origin, one memory.
 
 What is checked (Chromium):
   1. the sources: the four storage names, the sentences and the phrases word for word, no network calls, the docs carry the same; the guard
-     against the words of a device (it also sees Touch&nbsp;ID, Touch U+00A0 ID, TouchID) and the same pattern in the build;
+     against a lone Face ID or Touch ID and the words of one device (it also sees Touch&nbsp;ID, Touch U+00A0 ID, TouchID, a slash with or
+     without spaces) and the same patterns in the build;
   2. every kind of device x every memory state x every phrase through the API (explicit kind);
   3. 7 devices x 8 memory states x 3 screens (login, passkey, enroll) loaded fresh with the memory already in localStorage: label, icon and
-     hint; without a confirmed key no method of the device on the sign-in and the waiting screens at all, on any device (the case of Lev's Mac);
+     hint; without a confirmed key no method of one device and no lone Face ID or Touch ID on the sign-in and the waiting screens at all, on any device
+     (the case of Lev's Mac);
   4. the rules of the memory: what a confirmation by the device, by the phone, a miss, a cancelled attempt and «Не сейчас» change; nothing
      but the four names is ever written;
   5. storage that throws, a blocked localStorage getter and a browser without WebAuthn: nothing breaks, nothing is promised;
@@ -38,10 +41,13 @@ L, S, M, Z = KEYS['PK_LOCAL'], KEYS['PK_LAST'], KEYS['PK_MISS'], KEYS['PK_SKIP']
 
 
 class Banned:
-    """The words that name a method of the device. Looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens and zero-width
-    characters dropped, any space (a non-breaking one too) between «Touch» and «ID», so a typographic variant does not slip through.
-    The same pattern is DEVICE_WORDS in src/build_gg_id.py (the build refuses it in the markup of the screens); the check compares the two."""
-    pattern = r'(?<![a-z])(?:Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц'
+    """What must not stand in a text: a lone «Face ID» or «Touch ID» (rule of 10.10.2026: the sensor of Apple is always the pair «Face ID / Touch ID») and the words that
+    name a method of one device (Windows Hello, «отпечаток», «палец»; rule of 09.10.2026). Looked for in what a person reads: entities decoded (Touch&nbsp;ID), soft hyphens
+    and zero-width characters dropped, any space (a non-breaking one too) between the words and around the slash, the pair taken out first, so a typographic variant does not
+    slip through. The same patterns are PAIR_WORDS and DEVICE_WORDS in src/build_gg_id.py (the build refuses them in the markup of the screens); the check compares the two."""
+    pair = r'(?<![a-z])Face\s*ID\s*/\s*Touch\s*ID(?![a-z])'
+    pattern = r'(?<![a-z])(?:Face\s*ID|Touch\s*ID|Windows\s*Hello)(?![a-z])|отпечат|палец|пальц'
+    _pair = re.compile(pair, re.I)
     _re = re.compile(pattern, re.I)
 
     @staticmethod
@@ -49,18 +55,19 @@ class Banned:
         return re.sub('[\u00ad\u200b-\u200d\u2060\ufeff]', '', html.unescape('' if text is None else str(text)))
 
     def search(self, text):
-        return self._re.search(self.plain(text))
+        return self._re.search(self._pair.sub(' ', self.plain(text)))
 
     def findall(self, text):
-        return self._re.findall(self.plain(text))
+        return self._re.findall(self._pair.sub(' ', self.plain(text)))
 
 
 BANNED = Banned()
 
-HINT_UNKNOWN = 'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.'
-HINT_PHONE = 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID.'
+PAIR = 'Face ID / Touch ID'      # the one phrase for the sensors of Apple, with a slash (Lev, 10.10.2026)
+HINT_UNKNOWN = 'Подтвердите вход в окне браузера: Face ID / Touch ID на телефоне (QR-код) или ключ на этом устройстве.'
+HINT_PHONE = 'Подтвердите вход с телефона: наведите камеру телефона на QR-код в окне браузера и подтвердите Face ID / Touch ID.'
 HINT_OWN = 'Подтвердите вход: {} на этом устройстве.'
-HINT_SYSTEM_IOS = 'Подтвердите вход Face ID в системном окне. Это займёт секунду.'
+HINT_SYSTEM_IOS = 'Подтвердите вход Face ID / Touch ID в системном окне. Это займёт секунду.'
 HINT_SYSTEM_ANDROID = 'Подтвердите вход в системном окне. Это займёт секунду.'
 WAIT = 'Ждём подтверждения'
 
@@ -82,18 +89,18 @@ DEVICES = {
               'Linux x86_64', 0, 'Linux', 'key'),
 }
 # the expected words, written out by hand (not derived from the kit): kind -> ...
-OWN_WORD = {'touchid': 'Touch ID', 'faceid': 'Face ID', 'hello': 'Windows Hello', 'finger': 'отпечаток пальца', 'key': 'ключ доступа'}
-OWN_LOGIN = {'touchid': 'Войти с Touch ID', 'faceid': 'Войти с Face ID', 'hello': 'Войти с Windows Hello',
+OWN_WORD = {'touchid': PAIR, 'faceid': PAIR, 'hello': 'Windows Hello', 'finger': 'отпечаток пальца', 'key': 'ключ доступа'}
+OWN_LOGIN = {'touchid': 'Войти с Face ID / Touch ID', 'faceid': 'Войти с Face ID / Touch ID', 'hello': 'Войти с Windows Hello',
              'finger': 'Войти по отпечатку', 'key': 'Войти по ключу доступа'}
 ICON = {'touchid': 'fingerprint', 'faceid': 'scan-face', 'hello': 'scan-face', 'finger': 'fingerprint', 'key': 'key-round'}
-ENROLL = {'touchid': 'Подключить Touch ID', 'faceid': 'Подключить Face ID', 'hello': 'Подключить Windows Hello',
+ENROLL = {'touchid': 'Подключить Face ID / Touch ID', 'faceid': 'Подключить Face ID / Touch ID', 'hello': 'Подключить Windows Hello',
           'finger': 'Подключить вход по отпечатку', 'key': 'Создать ключ доступа'}
-LEAD = {'touchid': 'Подключите Touch ID', 'faceid': 'Подключите Face ID', 'hello': 'Подключите Windows Hello',     # start of the sub line of the offer
+LEAD = {'touchid': 'Подключите Face ID / Touch ID', 'faceid': 'Подключите Face ID / Touch ID', 'hello': 'Подключите Windows Hello',     # start of the sub line of the offer
         'finger': 'Подключите отпечаток', 'key': 'Создайте ключ доступа'}
 
 
-def safe_login(kind):      # what is true on every device: Face ID of the phone (Android has no Face ID: the general phrase)
-    return 'Войти по ключу доступа' if kind == 'finger' else 'Войти с Face ID'
+def safe_login(kind):      # what is true on every device: the pair of the phone (Android has no Face ID: the general phrase)
+    return 'Войти по ключу доступа' if kind == 'finger' else 'Войти с Face ID / Touch ID'
 
 
 def safe_icon(kind):
@@ -189,11 +196,23 @@ def run(b, problems, counts):
         for sentence in (HINT_UNKNOWN, HINT_PHONE, HINT_SYSTEM_IOS, HINT_SYSTEM_ANDROID, WAIT, 'Подтвердите вход: '):
             ok(f'source: gg-id.js says «{short(sentence, 50)}»', sentence in js)
         ok('source: gg-id.js makes no network calls', not re.search(r'\b(fetch|XMLHttpRequest|sendBeacon|WebSocket)\b', js))
+        # the texts of the tables, word for word, and not one lone Face ID or Touch ID in any string of the kit scripts (comments may explain the rule)
+        for phrase in ('Войти с Face ID / Touch ID', 'Подключить Face ID / Touch ID', 'Подключите Face ID / Touch ID'):
+            ok(f'source: gg-id.js says «{phrase}» for both faceid and touchid', js.count("'" + phrase + "'") == 2, js.count("'" + phrase + "'"))
+        ok('source: gg-id.js PASSKEY_WORD names the pair for faceid and touchid',
+           re.search(r"PASSKEY_WORD\s*=\s*\{\s*faceid:\s*'Face ID / Touch ID',\s*touchid:\s*'Face ID / Touch ID',", js) is not None)
+        for script in ('gg-id.js', 'gg-id-service.js', os.path.join('account-menu', 'gg-account-menu.js')):
+            code = open(os.path.join(KIT, script), encoding='utf-8').read()
+            code = re.sub(r'/\*.*?\*/', ' ', code, flags=re.S)
+            code = '\n'.join(re.sub(r'(^|\s)//.*$', '', ln) for ln in code.split('\n'))
+            lits = re.findall(r"'((?:[^'\\\n]|\\.)*)'", code)
+            lone = [s for s in lits if re.search(r'[А-Яа-яЁё]', s) and re.search(r'Face|Touch', s, re.I) and BANNED.search(s)]      # Russian strings only: 'faceid' and 'touchid' are keys of the tables
+            ok(f'source: {script} has no lone Face ID or Touch ID in its strings', not lone, lone[:3])
         ok('source: gg-id.js has the icon table the hub test reads (PASSKEY_ICON = {...})', re.search(r"PASSKEY_ICON\s*=\s*\{[^}]*\}", js) is not None)
         handoff = open(os.path.join(KIT, 'HANDOFF-AUTH.md'), encoding='utf-8').read()
         for name in KEYS.values():
             ok(f'docs: HANDOFF-AUTH.md names {name}', name in handoff)
-        for sentence in (HINT_UNKNOWN, HINT_PHONE, HINT_OWN.format('Touch ID'), HINT_SYSTEM_IOS, HINT_SYSTEM_ANDROID, WAIT):
+        for sentence in (HINT_UNKNOWN, HINT_PHONE, HINT_OWN.format(PAIR), HINT_SYSTEM_IOS, HINT_SYSTEM_ANDROID, WAIT, 'Войти с Face ID / Touch ID', 'Подключить Face ID / Touch ID'):
             ok(f'docs: HANDOFF-AUTH.md carries «{short(sentence, 50)}»', sentence in handoff)
         ok('docs: HANDOFF-AUTH.md no longer tells to set the old gg-id-pk flag', "setItem('gg-id-pk'" not in handoff and "getItem('gg-id-pk')" not in handoff)
         readme = open(os.path.join(KIT, 'README.md'), encoding='utf-8').read()
@@ -208,13 +227,17 @@ def run(b, problems, counts):
     # ---- 1b. the guard itself: the words it looks for are found in the typographic variants this repo uses, and nothing true is taken for a method of the device ----
     def guard_words():
         for text in ('Войти с Touch ID', 'touch id', 'TOUCH ID', 'Touch&nbsp;ID', 'Touch&#160;ID', 'Touch\u00a0ID', 'Touch\u202fID', 'TouchID', 'Tou\u200bch ID',
+                     'Войти с Face ID', 'Подключите Face ID', 'FaceID', 'Face&nbsp;ID', 'Face\u00a0ID', 'Fa\u00adce ID', 'Face ID подключён', 'Touch ID / Face ID', 'Face ID / Touch',
+                     'Face ID, Touch ID', 'Face ID и Touch ID', 'Face ID \\ Touch ID',
                      'Windows Hello', 'Windows&nbsp;Hello', 'Windows\u00a0Hello', 'Войти по отпечатку', 'Приложите палец', 'пальцем'):
-            ok(f'guard: {text!r} names a method of the device', bool(BANNED.search(text)), text)
-        for text in ('Войти с Face ID', 'Face&nbsp;ID', 'Face\u00a0ID', 'Войти по ключу доступа', 'Ждём подтверждения', 'touch ideas', 'Windows Helloween',
-                     'Подтвердите вход в окне браузера: Face ID на телефоне (QR-код) или ключ на этом устройстве.'):
-            ok(f'guard: {text!r} is not one', not BANNED.search(text), BANNED.findall(text))
+            ok(f'guard: {text!r} is not allowed', bool(BANNED.search(text)), text)
+        for text in ('Войти с Face ID / Touch ID', 'Face&nbsp;ID / Touch&nbsp;ID', 'Face\u00a0ID\u00a0/\u00a0Touch\u00a0ID', 'Face ID/Touch ID', 'face id / touch id', 'Face ID / Touch ID подключён',
+                     'Войти по ключу доступа', 'Ждём подтверждения', 'touch ideas', 'Windows Helloween', 'Faceless',
+                     'Подтвердите вход в окне браузера: Face ID / Touch ID на телефоне (QR-код) или ключ на этом устройстве.'):
+            ok(f'guard: {text!r} is allowed', not BANNED.search(text), BANNED.findall(text))
         build = open(os.path.join(ROOT, 'src', 'build_gg_id.py'), encoding='utf-8').read()
         ok('guard: the build refuses the same words as this check (DEVICE_WORDS = BANNED.pattern)', "DEVICE_WORDS = re.compile(r'" + BANNED.pattern + "', re.I)" in build)
+        ok('guard: the build lets the same pair through as this check (PAIR_WORDS = BANNED.pair)', "PAIR_WORDS = re.compile(r'" + BANNED.pair + "', re.I)" in build)
 
     # ---- 2. explicit kind: every kind x every memory state x every phrase, in one page ----
     def explicit_kinds():
@@ -245,7 +268,7 @@ def run(b, problems, counts):
                     for k in ('login', 'wait', 'hint'):
                         ok(f'no method of the device without a confirmed key {tag} {k}', not BANNED.search(t[k]), t[k])
         pg.evaluate(SET_STORE, {})
-        eq('unknown phrase falls back to the login phrase', pg.evaluate('() => GGID.passkeyText("nope", "key")'), 'Войти с Face ID')
+        eq('unknown phrase falls back to the login phrase', pg.evaluate('() => GGID.passkeyText("nope", "key")'), 'Войти с Face ID / Touch ID')
         pg.evaluate(SET_STORE, STATES['own key'][0])
         eq('unknown kind falls back to the key phrase (own key)', pg.evaluate('() => GGID.passkeyText("login", "toaster")'), 'Войти по ключу доступа')
         eq('unknown kind falls back to the key word in the hint (own key)', pg.evaluate('() => GGID.passkeyHint("toaster")'), HINT_OWN.format('ключ доступа'))
@@ -315,7 +338,7 @@ def run(b, problems, counts):
         pg.evaluate('''() => { const d = document.createElement('div');
           d.innerHTML = '<p data-gid-passkey-hint>x</p><button><span data-gid-passkey="login">x</span></button>'; document.body.appendChild(d); GGID.init(d); window.__fx = d; }''')
         eq('a hint and a label added later are painted by GGID.init(node)',
-           pg.evaluate('() => [...window.__fx.querySelectorAll("p, span")].map(e => e.textContent)'), ['Подтвердите вход: Touch ID на этом устройстве.', 'Войти с Touch ID'])
+           pg.evaluate('() => [...window.__fx.querySelectorAll("p, span")].map(e => e.textContent)'), ['Подтвердите вход: Face ID / Touch ID на этом устройстве.', 'Войти с Face ID / Touch ID'])
         ok('page: console and exceptions clean (icons)', not errs, errs[:3])
         ctx.close()
 
@@ -371,14 +394,16 @@ def run(b, problems, counts):
             eq(f'snoozed when the stored time is {ahead // 3600000} hours ahead', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
         pg.evaluate(SET_STORE, {})
         eq('snoozed in an empty browser', pg.evaluate('() => GGID.passkeyMemory().snoozed'), False)
-        # a whole life of a browser: phone first, then the key of the device appears, fails once, and the phone answers
+        # a whole life of a browser: phone first, then the key of the device appears, fails once, and the phone answers. On Windows the label follows the memory
+        # (Windows Hello only while the key of the device is confirmed); on a Mac the pair «Face ID / Touch ID» stands whatever the memory says
         pg.evaluate(SET_STORE, {})
-        for code, label, store in (('GGID.passkeyRemember("cross-platform")', 'Войти с Face ID', {S: 'cross-platform'}),
-                                   ('GGID.passkeyRemember("platform")', 'Войти с Touch ID', {L: '1', S: 'platform'}),
-                                   ('GGID.passkeyMissed({ name: "NotAllowedError" })', 'Войти с Touch ID', {L: '1', S: 'platform', M: '1'}),
-                                   ('GGID.passkeyRemember("cross-platform")', 'Войти с Face ID', {S: 'cross-platform'})):
+        for code, label, store in (('GGID.passkeyRemember("cross-platform")', 'Войти с Face ID / Touch ID', {S: 'cross-platform'}),
+                                   ('GGID.passkeyRemember("platform")', 'Войти с Windows Hello', {L: '1', S: 'platform'}),
+                                   ('GGID.passkeyMissed({ name: "NotAllowedError" })', 'Войти с Windows Hello', {L: '1', S: 'platform', M: '1'}),
+                                   ('GGID.passkeyRemember("cross-platform")', 'Войти с Face ID / Touch ID', {S: 'cross-platform'})):
             pg.evaluate('() => { ' + code + '; }')
-            eq(f'life: {code} -> label', pg.evaluate('() => GGID.passkeyText("login", "touchid")'), label)
+            eq(f'life: {code} -> label (Windows)', pg.evaluate('() => GGID.passkeyText("login", "hello")'), label)
+            eq(f'life: {code} -> label (Mac: the same pair)', pg.evaluate('() => GGID.passkeyText("login", "touchid")'), 'Войти с Face ID / Touch ID')
             eq(f'life: {code} -> storage', pg.evaluate(STORE), store)
         # nothing but the four names is ever written
         pg.evaluate(SET_STORE, {})
@@ -402,7 +427,7 @@ def run(b, problems, counts):
             pg.add_init_script(script)
             pg.goto('file://' + os.path.join(SCREENS, 'login.html') + '?layout=split')
             r = pg.evaluate(READ)
-            eq(f'{how}: a Mac says Face ID, not Touch ID', r['text'], 'Войти с Face ID')
+            eq(f'{how}: a Mac says the pair Face ID / Touch ID', r['text'], 'Войти с Face ID / Touch ID')
             ok(f'{how}: no method of the device on the screen', not BANNED.search(r['page']), BANNED.findall(r['page']))
             res = pg.evaluate('''() => { const out = {};
               for (const [n, f] of Object.entries({ remember: () => GGID.passkeyRemember('platform'), missed: () => GGID.passkeyMissed({ name: 'NotAllowedError' }),
@@ -414,7 +439,7 @@ def run(b, problems, counts):
             if how != 'no PublicKeyCredential':
                 eq(f'{how}: nothing is remembered', [res['memory']['own'], res['memory']['last'], res['memory']['snoozed']], [False, '', False])
                 eq(f'{how}: the hint stays the honest default', res['hint'], HINT_UNKNOWN)
-                eq(f'{how}: the label stays Face ID', res['text'], 'Войти с Face ID')
+                eq(f'{how}: the label stays the pair Face ID / Touch ID', res['text'], 'Войти с Face ID / Touch ID')
             ok(f'{how}: console and exceptions clean', not errs, errs[:3])
             ctx.close()
 
@@ -471,7 +496,10 @@ def run(b, problems, counts):
         pg.evaluate('() => GGID.passkeyCreated()')
         eq('webauthn: created on the device -> key flag and platform', pg.evaluate(STORE), {L: '1', S: 'platform'})
         pg.reload()
-        eq('webauthn: the next load of the screen names the device on a Mac', pg.evaluate(READ)['text'], 'Войти с Touch ID')
+        eq('webauthn: the next load of the screen says the pair on a Mac', pg.evaluate(READ)['text'], 'Войти с Face ID / Touch ID')
+        eq('webauthn: the memory now knows the key of the device', pg.evaluate('() => GGID.passkeyMemory().own'), True)
+        pg.goto(ORIGIN + '/gg-id/screens/passkey.html?layout=split')
+        eq('webauthn: the waiting hint of a Mac with its own key', pg.evaluate(READ)['hint'], HINT_OWN.format(PAIR))
         pg.evaluate('() => GGID.passkeyWatch()')
         eq('webauthn: a real sign-in with the key of the device says platform', pg.evaluate(GET), 'platform')
         pg.evaluate('() => GGID.passkeyRemember(GGID.passkeySeen())')
@@ -491,7 +519,7 @@ def run(b, problems, counts):
         eq('webauthn: signed in by the phone/USB key -> cross-platform, no key of the device', pg.evaluate(STORE), {S: 'cross-platform'})
         pg.reload()
         r = pg.evaluate(READ)
-        eq('webauthn: after the phone, a Mac still says Face ID', r['text'], 'Войти с Face ID')
+        eq('webauthn: after the phone, a Mac still says the pair Face ID / Touch ID', r['text'], 'Войти с Face ID / Touch ID')
         ok('webauthn: after the phone, no method of the device on the screen', not BANNED.search(r['page']), BANNED.findall(r['page']))
         pg.goto(ORIGIN + '/gg-id/screens/passkey.html?layout=split')
         eq('webauthn: after the phone, the waiting hint tells to point the phone at the QR code', pg.evaluate(READ)['hint'], HINT_PHONE)

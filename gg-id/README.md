@@ -10,7 +10,8 @@
 | Файл | Что внутри |
 |---|---|
 | `gg-id.css` | токены (светлая и тёмная тема), раскладки `split`, `card`, `minimal`, все компоненты |
-| `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи входа по ключу (Face ID; Touch ID, Windows Hello и «отпечаток» только при подтверждённом ключе этого браузера) и память браузера про ключ |
+| `gg-id-stage.css` | **сцена экрана входа**: добавочный файл ПОСЛЕ `gg-id.css` на каждой странице раскладки `split`, чтобы верх карточки, подвал, фон и левая панель стояли на одних местах в любом сервисе и в любом виде (раздел «Сцена экрана входа»). Контракт хаба, ворот и сервисов: копия байт в байт, sha256 `451ecc72…ffbf0` |
+| `gg-id.js` | без зависимостей и без сети: глаз пароля, только рабочая почта, правила нового пароля, ячейки кода, обратный отсчёт, подписи входа по ключу (Face ID / Touch ID; Windows Hello и «отпечаток» только при подтверждённом ключе этого браузера) и память браузера про ключ |
 | `fonts/` | Montserrat v31 (переменный, 400-700) самохостом: кириллица, латиница и `latin-ext` (латиница с диакритикой и знаки валют, в том числе ₽; sha256 `920711de…0082`, грузится, только если на странице есть такие знаки) |
 | `gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 своего origin (раздел «Поведение в сервисе») |
 | `account-menu/` | **меню аккаунта сервиса** (`GGAccountMenu`): чип с инициалами и карточка со значком Add to Apple Wallet, «Мои сервисы» (список сервисов человека, переход в любой одним нажатием), «Профиль GG ID», свои пункты сервиса, «Выйти». Один вид во всех сервисах, как у АКБ: `gg-account-menu.js`, `gg-account-menu.css` (генерируется из `gg-id.css`), `demo.html`, подробности и сниппеты для Jinja, React и статики в `account-menu/README.md` |
@@ -21,13 +22,15 @@
 | `email/gg-logo-navy-2x.png` | navy-логотип для писем на светлом фоне (302 x 76), генерируется `src/rasterize_gg_id_email.py` |
 | `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-10.1`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-10.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
-Хаб копирует `gg-id.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`.
+Хаб копирует `gg-id.css`, `gg-id-stage.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-stage.css` для экранов входа, `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`.
 
 ## Каркас страницы
 
 ```html
+<link rel="stylesheet" href="/assets/gg-id/gg-id.css">
+<link rel="stylesheet" href="/assets/gg-id/gg-id-stage.css">   <!-- сцена: ПОСЛЕ gg-id.css, только для split (раздел «Сцена экрана входа») -->
 <body class="gid-body">
 <div class="gid" data-layout="split">            <!-- split (рекомендую) | card | minimal; data-theme="dark" только чтобы зафиксировать тему, иначе по системе -->
   <div class="gid-frame">
@@ -39,7 +42,8 @@
         <p class="gid-sub">...</p>
         ...
       </section>
-      <footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span></footer>
+      <!-- подвал обязателен и в две строки: подпись и ссылка на инструкцию (иконка gi-book-open из спрайта), он прижат к низу окна -->
+      <footer class="gid-foot"><span><b>GG ID</b> · единый вход Global Generation</span><a class="gid-link gid-link--muted gid-link--sm" href="https://id.global-generations-edu.com/instructions/" target="_blank" rel="noopener"><svg class="gid-ic" aria-hidden="true"><use href="#gi-book-open"/></svg>Как войти: инструкция</a></footer>
     </main>
   </div>
 </div>
@@ -50,11 +54,58 @@
 
 Раскладки переключаются только атрибутом, разметка одна. Ширину кит меряет container queries, поэтому тот же экран правильно ложится и во всё окно, и в модальное окно сервиса.
 
+## Сцена экрана входа
+
+Файл `gg-id-stage.css` (6811 байт, sha256 `451ecc726041580570e0d11c6951c271519ae734fddeeee44d650044e65ffbf0`) задаёт одну геометрию экрана входа для хаба, ворот и всех сервисов GG. Человек, который нажимает между входом сервиса и входом хаба (`id.global-generations-edu.com/login.html`), не видит, как двигаются карточка, фон или левая панель. Поводом была жалоба Лёва 10.10: «после первого клика экран меняется, фон и геометрия ломаются».
+
+**Что было.** Кит центрирует карточку по высоте её нынешнего вида (`margin-block:auto`) и въезжает ею заново на каждом шаге. Высота вида у каждого сервиса своя (вход хаба 445 px, у Консультаций 239 px, выбор из двух кнопок 260 px), поэтому на компьютере заголовок стоял на 105-146 px ниже, чем на входе хаба, и прыгал на 100-250 px при каждом нажатии. На экранах кита (`login`, `password`, `forgot`, `error`, `noaccess`) заголовок расходился между собой на 164 px.
+
+**Что делает файл.** Только в раскладке `split` и только на компьютере (контейнер кита от 960 px):
+
+- заголовок стоит на `y = max(28 px, (высота окна - 560 px) / 2)`: верх карточки зависит от высоты окна, а не от вида и сервиса. Вид меняет содержимое карточки на месте и растёт вниз, ничего не двигая;
+- карточка шириной 384 px с отступом снизу 28 px (`margin-block:0 28px`), подвал прижат к низу окна (`margin-top:auto`);
+- у карточки нет анимации. Один раз при открытии страницы плавно появляется вся правая колонка (`.gid-main`, 0,3 с, при «меньше движения» без анимации);
+- от 975 px (контейнер кита 960 px плюс 15 px полосы прокрутки) `html` получает `scrollbar-gutter:stable` и фон `#ffffff` (в тёмной теме `#0a1f2c`): место под полосу занято всегда, поэтому левая панель не сужается, когда вид выше окна и полоса появляется;
+- подсказка «Нужна рабочая почта» вынесена из потока в строку подписи поля (`.gid-label-row > .gid-hint`). Кит показывает её по blur поля, то есть между нажатием и отпусканием кнопки «Войти», и любая перемена высоты формы в этот момент уводит кнопку из-под курсора: клик пропадал.
+
+Телефон и планшет (контейнер уже 960 px) кит и так закрепляет сверху (панель строкой 390 x 90, карточка под ней): там у всех страниц одно место, файл меняет только анимацию.
+
+**Числа контракта.** Замер входа хаба, headless Chromium, допуск 1 px. На Windows, Linux и Маке с мышью от 975 px полоса занимает 15 px, ширины считаются без неё.
+
+| Окно | Заголовок, y | Карточка, x и ширина | Левая панель, ширина | Первая строка подвала, y |
+|---|---|---|---|---|
+| 1440 x 900 | 170 | 901.84 и 384 | 747.69 | 825.75 |
+| 1280 x 720 | 80 | 780.30 и 384 | 664.61 | 645.75 |
+| 1920 x 1080 | 260 | 1266.45 и 384 | 996.92 | 1005.75 |
+| 390 x 844 | 110 | 16 и 358 | полоса 390 x 90 | 773.75 |
+
+После раскрытия «Резервного входа» или смены вида заголовок, карточка по x и панель сдвигаются на 0 px.
+
+**Тест на Linux.** Числа таблицы сняты на Маке, где полоса прокрутки headless Chromium не занимает места. Headless Chromium на Linux (раннер CI на Ubuntu) резервирует 15 px `scrollbar-gutter:stable` от 975 px и не показывает их в `html.clientWidth`: на 1440 x 900 там карточка стоит на 890,44, а панель 739,89 вместо 901,84 и 747,69. Ширины в тесте считайте от ширины раскладки (ширина `.gid`, `W`): панель = `W x 1,08 / 2,08`, карточка по x = панель + (`W` - панель - 384) / 2 (`expected()` в `src/check_gg_id_stage.py`). Заголовок, подвал, высоты и телефон от этого не зависят.
+
+**Как подключить.** Файл идёт ПОСЛЕ `gg-id.css` на каждой странице раскладки `split`: вход, step-up, отказ, ошибка (`<link rel="stylesheet" href="/assets/gg-id/gg-id-stage.css">`). Если страница собирается одной строкой HTML, текст файла вшивается как есть в `<style>` сразу после CSS кита. В сервисе лежит копия БАЙТ В БАЙТ, её sha256 сверяет тест сервиса; руками копию не править. Закреплённые копии `gg-id.css`, `gg-id-login.css` и `gg-id-kit.css` у сервисов не нужно ни править, ни обновлять: сцена добавочный файл, зависимости между репо нет, а версию кита `2026-10-10.2` сервис перенимает при очередном обновлении.
+
+**Требования к разметке** (так устроены `screens/*.html`):
+
+- `<div class="gid" data-layout="split"> > .gid-frame > aside.gid-aside + main.gid-main > (section.gid-card + footer.gid-foot)`. Карточка и подвал ПРЯМЫЕ дети `.gid-main`: правила сцены записаны через `>`.
+- Подвал обязателен и в две строки: «GG ID · единый вход Global Generation» и ссылка «Как войти: инструкция» на `https://id.global-generations-edu.com/instructions/` (`target="_blank" rel="noopener"`, иконка книги `gi-book-open`). Подвал в одну строку стоит на 33,5 px ниже, чем у хаба.
+- Своих `margin-block:auto` и `animation` у `.gid-card`, своего `padding-top` у `.gid-main` и своих `html{background}` и `scrollbar-gutter` на странице входа нет: файл их выключает, а лишнее правило снова сдвинет карточку.
+- Подсказка про рабочую почту лежит в `.gid-label-row` вместе с подписью поля, а не под полем.
+- Все виды одного сервиса (вход, step-up, отказ, ошибка, «нет доступа») лежат в одной карточке и меняют содержимое на месте. Страницы отказа и ошибки на старой коже переводятся на раскладку кита и сцену.
+
+**Зачем `:has`.** В Vite и Next кит подключён на весь бандл: CSS экрана входа остаётся в приложении и после входа. Правило на `html` без условия оставило бы там `scrollbar-gutter:stable` и белый фон. Правила `html:has(.gid[data-layout="split"])` включаются и выключаются вместе с экраном входа. Цвет `html` следует системной теме (`prefers-color-scheme`), а не `data-theme` на `.gid`: принудительная тёмная тема нужна макетам и витрине, там `html` не красится (витрина выключает правило сама).
+
+**Потребители.** Хаб GG ID (login, forgot, set-password, no-access), ворота (страницы sso-gate: PIN, нет доступа, выбор входа, недоступен) и сервисы GG со входом через GG ID: АКБ, Кабинет ментора, Консультации, Найм, Merch, Notetaker, Телесуфлёр, Production, Видеофабрика, SAT, IELTS, Reporter, Publisher, Юротдел. После мержа кита копию берут отсюда (`gg-id/gg-id-stage.css`, хэш тот же), хаб удаляет свой `stage.css` и читает этот файл через `sync-gg-id.sh`.
+
+**Менять сцену** можно только новым файлом: новый sha256 в `src/build_gg_id.py` (`STAGE_SHA256`), в `src/check_gg_id_stage.py` и в этом разделе, новая версия кита и PR во все копии.
+
+**Проверка.** `python3 src/check_gg_id_stage.py` (без браузера, идёт в CI): файл и sha256, порядок подключения на каждой странице, подвал со ссылкой, нет чужих правил у `.gid-card`. `uv run --with playwright python src/check_gg_id_stage.py --browser` (идёт в CI и входит в `check_gg_id.py`): на экранах `login`, `password`, `forgot`, `error`, `noaccess` в четырёх окнах контракта заголовок стоит по формуле и не двигается между экранами, карточка, панель и подвал на числах таблицы, `html` красится только пока на странице есть экран входа.
+
 ## Разметка поведения
 
 | Атрибут | Что делает |
 |---|---|
-| `data-gid-passkey="login\|enroll\|enroll-lead\|wait"` | подпись кнопки входа по ключу по памяти браузера (раздел «Вход по ключу» ниже). `login`: «Войти с Face ID» (на Android «Войти по ключу доступа»), а «Войти с Touch ID», «Войти с Windows Hello», «Войти по отпечатку» только если в этом браузере уже входили своим ключом. `wait`: «Ждём подтверждения». `enroll` и `enroll-lead` (начало подзаголовка: «Подключите Touch ID, и вход займёт секунду.»): способ устройства, экран показывать только после `GGPasskey.platformAvailable()` |
+| `data-gid-passkey="login\|enroll\|enroll-lead\|wait"` | подпись кнопки входа по ключу по памяти браузера (раздел «Вход по ключу» ниже). `login`: «Войти с Face ID / Touch ID» (на Android «Войти по ключу доступа»), а «Войти с Windows Hello», «Войти по отпечатку» только если в этом браузере уже входили своим ключом. `wait`: «Ждём подтверждения». `enroll` и `enroll-lead` (начало подзаголовка: «Подключите Face ID / Touch ID, и вход займёт секунду.»): способ устройства, экран показывать только после `GGPasskey.platformAvailable()` |
 | `data-gid-passkey-icon` на `<svg>` | значок к подписи в той же кнопке: лицо, отпечаток или ключ (путь к спрайту в `href` сохраняется) |
 | `data-gid-passkey-hint` | подсказка под заголовком, пока открыто окно браузера (три текста по памяти браузера) |
 | `data-gid-eye` | кнопка «показать пароль» в `.gid-input-wrap` |
@@ -68,7 +119,7 @@ JS: `GGID.busy(btn, true, 'Входим')` и `GGID.busy(btn, false)` (кноп�
 
 ### Вход по ключу: подписи и память браузера
 
-Правило 09.10.2026 (полностью: `HANDOFF-AUTH.md`, раздел 6.1). «Touch ID», «Windows Hello», «отпечаток» и «палец» кит говорит, только когда в ЭТОМ браузере уже входили ключом самого устройства: у MacBook есть датчик Touch ID, а ключ GG ID может лежать только в iPhone, и тогда Chrome на маке показывает один QR-код телефона. Иначе кнопка зовёт Face ID, пока ждём «Ждём подтверждения», а подсказка называет оба пути. Память живёт в `localStorage` (`gg-id-local-key`, `gg-id-last-method`, `gg-id-local-miss`, `gg-id-enroll-skip`); имена общие со страницей входа хаба и страницами подтверждения Face ID для админов (Infra-AWS и её порт Infra-Auth), переименовать можно только во всех местах сразу. `GGID.init` подписывает размеченные элементы сам, страница лишь сообщает киту, чем закончился вход:
+Правила 09.10.2026 и 10.10.2026 (полностью: `HANDOFF-AUTH.md`, раздел 6.1). Датчик Apple кит всегда называет одной парой «Face ID / Touch ID», со слэшем (Лёв 10.10: «Face ID это не всегда Face ID, иногда Touch ID», «пиши всегда слеш»), одиноких «Face ID» и «Touch ID» нет нигде, ключ называем «passkey». «Windows Hello», «отпечаток» и «палец» кит говорит, только когда в ЭТОМ браузере уже входили ключом самого устройства: у MacBook есть датчик, а ключ GG ID может лежать только в iPhone, и тогда Chrome на маке показывает один QR-код телефона. Иначе кнопка зовёт «Face ID / Touch ID», пока ждём «Ждём подтверждения», а подсказка называет оба пути. Память живёт в `localStorage` (`gg-id-local-key`, `gg-id-last-method`, `gg-id-local-miss`, `gg-id-enroll-skip`); имена общие со страницей входа хаба и страницами подтверждения Face ID / Touch ID для админов (Infra-AWS и её порт Infra-Auth), переименовать можно только во всех местах сразу. `GGID.init` подписывает размеченные элементы сам, страница лишь сообщает киту, чем закончился вход:
 
 ```js
 GGID.passkeyWatch()                 // один раз при загрузке: читает authenticatorAttachment из ответов navigator.credentials.get и create (запрос и ответ идут как шли)
@@ -88,8 +139,8 @@ GGID.passkeyText('login|enroll|enroll-lead|wait'), GGID.passkeyIcon('login|enrol
 Логика как в текущем `login.html` хаба, меняется только вид:
 
 1. `GET /api/auth/capabilities`: `password_reset` показывает «Забыли пароль?». Входа через Aura на экранах GG ID нет (`aura_login` экраны не читают).
-2. `GGPasskey.platformAvailable()` и `GGPasskey.enabled()`: если ключ есть, первый экран `login` (Face ID главной кнопкой); если нет, сразу `password`.
-3. Face ID: `GGID.busy(btn, true)` и состояние `passkey` (подпись `GGID.passkeyText('wait')`, подсказка `GGID.passkeyHint()`), затем `GGPasskey.login()`. Удалось: `GGID.passkeyRemember(GGID.passkeySeen())`. `NotAllowedError` (человек отменил) = тихо назад, без ошибки (и `GGID.passkeyMissed(e)`). Другая ошибка = «Face ID не сработал, войдите по паролю» и экран `password`.
+2. `GGPasskey.platformAvailable()` и `GGPasskey.enabled()`: если ключ есть, первый экран `login` (Face ID / Touch ID главной кнопкой); если нет, сразу `password`.
+3. Face ID / Touch ID: `GGID.busy(btn, true)` и состояние `passkey` (подпись `GGID.passkeyText('wait')`, подсказка `GGID.passkeyHint()`), затем `GGPasskey.login()`. Удалось: `GGID.passkeyRemember(GGID.passkeySeen())`. `NotAllowedError` (человек отменил) = тихо назад, без ошибки (и `GGID.passkeyMissed(e)`). Другая ошибка = «Face ID / Touch ID не сработал, войдите по паролю» и экран `password`.
 4. Пароль: `POST /api/auth/login`. 401 = «Неверная почта или пароль. Проверьте раскладку и Caps Lock.», 429 = «Слишком много попыток, подождите минуту», сеть = «Сеть недоступна». Поле пароля очистить, фокус в него.
 5. Успех: экран `done` (сборка знака) и `location.replace(next)`. После входа по паролю на устройстве без ключа сначала `enroll` (`GGPasskey.register()`, затем `GGID.passkeyCreated()`), «Не сейчас» (`GGID.passkeySnooze()`) идёт дальше. Тот же экран после входа с телефона (`passkeySeen()` = `cross-platform`), если своего ключа в этом браузере нет (`!passkeyMemory().local`), браузер умеет свой (`platformAvailable()`) и неделю не отказывались (`!passkeyMemory().snoozed`).
 6. `next` проверять как сейчас: только тот же origin, не `/login.html`.
@@ -99,13 +150,13 @@ GGID.passkeyText('login|enroll|enroll-lead|wait'), GGID.passkeyIcon('login|enrol
 
 | Экран | Файл | Когда | Хаб |
 |---|---|---|---|
-| Вход | `screens/login.html` | Первый экран. Главная кнопка Face ID, если на устройстве есть ключ входа; если нет, сразу экран пароля. Touch ID, Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере. | `GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()` |
-| По паролю | `screens/password.html` | Почта и пароль. После входа без ключа на устройстве предлагаем подключить Face ID. | `POST /api/auth/login` |
+| Вход | `screens/login.html` | Первый экран. Главная кнопка Face ID / Touch ID, если на устройстве есть passkey; если нет, сразу экран пароля. Windows Hello и «отпечаток» в подписи только после входа своим ключом в этом браузере. | `GET /api/auth/capabilities, GGPasskey.enabled(), GGPasskey.login()` |
+| По паролю | `screens/password.html` | Почта и пароль. После входа без passkey на устройстве предлагаем подключить Face ID / Touch ID. | `POST /api/auth/login` |
 | Ошибка | `screens/error.html` | 401: неверная почта или пароль, поля трясутся, пароль очищается. 429: «Слишком много попыток, подождите минуту». Сеть: «Сеть недоступна». | `POST /api/auth/login: 401, 429` |
-| Face ID | `screens/passkey.html` | Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки. | `GGPasskey.login()` |
+| Face ID / Touch ID | `screens/passkey.html` | Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки. | `GGPasskey.login()` |
 | Готово | `screens/done.html` | Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда. | `GET /api/auth/me, переход на next` |
 | Продолжить как | `screens/continue.html` | Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт. | `GET /api/auth/authorize` |
-| Подключить Face ID | `screens/enroll.html` | После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю. | `GGPasskey.register()` |
+| Подключить Face ID / Touch ID | `screens/enroll.html` | После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. Совет: после «Не сейчас» не спрашивать на этом устройстве неделю. | `GGPasskey.register()` |
 | Забыли пароль | `screens/forgot.html` | Восстановление по рабочей почте. | `POST /api/auth/forgot` |
 | Письмо отправлено | `screens/sent.html` | Ответ одинаковый, есть такая почта в GG ID или нет: так нельзя проверить, кто в команде. | `POST /api/auth/forgot: 200` |
 | Новый пароль | `screens/setpass.html` | Ссылка из приглашения или восстановления (#token=). Приглашение: «Добро пожаловать в команду», восстановление: «Новый пароль». Правила как на сервере. | `POST /api/auth/set-password/check, POST /api/auth/set-password` |
@@ -222,7 +273,7 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-10.1' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-10.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
@@ -249,7 +300,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 - Карта светлая в обеих темах, как настоящая; тема меняет только тень (`--g-idc-shadow`). Перелив только в голубых и серебряных тонах.
 - Размер: `width: 100%`, `max-width: var(--gid-idcard-w, 460px)`, высота не меньше ширины x 54 / 85,6 (пропорции настоящей карты 85,6 x 54 мм). На телефоне во всю ширину контейнера. Если данных больше (длинное имя, три длинные должности, длинная почта на узкой карте), карта растёт вниз, ничего не обрезается.
 - Пропорцию держит распорка `.gid-idcard::before`, а не `aspect-ratio`: во flex- и grid-родителях `aspect-ratio` не даёт карте вырасти, и текст вылезает. В flex-ряду с `align-items: stretch` карточка тянется на высоту ряда: поставить ей `align-self: flex-start`.
-- Один акцент: голубая точка статуса «Активен» (в строке под почтой, рядом «Face ID подключён»). Больше на карточке ничего не подсвечиваем.
+- Один акцент: голубая точка статуса «Активен» (в строке под почтой, рядом «Face ID / Touch ID подключён»). Больше на карточке ничего не подсвечиваем.
 - Та же карта висит героем на панели сплита (раздел «Экран входа: панель с картой»).
 - Ставится внутри `.gid` или `.gid-kit` (оттуда шрифт и токены). Над заголовком экрана карточку не ставим: сначала заголовок, потом карточка.
 
@@ -277,7 +328,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
     <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
     <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
     <p class="gid-idcard-mail" data-gid-field="email">ivan.<wbr>obraztsov<wbr><span>@global-generations.com</span></p>
-    <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID подключён</span></p>
+    <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID / Touch ID подключён</span></p>
   </div>
   <div class="gid-idcard-facts">
     <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
@@ -325,7 +376,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 | Номер GG ID | `id` | строка, цифры моноширинные (`tabular-nums`) | до 14 символов; формат решает хаб, пример `GG 0042-7F3A` | новое поле `gg_id` |
 | В команде с | `since` | «марта 2024» (месяц в родительном падеже и год) | `YYYY-MM` или готовая строка | новое поле: месяц прихода в команду. `users.created_at` не подходит: аккаунты заведены при переезде на GG ID |
 | Статус | `status` | «Активен» с голубой точкой; `data-status="disabled"` = «Отключён», точка серая | `active` или `disabled` | `users.status` |
-| Face ID | `passkey` | «Face ID подключён» со значком `gi-scan-face` | только если у аккаунта есть ключ входа, иначе `hidden` | `GGPasskey.list()` не пустой (или число ключей в `/api/auth/me`) |
+| Face ID / Touch ID | `passkey` | «Face ID / Touch ID подключён» со значком `gi-scan-face` | только если у аккаунта есть ключ входа, иначе `hidden` | `GGPasskey.list()` не пустой (или число ключей в `/api/auth/me`) |
 
 Данные для `GGID.card(el, data)`:
 
@@ -337,7 +388,7 @@ GGID.card(document.querySelector('.gid-idcard'), {
   id: 'GG 0042-7F3A',                               // до 14 символов
   since: '2024-03',                                 // или готовая строка «марта 2024»
   status: 'active',                                 // active | disabled
-  passkey: true                                     // Face ID подключён
+  passkey: true                                     // Face ID / Touch ID подключён
 });
 ```
 
@@ -366,7 +417,9 @@ GGID.card(document.querySelector('.gid-idcard'), {
 - Иконка GG ID = белый ключ на светлом градиенте `--grad-tile` (`assets/favicons/gg-id.svg`): в кнопке «Войти через GG ID», в окне «Сессия истекла» и в фавиконе экранов GG ID. Тёмных градиентных плиток нет (правило 4a).
 - Над заголовком ничего: ни замка, ни значка, ни плашки (правило 07.10). Заголовок называет сервис: «Вход в АКБ». Названия сервисов пишем так, чтобы не склонять («сервис «Пульс»»).
 - Подпись «логотип | ID»: логотип один, одного цвета (navy на светлом, белый на тёмном), высота 28 px (ширина не меньше 110 px).
-- Одно главное действие на экране.
+- Одно главное действие на экране. Подпись главной кнопки стоит в одну строку: самая длинная, «Подключить Face ID / Touch ID» (247 px кеглем 15), со стрелкой входит в колонку от 355 px; в более узкой (iPhone 375, раскладка «Карточка») кегль 14 px, ниже 340 px стрелки нет. Новая длинная подпись проверяется `check_gg_id.py` (окна 360 и 375, раскладка «Карточка»).
+- Сцена экрана входа (`gg-id-stage.css`): заголовок на одной высоте на каждом экране каждого сервиса, подвал со ссылкой «Как войти: инструкция» (раздел «Сцена экрана входа»). Своих отступов, центровки и анимации карточки на странице входа нет.
+- Вход по ключу пишем «Face ID / Touch ID», всегда со слэшем (Лёв 10.10), ключ называем «passkey». Одиноких «Face ID» и «Touch ID» нет; «Windows Hello» и «отпечаток» только при подтверждённом ключе устройства (`HANDOFF-AUTH.md`, 6.1). Сборка не пускает одиночные слова в разметку экранов.
 - Только GG: ни логотипа, ни ссылки «Войти через Aura» на экранах GG ID (Aura и GG раздельно, решение Лёва 08.10).
 - Только рабочая почта @global-generations.com. Восстановление отвечает одинаково, есть почта в GG ID или нет.
 - Тексты: без длинных тире и эмодзи, «ментор», «Джи-джи». Команде чётко и спокойно, ошибки без кодов.
@@ -382,6 +435,8 @@ GGID.card(document.querySelector('.gid-idcard'), {
 python3 src/build_gg_id.py                                  # gg-id.html, gg-id/screens/*.html, gg-id/fonts/*, проверка email-card.html
 uv run --with playwright python src/check_gg_id.py          # все экраны x 3 раскладки x 2 темы x 1440/390 px, карточка, письмо, витрина, подписи входа по ключу
 uv run --with playwright python src/check_gg_id_passkey.py  # только подписи входа по ключу и память браузера (около 15 секунд, входит в полный прогон)
+python3 src/check_gg_id_stage.py                            # сцена без браузера: файл, sha256, порядок подключения, подвал со ссылкой (идёт в CI)
+uv run --with playwright python src/check_gg_id_stage.py --browser  # сцена в браузере: заголовок по формуле и неподвижен между экранами в 4 окнах контракта (идёт в CI и в check_gg_id.py)
 uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась подпись: email/gg-id-lockup-2x.png
 python3 src/build_account_menu.py                           # account-menu/gg-account-menu.css из gg-id.css и src/account_menu/local.css (--check: только сверить)
 uv run --with playwright python src/check_account_menu.py   # меню аккаунта: вид против разметки АКБ, клавиатура, список сервисов с настоящим CORS, безопасность, 390 px

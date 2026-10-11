@@ -1,6 +1,7 @@
 name: gg-id kit
 
-# Кит GG ID (gg-id/): сборка в ногу с исходниками и проверка меню аккаунта (GGAccountMenu) в настоящем браузере на каждый pull request.
+# Кит GG ID (gg-id/): сборка в ногу с исходниками, сцена экрана входа (gg-id-stage.css: файл, sha256, порядок подключения, подвал со ссылкой, заголовок на одной высоте
+# в четырёх окнах контракта) и проверка меню аккаунта (GGAccountMenu) в настоящем браузере на каждый pull request.
 # Полная проверка экранов входа (src/check_gg_id.py) долгая и гоняется руками перед PR (gg-id/README.md, раздел «Пересобрать и проверить»).
 
 on:
@@ -35,7 +36,11 @@ jobs:
           python3 src/build_gg_id.py
           python3 src/build_account_menu.py
           git diff --exit-code
+      - name: scene of the sign-in screen, static (file, sha256, order of the links, footer with the instruction link)
+        run: python3 src/check_gg_id_stage.py
       - name: browser
         run: uv run --with playwright python -m playwright install --with-deps chromium
+      - name: scene of the sign-in screen, four windows of the contract (title y, card, panel, footer; no jump between the screens)
+        run: uv run --with playwright python src/check_gg_id_stage.py --browser
       - name: account menu check
         run: uv run --with playwright python src/check_account_menu.py

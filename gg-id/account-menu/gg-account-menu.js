@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-10.1 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-10.2 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -31,7 +31,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-10.1';
+  var VERSION = '2026-10-10.2';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),

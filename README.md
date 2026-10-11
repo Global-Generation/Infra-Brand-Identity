@@ -33,6 +33,7 @@
 - `favicons-client-site.html`, `favicons-v3.html` - история выбора.
 - `favicons-final.html` - **итог 07.10.2026**: клиентские = фавикон сайта на своём синем фоне, внутренние = светлый фон анкеты и крупная иконка. Страница рисует файлы из `assets/favicons`.
 - `gg-id.html` - **GG ID, единый вход** (08.10.2026): 17 экранов входа хаба, три раскладки, светлая и тёмная тема, кнопка «Войти через GG ID», аккаунт в шапке, «сессия истекла», **карточка GG ID** (как студенческий ID: кабинет, онбординг, инструкция, письмо `gg-id/email-card.html`). Кит и правила подключения: `gg-id/README.md`.
+- `gg-id/gg-id-stage.css` - **сцена экрана входа** (10.10.2026): один добавочный файл после `gg-id.css`, из-за которого вход любого сервиса и вход хаба стоят на одних местах (заголовок на `max(28 px, (высота окна - 560 px) / 2)`, подвал внизу окна со ссылкой «Как войти: инструкция») и не прыгают между видами. Контракт хаба, ворот и сервисов, копия байт в байт: `gg-id/README.md`, раздел «Сцена экрана входа».
 - `gg-id/account-menu/` - **меню аккаунта сервиса** (10.10.2026): `GGAccountMenu`, чип с инициалами и белая карточка (значок Add to Apple Wallet, «Мои сервисы» раскрывается списком сервисов человека, «Профиль GG ID», пункты сервиса, «Выйти»). Один вид во всех сервисах команды, как у АКБ. Демо `gg-id/account-menu/demo.html`, правила и сниппеты для Jinja, React и статики `gg-id/account-menu/README.md`.
 - `assets/` - готовые файлы: бери отсюда, не рисуй заново.
 
@@ -70,6 +71,8 @@ uv run --with fonttools --with brotli python src/build_favicon_variants.py --app
 uv run --with playwright python src/rasterize_favicons.py                                  # png/*-180.png, ico/*.ico
 python3 src/build_gg_id.py                                  # GG ID: gg-id.html, gg-id/screens, gg-id/fonts
 uv run --with playwright python src/check_gg_id.py          # GG ID: все экраны x раскладки x темы x 1440/390
+python3 src/check_gg_id_stage.py                            # GG ID: сцена входа без браузера (файл, sha256, порядок подключения, подвал), идёт в CI
+uv run --with playwright python src/check_gg_id_stage.py --browser   # GG ID: сцена в четырёх окнах (заголовок не двигается между экранами), идёт в CI
 ```
 
 Правки дизайна - в `src/template.html`, потом сборка и `check.py`. Новый сервис: строка в `SERVICES` в `src/build_favicon_variants.py` (контур + пиктограмма в `pictogram()`), строка в `SERVICES` внутри `template.html` и в `manifest.json`, затем две команды фавиконов выше и `build.py`.
