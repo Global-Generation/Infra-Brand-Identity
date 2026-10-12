@@ -5,5 +5,5 @@
   {"label": "Next.js", "message": "16", "color": "000000", "logo": "nextdotjs"},
   {"label": "PostgreSQL", "message": "SQLAlchemy 2", "color": "4169E1", "logo": "postgresql"},
   {"label": "Docker", "message": "Compose", "color": "2496ED", "logo": "docker"},
-  {"label": "Prod", "message": "legal.global-generations-edu.com", "color": "13445d", "href": "https://legal.global-generations-edu.com/legal"}
+  {"label": "Prod", "message": "id.global-generations-edu.com/admin/legal", "color": "13445d", "href": "https://id.global-generations-edu.com/admin/legal/"}
  ]}
