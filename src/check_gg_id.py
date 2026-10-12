@@ -5,7 +5,7 @@ Fails on horizontal scroll, elements sticking out of the screen, missing Montser
 for the card also on text outside the card padding, wrong proportions, more than one accent, proportional digits;
 for the e-mail card on low contrast in light, dark (Apple Mail) and inverted (Gmail on iPhone) modes.
 Layout everywhere (screens and every component of the showcase at 1440, 1024 and 390, both themes): every element inside
-its component card, no cut content, no overlapping siblings, avatars with white centred initials, one-line button labels.
+its component card, no cut content, no overlapping siblings, avatars centred on a light fill with legible navy initials, one-line button labels.
 gg-id-service.js: account menu (mouse, keyboard, Esc, click outside), «Сессия истекла» (401, focus trap, Esc, backdrop).
 QA 08.10: screens in the split layout at 360, 375, 768, 1024 px and at 200 % zoom; short windows down to 400 px tall and the 320 px phone
 (the card on the panel never overlaps the logo or the text, is never clipped, never narrower than 240 px, long data stays inside);
@@ -171,7 +171,7 @@ def email_page(values):
 
 
 # Layout of every component: each element inside its component card (unless an ancestor clips or scrolls it on purpose),
-# no content cut by overflow:hidden, no overlapping in-flow siblings, avatars with white centred initials, one-line buttons.
+# no content cut by overflow:hidden, no overlapping in-flow siblings, avatars centred on a light fill with legible navy initials, one-line buttons.
 LAYOUT = r'''async (sel) => {
   await document.fonts.ready;
   const name = e => {
@@ -231,17 +231,6 @@ LAYOUT = r'''async (sel) => {
       }
     });
   });
-  document.querySelectorAll('.gid-avatar').forEach(a => {
-    if (!a.getClientRects().length) return;
-    const s = getComputedStyle(a), r = a.getBoundingClientRect();
-    if (!r.width) return;
-    const t = [...a.childNodes].find(n => n.nodeType === 3 && n.nodeValue.trim());
-    let dx = 0, dy = 0;
-    if (t) { const rg = document.createRange(); rg.selectNodeContents(t); const q = rg.getBoundingClientRect();
-      dx = (q.left + q.right) / 2 - (r.left + r.right) / 2; dy = (q.top + q.bottom) / 2 - (r.top + r.bottom) / 2; }
-    if (!/grid/.test(s.display) || s.color !== 'rgb(255, 255, 255)' || Math.abs(dx) > 1.5 || Math.abs(dy) > 2 || parseFloat(s.fontSize) < 10.5)
-      add('avatars', name(a.parentElement) + ' > avatar ' + txt(a) + ': display ' + s.display + ', color ' + s.color + ', font ' + s.fontSize + ', off ' + dx.toFixed(1) + ',' + dy.toFixed(1));
-  });
   // кнопки: подпись контрастная (от 4,5 к фону под кнопкой, полупрозрачные слои и градиенты учтены), высота от 44 px
   const parseC = v => { const m = v && v.match(/rgba?\(([^)]+)\)/); if (!m) return null; const q = m[1].split(',').map(Number); return {r: q[0], g: q[1], b: q[2], a: q.length > 3 ? q[3] : 1}; };
   const lum = c => { const f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }; return .2126 * f(c.r) + .7152 * f(c.g) + .0722 * f(c.b); };
@@ -257,6 +246,24 @@ LAYOUT = r'''async (sel) => {
     }
     return {layers, bases: [{r: 255, g: 255, b: 255, a: 1}]};
   };
+  // аватар (12.10, Лёв про тёмную градиентную заливку: «так не должно быть»): инициалы по центру круга, заливка светлая (каждая опорная точка градиента не темнее 0,30 по яркости:
+  // у кита от 0,45), буквы от 4,5 к каждой точке заливки (у кита от 6,7)
+  document.querySelectorAll('.gid-avatar').forEach(a => {
+    if (!a.getClientRects().length) return;
+    const s = getComputedStyle(a), r = a.getBoundingClientRect();
+    if (!r.width) return;
+    const t = [...a.childNodes].find(n => n.nodeType === 3 && n.nodeValue.trim());
+    let dx = 0, dy = 0;
+    if (t) { const rg = document.createRange(); rg.selectNodeContents(t); const q = rg.getBoundingClientRect();
+      dx = (q.left + q.right) / 2 - (r.left + r.right) / 2; dy = (q.top + q.bottom) / 2 - (r.top + r.bottom) / 2; }
+    const stops = (s.backgroundImage.match(/rgba?\([^)]+\)/g) || []).map(parseC).filter(x => x && x.a >= .99);
+    if (!stops.length) { const c = parseC(s.backgroundColor); if (c && c.a >= .99) stops.push(c); }
+    const ink = parseC(s.color);
+    const worst = stops.length && ink ? Math.min(...stops.map(c => ratio(ink, c))) : 0;
+    const darkest = stops.length ? Math.min(...stops.map(lum)) : 0;
+    if (!/grid/.test(s.display) || !stops.length || darkest < .30 || worst < 4.5 || Math.abs(dx) > 1.5 || Math.abs(dy) > 2 || parseFloat(s.fontSize) < 10.5)
+      add('avatars', name(a.parentElement) + ' > avatar ' + txt(a) + ': display ' + s.display + ', fill ' + (stops.length ? 'darkest ' + darkest.toFixed(2) : 'none') + ', color ' + s.color + ' (' + worst.toFixed(2) + ':1), font ' + s.fontSize + ', off ' + dx.toFixed(1) + ',' + dy.toFixed(1));
+  });
   document.querySelectorAll('.gid-sso, .gid-btn').forEach(b => {
     if (!b.getClientRects().length || b.disabled || b.closest('[aria-hidden="true"]')) return;
     const br = b.getBoundingClientRect();
@@ -291,7 +298,7 @@ SHOWCASE_BOXES = ('.sc-top, .sc-hero, .sc-bar, .sc-seg, .sc-sel, .sc-tabs, .sc-b
 def layout_issues(label, r):
     found = []
     for k, what in (('outside', 'sticks out of its card'), ('cut', 'content cut by overflow'), ('overlap', 'overlapping siblings'),
-                    ('avatars', 'avatar initials not white and centred'), ('wrapped', 'button label on two lines'),
+                    ('avatars', 'avatar: dark fill, initials below 4.5:1 or not centred'), ('wrapped', 'button label on two lines'),
                     ('contrast', 'button label contrast below 4.5'), ('small', 'button lower than 44 px')):
         if r[k]:
             found.append(f'{label}: {what} {r[k][:4]}')

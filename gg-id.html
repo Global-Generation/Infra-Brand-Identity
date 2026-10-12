@@ -7,7 +7,7 @@
 <title>GG ID</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22sg%22%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2232%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%3Cstop%20stop-color%3D%22%238FBADD%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%234B8FD6%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214.8%22%20fill%3D%22url%28%23sg%29%22%2F%3E%3Cg%20transform%3D%22translate%2810.00%2010.00%29%20scale%280.6875%29%22%3E%3Cpath%20d%3D%22M6%2023A17%2017%200%201%200%2040%2023A17%2017%200%201%200%206%2023ZM14.5%2023A8.5%208.5%200%201%200%2031.5%2023A8.5%208.5%200%201%200%2014.5%2023Z%22%20fill%3D%22%23ffffff%22%20fill-rule%3D%22evenodd%22%2F%3E%3Cpath%20d%3D%22M33%2033L55%2055M44%2044L38.5%2049.5M51%2051L45.5%2056.5%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%227.5%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2223%22%20cy%3D%2223%22%20r%3D%224.5%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.7%29%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" type="image/svg+xml">
 <style>
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-10.2 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-12.1 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -42,7 +42,9 @@
   --g-field:#ffffff; --g-field-line:#d5dee8; --g-field-hover:#94a3b8; --g-autofill:#f2f8fd;
   --g-danger:#dc2626; --g-danger-ink:#b91c1c; --g-danger-soft:#fef2f2; --g-danger-ring:rgba(220,38,38,.14);
   --g-success:#16a34a; --g-warn:#d97706;
-  --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  /* аватар с инициалами (12.10, Лёв про тёмную градиентную заливку: «так не должно быть, надо чтобы была светлая приятная»): светло-голубая заливка, navy-буквы
+     (от 8:1), тонкая рамка navy 14%. Тёмных заливок у аватара нет ни в одной теме */
+  --g-avatar:linear-gradient(150deg,#e8f1fa 0%,#d6e6f5 100%); --g-avatar-ink:#13445d; --g-avatar-line:rgba(19,68,93,.14);
   --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
   --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
   /* карточка GG ID (08.10, «Итог»): светлый пластик в обеих темах, тема меняет только тень */
@@ -69,7 +71,8 @@
   --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
   --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
   --g-success:#4ade80; --g-warn:#fbbf24;
-  --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+  /* тёмная тема: та же светлая заливка, чуть глубже, чтобы не слепила на тёмном (без почти чёрного); буквы navy-deep, от 6,7:1 */
+  --g-avatar:linear-gradient(150deg,#b4d3ec 0%,#8fb9de 100%); --g-avatar-ink:#0d2f42; --g-avatar-line:rgba(13,47,66,.18);
   --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
   --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
   --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
@@ -93,7 +96,7 @@
     --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
     --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
     --g-success:#4ade80; --g-warn:#fbbf24;
-    --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+    --g-avatar:linear-gradient(150deg,#b4d3ec 0%,#8fb9de 100%); --g-avatar-ink:#0d2f42; --g-avatar-line:rgba(13,47,66,.18);
     --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
     --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
     --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
@@ -414,11 +417,11 @@
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")}
 
 /* ---------- аккаунт ---------- */
-/* аватар: инициалы белым по центру круга в любом контейнере. Селектор (0,2,0) сильнее правил вида «.контейнер span»,
-   а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
+/* аватар: инициалы navy по центру светлого круга в любом контейнере (заливка, цвет букв и рамка: --g-avatar, --g-avatar-ink, --g-avatar-line). Селектор (0,2,0)
+   сильнее правил вида «.контейнер span», а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
 :is(.gid,.gid-kit) .gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;margin:0;padding:0;border-radius:50%;
-  background:var(--g-avatar);color:#fff;font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
-  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  background:var(--g-avatar);color:var(--g-avatar-ink);font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
+  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px var(--g-avatar-line)}
 :is(.gid,.gid-kit) .gid-avatar--sm{width:36px;height:36px;font-size:13px}
 :is(.gid,.gid-kit) .gid-avatar--xs{width:28px;height:28px;font-size:11px}
 .gid-account{display:flex;align-items:center;gap:14px;width:100%;margin-top:28px;padding:14px 16px;border-radius:16px;
@@ -1139,7 +1142,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
             <div class="sc-hdr sc-hdr--s"><div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">АКБ</span></div><div class="gid-acct"><button class="gid-chip" type="button" aria-label="Аккаунт: Александра"><span class="gid-avatar gid-avatar--xs" aria-hidden="true">АО</span><span class="gid-chip-name">Александра</span><svg class="gid-ic" aria-hidden="true"><use href="#gi-chevron-down"/></svg></button></div></div>
           </div>
         </div>
-        <p>Инициалы на navy-градиенте, без фото. Шапка уже: сначала уходит стрелка, потом имя обрезается многоточием, потом в чипе остаются только инициалы. «Выйти» закрывает сессию GG ID на устройстве (экран «Вы вышли»). Меню и клавиши: <code>gg-id-service.js</code>.</p>
+        <p>Инициалы navy на светло-голубом круге, без фото. Шапка уже: сначала уходит стрелка, потом имя обрезается многоточием, потом в чипе остаются только инициалы. «Выйти» закрывает сессию GG ID на устройстве (экран «Вы вышли»). Меню и клавиши: <code>gg-id-service.js</code>.</p>
       </div>
     </div>
   </div>
@@ -1385,7 +1388,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   </div></template>
 <script>window.GGID_MANUAL = true;</script>
 <script>
-/* GG ID: поведение экранов входа (версия 2026-10-10.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-12.1, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
@@ -1904,7 +1907,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     passwordChecks: passwordChecks, passwordLevel: passwordLevel,
     card: card, cardSince: cardSince, cardInitials: cardInitials,
     qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
-    version: '2026-10-10.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
+    version: '2026-10-12.1'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);
@@ -2121,7 +2124,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
     sessionExpired: function () { if (dialog.el) showExpired(); else fire(doc, 'gid:session-expired'); },
     closeSessionExpired: hideExpired,
     watchFetch: watchFetch,                                            // fetch: 401 со своего origin = окно
-    version: '2026-10-10.2'                                            // = gg-id/VERSION
+    version: '2026-10-12.1'                                            // = gg-id/VERSION
   };
 
   function auto() {
