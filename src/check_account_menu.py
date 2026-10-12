@@ -822,10 +822,11 @@ def phone(b, engine):
     goto(pg, 'ph', page(mount_js(ITEMS)))
     geo = pg.evaluate('''() => { const c = document.querySelector('#account .gid-chip'), r = c.getBoundingClientRect(), av = c.querySelector('.gid-avatar'), ar = av.getBoundingClientRect(),
       de = document.documentElement, cs = getComputedStyle(av);
-      return {w: r.width, h: r.height, avatar: ar.width, text: av.textContent, bg: cs.backgroundImage, radius: getComputedStyle(c).borderRadius, scrollW: de.scrollWidth, clientW: de.clientWidth,
+      return {w: r.width, h: r.height, avatar: ar.width, text: av.textContent, bg: cs.backgroundImage, ink: cs.color, radius: getComputedStyle(c).borderRadius, scrollW: de.scrollWidth, clientW: de.clientWidth,
               name: getComputedStyle(c.querySelector('.gid-chip-name')).display, arrow: getComputedStyle(c.querySelector('svg')).display, right: r.right}; }''')
     check('phone', 'at 390 px the chip is the round 40 px initials (name and arrow are gone, as in AKB)', abs(geo['w'] - 40) < 1.1 and abs(geo['h'] - 40) < 1.1 and geo['name'] == 'none' and geo['arrow'] == 'none', geo)
-    check('phone', 'the initials are ЛА white on the navy gradient circle', geo['text'] == 'ЛА' and 'linear-gradient' in geo['bg'] and '26, 90, 122' in geo['bg'] and abs(geo['avatar'] - 28) < 0.6, geo)
+    check('phone', 'the initials are ЛА navy on the light blue gradient circle (12.10: no dark fill)', geo['text'] == 'ЛА' and 'linear-gradient' in geo['bg'] and '232, 241, 250' in geo['bg'] and '214, 230, 245' in geo['bg']
+          and geo['ink'] == 'rgb(19, 68, 93)' and abs(geo['avatar'] - 28) < 0.6, geo)
     check('phone', 'no horizontal scroll with the chip in the header', geo['scrollW'] <= geo['clientW'], geo)
     named = pg.evaluate('''() => { const c = document.querySelector('#account .gid-chip'), sr = c.querySelector('.gam-sr'), r = sr.getBoundingClientRect(), cs = getComputedStyle(sr);
       return {text: sr.textContent, display: cs.display, visibility: cs.visibility, w: r.width, h: r.height, pos: cs.position}; }''')

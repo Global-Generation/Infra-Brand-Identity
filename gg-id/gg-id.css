@@ -1,4 +1,4 @@
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-10.2 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-12.1 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -33,7 +33,9 @@
   --g-field:#ffffff; --g-field-line:#d5dee8; --g-field-hover:#94a3b8; --g-autofill:#f2f8fd;
   --g-danger:#dc2626; --g-danger-ink:#b91c1c; --g-danger-soft:#fef2f2; --g-danger-ring:rgba(220,38,38,.14);
   --g-success:#16a34a; --g-warn:#d97706;
-  --g-avatar:linear-gradient(150deg,#1a5a7a 0%,#0d2f42 90%);
+  /* аватар с инициалами (12.10, Лёв про тёмную градиентную заливку: «так не должно быть, надо чтобы была светлая приятная»): светло-голубая заливка, navy-буквы
+     (от 8:1), тонкая рамка navy 14%. Тёмных заливок у аватара нет ни в одной теме */
+  --g-avatar:linear-gradient(150deg,#e8f1fa 0%,#d6e6f5 100%); --g-avatar-ink:#13445d; --g-avatar-line:rgba(19,68,93,.14);
   --g-blob-a:rgba(0,156,220,.16); --g-blob-b:rgba(19,68,93,.12);
   --g-menu-shadow:0 1px 2px rgba(15,23,42,.05),0 24px 50px -24px rgba(19,68,93,.45);
   /* карточка GG ID (08.10, «Итог»): светлый пластик в обеих темах, тема меняет только тень */
@@ -60,7 +62,8 @@
   --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
   --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
   --g-success:#4ade80; --g-warn:#fbbf24;
-  --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+  /* тёмная тема: та же светлая заливка, чуть глубже, чтобы не слепила на тёмном (без почти чёрного); буквы navy-deep, от 6,7:1 */
+  --g-avatar:linear-gradient(150deg,#b4d3ec 0%,#8fb9de 100%); --g-avatar-ink:#0d2f42; --g-avatar-line:rgba(13,47,66,.18);
   --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
   --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
   --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
@@ -84,7 +87,7 @@
     --g-field:rgba(255,255,255,.04); --g-field-line:rgba(255,255,255,.14); --g-field-hover:rgba(255,255,255,.3); --g-autofill:#10293a;
     --g-danger:#f87171; --g-danger-ink:#fca5a5; --g-danger-soft:rgba(248,113,113,.10); --g-danger-ring:rgba(248,113,113,.18);
     --g-success:#4ade80; --g-warn:#fbbf24;
-    --g-avatar:linear-gradient(150deg,#2a7aa3 0%,#13445d 90%);
+    --g-avatar:linear-gradient(150deg,#b4d3ec 0%,#8fb9de 100%); --g-avatar-ink:#0d2f42; --g-avatar-line:rgba(13,47,66,.18);
     --g-blob-a:rgba(0,156,220,.22); --g-blob-b:rgba(92,195,236,.10);
     --g-menu-shadow:0 30px 60px -30px rgba(0,0,0,.8);
     --g-idc-shadow:0 1px 0 #dbe2e9,0 2.5px 0 #c3cdd7,0 20px 34px -18px rgba(0,0,0,.6),0 46px 80px -42px rgba(0,0,0,.7);
@@ -405,11 +408,11 @@
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")}
 
 /* ---------- аккаунт ---------- */
-/* аватар: инициалы белым по центру круга в любом контейнере. Селектор (0,2,0) сильнее правил вида «.контейнер span»,
-   а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
+/* аватар: инициалы navy по центру светлого круга в любом контейнере (заливка, цвет букв и рамка: --g-avatar, --g-avatar-ink, --g-avatar-line). Селектор (0,2,0)
+   сильнее правил вида «.контейнер span», а свойства, которые контейнеры обычно перебивают (display, шрифт, цвет, выравнивание), заданы явно */
 :is(.gid,.gid-kit) .gid-avatar{display:inline-grid;place-items:center;width:44px;height:44px;flex:none;margin:0;padding:0;border-radius:50%;
-  background:var(--g-avatar);color:#fff;font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
-  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  background:var(--g-avatar);color:var(--g-avatar-ink);font-size:15px;font-weight:700;font-style:normal;line-height:1;letter-spacing:.02em;
+  text-align:center;text-indent:0;text-transform:none;white-space:nowrap;overflow:hidden;box-shadow:inset 0 0 0 1px var(--g-avatar-line)}
 :is(.gid,.gid-kit) .gid-avatar--sm{width:36px;height:36px;font-size:13px}
 :is(.gid,.gid-kit) .gid-avatar--xs{width:28px;height:28px;font-size:11px}
 .gid-account{display:flex;align-items:center;gap:14px;width:100%;margin-top:28px;padding:14px 16px;border-radius:16px;

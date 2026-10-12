@@ -48,7 +48,7 @@ def kit_blocks(css):
         ('resets and [hidden]', between(css, '/* сбросы с нулевой специфичностью', '.gid [hidden],.gid-kit [hidden]', 'resets')),
         ('no break inside the domain of an e-mail', between(css, '.gid-nowrap{', '.gid-nowrap{', 'nowrap')),
         ('icons', between(css, '.gid-ic{', '.gid-ic--fill{', 'icons')),
-        ('avatar', between(css, '/* аватар: инициалы белым', ':is(.gid,.gid-kit) .gid-avatar--xs{', 'avatar')),
+        ('avatar', between(css, '/* аватар: инициалы navy', ':is(.gid,.gid-kit) .gid-avatar--xs{', 'avatar')),
         ('account chip and menu', between(css, '/* аккаунт в шапке сервиса', '.gid-menu-sep{', 'chip and menu')),
     ]
 
