@@ -91,8 +91,7 @@ inline_css = inline_css.replace('url(fonts/montserrat-latin-ext.woff2)', 'url(gg
 logo_paths = re.findall(r'<path d="([^"]+)"', read(HERE, 'global-logo.svg'))
 assert len(logo_paths) == 20, len(logo_paths)
 LOGO = ''.join(f'<path d="{d}"/>' for d in logo_paths)
-LETTERS = ''.join(f'<path d="{d}"/>' for d in logo_paths[:16])  # 0-15 = GLOBAL GENERATION, 16-19 = mark
-mark = re.findall(r'<path d="([^"]+)"', read(HERE, 'gg-icon.svg'))
+mark = re.findall(r'<path d="([^"]+)"', read(HERE, 'gg-icon.svg'))   # знак GG из четырёх частей: по ним сверяется знак в пилюле (прелоадер ниже)
 assert len(mark) == 4, len(mark)
 ARC, RIGHT_TOP, MAIN, RIGHT_BOTTOM = mark
 # иконка GG ID (08.10.2026): белый ключ на светлом градиенте #8FBADD -> #4B8FD6 (--grad-tile), файл assets/favicons/gg-id.svg
@@ -142,9 +141,22 @@ PILL_SYMBOL = (f'<symbol id="gid-pill" viewBox="{PILL_VIEWBOX}"><path style="fil
                f'<path style="fill:var(--g-pill-ink,{PILL_WHITE})" d="{PILL_GG}"/><path style="fill:var(--g-pill-ink,{PILL_WHITE})" d="{PILL_ID}"/></symbol>')
 LOCKUP = (f'<div class="gid-lockup"><svg class="gid-pill" viewBox="{PILL_VIEWBOX}" role="img" aria-label="GG ID">'
           '<use href="#gid-pill"/></svg></div>')
-LOADER = ('<div class="gid-ld" aria-hidden="true"><svg class="gid-ld-mark" viewBox="3.6 8.6 31.3 20.95">'
-          f'<path class="gid-ld-arc" d="{ARC}"/><path class="gid-ld-right" d="{RIGHT_TOP} {RIGHT_BOTTOM}"/>'
-          f'<path class="gid-ld-main" d="{MAIN}"/></svg><span class="gid-ld-word"><svg viewBox="336 89 444 110">{LETTERS}</svg></span></div>')
+# Прелоадер .gid-ld («вход выполнен», 13.10.2026, Лёв: «везде пилюлей лого»; раньше стояли знак GG и слово «Global Generation»): та же пилюля, что символ gid-pill, из тех же трёх
+# путей утверждённого файла (капсула, знак GG, «ID»), не перерисованная. Знак GG разобран на четыре части по подпутям: они собираются своими keyframes (gg-id.css), дуга слева,
+# правые части и основная; капсула стоит на месте, «ID» проявляется шторкой, как проявлялось слово. Части знака в пилюле это части знака из src/gg-icon.svg в том же порядке
+# (в пилюле он в 4,962 раза крупнее), порядок команд путей сверяется: сменился файл пилюли или знак, сборка скажет это, а не нарисует кашу.
+# Отдельные элементы с общей границей дают на краю сглаживания светлый шов (в белом знаке на navy он виден: при 3x линия между основной частью и правой нижней, замер 13.10),
+# один путь шва не даёт. Поэтому, когда части встали на место (38% цикла), их сменяет тот же знак одним путём (gid-ld-whole, это PILL_GG целиком), а при «меньше движения» и
+# без анимации виден только он: пилюля в покое равна утверждённому файлу пиксель в пиксель, части видны лишь пока движутся
+_gg_parts = [p for p in re.split(r'(?=M)', PILL_GG) if p]
+assert len(_gg_parts) == 4 and ''.join(_gg_parts) == PILL_GG, 'the GG mark of the pill is expected as four sub-paths: arc, right top, main, right bottom'
+for _part, _icon in zip(_gg_parts, (ARC, RIGHT_TOP, MAIN, RIGHT_BOTTOM)):
+    assert re.findall('[A-Za-z]', _part) == re.findall('[A-Za-z]', _icon), 'the sub-paths of the pill GG mark must follow src/gg-icon.svg: arc, right top, main, right bottom'
+LD_ARC, LD_RIGHT_TOP, LD_MAIN, LD_RIGHT_BOTTOM = _gg_parts
+LOADER = ('<div class="gid-ld" aria-hidden="true">'
+          f'<svg class="gid-ld-pill" viewBox="{PILL_VIEWBOX}"><path class="gid-ld-cap" d="{PILL_CAPSULE}"/>'
+          f'<path class="gid-ld-arc" d="{LD_ARC}"/><path class="gid-ld-right" d="{LD_RIGHT_TOP} {LD_RIGHT_BOTTOM}"/>'
+          f'<path class="gid-ld-main" d="{LD_MAIN}"/><path class="gid-ld-whole" d="{PILL_GG}"/><path class="gid-ld-id" d="{PILL_ID}"/></svg></div>')
 
 # ---- карта GG ID (08.10, «Итог»): светлая, ключ GG ID в печати, без фото и плашки инициалов. Данные вымышленные ----
 MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
@@ -300,7 +312,8 @@ INFO = {
     'passkey': ('Открыто окно браузера (на телефоне системное). Кнопка занята, второй запрос не уходит, подсказка по тому, что браузер уже видел: '
                 'свой ключ, телефон по QR-коду или ничего. Отмена в окне возвращает на первый экран без ошибки.',
                 'GGPasskey.login()'),
-    'done': ('Вход выполнен, идёт переход в сервис. Фирменная сборка знака, как прелоудер бренда.', 'GET /api/auth/me, переход на next'),
+    'done': ('Вход выполнен, идёт переход в сервис. Прелоадер: в пилюле GG ID собирается знак GG, затем проявляется «ID». При «меньше движения» пилюля стоит целиком.',
+             'GET /api/auth/me, переход на next'),
     'continue': ('Сессия GG ID на устройстве уже есть, сервис просит подтвердить аккаунт.', 'GET /api/auth/authorize'),
     'enroll': ('После входа по паролю, если ключа на этом устройстве нет, и после входа с телефона, если своего ключа в этом браузере нет. '
                'Показывать после GGPasskey.platformAvailable(): способ устройства здесь назван, потому что ключ создаётся на нём. '

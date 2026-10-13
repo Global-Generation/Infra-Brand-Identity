@@ -1,4 +1,4 @@
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-13.2 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-13.3 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -438,19 +438,29 @@
 .gid-who-tx b{font-size:14px}
 .gid-who-tx span{font-size:12.5px}
 
-/* ---------- вход выполнен: фирменная сборка знака ---------- */
+/* ---------- вход выполнен: пилюля GG ID собирается ---------- */
 .gid-done{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 0 14px}
 .gid-done .gid-sub{margin-inline:auto}
-.gid-ld{display:flex;align-items:center;justify-content:center;gap:9px;height:64px;margin-bottom:30px;color:var(--g-logo)}
-.gid-ld-mark{width:66px;height:44px;overflow:visible;fill:currentColor}
-.gid-ld-word{line-height:0;clip-path:inset(0 100% 0 0);animation:gidLdWipe 3.4s cubic-bezier(.22,.9,.24,1) infinite}
-.gid-ld-word svg{height:35px;width:auto;fill:currentColor;display:block}
+/* прелоадер (13.10.2026, Лёв: «везде пилюлей лого»; раньше стояли знак GG и слово «Global Generation»): та же пилюля, что символ gid-pill, из тех же путей утверждённого файла,
+   высотой 44 px, как был знак (ширина 101,8 px). Капсула стоит на месте, знак GG собирается в ней своими прежними keyframes, «ID» проявляется шторкой слева направо, как проявлялось слово.
+   Цвета только токены: капсула --g-pill, знак и «ID» --g-pill-ink (на тёмном белая капсула и navy знак). Блок .gid-ld прежний, 64 px и 30 px под ним: экран «готово» не прыгает */
+.gid-ld{display:flex;align-items:center;justify-content:center;height:64px;margin-bottom:30px}
+.gid-ld-pill{display:block;height:44px;width:auto;flex:none}
+.gid-ld-cap{fill:var(--g-pill)}
+.gid-ld-arc,.gid-ld-right,.gid-ld-main,.gid-ld-whole,.gid-ld-id{fill:var(--g-pill-ink)}
+/* в покое виден знак одним путём (.gid-ld-whole), части знака спрятаны: так и без анимации, и при «меньше движения», и в миниатюрах витрины. Пока части движутся, видны они;
+   когда встали на место (38% цикла), их мгновенно сменяет знак одним путём: у отдельных элементов с общей границей на сглаживании остаётся светлый шов, у одного пути его нет */
+.gid-ld-arc,.gid-ld-right,.gid-ld-main{opacity:0}
+.gid-ld-id{clip-path:inset(0 100% 0 0);animation:gidLdWipe 3.4s cubic-bezier(.22,.9,.24,1) infinite}
 .gid-ld-main{transform-box:fill-box;transform-origin:center;animation:gidLdMain 3.4s var(--g-pop) infinite}
 .gid-ld-arc{animation:gidLdLeft 3.4s var(--g-ease) infinite}
 .gid-ld-right{animation:gidLdRight 3.4s var(--g-ease) infinite}
-@keyframes gidLdMain{0%,6%{opacity:0;transform:scale(.8)}22%{opacity:1;transform:scale(1)}86%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
-@keyframes gidLdLeft{0%,16%{opacity:0;transform:translateX(3px)}34%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
-@keyframes gidLdRight{0%,20%{opacity:0;transform:translateX(-3px)}38%{opacity:1;transform:none}86%{opacity:1;transform:none}100%{opacity:0}}
+.gid-ld-whole{animation:gidLdWhole 3.4s var(--g-ease) infinite}
+@keyframes gidLdMain{0%,6%{opacity:0;transform:scale(.8)}22%,38%{opacity:1;transform:scale(1)}38.001%,100%{opacity:0;transform:scale(1)}}
+/* сдвиг частей знака прежний, 3 единицы знака из gg-icon.svg; пилюля нарисована в 4,962 раза крупнее, поэтому в её единицах это 14,9 */
+@keyframes gidLdLeft{0%,16%{opacity:0;transform:translateX(14.9px)}34%,38%{opacity:1;transform:none}38.001%,100%{opacity:0}}
+@keyframes gidLdRight{0%,20%{opacity:0;transform:translateX(-14.9px)}38%{opacity:1;transform:none}38.001%,100%{opacity:0}}
+@keyframes gidLdWhole{0%,38%{opacity:0}38.001%,86%{opacity:1}100%{opacity:0}}
 @keyframes gidLdWipe{0%,30%{clip-path:inset(0 100% 0 0)}52%{clip-path:inset(0 0 0 0)}86%{clip-path:inset(0 0 0 0);opacity:1}100%{clip-path:inset(0 0 0 0);opacity:0}}
 .gid-done .gid-progress{width:140px;height:3px;border-radius:3px;background:var(--g-soft);overflow:hidden;margin-top:22px}
 .gid-done .gid-progress i{display:block;height:100%;width:40%;border-radius:3px;background:var(--g-accent);animation:gidProg 1.4s var(--g-ease) infinite}
@@ -658,6 +668,7 @@
   /* и псевдоэлементы: пятно на панели (.gid-aside::after), линия Face ID (.gid-scan::after), пульс занятой кнопки (.gid-btn.is-busy::before) */
   .gid *,.gid *::before,.gid *::after,.gid::before,.gid::after,.gid-kit *,.gid-kit *::before,.gid-kit *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .gid-mq-row{animation:none!important}
-  .gid-ld-word{clip-path:none}
-  .gid-ld-main,.gid-ld-arc,.gid-ld-right,.gid-ld-word{animation:none!important;opacity:1}
+  /* прелоадер: пилюля целиком и неподвижна: знак GG одним путём (части знака спрятаны), «ID» без шторки */
+  .gid-ld-id{clip-path:none}
+  .gid-ld-main,.gid-ld-arc,.gid-ld-right,.gid-ld-whole,.gid-ld-id{animation:none!important}
 }
