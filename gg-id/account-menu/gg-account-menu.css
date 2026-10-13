@@ -1,4 +1,4 @@
-/* GG account menu: styles of the account chip and its dropdown. Kit version 2026-10-12.1 (gg-id/VERSION).
+/* GG account menu: styles of the account chip and its dropdown. Kit version 2026-10-13.1 (gg-id/VERSION).
    GENERATED, do not edit by hand: python3 src/build_account_menu.py (Global-Generation/Infra-Brand-Identity).
    The blocks marked "kit" are copied byte for byte from gg-id/gg-id.css, so the menu looks exactly like the kit chip and menu of AKB;
    the last block is src/account_menu/local.css (services list, sections, narrow screen). A change of the look is a PR to the kit.
@@ -17,6 +17,8 @@
   --g-head:#13445d; --g-ink:#0f172a; --g-ink-2:#334155; --g-muted:#64748b; --g-faint:#94a3b8;
   --g-line:#e2e8f0; --g-soft:#f1f5f9; --g-surface:#f8fafc;
   --g-logo:#13445d; --g-divider:rgba(19,68,93,.2);
+  /* логотип GG ID, пилюля (13.10.2026): на светлом navy-пилюля с белыми знаком GG и ID, на тёмном белая с navy (символ gid-pill берёт цвета отсюда) */
+  --g-pill:#13445d; --g-pill-ink:#ffffff;
   /* главная кнопка, стиль A (08.10): белая с тонкой рамкой, светлая плитка слева, navy-текст; без navy-заливки */
   --g-primary:#ffffff; --g-primary-hi:#f7fafd; --g-primary-ink:#0f172a;
   --g-primary-line:#c9d5e1; --g-primary-line-hi:#94a3b8;
@@ -50,6 +52,7 @@
   --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
   --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
   --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+  --g-pill:#ffffff; --g-pill-ink:#13445d;
   --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
   --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
   --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
@@ -75,6 +78,7 @@
     --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
     --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
     --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+    --g-pill:#ffffff; --g-pill-ink:#13445d;
     --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
     --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
     --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;

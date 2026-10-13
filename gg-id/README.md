@@ -15,16 +15,18 @@
 | `fonts/` | Montserrat v31 (переменный, 400-700) самохостом: кириллица, латиница и `latin-ext` (латиница с диакритикой и знаки валют, в том числе ₽; sha256 `920711de…0082`, грузится, только если на странице есть такие знаки) |
 | `gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 своего origin (раздел «Поведение в сервисе») |
 | `account-menu/` | **меню аккаунта сервиса** (`GGAccountMenu`): чип с инициалами и карточка со значком Add to Apple Wallet, «Мои сервисы» (список сервисов человека, переход в любой одним нажатием), «Профиль GG ID», свои пункты сервиса, «Выйти». Один вид во всех сервисах, как у АКБ: `gg-account-menu.js`, `gg-account-menu.css` (генерируется из `gg-id.css`), `demo.html`, подробности и сниппеты для Jinja, React и статики в `account-menu/README.md` |
-| `sprite.svg` | логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя) и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
+| `sprite.svg` | логотип GG ID, пилюля `gid-pill`, логотип Global Generation `gid-logo` (для подписи сервиса «логотип \| сервис»), иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя) и все иконки `gi-*` одним файлом: `<use href="/assets/gg-id/sprite.svg#gi-eye"/>` (тот же origin) |
+| `gg-id-pill.svg`, `gg-id-pill-dark.svg` | логотип GG ID отдельными файлами для `<img>`: navy-пилюля с белыми знаком и ID (на светлом) и белая с navy (на тёмном). Утверждённые файлы `assets/logo/gg-id-pill*.svg`, копии, генерируются |
 | `gg-id-icon.svg` | иконка GG ID отдельным файлом (копия `assets/favicons/gg-id.svg`) |
 | `screens/` | 18 эталонных страниц (17 экранов входа и карточка GG ID), генерируются, руками не править |
 | `email-card.html` | карточка GG ID и кнопки письма-приглашения (стиль «Итог», как письмо Infra-AWS #93): таблицы, встроенные стили, подстановки `{{...}}` |
-| `email/gg-logo-navy-2x.png` | navy-логотип для писем на светлом фоне (302 x 76), генерируется `src/rasterize_gg_id_email.py` |
-| `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут |
+| `email/gg-id-pill-3x.png` | логотип GG ID для писем: пилюля на прозрачном фоне, 246 x 90 (в письме 82 x 30), генерируется `src/rasterize_gg_id_email.py` |
+| `email/gg-logo-navy-2x.png` | прежний navy-логотип Global Generation для писем на светлом фоне (302 x 76), больше не генерируется: разосланные письма ссылаются на его адрес |
+| `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут, больше не генерируется |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-12.1`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-13.1`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
-Хаб копирует `gg-id.css`, `gg-id-stage.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-stage.css` для экранов входа, `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`.
+Хаб копирует `gg-id.css`, `gg-id-stage.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-stage.css` для экранов входа, `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png`.
 
 ## Каркас страницы
 
@@ -37,7 +39,7 @@
     <aside class="gid-aside">...</aside>          <!-- только для split: подпись, карта GG ID на ленте, текст; разметку брать из screens/login.html -->
     <main class="gid-main">
       <section class="gid-card">
-        <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+        <div class="gid-lockup"><svg class="gid-pill" viewBox="0 0 426.265 156" role="img" aria-label="GG ID"><use href="#gid-pill"/></svg></div>   <!-- логотип GG ID, пилюля; вся подпись, «| ID» рядом нет -->
         <h1 class="gid-h">Вход в АКБ</h1>         <!-- название сервиса из client_id -->
         <p class="gid-sub">...</p>
         ...
@@ -273,7 +275,7 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-12.1' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-13.1' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
@@ -296,7 +298,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 
 Где показываем: вверху кабинета «Мои сервисы» (`/cabinet/` хаба), на первом входе после приглашения и в онбординге, образцом в инструкции «Как войти» (`kak-voyti.html`). В письме-приглашении её копия `email-card.html` (ниже). Эталон: `screens/card.html`; витрина: `gg-id.html#s=card` и раздел «Карточка GG ID».
 
-- Вид «Итог» (08.10): белая пластиковая карта с голубым голографическим переливом, ключ GG ID в голографической печати (символ `gid-id-icon`), подпись «логотип | ID» navy. Без фото и без плашки инициалов.
+- Вид «Итог» (08.10): белая пластиковая карта с голубым голографическим переливом, ключ GG ID в голографической печати (символ `gid-id-icon`), логотип GG ID (пилюля) navy. Без фото и без плашки инициалов.
 - Карта светлая в обеих темах, как настоящая; тема меняет только тень (`--g-idc-shadow`). Перелив только в голубых и серебряных тонах.
 - Размер: `width: 100%`, `max-width: var(--gid-idcard-w, 460px)`, высота не меньше ширины x 54 / 85,6 (пропорции настоящей карты 85,6 x 54 мм). На телефоне во всю ширину контейнера. Если данных больше (длинное имя, три длинные должности, длинная почта на узкой карте), карта растёт вниз, ничего не обрезается.
 - Пропорцию держит распорка `.gid-idcard::before`, а не `aspect-ratio`: во flex- и grid-родителях `aspect-ratio` не даёт карте вырасти, и текст вылезает. В flex-ряду с `align-items: stretch` карточка тянется на высоту ряда: поставить ей `align-self: flex-start`.
@@ -321,7 +323,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 <article class="gid-idcard" aria-label="Global Generation ID: Иван Образцов">
   <span class="gid-idcard-holo" aria-hidden="true"></span>
   <div class="gid-idcard-top">
-    <div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>
+    <div class="gid-lockup"><svg class="gid-pill" viewBox="0 0 426.265 156" role="img" aria-label="GG ID"><use href="#gid-pill"/></svg></div>
     <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
   </div>
   <div class="gid-idcard-who">
@@ -347,7 +349,7 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 
 ```html
 <aside class="gid-aside">
-  <div class="gid-lockup">…логотип | ID…</div>
+  <div class="gid-lockup">…пилюля GG ID…</div>
   <div class="gid-aside-hero"><div class="gid-hero" aria-hidden="true"><div class="gid-hero-hang">
     <div class="gid-hero-lan"><span class="gid-hero-strap"></span><svg class="gid-hero-clip" viewBox="0 0 30 36">…</svg></div>
     <div class="gid-hero-holder"><span class="gid-hero-gloss"></span>
@@ -400,12 +402,12 @@ GGID.card(document.querySelector('.gid-idcard'), {
 
 ### В письме: `email-card.html`
 
-- Стиль «Итог», как письмо-приглашение хаба (Infra-AWS #93, `invite_email.py`): светлая карта, как в «Мои сервисы» (фон `#e9f3fa` и голубой перелив, рамка `#cfe0ec`), подпись «логотип | ID», имя, до трёх должностей, почта, статус «Активен» с голубой точкой и номер GG ID. Фото и плашки инициалов нет. Под картой белая кнопка «Задать пароль» с тонкой рамкой `#c9d5e1` (стиль A, радиус 14, 52 px), ссылка текстом «Инструкция: как войти» и строка «Потом в любом сервисе нажмите «Войти через GG ID»».
+- Стиль «Итог», как письмо-приглашение хаба (Infra-AWS #93, `invite_email.py`): светлая карта, как в «Мои сервисы» (фон `#e9f3fa` и голубой перелив, рамка `#cfe0ec`), логотип GG ID (пилюля), имя, до трёх должностей, почта, статус «Активен» с голубой точкой и номер GG ID. Фото и плашки инициалов нет. Под картой белая кнопка «Задать пароль» с тонкой рамкой `#c9d5e1` (стиль A, радиус 14, 52 px), ссылка текстом «Инструкция: как войти» и строка «Потом в любом сервисе нажмите «Войти через GG ID»».
 - Таблицы и встроенные стили, системный шрифт (Montserrat, только если он установлен), без внешних шрифтов, скриптов, SVG и `data:`. Ширина карты до 440 px, на телефоне во всю ширину.
 - Подстановки: в карте `{{name}}`, `{{positions}}` (через « · », нет должностей = строку убрать), `{{email}}`, `{{id}}`; в кнопках `{{link}}` (одноразовая ссылка) и `{{guide_url}}` (`https://id.global-generations-edu.com/instructions/`). Хаб экранирует каждое значение как HTML. Статус «Активен» только если хаб так говорит.
 - В своё письмо вставлять блоки между `<!-- gg-id-card:start -->` и `<!-- gg-id-card:end -->` (карта) и между `<!-- gg-id-actions:start -->` и `<!-- gg-id-actions:end -->` (кнопка и ссылки).
-- Логотип = картинка `email/gg-logo-navy-2x.png` (302 x 76, в карте 111 x 28, в шапке письма 151 x 38) по адресу `https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png`, рядом текстом «ID». Почта не рисует SVG и блокирует `data:`-картинки, поэтому PNG. Пересобрать: `uv run --with playwright python src/rasterize_gg_id_email.py`. Прежняя подпись для navy-карты `email/gg-id-lockup-2x.png` остаётся для писем, которые её ещё берут.
-- Тема: письмо светлое (`color-scheme: light`), Apple Mail его не перекрашивает; Gmail на Android тёмный фон не трогает; Gmail на iPhone инвертирует цвета, но не картинки: текст остаётся контрастным, navy-логотип на тёмной карте читается хуже (так же у письма #93).
+- Логотип = пилюля GG ID, одна картинка `email/gg-id-pill-3x.png` (246 x 90, в письме 82 x 30) по адресу `https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png`, текста «ID» рядом нет: он уже в пилюле. Почта не рисует SVG и блокирует `data:`-картинки, поэтому PNG. Пересобрать: `uv run --with playwright python src/rasterize_gg_id_email.py`. Прежние `email/gg-logo-navy-2x.png` (navy-логотип Global Generation) и `email/gg-id-lockup-2x.png` (подпись для navy-карты) лежат в ките, потому что разосланные письма ссылаются на их адреса; новое письмо их не берёт.
+- Тема: письмо светлое (`color-scheme: light`), Apple Mail его не перекрашивает; Gmail на Android тёмный фон не трогает; Gmail на iPhone инвертирует цвета, но не картинки: текст остаётся контрастным, а пилюля остаётся navy с белыми буквами, картинка не инвертируется.
 
 | Письмо | Gmail на iPhone, тёмная тема (симуляция инверсии в проверке) |
 |---|---|
@@ -416,7 +418,7 @@ GGID.card(document.querySelector('.gid-idcard'), {
 - Меню аккаунта в шапке сервиса: только `account-menu/` (`GGAccountMenu`), свою разметку чипа и карточки не рисуем. «Выйти» в нём = прежний выход сервиса, который заканчивает и сессию хаба.
 - Иконка GG ID = белый ключ на светлом градиенте `--grad-tile` (`assets/favicons/gg-id.svg`): в кнопке «Войти через GG ID», в окне «Сессия истекла» и в фавиконе экранов GG ID. Тёмных градиентных плиток нет (правило 4a).
 - Над заголовком ничего: ни замка, ни значка, ни плашки (правило 07.10). Заголовок называет сервис: «Вход в АКБ». Названия сервисов пишем так, чтобы не склонять («сервис «Пульс»»).
-- Подпись «логотип | ID»: логотип один, одного цвета (navy на светлом, белый на тёмном), высота 28 px (ширина не меньше 110 px).
+- Логотип GG ID = пилюля (Лёв 13.10: «давай везде пилюлей лого», «слева лого справа айди и всё в пилюле»; вариант C, файлы `assets/logo/gg-id-pill*.svg` берутся как есть, не перерисовываются): navy-пилюля с белыми знаком GG и ID на светлом, белая с navy на тёмном (токены `--g-pill` и `--g-pill-ink`, символ `gid-pill`), высота 28 px (ширина 76 px), один цвет на тему. Подписи «логотип \| ID» больше нет: пилюля занимает её место и держит ту же высоту строки, поэтому панель, карточка и шапки не сдвинулись. Исключение: подпись СЕРВИСА «логотип Global Generation \| АКБ» в шапке сервиса остаётся прежней (логотип Global Generation, символ `gid-logo`, класс `gid-lockup-name`): это название сервиса, а не GG ID. Фавикон и иконки приложений не менялись (отдельное решение).
 - Одно главное действие на экране. Подпись главной кнопки стоит в одну строку: самая длинная, «Подключить Face ID / Touch ID» (247 px кеглем 15), со стрелкой входит в колонку от 355 px; в более узкой (iPhone 375, раскладка «Карточка») кегль 14 px, ниже 340 px стрелки нет. Новая длинная подпись проверяется `check_gg_id.py` (окна 360 и 375, раскладка «Карточка»).
 - Сцена экрана входа (`gg-id-stage.css`): заголовок на одной высоте на каждом экране каждого сервиса, подвал со ссылкой «Как войти: инструкция» (раздел «Сцена экрана входа»). Своих отступов, центровки и анимации карточки на странице входа нет.
 - Вход по ключу пишем «Face ID / Touch ID», всегда со слэшем (Лёв 10.10), ключ называем «passkey». Одиноких «Face ID» и «Touch ID» нет; «Windows Hello» и «отпечаток» только при подтверждённом ключе устройства (`HANDOFF-AUTH.md`, 6.1). Сборка не пускает одиночные слова в разметку экранов.
@@ -437,7 +439,7 @@ uv run --with playwright python src/check_gg_id.py          # все экран�
 uv run --with playwright python src/check_gg_id_passkey.py  # только подписи входа по ключу и память браузера (около 15 секунд, входит в полный прогон)
 python3 src/check_gg_id_stage.py                            # сцена без браузера: файл, sha256, порядок подключения, подвал со ссылкой (идёт в CI)
 uv run --with playwright python src/check_gg_id_stage.py --browser  # сцена в браузере: заголовок по формуле и неподвижен между экранами в 4 окнах контракта (идёт в CI и в check_gg_id.py)
-uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась подпись: email/gg-id-lockup-2x.png
+uv run --with playwright python src/rasterize_gg_id_email.py  # только если менялась пилюля: email/gg-id-pill-3x.png
 python3 src/build_account_menu.py                           # account-menu/gg-account-menu.css из gg-id.css и src/account_menu/local.css (--check: только сверить)
 uv run --with playwright python src/check_account_menu.py   # меню аккаунта: вид против разметки АКБ, клавиатура, список сервисов с настоящим CORS, безопасность, 390 px
 ```

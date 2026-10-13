@@ -114,8 +114,8 @@ EMPTY = {'name': 'Лёв', 'positions': [], 'email': 'lev.demo@global-generation
 
 # e-mail card: the hub fills the placeholders (escaped), Gmail on iPhone inverts colours but not images
 EMAIL = os.path.join(ROOT, 'gg-id', 'email-card.html')
-EMAIL_PNG = os.path.join(ROOT, 'gg-id', 'email', 'gg-logo-navy-2x.png')
-EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png'
+EMAIL_PNG = os.path.join(ROOT, 'gg-id', 'email', 'gg-id-pill-3x.png')
+EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png'
 EMAIL_LINKS = {'link': 'https://id.global-generations-edu.com/set-password.html#token=demo&invite=1',
                'guide_url': 'https://id.global-generations-edu.com/instructions/'}
 EMAIL_DEMO = {'name': 'Иван Образцов', 'positions': 'Ментор · Продажи', 'email': 'ivan.obraztsov@global-generations.com',
