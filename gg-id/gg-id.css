@@ -1,4 +1,4 @@
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-12.1 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-13.1 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -21,6 +21,8 @@
   --g-head:#13445d; --g-ink:#0f172a; --g-ink-2:#334155; --g-muted:#64748b; --g-faint:#94a3b8;
   --g-line:#e2e8f0; --g-soft:#f1f5f9; --g-surface:#f8fafc;
   --g-logo:#13445d; --g-divider:rgba(19,68,93,.2);
+  /* логотип GG ID, пилюля (13.10.2026): на светлом navy-пилюля с белыми знаком GG и ID, на тёмном белая с navy (символ gid-pill берёт цвета отсюда) */
+  --g-pill:#13445d; --g-pill-ink:#ffffff;
   /* главная кнопка, стиль A (08.10): белая с тонкой рамкой, светлая плитка слева, navy-текст; без navy-заливки */
   --g-primary:#ffffff; --g-primary-hi:#f7fafd; --g-primary-ink:#0f172a;
   --g-primary-line:#c9d5e1; --g-primary-line-hi:#94a3b8;
@@ -54,6 +56,7 @@
   --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
   --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
   --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+  --g-pill:#ffffff; --g-pill-ink:#13445d;
   --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
   --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
   --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
@@ -79,6 +82,7 @@
     --g-head:#ffffff; --g-ink:#e8eff5; --g-ink-2:#c5d3df; --g-muted:#8ea4b7; --g-faint:#5d778b;
     --g-line:rgba(255,255,255,.09); --g-soft:rgba(255,255,255,.07); --g-surface:rgba(255,255,255,.04);
     --g-logo:#ffffff; --g-divider:rgba(255,255,255,.35);
+    --g-pill:#ffffff; --g-pill-ink:#13445d;
     --g-primary:rgba(255,255,255,.04); --g-primary-hi:rgba(255,255,255,.08); --g-primary-ink:#ffffff;
     --g-primary-line:rgba(255,255,255,.22); --g-primary-line-hi:rgba(255,255,255,.36);
     --g-primary-shadow:none; --g-chev:#8ea4b7; --g-text-btn:#e8eff5;
@@ -209,7 +213,7 @@
 @media (prefers-color-scheme:dark){.gid:not([data-theme="light"]) .gid-aside{background:radial-gradient(90% 70% at 0% 0%,#154b66 0%,rgba(21,75,102,0) 60%),linear-gradient(160deg,#0f3a51 0%,#0a2433 52%,#06161f 100%)}}
 .gid-aside::after{content:"";position:absolute;z-index:-1;width:620px;height:620px;right:-220px;bottom:-260px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(0,156,220,.34),transparent);animation:gidDriftB 22s var(--g-ease) infinite alternate;pointer-events:none}
-.gid-aside > .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);margin:0;position:relative}
+.gid-aside > .gid-lockup{--g-logo:#ffffff;--g-divider:rgba(255,255,255,.35);--g-pill:#ffffff;--g-pill-ink:#13445d;margin:0;position:relative}
 .gid-aside-hero{position:relative;flex:1 1 auto;min-height:0;display:grid;place-items:center}
 .gid-aside-copy{position:relative;max-width:540px}
 .gid-aside-title{font-size:26px;line-height:1.14;font-weight:700;letter-spacing:-.03em;color:#fff;text-wrap:balance}
@@ -233,6 +237,9 @@
 .gid-logo{display:block;height:28px;width:auto;flex:none;fill:currentColor}
 .gid-lockup-name{display:flex;align-items:center;padding-left:14px;border-left:1px solid var(--g-divider);
   font-size:16px;font-weight:600;line-height:1.1;white-space:nowrap;color:var(--g-logo)}
+/* логотип GG ID, пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», вариант C): знак GG слева, ID справа, всё в пилюле. Это вся подпись, «| ID» после неё нет.
+   Высота 28 px, как была у логотипа в подписи: панель, карточка и шапки стоят на тех же местах (ширина 76 px вместо 160). Цвета дают --g-pill и --g-pill-ink */
+.gid-pill{display:block;height:var(--gid-pill-h,28px);width:auto;flex:none}
 
 /* ---------- текст ---------- */
 .gid-h{font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.028em;color:var(--g-head);text-wrap:balance}
@@ -561,8 +568,9 @@
   background-size:260% 260%;animation:gidHolo 10s ease-in-out infinite alternate}
 @keyframes gidHolo{from{background-position:0% 30%}to{background-position:100% 70%}}
 .gid-idcard-top{grid-area:1/1;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}
-.gid-idcard .gid-lockup{--g-logo:#13445d;--g-divider:rgba(19,68,93,.24);margin:0;flex:none;gap:clamp(9px,3cqi,14px)}
+.gid-idcard .gid-lockup{--g-logo:#13445d;--g-divider:rgba(19,68,93,.24);--g-pill:#13445d;--g-pill-ink:#ffffff;margin:0;flex:none;gap:clamp(9px,3cqi,14px)}
 .gid-idcard .gid-logo{height:clamp(20px,6cqi,28px)}
+.gid-idcard .gid-pill{height:clamp(22px,6cqi,28px)}
 .gid-idcard .gid-lockup-name{padding-left:clamp(9px,3cqi,14px);font-size:clamp(12px,3.5cqi,16px)}
 /* ключ GG ID в голографической печати (символ gid-id-icon) */
 .gid-idcard-seal{display:grid;place-items:center;flex:none;width:clamp(46px,14cqi,64px);aspect-ratio:1;border-radius:50%;

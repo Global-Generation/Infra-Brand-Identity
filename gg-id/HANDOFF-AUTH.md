@@ -25,7 +25,7 @@
 | `gg-id/gg-id.css` | токены (светлая и тёмная), раскладки `split` / `card` / `minimal`, все компоненты | да, источник |
 | `gg-id/gg-id.js` | поведение: глаз пароля, только рабочая почта, правила пароля, ячейки кода, отсчёт, подписи входа по ключу по памяти браузера (раздел 6.1), `GGID.busy/error/shake` | да, источник |
 | `gg-id/fonts/montserrat-{cyrillic,latin}.woff2` | переменный Montserrat 400-700 | нет, генерируется из `src/fonts.css` |
-| `gg-id/sprite.svg` | все символы: логотип `gid-logo`, иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя), иконки `gi-*` | нет, генерируется |
+| `gg-id/sprite.svg` | все символы: логотип GG ID, пилюля `gid-pill`, логотип Global Generation `gid-logo` (подпись сервиса), иконка GG ID `gid-id-icon` (`gid-tile` = её старое имя), иконки `gi-*` | нет, генерируется |
 | `gg-id/gg-id-service.js` | поведение компонентов в сервисах: меню аккаунта, окно «Сессия истекла», перехват 401 (README, «Поведение в сервисе») | да, источник |
 | `gg-id/screens/*.html` | 17 эталонных страниц, открываются как есть | нет, генерируются |
 | `gg-id/README.md` | справочник кита: каркас, атрибуты, таблица экранов → API | да (таблица между маркерами генерируется) |
@@ -79,7 +79,7 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
    assets/gg-id/VERSION          # одна строка: sha коммита Infra-Brand-Identity, с которого скопировано
    ```
 2. Предлагаю скрипт `scripts/sync-gg-id.sh <sha>`: берёт 5 файлов через `gh api repos/Global-Generation/Infra-Brand-Identity/contents/gg-id/...?ref=<sha>`, пишет `VERSION`, показывает diff. Руками файлы кита в хабе не править: правка вида = PR в Infra-Brand-Identity → sync.
-3. Тест (по образцу твоего `tests/test_gg_id_docs.py`): файлы на месте, `VERSION` = 40 hex, в CSS/JS нет длинного тире и внешних URL, `url(fonts/...)` указывает на существующие файлы, в `sprite.svg` есть `gid-logo` и все `gi-*`, на которые ссылаются страницы хаба.
+3. Тест (по образцу твоего `tests/test_gg_id_docs.py`): файлы на месте, `VERSION` = 40 hex, в CSS/JS нет длинного тире и внешних URL, `url(fonts/...)` указывает на существующие файлы, в `sprite.svg` есть `gid-pill`, `gid-logo` и все `gi-*`, на которые ссылаются страницы хаба.
 4. `scripts/deploy.sh`: `assets/` уже в выкатке (проверь, что подпапки тоже едут), `deploy.yml` `paths` уже ловит `assets/**`? Если нет, добавить.
 5. Риск нулевой: ни одна страница ещё не подключает кит.
 
@@ -129,8 +129,7 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
     <main class="gid-main">
       <section class="gid-card" id="card">
         <div class="gid-lockup">
-          <svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation"><use href="/assets/gg-id/sprite.svg#gid-logo"/></svg>
-          <span class="gid-lockup-name">ID</span>
+          <svg class="gid-pill" viewBox="0 0 426.265 156" role="img" aria-label="GG ID"><use href="/assets/gg-id/sprite.svg#gid-pill"/></svg>
         </div>
         <!-- виды экрана: <div data-view="..." hidden>...</div> -->
       </section>

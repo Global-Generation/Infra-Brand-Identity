@@ -3,7 +3,8 @@
 Sources: gg-id/gg-id.css + gg-id/gg-id.js (the kit, edited by hand), gg-id/gg-id-stage.css (the scene of the sign-in screen: one contract of the hub, the gates
 and every service, pinned by sha256 below, linked after gg-id.css on every screen), src/gg_id/screens.html (screens),
 src/gg_id/showcase.html (showcase page), src/fonts.css, src/global-logo.svg, src/gg-icon.svg, assets/favicons/gg-id.svg,
-gg-id/email-card.html + gg-id/email/gg-id-lockup-2x.png (the e-mail card, checked here, PNG from src/rasterize_gg_id_email.py).
+assets/logo/gg-id-pill.svg + gg-id-pill-dark.svg (the GG ID logo, the pill: approved files, never redrawn),
+gg-id/email-card.html + gg-id/email/gg-id-pill-3x.png (the e-mail card, checked here, PNG from src/rasterize_gg_id_email.py).
 
 Run: python3 src/build_gg_id.py
 """
@@ -112,8 +113,33 @@ ID_ICON_INLINE = (f'<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="t
                   f'{id_icon_inner("gid-id-icon-inline")}</svg>')
 FAVICON_URI = 'data:image/svg+xml,' + urllib.parse.quote(ID_ICON_SVG, safe='')
 
-LOCKUP = ('<div class="gid-lockup"><svg class="gid-logo" viewBox="0 0 777 196" role="img" aria-label="Global Generation">'
-          '<use href="#gid-logo"/></svg><span class="gid-lockup-name">ID</span></div>')
+# ---- логотип GG ID: пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», «слева лого справа айди и всё в пилюле», вариант C) ----
+# Утверждённые файлы лежат в assets/logo/ и не перерисовываются: gg-id-pill.svg (на светлом: navy-пилюля, белые знак GG и ID) и gg-id-pill-dark.svg (на тёмном: белая
+# пилюля, navy знак и ID). В спрайт идёт один символ gid-pill, а цвета ему дают токены: пилюле --g-pill, знаку и ID --g-pill-ink (светлая и тёмная тема, панель входа
+# и карта задают их в gg-id.css). Запасные значения равны файлу на светлом, поэтому символ и без кита рисуется верно. Символ gid-logo (логотип Global Generation) остаётся:
+# им подписаны шапки сервисов («логотип | АКБ»), это не логотип GG ID.
+PILL_FILE = os.path.join(ROOT, 'assets', 'logo', 'gg-id-pill.svg')
+PILL_DARK_FILE = os.path.join(ROOT, 'assets', 'logo', 'gg-id-pill-dark.svg')
+PILL_NAVY, PILL_WHITE = '#13445d', '#ffffff'
+PILL_VIEWBOX = '0 0 426.265 156'
+PILL_RATIO = 426.265 / 156
+
+
+def _pill_parts(path, fills):
+    svg = read(path)
+    assert f'viewBox="{PILL_VIEWBOX}"' in svg, f'{path}: viewBox must be {PILL_VIEWBOX}'
+    parts = re.findall(r'<path d="([^"]+)" fill="([^"]+)"/>', svg)
+    assert [f for _, f in parts] == fills, f'{path}: three paths (pill, GG, ID) with fills {fills}, found {[f for _, f in parts]}'
+    return [d for d, _ in parts]
+
+
+PILL_CAPSULE, PILL_GG, PILL_ID = _pill_parts(PILL_FILE, [PILL_NAVY, PILL_WHITE, PILL_WHITE])
+assert _pill_parts(PILL_DARK_FILE, [PILL_WHITE, PILL_NAVY, PILL_NAVY]) == [PILL_CAPSULE, PILL_GG, PILL_ID], \
+    'gg-id-pill-dark.svg must be the same pill with the colours swapped'
+PILL_SYMBOL = (f'<symbol id="gid-pill" viewBox="{PILL_VIEWBOX}"><path style="fill:var(--g-pill,{PILL_NAVY})" d="{PILL_CAPSULE}"/>'
+               f'<path style="fill:var(--g-pill-ink,{PILL_WHITE})" d="{PILL_GG}"/><path style="fill:var(--g-pill-ink,{PILL_WHITE})" d="{PILL_ID}"/></symbol>')
+LOCKUP = (f'<div class="gid-lockup"><svg class="gid-pill" viewBox="{PILL_VIEWBOX}" role="img" aria-label="GG ID">'
+          '<use href="#gid-pill"/></svg></div>')
 LOADER = ('<div class="gid-ld" aria-hidden="true"><svg class="gid-ld-mark" viewBox="3.6 8.6 31.3 20.95">'
           f'<path class="gid-ld-arc" d="{ARC}"/><path class="gid-ld-right" d="{RIGHT_TOP} {RIGHT_BOTTOM}"/>'
           f'<path class="gid-ld-main" d="{MAIN}"/></svg><span class="gid-ld-word"><svg viewBox="336 89 444 110">{LETTERS}</svg></span></div>')
@@ -313,6 +339,8 @@ def sprite(text):
         parts.append(f'<symbol id="gi-{n}" viewBox="0 0 24 24">{icon_inner(n)}</symbol>')
     if '#gid-logo' in text:
         parts.append(f'<symbol id="gid-logo" viewBox="0 0 777 196">{LOGO}</symbol>')
+    if '#gid-pill' in text:
+        parts.append(PILL_SYMBOL)
     if '#gid-id-icon' in text:
         parts.append(f'<symbol id="gid-id-icon" viewBox="0 0 64 64">{id_icon_inner("gid-id-icon")}</symbol>')
     if '#gid-tile' in text:   # старое имя: та же иконка GG ID, чтобы старая разметка <use href="#gid-tile"> показала ключ
@@ -450,15 +478,18 @@ for s in SCREENS:
 
 # full sprite for the hub: every symbol any screen or service component uses (<use href="/assets/gg-id/sprite.svg#gi-eye">)
 all_text = (''.join(s['body'] for s in SCREENS) + LOCKUP + FOOT + IDCARD + idrow(DEMO) + read(HERE, 'gg_id', 'showcase.html') +   # FOOT: книга «Как войти: инструкция»
-            ' data-gid-passkey-icon #gid-id-icon #gid-tile ')   # gid-tile = старое имя иконки GG ID, для старой разметки
+            ' data-gid-passkey-icon #gid-id-icon #gid-tile #gid-pill ')   # gid-tile = старое имя иконки GG ID, для старой разметки; gid-pill = логотип GG ID
 full = sprite(all_text).replace('<svg width="0" height="0" style="position:absolute" aria-hidden="true">',
                                 '<svg xmlns="http://www.w3.org/2000/svg">', 1)
-full = '<!-- GG ID: logo, root favicon tile and kit icons. Generated by src/build_gg_id.py -->\n' + full + '\n'
+full = '<!-- GG ID: logo of Global Generation (gid-logo), the GG ID pill (gid-pill), the GG ID icon and kit icons. Generated by src/build_gg_id.py -->\n' + full + '\n'
 brand_check('gg-id/sprite.svg', full)
 kit_rules_check('gg-id/sprite.svg', full)
 write_if_changed(os.path.join(KIT, 'sprite.svg'), full)
 # иконка GG ID отдельным файлом в ките: хаб отдаёт её из /assets/gg-id/ (img, презентации), источник assets/favicons/gg-id.svg
 write_if_changed(os.path.join(KIT, 'gg-id-icon.svg'), ID_ICON_SVG + '\n')
+# логотип GG ID (пилюля) отдельными файлами: хаб отдаёт их из /assets/gg-id/ для <img> (шапка админки, презентации), байт в байт утверждённые файлы assets/logo/
+for _pill_name, _pill_src in (('gg-id-pill.svg', PILL_FILE), ('gg-id-pill-dark.svg', PILL_DARK_FILE)):
+    write_if_changed(os.path.join(KIT, _pill_name), read(_pill_src))
 
 # drop screens that no longer exist in the source
 for fn in os.listdir(os.path.join(KIT, 'screens')):
@@ -466,10 +497,11 @@ for fn in os.listdir(os.path.join(KIT, 'screens')):
         os.remove(os.path.join(KIT, 'screens', fn))
 
 # ---- карточка GG ID и кнопки письма: gg-id/email-card.html (правится руками, стиль «Итог», как письмо Infra-AWS #93) ----
-# логотип письма: gg-id/email/gg-logo-navy-2x.png (src/rasterize_gg_id_email.py), хаб отдаёт его из /assets/gg-id/email/
+# логотип письма: пилюля gg-id/email/gg-id-pill-3x.png (src/rasterize_gg_id_email.py), хаб отдаёт её из /assets/gg-id/email/. Прежние gg-logo-navy-2x.png и gg-id-lockup-2x.png
+# остаются на месте: уже разосланные письма ссылаются на их адреса, но в новом письме их нет
 EMAIL_PATH = os.path.join(KIT, 'email-card.html')
-EMAIL_PNG = os.path.join(KIT, 'email', 'gg-logo-navy-2x.png')
-EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-logo-navy-2x.png'
+EMAIL_PNG = os.path.join(KIT, 'email', 'gg-id-pill-3x.png')
+EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png'
 EMAIL_FIELDS = ('name', 'positions', 'email', 'id')            # карта
 EMAIL_ACTION_FIELDS = ('link', 'guide_url')                   # кнопка «Задать пароль» и ссылка «Инструкция: как войти» (GUIDE_URL выше, как в подвале экранов)
 email_html = read(EMAIL_PATH)
