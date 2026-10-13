@@ -1,4 +1,4 @@
-/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-13.1 (gg-id/VERSION).
+/* GG ID: единый вход Global Generation. Кит экранов входа и компонентов, версия 2026-10-13.2 (gg-id/VERSION).
    Источник правды: Global-Generation/Infra-Brand-Identity, папка gg-id/ (правила в gg-id/README.md).
    Цвета и шрифт из assets/tokens/gg-tokens.css. Montserrat самохостом из fonts/, никаких CDN.
    Корень экрана: <div class="gid" data-layout="split|card|minimal" [data-theme="light|dark"]>.
@@ -237,8 +237,8 @@
 .gid-logo{display:block;height:28px;width:auto;flex:none;fill:currentColor}
 .gid-lockup-name{display:flex;align-items:center;padding-left:14px;border-left:1px solid var(--g-divider);
   font-size:16px;font-weight:600;line-height:1.1;white-space:nowrap;color:var(--g-logo)}
-/* логотип GG ID, пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», вариант C): знак GG слева, ID справа, всё в пилюле. Это вся подпись, «| ID» после неё нет.
-   Высота 28 px, как была у логотипа в подписи: панель, карточка и шапки стоят на тех же местах (ширина 76 px вместо 160). Цвета дают --g-pill и --g-pill-ink */
+/* логотип GG ID, пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», вариант C; «ID» меньше: «вариант 4 однозначно»): знак GG слева, ID справа, всё в пилюле. Это вся подпись, «| ID» после неё нет.
+   Высота 28 px, как была у логотипа в подписи: панель, карточка и шапки стоят на тех же местах (ширина 64,78 px вместо 160). Цвета дают --g-pill и --g-pill-ink */
 .gid-pill{display:block;height:var(--gid-pill-h,28px);width:auto;flex:none}
 
 /* ---------- текст ---------- */

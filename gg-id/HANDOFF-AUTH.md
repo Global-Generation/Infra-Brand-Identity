@@ -129,7 +129,7 @@ uv run --with playwright python src/check_gg_id_passkey.py   # только по
     <main class="gid-main">
       <section class="gid-card" id="card">
         <div class="gid-lockup">
-          <svg class="gid-pill" viewBox="0 0 426.265 156" role="img" aria-label="GG ID"><use href="/assets/gg-id/sprite.svg#gid-pill"/></svg>
+          <svg class="gid-pill" viewBox="0 0 360.931 156" role="img" aria-label="GG ID"><use href="/assets/gg-id/sprite.svg#gid-pill"/></svg>
         </div>
         <!-- виды экрана: <div data-view="..." hidden>...</div> -->
       </section>

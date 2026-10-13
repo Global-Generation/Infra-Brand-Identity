@@ -113,16 +113,18 @@ ID_ICON_INLINE = (f'<svg class="gid-sso-tile" viewBox="0 0 64 64" aria-hidden="t
                   f'{id_icon_inner("gid-id-icon-inline")}</svg>')
 FAVICON_URI = 'data:image/svg+xml,' + urllib.parse.quote(ID_ICON_SVG, safe='')
 
-# ---- логотип GG ID: пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», «слева лого справа айди и всё в пилюле», вариант C) ----
+# ---- логотип GG ID: пилюля (13.10.2026, Лёв: «давай везде пилюлей лого», «слева лого справа айди и всё в пилюле», вариант C; «ID» меньше: «вариант 4 однозначно») ----
 # Утверждённые файлы лежат в assets/logo/ и не перерисовываются: gg-id-pill.svg (на светлом: navy-пилюля, белые знак GG и ID) и gg-id-pill-dark.svg (на тёмном: белая
 # пилюля, navy знак и ID). В спрайт идёт один символ gid-pill, а цвета ему дают токены: пилюле --g-pill, знаку и ID --g-pill-ink (светлая и тёмная тема, панель входа
 # и карта задают их в gg-id.css). Запасные значения равны файлу на светлом, поэтому символ и без кита рисуется верно. Символ gid-logo (логотип Global Generation) остаётся:
 # им подписаны шапки сервисов («логотип | АКБ»), это не логотип GG ID.
+# Геометрия (вариант 4, 13.10): высота капсулы 156, торцы радиусом 78, знак GG прежний; «ID» это Montserrat ExtraBold 800 с высотой заглавной 64 (64% высоты знака,
+# было 100), по центру капсулы по вертикали; просвет знак-«I» 23,52 (было 30), правое поле 42,48 (было 46,8); ширина 360,931.
 PILL_FILE = os.path.join(ROOT, 'assets', 'logo', 'gg-id-pill.svg')
 PILL_DARK_FILE = os.path.join(ROOT, 'assets', 'logo', 'gg-id-pill-dark.svg')
 PILL_NAVY, PILL_WHITE = '#13445d', '#ffffff'
-PILL_VIEWBOX = '0 0 426.265 156'
-PILL_RATIO = 426.265 / 156
+PILL_VIEWBOX = '0 0 360.931 156'
+PILL_RATIO = 360.931 / 156
 
 
 def _pill_parts(path, fills):
