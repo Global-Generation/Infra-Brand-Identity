@@ -15,7 +15,7 @@ Passkey wording (rules of 09.10.2026 and 10.10.2026, src/check_gg_id_passkey.py,
 Windows Hello, «отпечаток» and «палец» only when this browser has a confirmed key of the device; 7 devices x 8 memory states x 3 screens, the rules of the shared
 localStorage memory, the real WebAuthn of Chromium (virtual authenticators), a browser without storage or WebAuthn.
 The scene of the sign-in screen (rule of 10.10.2026, src/check_gg_id_stage.py, also runnable alone): on login, password, forgot, error and noaccess in the four windows of
-the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, (window height - 260 px) / 2) and does not move between the screens, the card,
+the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, min((window height - 260 px) / 2, window height - 560 px)) and does not move between the screens, the card,
 the panel and the footer stand on the numbers of the sign-in page of the hub; the footer links the instruction; the tabs of the showcase change the screen in place.
 A view taller than the window grows downwards and scrolls, so «taller than the window» on the desktop screens counts the height without the lift of the scene (a view that
 does not fit even with the top of 28 px is still a failure).
@@ -427,7 +427,7 @@ with sync_playwright() as p:
                         if not (h['hero'] and h['inside'] and h['qr'] and h['key']):
                             problems.append(f'{label}: hero card of the split panel {h}')
                     # Сцена ставит карточку по центру окна, поэтому вид, который не помещается ниже этого подъёма, растёт вниз и прокручивается: это её правило (рабочая высота
-                    # 260 px, 13.10), а не раздутая вёрстка. Лишнюю высоту считаем без подъёма: вид, который не помещается в окно даже с верхом 28 px, по-прежнему ошибка.
+                    # 260 px, 13.10, ниже 860 px запас 560 px, 14.10), а не раздутая вёрстка. Лишнюю высоту считаем без подъёма: вид, который не помещается в окно даже с верхом 28 px, по-прежнему ошибка.
                     if r['height'] - r['sceneLift'] > r['viewH'] and tag == 'desktop':
                         problems.append(f'{label}: taller than the window {r["height"]} > {r["viewH"]} even without the {round(r["sceneLift"])} px the scene adds above the top of 28 px')
                     shot = (theme == 'light' and layout == 'split') or key in ('login', 'setpass', 'done', 'pin', 'card')
