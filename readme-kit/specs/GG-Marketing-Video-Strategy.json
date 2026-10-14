@@ -1,0 +1,11 @@
+{
+ "title": "Видеопродакшн: стратегия",
+ "tagline": "Внутренняя страница GG: экономика видеопродакшна, модель мотивации, календарь окт-янв и планы по людям.",
+ "body": "replace",
+ "body_md": "Внутренний документ видеокоманды GG (07.09.2026): общий вайб и вижн, модель мотивации (ростовые роли на просмотры, надёжностные на поток), экономика, календарь октябрь-январь, планы по каждому человеку, платёжный контур и открытые вопросы.\n\nДо 14.10.2026 страница жила только файлом на сервере хаба, без репо. Теперь источник правды здесь.\n\n## Где открывается\n\n- [id.global-generations-edu.com/video-strategy/](https://id.global-generations-edu.com/video-strategy/), за входом хаба GG ID.\n- На борде: кнопка на карточке Production (раздел Маркетинг), код Production в [GG-Marketing-Production](https://github.com/Global-Generation/GG-Marketing-Production).\n\n## Как править и выкатывать\n\n1. Правка `index.html` в ветке, PR в `main`.\n2. После мержа: `./deploy.sh` из `main`. Скрипт кладёт файл в `/var/www/levauth/video-strategy/` на EC2 хаба, прошлую версию оставляет рядом (`index.html.bak-<дата>`).\n\nОдин файл без сборки и зависимостей.\n",
+ "badges": [
+  {"label": "HTML", "message": "статика", "color": "E34F26", "logo": "html5"},
+  {"label": "Хостинг", "message": "nginx хаба EC2", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Вход", "message": "GG ID", "color": "1F5FBF"}
+ ]
+}
