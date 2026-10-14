@@ -15,7 +15,7 @@ Passkey wording (rules of 09.10.2026 and 10.10.2026, src/check_gg_id_passkey.py,
 Windows Hello, «отпечаток» and «палец» only when this browser has a confirmed key of the device; 7 devices x 8 memory states x 3 screens, the rules of the shared
 localStorage memory, the real WebAuthn of Chromium (virtual authenticators), a browser without storage or WebAuthn.
 The scene of the sign-in screen (rule of 10.10.2026, src/check_gg_id_stage.py, also runnable alone): on login, password, forgot, error and noaccess in the four windows of
-the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, (window height - 560 px) / 2) and does not move between the screens, the card,
+the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, (window height - 260 px) / 2) and does not move between the screens, the card,
 the panel and the footer stand on the numbers of the sign-in page of the hub; the footer links the instruction; the tabs of the showcase change the screen in place.
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).

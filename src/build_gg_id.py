@@ -76,7 +76,7 @@ assert 'url(fonts/montserrat-latin-ext.woff2)' in kit_css, 'gg-id.css must load 
 # они кладут к себе копию БАЙТ В БАЙТ и сверяют sha256 в своих тестах, поэтому файл закреплён и здесь. Правка сцены = новый файл, новый sha256 в этой строке,
 # в gg-id/README.md и в src/check_gg_id_stage.py, новая версия кита и PR во все копии; незаметно подменить его нельзя (gg-id/README.md, «Сцена экрана входа»)
 STAGE_FILE = 'gg-id-stage.css'
-STAGE_SHA256 = '451ecc726041580570e0d11c6951c271519ae734fddeeee44d650044e65ffbf0'
+STAGE_SHA256 = '16f8061a73ab1b1613e751c98d73e5958fc5ba129d7b44112f937121ee95c14b'
 _stage_bytes = open(os.path.join(KIT, STAGE_FILE), 'rb').read()
 assert hashlib.sha256(_stage_bytes).hexdigest() == STAGE_SHA256, \
     f'gg-id/{STAGE_FILE} changed: the scene is a contract of every service; a new file needs a new sha256 here, in gg-id/README.md, in src/check_gg_id_stage.py and a new kit version'
