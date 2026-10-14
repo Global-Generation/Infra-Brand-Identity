@@ -2,7 +2,7 @@
 
 Лёв (владелец, Global Generation) хочет, чтобы README всех репо орги `Global-Generation` были оформлены как у `Infra-Core` / `Infra-IaC`:
 лого по центру, заголовок, строка-описание, бейджи стека и прода, навигация по разделам. Пилот, одобренный по дизайну:
-- https://github.com/Global-Generation/GG-Product-SAT/blob/docs/readme-design/README.md (спека `spec-sat.json`)
+- https://github.com/Global-Generation/Aura-Product-SAT/blob/docs/readme-design/README.md (спека `spec-sat.json`)
 - https://github.com/Global-Generation/Ops-Legal/blob/docs/readme-design/README.md (`spec-legal.json`)
 - https://github.com/Global-Generation/Aura-LeadGen-CRM/blob/docs/readme-design/README.md (`spec-crm.json`, README написан с нуля)
 
