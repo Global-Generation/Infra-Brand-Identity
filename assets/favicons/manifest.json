@@ -105,7 +105,7 @@
   "key": "careers",
   "name": "Вакансии",
   "host": "careers.*",
-  "repo": "Web-HR",
+  "repo": "GG-Ops-HR",
   "family": "client",
   "favicon": "assets/favicons/careers.svg",
   "png": {
@@ -190,7 +190,7 @@
   "key": "demoitaly",
   "name": "Демо-карта Италия",
   "host": "demo.italy.*",
-  "repo": "GG-Product-Italy-Portal",
+  "repo": "Aura-Product-Italy-Portal",
   "family": "client",
   "favicon": "assets/favicons/demoitaly.svg",
   "png": {
@@ -275,7 +275,7 @@
   "key": "onboarding",
   "name": "Онбординг",
   "host": "onboarding.*",
-  "repo": "Ops-Onboarding",
+  "repo": "GG-Ops-Onboarding",
   "family": "internal",
   "favicon": "assets/favicons/onboarding.svg",
   "png": {
