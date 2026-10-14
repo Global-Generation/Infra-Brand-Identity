@@ -25,6 +25,11 @@
 .gam .gid-menu-meta + .gam-chev{margin-left:8px}
 .gam [aria-expanded="true"] > .gam-chev{transform:rotate(90deg)}
 .gam-sub{max-height:272px;overscroll-behavior:contain}
+/* "Мои сервисы" has no height limit of its own: every service of the person is in view and the card grows with the list. A card that is taller than the window is
+   limited by the window, not by the list: fit() of the js gives .gid-menu max-height and overflow-y:auto, so the whole card scrolls (one scroll, not a scroll inside a
+   scroll). The panels of the service's own items (a long list of people) keep the limit above. Two classes on purpose: the rule wins over .gid-menu-sub of the kit css
+   wherever that file lands in the cascade. */
+.gam .gam-sub--all{max-height:none;overflow:visible}
 .gam-sub .gid-menu-item:hover,.gam-sub .gid-menu-item:focus-visible{background:var(--g-soft)}
 .gam-note{padding:10px;font-size:12.5px;line-height:1.4;color:var(--g-muted)}
 

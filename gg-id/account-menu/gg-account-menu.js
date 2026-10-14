@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-13.3 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-14.1 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -31,7 +31,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-13.3';
+  var VERSION = '2026-10-14.1';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -395,7 +395,7 @@
     btn.setAttribute('aria-controls', pid);
     btn.setAttribute('data-gam-keep', '1');                 // a click here opens the panel, it does not close the menu
     btn.appendChild(icon('chevron-right', 'gid-ic gam-chev'));
-    var panel = h('div', 'gid-menu-sub gam-sub'); panel.id = pid; panel.setAttribute('role', 'group'); panel.setAttribute('aria-label', str(def.label)); panel.hidden = true;
+    var panel = h('div', 'gid-menu-sub gam-sub' + (opt.panelClass ? ' ' + opt.panelClass : '')); panel.id = pid; panel.setAttribute('role', 'group'); panel.setAttribute('aria-label', str(def.label)); panel.hidden = true;
     var sec = { btn: btn, panel: panel, link: opt.link || null, expanded: false, status: opt.status || 'idle', rows: opt.rows || [],
                 load: opt.load, render: opt.render, retry: !!opt.retry, hideOnFail: !!opt.hideOnFail };
     if (sec.link) { sec.link.hidden = true; }
@@ -469,6 +469,7 @@
     var target = c.servicesTarget === '_blank' ? '_blank' : '';
     var sec = this.section(menu, { id: 'services', label: L.services, icon: 'layout-grid' }, {
       link: link, hideOnFail: true,
+      panelClass: 'gam-sub--all',                              // every service in view, no scroll of the list's own (the card scrolls when the window is low)
       status: fixed ? (fixed.length ? 'ready' : 'failed') : (api ? 'idle' : 'failed'),
       rows: fixed || [],
       load: api ? function () { return fetchServices(api, c.servicesTimeout); } : null,
