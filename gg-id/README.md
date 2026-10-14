@@ -24,7 +24,7 @@
 | `email/gg-logo-navy-2x.png` | прежний navy-логотип Global Generation для писем на светлом фоне (302 x 76), больше не генерируется: разосланные письма ссылаются на его адрес |
 | `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут, больше не генерируется |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-14.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-14.3`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
 Хаб копирует `gg-id.css`, `gg-id-stage.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-stage.css` для экранов входа, `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png`.
 
@@ -275,7 +275,7 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-14.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-14.3' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).

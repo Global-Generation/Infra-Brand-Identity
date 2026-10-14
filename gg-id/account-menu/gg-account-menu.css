@@ -1,4 +1,4 @@
-/* GG account menu: styles of the account chip and its dropdown. Kit version 2026-10-14.2 (gg-id/VERSION).
+/* GG account menu: styles of the account chip and its dropdown. Kit version 2026-10-14.3 (gg-id/VERSION).
    GENERATED, do not edit by hand: python3 src/build_account_menu.py (Global-Generation/Infra-Brand-Identity).
    The blocks marked "kit" are copied byte for byte from gg-id/gg-id.css, so the menu looks exactly like the kit chip and menu of AKB;
    the last block is src/account_menu/local.css (services list, sections, narrow screen). A change of the look is a PR to the kit.
@@ -199,6 +199,9 @@
 .gam .gid-menu-item .gam-tile .gid-ic{width:16px;height:16px;color:#fff}
 .gam-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gam-svc .gid-menu-meta{flex:none}
+/* The caption of a group of services (the hub sends `group`): small, grey, the same inset as the rows; none when the answer has no groups */
+.gam-group{padding:10px 10px 4px;font-size:12px;font-weight:600;line-height:1.3;color:var(--g-muted)}
+.gam-group:first-child{padding-top:4px}
 .gam-all{padding:8px 10px;font-size:13px;color:var(--g-muted)}
 .gam-all .gid-ic{width:16px;height:16px;margin:0 6px}
 

@@ -229,6 +229,9 @@ def hub_handler():
                 return self.json(200, {'services': services(60)}, cors)
             if mode == 'thirteen':          # what the hub gives its administrator (14.10.2026: 13 services, the list showed six)
                 return self.json(200, {'services': services(13)}, cors)
+            if mode == 'grouped':           # the hub of 14.10.2026: `group` on every service, in the order of the groups
+                grp = ['Продукт'] * 4 + ['YouTube'] * 3 + ['Веб и прочее'] * 5 + ['<img src=x onerror="window.__pwned=9">' + 'Я' * 60]
+                return self.json(200, {'services': [dict(e, group=grp[n]) for n, e in enumerate(services(13))]}, cors)
             if mode == 'evil':
                 bad = [
                     {'key': 'x1', 'title': '<img src=x onerror="window.__pwned=1">Сервис <b>один</b>', 'url': f'{ORIGINS["svc"]}/svc/x1', 'icon': 'users'},
@@ -722,6 +725,33 @@ def listing(b):
     check('services', '13 services in a window of 600 px: scrolled to its end the card shows «Все сервисы» and «Выйти»', end['allSeen'] and end['logoutSeen'], end)
     pg.keyboard.press('Escape')
     pg.set_viewport_size({'width': 1440, 'height': 1000})
+
+    # the groups of 14.10.2026: the hub sends `group`, the list draws a small grey caption before the first service of each group; no `group` = no captions
+    check('groups', 'an answer without `group` (the old hub) draws no captions', pg.evaluate("document.querySelectorAll('#account .gam-group').length") == 0)
+    HUB['mode'] = 'grouped'
+    goto(pg, 'svc-groups', page(mount_js()))
+    open_services(pg)
+    pg.wait_for_selector('#account .gam-group')
+    info = pg.evaluate("""() => {
+      const caps = [...document.querySelectorAll('#account .gam-group')];
+      const panel = caps[0].parentElement, kids = [...panel.children];
+      const cs = getComputedStyle(caps[0]);
+      return { texts: caps.map(c => c.textContent), rows: panel.querySelectorAll('.gam-svc').length,
+               before: caps.map(c => c.nextElementSibling.classList.contains('gam-svc')),
+               first: kids[0] === caps[0], size: cs.fontSize, weight: cs.fontWeight, transform: cs.textTransform,
+               color: cs.color, rowColor: getComputedStyle(panel.querySelector('.gam-name')).color,
+               imgs: panel.querySelectorAll('img').length, pwned: window.__pwned || 0 };
+    }""")
+    check('groups', 'captions: one per group, in the order of the answer, text only (markup and 60 letters are cut to 40 and shown as text), before the first service of the group',
+          info['texts'][:3] == ['Продукт', 'YouTube', 'Веб и прочее'] and len(info['texts']) == 4 and len(info['texts'][3]) == 40 and info['texts'][3].startswith('<img')
+          and info['imgs'] == 0 and info['pwned'] == 0 and info['rows'] == 13 and all(info['before']) and info['first'], info)
+    check('groups', 'captions: 12 px, weight 600, not upper-cased, muted colour (not the colour of the service names)',
+          info['size'] == '12px' and info['weight'] == '600' and info['transform'] == 'none' and info['color'] != info['rowColor'], info)
+    geo = pg.evaluate(CARD_GEO)
+    check('groups', 'grouped list of 13 in a window of 1000 px: all rows, «Все сервисы» and «Выйти» in view, no scroll of its own',
+          geo['rows'] == 13 and geo['seen'] == 13 and geo['allSeen'] and geo['logoutSeen'] and not geo['panelScroll'], geo)
+    pg.keyboard.press('Escape')
+    HUB['mode'] = 'thirteen'
 
     # the panel of an item of the service itself (a long list of people) keeps its own box: only «Мои сервисы» lost the limit
     people = ', '.join("{label: 'Ментор %d'}" % i for i in range(40))

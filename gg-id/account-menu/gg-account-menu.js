@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-14.2 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-14.3 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -31,7 +31,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-14.2';
+  var VERSION = '2026-10-14.3';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -200,7 +200,9 @@
       var id = key || url;
       if (seen[id]) return;
       seen[id] = 1;
-      out.push({ key: key, title: title, url: url, icon: Object.prototype.hasOwnProperty.call(ICONS, s.icon) ? s.icon : DEFAULT_SERVICE_ICON });
+      // group: the caption of the group the hub puts the service in ("Продукт", "YouTube"...); text only, absent in an old answer = no headings
+      out.push({ key: key, title: title, url: url, icon: Object.prototype.hasOwnProperty.call(ICONS, s.icon) ? s.icon : DEFAULT_SERVICE_ICON,
+                 group: str(s.group).replace(/\s+/g, ' ').trim().slice(0, 40) });
     });
     return out;
   }
@@ -475,7 +477,14 @@
       load: api ? function () { return fetchServices(api, c.servicesTimeout); } : null,
       render: function (panel, list) {
         var here = currentIndex(list, c.currentKey);
+        var lastGroup = '';
         list.forEach(function (s, i) {
+          if (s.group && s.group !== lastGroup) {                // a small grey caption before the first service of a group
+            var cap = h('div', 'gam-group', s.group);
+            cap.setAttribute('role', 'presentation');
+            panel.appendChild(cap);
+          }
+          lastGroup = s.group;
           var a = h('a', 'gid-menu-item gam-svc');
           a.setAttribute('role', 'menuitem');
           a.setAttribute('href', s.url);
