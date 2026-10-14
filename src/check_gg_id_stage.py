@@ -1,6 +1,6 @@
 """GG ID kit: the scene of the sign-in screen, gg-id/gg-id-stage.css (rule of Lev, 10.10.2026: «после первого клика экран меняется, фон и геометрия ломаются»).
 
-One geometry of the sign-in screen for the hub, the gates and every GG service: on a computer the title stands at y = max(28 px, min((window height - 260 px) / 2, window height - 560 px))
+One geometry of the sign-in screen for the hub, the gates and every GG service: on a computer the title stands at y = max(28 px, min((window height - 260 px) / 2, window height - 590 px))
 whatever the view and whatever the service, the card and the panel and the background do not move, the footer (two lines, with the link «Как войти: инструкция»)
 is pressed to the bottom of the window. The file is a contract: every service keeps a copy byte for byte and checks the sha256 in its own tests.
 
@@ -31,16 +31,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KIT = os.path.join(ROOT, 'gg-id')
 SCREENS = os.path.join(KIT, 'screens')
 STAGE_FILE = 'gg-id-stage.css'
-STAGE_SHA256 = '066b13ce20e4379f3995c29a820fed385938b86cfb81af26ec39c70922acf863'   # the same in src/build_gg_id.py and gg-id/README.md: a new file needs all three
-STAGE_BYTES = 8243
+STAGE_SHA256 = 'f73d18f2d29384bd85a68d749a4bb0b1a3488691312e95e3241a331e2fe15915'   # the same in src/build_gg_id.py and gg-id/README.md: a new file needs all three
+STAGE_BYTES = 8340
 GUIDE_URL = 'https://id.global-generations-edu.com/instructions/'
 
 # The sign-in page of the hub, measured in headless Chromium (tolerance 1 px): window -> title y, card x, card width, panel width, first line of the footer y.
-# Desktop: title y = max(28, min((H - 260) / 2, H - 560)); panel = client width x 1.08 / 2.08; the card (384) is centred in the rest; the footer of two lines ends 22 px above the bottom.
+# Desktop: title y = max(28, min((H - 260) / 2, H - 590)); panel = client width x 1.08 / 2.08; the card (384) is centred in the rest; the footer of two lines ends 22 px above the bottom.
 # Phone (390 x 844): the panel is a strip 390 x 90, the title stands on 110, the card is 16 px from the edge; the footer ends 18 px above the bottom.
 CONTRACT = {
-    (1440, 900): {'h1': 320, 'card_x': 901.84, 'card_w': 384, 'aside_w': 747.69, 'foot1': 825.75},
-    (1280, 720): {'h1': 160, 'card_x': 780.30, 'card_w': 384, 'aside_w': 664.61, 'foot1': 645.75},
+    (1440, 900): {'h1': 310, 'card_x': 901.84, 'card_w': 384, 'aside_w': 747.69, 'foot1': 825.75},
+    (1280, 720): {'h1': 130, 'card_x': 780.30, 'card_w': 384, 'aside_w': 664.61, 'foot1': 645.75},
     (1920, 1080): {'h1': 410, 'card_x': 1266.45, 'card_w': 384, 'aside_w': 996.92, 'foot1': 1005.75},
     (390, 844): {'h1': 110, 'card_x': 16, 'card_w': 358, 'aside_w': 390, 'aside_h': 90, 'foot1': 773.75},
 }
@@ -153,7 +153,7 @@ def static(problems, counts):
                  'html:has(.gid[data-layout="split"]){scrollbar-gutter:stable;background:#ffffff}',
                  'html:has(.gid[data-layout="split"]){background:#0a1f2c}',
                  '@container gid (min-width:960px){',
-                 'padding-top:max(28px,min((100vh - 260px) / 2,100vh - 560px));padding-top:max(28px,min((100dvh - 260px) / 2,100dvh - 560px))',
+                 'padding-top:max(28px,min((100vh - 260px) / 2,100vh - 590px));padding-top:max(28px,min((100dvh - 260px) / 2,100dvh - 590px))',
                  '.gid[data-layout="split"] .gid-main > .gid-card{margin-block:0 28px}',
                  '.gid[data-layout="split"] .gid-main > .gid-foot{margin-top:auto}',
                  '@keyframes gidStageFade'):
@@ -169,7 +169,7 @@ def static(problems, counts):
     for (w, h), c in CONTRACT.items():
         if w >= 960:
             aside = round(w * 1.08 / 2.08, 2)
-            ok(f'contract {w}x{h}: title y is max(28, min((H - 260) / 2, H - 560))', abs(c['h1'] - max(28, min((h - 260) / 2, h - 560))) < 0.01, c['h1'])
+            ok(f'contract {w}x{h}: title y is max(28, min((H - 260) / 2, H - 590))', abs(c['h1'] - max(28, min((h - 260) / 2, h - 590))) < 0.01, c['h1'])
             ok(f'contract {w}x{h}: panel is 1.08 / 2.08 of the width', abs(c['aside_w'] - aside) < 0.01, c['aside_w'])
             ok(f'contract {w}x{h}: the card (384) is centred in the column', abs(c['card_x'] - round(aside + (w - aside - 384) / 2, 2)) < 0.02, c['card_x'])
             ok(f'contract {w}x{h}: the footer of two lines ends 22 px above the bottom', abs(c['foot1'] - (h - 74.25)) < 0.01, c['foot1'])
@@ -332,7 +332,7 @@ def browser(b, problems, counts):
         seen.append(pg.evaluate(SHOWCASE_READ))
     ok('showcase: every tab shows its screen', [s and s['key'] for s in seen] == list(SCREENS5), [s and s['key'] for s in seen])
     ys = [s['h1'] for s in seen if s]
-    near('showcase: the title stands on min((frame height - 260) / 2, frame height - 560) = 240 px inside the frame 1280 x 800', ys[0], 240, 1.5)
+    near('showcase: the title stands on min((frame height - 260) / 2, frame height - 590) = 210 px inside the frame 1280 x 800', ys[0], 210, 1.5)
     ok(f'showcase: the title does not move between the tabs (spread {max(ys) - min(ys):.2f} px)', max(ys) - min(ys) <= 0.5, ys)
     ok('showcase: the card and the panel do not move between the tabs', len({(round(s['cardX'], 1), round(s['asideW'], 1)) for s in seen}) == 1, [(s['cardX'], s['asideW']) for s in seen])
     gut, bg = pg.evaluate(HTML_PAINT)
