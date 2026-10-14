@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-14.2 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-15.1 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -27,11 +27,17 @@
 
    Or without a script of your own: <div data-gg-account-menu data-name="..." data-email="..." data-logout-url="..."></div>
    (items: data-gam-items='[{"label":"Настройки","icon":"settings","href":"/settings"}]'; JSON of the whole config: data-gg-account-menu='{...}').
-   window.GG_ACCOUNT_MENU_MANUAL = true before this file turns the automatic mounting off (React and other late markup: call mount yourself). */
+   window.GG_ACCOUNT_MENU_MANUAL = true before this file turns the automatic mounting off (React and other late markup: call mount yourself).
+
+   The bar of a sign-in on behalf of a person (the administrator looks at a service with the eyes of a person): one bar for the hub and every service, a strip over the whole
+   width right under the header. Put an empty element there and call
+     GGAccountMenu.impBar('#imp', { name: 'Иван Образцов', until: '2026-10-15T12:30:00Z', endHref: '/logout' });     // or onEnd: function () { return promise } or endForm: { action, fields }
+   ("Вы смотрите как Иван Образцов", "Только просмотр до ЧЧ:ММ (по часам устройства). Изменения не сохраняются.", the button «Вернуться к себе»; after `until`: «Вход от имени закончился»).
+   Or with no script of your own: <div data-gg-imp-bar data-name="..." data-until="..." data-end-href="..."></div>. The bar only shows and returns: what the service does in such a session is its own rule. */
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-14.2';
+  var VERSION = '2026-10-15.1';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -80,6 +86,18 @@
     'globe': [['circle', 12, 12, 10], ['path', 'M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20'], ['path', 'M2 12h20']],
     'server': [['rect', 2, 2, 20, 8, 2], ['rect', 2, 14, 20, 8, 2], ['line', 6, 6, 6.01, 6], ['line', 6, 18, 6.01, 18]],
     'wallet': [['path', 'M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1'], ['path', 'M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4']],
+    'briefcase': [['path', 'M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16'], ['rect', 2, 6, 20, 14, 2]],
+    'id-card': [['path', 'M16 10h2'], ['path', 'M16 14h2'], ['path', 'M6.17 15a3 3 0 0 1 5.66 0'], ['circle', 9, 11, 2], ['rect', 2, 5, 20, 14, 2]],
+    'clipboard-list': [['rect', 8, 2, 8, 4, 1], ['path', 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'], ['path', 'M12 11h4'], ['path', 'M12 16h4'], ['path', 'M8 11h.01'], ['path', 'M8 16h.01']],
+    'messages-square': [['path', 'M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'], ['path', 'M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1']],
+    'mic': [['path', 'M12 19v3'], ['path', 'M19 10v2a7 7 0 0 1-14 0v-2'], ['rect', 9, 2, 6, 13, 3]],
+    'shopping-bag': [['path', 'M16 10a4 4 0 0 1-8 0'], ['path', 'M3.103 6.034h17.794'], ['path', 'M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z']],
+    'clapperboard': [['path', 'M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z'], ['path', 'm6.2 5.3 3.1 3.9'], ['path', 'm12.4 3.4 3.1 4'], ['path', 'M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z']],
+    'film': [['rect', 3, 3, 18, 18, 2], ['path', 'M7 3v18'], ['path', 'M3 7.5h4'], ['path', 'M3 12h18'], ['path', 'M3 16.5h4'], ['path', 'M17 3v18'], ['path', 'M17 7.5h4'], ['path', 'M17 16.5h4']],
+    'scroll-text': [['path', 'M15 12h-5'], ['path', 'M15 8h-5'], ['path', 'M19 17V5a2 2 0 0 0-2-2H4'], ['path', 'M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3']],
+    'youtube': [['path', 'M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17'], ['path', 'm10 15 5-3-5-3z']],
+    'user-plus': [['path', 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'], ['circle', 9, 7, 4], ['line', 19, 8, 19, 14], ['line', 22, 11, 16, 11]],
+    'map': [['path', 'M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z'], ['path', 'M15 5.764v15'], ['path', 'M9 3.236v15']],
     'circle': [['circle', 12, 12, 10]]
   };
   var DEFAULT_SERVICE_ICON = 'layout-grid';
@@ -200,7 +218,12 @@
       var id = key || url;
       if (seen[id]) return;
       seen[id] = 1;
-      out.push({ key: key, title: title, url: url, icon: Object.prototype.hasOwnProperty.call(ICONS, s.icon) ? s.icon : DEFAULT_SERVICE_ICON });
+      // group: the caption of the group the hub puts the service in ("Product", "YouTube"...) and group_icon: its icon (a name of the kit set; none or unknown = no icon).
+      // Text only. Absent in an old answer = no captions at all
+      var gi = s.group_icon != null ? s.group_icon : s.groupIcon;
+      out.push({ key: key, title: title, url: url, icon: Object.prototype.hasOwnProperty.call(ICONS, s.icon) ? s.icon : DEFAULT_SERVICE_ICON,
+                 group: str(s.group).replace(/\s+/g, ' ').trim().slice(0, 40),
+                 groupIcon: Object.prototype.hasOwnProperty.call(ICONS, gi) ? gi : '' });
     });
     return out;
   }
@@ -474,8 +497,21 @@
       rows: fixed || [],
       load: api ? function () { return fetchServices(api, c.servicesTimeout); } : null,
       render: function (panel, list) {
-        var here = currentIndex(list, c.currentKey);
+        var here = currentIndex(list, c.currentKey), lastGroup = '', box = null, n = 0;
         list.forEach(function (s, i) {
+          if (s.group !== lastGroup) {                           // a new group: a caption (icon and name) and its services in a group of their own
+            lastGroup = s.group;
+            box = null;
+            if (s.group) {
+              box = h('div', 'gam-grp'); box.setAttribute('role', 'group');
+              var cap = h('div', 'gam-group'); cap.id = panel.id + '-g' + (++n);
+              if (s.groupIcon) cap.appendChild(icon(s.groupIcon, 'gid-ic'));
+              cap.appendChild(h('span', null, s.group));
+              box.setAttribute('aria-labelledby', cap.id);
+              box.appendChild(cap);
+              panel.appendChild(box);
+            }
+          }
           var a = h('a', 'gid-menu-item gam-svc');
           a.setAttribute('role', 'menuitem');
           a.setAttribute('href', s.url);
@@ -487,7 +523,7 @@
           a.appendChild(h('span', 'gam-name', s.title));
           if (i === here) { a.setAttribute('aria-current', 'true'); a.appendChild(h('span', 'gid-menu-meta', L.current)); }
           a.addEventListener('click', function () { self.emit('gam:select', { id: 'service', key: s.key, label: s.title }); });
-          panel.appendChild(a);
+          (box || panel).appendChild(a);
         });
         if (home) {
           var all = h('a', 'gid-menu-item gam-all');
@@ -713,10 +749,163 @@
     this.root.__ggAccountMenu = null;
   };
 
+  /* ---------- the bar of a sign-in on behalf of a person: one bar for the hub and every service (GGAccountMenu.impBar) ----------
+     A strip over the whole width right under the header (the menu): whose GG ID the administrator is looking at, until when, and the button «Вернуться к себе».
+     After the end time it says «Вход от имени закончился» and keeps the button. The bar only shows and returns; what the service does in such a session (look only,
+     nothing is saved) is the service's own rule and stays where it is. Names, times and the service's own words go in through textContent only. */
+  var IMP = {
+    region: 'Вход от имени',
+    watching: 'Вы смотрите как ',
+    anon: 'этот человек',
+    only: 'Только просмотр',
+    until: ' до ',
+    notSaved: 'Изменения не сохраняются.',
+    over: 'Вход от имени закончился',
+    overSub: 'Вернитесь к себе, чтобы продолжить.',
+    back: 'Вернуться к себе',
+    busy: 'Возвращаем…',
+    failed: 'Не получилось вернуться к себе. Попробуйте ещё раз.'
+  };
+  /* the end of the session as milliseconds: a number (milliseconds; below 1e11 it is seconds), an ISO string or a Date. 0 = not known */
+  function untilMs(v) {
+    if (v == null || v === '' || v === false) return 0;
+    var t = v instanceof Date ? v.getTime() : (typeof v === 'number' ? v : Date.parse(str(v)));
+    if (typeof v === 'number' && t > 0 && t < 1e11) t *= 1000;
+    return isFinite(t) && t > 0 ? t : 0;
+  }
+  function hhmm(ms) {
+    var d = new Date(ms);
+    return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  }
+
+  function ImpBar(root, opts) {
+    this.root = root;
+    this.baseClass = root.className || '';
+    this.cfg = {};
+    this.busy = false;
+    this.err = false;
+    this.note = '';
+    this.timer = 0;
+    this.noteTimer = 0;
+    this.over = null;
+    this.dead = false;
+    this.update(opts || {});
+  }
+  ImpBar.prototype.isOver = function () {
+    var t = untilMs(this.cfg.until);
+    return this.cfg.ended === true || (t > 0 && t <= Date.now());
+  };
+  ImpBar.prototype.update = function (opts) {
+    for (var k in (opts || {})) this.cfg[k] = opts[k];
+    this.render();
+  };
+  ImpBar.prototype.render = function () {
+    var self = this, c = this.cfg, root = this.root, over = this.isOver(), t = untilMs(c.until);
+    clearTimeout(this.timer);
+    root.textContent = '';
+    root.className = (this.baseClass + ' gid-kit gimp' + (over ? ' gimp--over' : '')).trim();
+    root.hidden = false;
+    root.setAttribute('role', 'region');
+    root.setAttribute('aria-label', IMP.region);
+    root.setAttribute('data-gimp', VERSION);
+    root.setAttribute('data-gimp-state', over ? 'over' : 'on');
+    root.appendChild(icon('eye', 'gid-ic gimp-ic'));
+
+    var tx = h('div', 'gimp-tx'), l1 = h('b', 'gimp-l1'), l2 = h('span', 'gimp-l2');
+    if (over) l1.textContent = IMP.over;
+    else {
+      l1.appendChild(doc.createTextNode(IMP.watching));
+      l1.appendChild(h('span', 'gimp-name', str(c.name).replace(/\s+/g, ' ').trim() || IMP.anon));
+    }
+    if (this.err) { l2.textContent = IMP.failed; l2.className += ' gimp-err'; l2.setAttribute('role', 'alert'); }
+    else if (this.note) { l2.textContent = this.note; l2.setAttribute('role', 'status'); }
+    else if (over) l2.textContent = IMP.overSub;
+    else l2.textContent = IMP.only + (t ? IMP.until + hhmm(t) : '') + '. ' + IMP.notSaved;
+    tx.appendChild(l1); tx.appendChild(l2);
+    root.appendChild(tx);
+
+    var form = c.endForm && typeof c.endForm === 'object' ? c.endForm : null, formUrl = form ? safeUrl(form.action) : '', href = safeUrl(c.endHref), act = null;
+    function face(node) {
+      node.appendChild(icon('log-out', 'gid-ic'));
+      node.appendChild(h('span', 'gimp-lbl', self.busy ? IMP.busy : IMP.back));
+      if (self.busy) { node.setAttribute('aria-busy', 'true'); if ('disabled' in node) node.disabled = true; }
+      return node;
+    }
+    if (formUrl) {                                           // a real POST (the service's own sign-out: its answer is a redirect)
+      var f = h('form', 'gimp-form'); f.method = 'post'; f.action = formUrl;
+      Object.keys(form.fields || {}).forEach(function (k) { var i = h('input'); i.type = 'hidden'; i.name = k; i.value = str(form.fields[k]); f.appendChild(i); });
+      var sb = face(h('button', 'gimp-btn')); sb.type = 'submit';
+      sb.addEventListener('click', function () { fire(root, 'gimp:end'); });
+      f.appendChild(sb);
+      act = f;
+    } else if (href) {                                       // a link
+      var a = face(h('a', 'gimp-btn')); a.setAttribute('href', href);
+      a.addEventListener('click', function () { fire(root, 'gimp:end'); });
+      act = a;
+    } else if (typeof c.onEnd === 'function') {              // the service's own call (the hub: POST impersonation/end); it navigates when it is done
+      var b = face(h('button', 'gimp-btn')); b.type = 'button';
+      b.addEventListener('click', function () { self.end(); });
+      act = b;
+    }
+    if (act) root.appendChild(act);
+
+    if (this.over !== null && this.over !== over && over) fire(root, 'gimp:over');
+    this.over = over;
+    if (!over && t) this.timer = setTimeout(function () { if (!self.dead) self.render(); }, Math.min(t - Date.now() + 500, 2147483000));
+  };
+  ImpBar.prototype.end = function () {
+    var self = this;
+    if (this.busy || this.dead || typeof this.cfg.onEnd !== 'function') return;
+    this.busy = true; this.err = false; this.note = '';
+    fire(this.root, 'gimp:end');
+    this.render();
+    var r;
+    try { r = this.cfg.onEnd(); } catch (e) { oops(e); r = Promise.reject(e); }
+    Promise.resolve(r).then(function (v) {
+      if (self.dead || v !== false) return;                  // resolved: the service goes on to another page; false = it stayed, the button works again
+      self.busy = false; self.render();
+    }, function (e) {
+      if (self.dead) return;
+      self.busy = false; self.err = !(e && e.silent); self.render();
+    });
+  };
+  /* a short line in the place of the second one (the service's «здесь только просмотр»): shown for some seconds, then the usual line comes back */
+  ImpBar.prototype.notice = function (text, ms) {
+    var self = this;
+    clearTimeout(this.noteTimer);
+    this.note = str(text).replace(/\s+/g, ' ').trim().slice(0, 200);
+    this.render();
+    if (this.note) this.noteTimer = setTimeout(function () { if (!self.dead) { self.note = ''; self.render(); } }, ms > 0 ? ms : 6000);
+  };
+  ImpBar.prototype.destroy = function () {
+    if (this.dead) return;
+    this.dead = true;
+    clearTimeout(this.timer); clearTimeout(this.noteTimer);
+    this.root.textContent = '';
+    this.root.className = this.baseClass;
+    ['role', 'aria-label', 'data-gimp', 'data-gimp-state'].forEach(function (a) { this.root.removeAttribute(a); }, this);
+    this.root.__ggImpBar = null;
+  };
+
+  function impBar(el, opts) {
+    el = resolveEl(el, 'GGAccountMenu.impBar');
+    if (el.__ggImpBar) { el.__ggImpBar.update(opts || {}); return el.__ggImpBar.handle; }
+    var inst = new ImpBar(el, opts);
+    inst.handle = {
+      el: el,
+      update: function (more) { inst.update(more || {}); },
+      notice: function (text, ms) { inst.notice(text, ms); },
+      isOver: function () { return inst.isOver(); },
+      destroy: function () { inst.destroy(); }
+    };
+    el.__ggImpBar = inst;
+    return inst.handle;
+  }
+
   /* ---------- public API ---------- */
-  function resolveEl(el) {
+  function resolveEl(el, who) {
     if (typeof el === 'string') el = doc.querySelector(el);
-    if (!el || el.nodeType !== 1) throw new TypeError('GGAccountMenu.mount: the element is not found');
+    if (!el || el.nodeType !== 1) throw new TypeError((who || 'GGAccountMenu.mount') + ': the element is not found');
     return el;
   }
 
@@ -758,6 +947,18 @@
     return cfg;
   }
 
+  /* the bar of a sign-in on behalf: <div data-gg-imp-bar data-name="Иван Образцов" data-until="2026-10-15T12:30:00Z" data-end-href="/logout"></div>
+     (JSON of the whole config: data-gg-imp-bar='{...}'; the POST form: data-end-form='{"action":"/logout","fields":{"to":"gg-id"}}'; data-ended="true" = already over) */
+  function impConfigFrom(node) {
+    var cfg = {}, raw = node.getAttribute('data-gg-imp-bar'), form = node.getAttribute('data-end-form');
+    if (raw && raw.charAt(0) === '{') { try { cfg = JSON.parse(raw) || {}; } catch (e) { oops(e); } }
+    var map = { name: 'data-name', until: 'data-until', endHref: 'data-end-href' };
+    Object.keys(map).forEach(function (k) { if (node.hasAttribute(map[k])) cfg[k] = node.getAttribute(map[k]); });
+    if (node.hasAttribute('data-ended')) cfg.ended = node.getAttribute('data-ended') !== 'false';
+    if (form) { try { cfg.endForm = JSON.parse(form); } catch (e) { oops(e); } }
+    return cfg;
+  }
+
   function init(root) {
     root = root || doc;
     var nodes = arr(root.querySelectorAll ? root.querySelectorAll('[data-gg-account-menu]') : []);
@@ -765,12 +966,18 @@
     nodes.forEach(function (n) {
       try { mount(n, configFrom(n)); } catch (e) { oops(e); }
     });
+    var bars = arr(root.querySelectorAll ? root.querySelectorAll('[data-gg-imp-bar]') : []);
+    if (root.matches && root.matches('[data-gg-imp-bar]')) bars.unshift(root);
+    bars.forEach(function (n) {
+      try { impBar(n, impConfigFrom(n)); } catch (e) { oops(e); }
+    });
   }
 
   win.GGAccountMenu = {
     version: VERSION,                                      // = gg-id/VERSION
     mount: mount,                                          // mount(el | selector, options) -> { open, close, toggle, isOpen, update, destroy, refreshServices }
-    init: init,                                            // mount every [data-gg-account-menu] inside root (document by default)
+    impBar: impBar,                                        // impBar(el | selector, options) -> { update, notice, isOver, destroy }: the bar of a sign-in on behalf of a person
+    init: init,                                            // mount every [data-gg-account-menu] and every [data-gg-imp-bar] inside root (document by default)
     initials: initials,
     icons: Object.keys(ICONS),
     hub: (function () { var o = {}; for (var k in HUB) o[k] = HUB[k]; return o; })(),   // the canonical hub addresses the defaults are made of (a copy: read only)

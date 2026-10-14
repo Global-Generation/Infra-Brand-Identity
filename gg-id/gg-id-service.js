@@ -207,7 +207,7 @@
     sessionExpired: function () { if (dialog.el) showExpired(); else fire(doc, 'gid:session-expired'); },
     closeSessionExpired: hideExpired,
     watchFetch: watchFetch,                                            // fetch: 401 со своего origin = окно
-    version: '2026-10-14.2'                                            // = gg-id/VERSION
+    version: '2026-10-15.1'                                            // = gg-id/VERSION
   };
 
   function auto() {

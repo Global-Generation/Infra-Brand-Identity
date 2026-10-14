@@ -201,15 +201,15 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
 <section class="sc-sec" id="idcard">
   <div class="wrap">
     <h2>Карточка GG ID</h2>
-    <p class="lead">Белая карта с голубым голографическим переливом и ключом GG ID, как студенческий ID в Duke или Stanford: имя, должности, рабочая почта и номер GG ID. На экране входа она висит на ленте в прозрачном держателе на navy-панели. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и номера на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
+    <p class="lead">Белая карта с голубым голографическим переливом, как студенческий ID в Duke или Stanford, одна на кабинет, Wallet, экран входа и конец онбординга: фото или аватар в круглой рамке (пока картинки нет, в рамке инициалы), имя, должности, команда и страна, QR. Номера GG ID на карте нет. На экране входа она висит на ленте в прозрачном держателе на navy-панели. Пропорции настоящей карты 85,6 x 54 мм, на телефоне во всю ширину. Люди и картинка на карточках вымышленные. Экран целиком: <a href="#s=card&amp;l=split&amp;t=light&amp;d=desktop" id="toCard">вкладка «Карточка GG ID»</a>.</p>
     <div class="sc-idc">
       <figure class="sc-idc-cell gid-kit" data-theme="light">
 @IDCARD@
-        <figcaption>Светлая тема</figcaption>
+        <figcaption>Светлая тема, картинки ещё нет: в рамке инициалы</figcaption>
       </figure>
       <figure class="sc-idc-cell dark gid-kit" data-theme="dark">
-@IDCARD@
-        <figcaption>Тёмная тема</figcaption>
+@IDCARD_PHOTO@
+        <figcaption>Тёмная тема, с фото или аватаром (на макете условный силуэт)</figcaption>
       </figure>
     </div>
     <div class="sc-idc">
@@ -237,7 +237,7 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
       <div class="sc-mail-frame"><iframe title="Карточка GG ID в письме" id="mailFrame" srcdoc="@EMAIL_SRCDOC@"></iframe></div>
       <div class="sc-mail-notes">
         <p><b>Файл:</b> <code>gg-id/email-card.html</code>, стиль «Итог», как письмо-приглашение Infra-AWS #93: светлая карта, как в «Мои сервисы», с номером GG ID, белая кнопка «Задать пароль» с тонкой рамкой, ссылка текстом «Инструкция: как войти», вход в сервисах «Войти через GG ID». Таблицы и встроенные стили, системный шрифт, без внешних шрифтов и скриптов. Хаб вставляет в письмо блоки между метками <code>gg-id-card</code> и <code>gg-id-actions</code>.</p>
-        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> в карте, <code>{{link}}</code> <code>{{guide_url}}</code> в кнопках. Каждое значение экранируется как HTML. Фото и плашки инициалов нет, как в ките.</p>
+        <p><b>Подстановки:</b> <code>{{name}}</code> <code>{{positions}}</code> <code>{{email}}</code> <code>{{id}}</code> в карте, <code>{{link}}</code> <code>{{guide_url}}</code> в кнопках. Каждое значение экранируется как HTML. Письмо пока прежнего вида (без фото, команды и страны, с номером): его переделывает тот, кто ведёт рассылку приглашений, вместе с онбордингом.</p>
         <p><b>Тёмная тема:</b> письмо светлое (<code>color-scheme: light</code>), Apple Mail его не перекрашивает. Gmail на iPhone инвертирует цвета, но не картинки: текст остаётся контрастным.</p>
         <p><b>Логотип:</b> пилюля GG ID, картинка <code>gg-id/email/gg-id-pill-3x.png</code> по https из <code>/assets/gg-id/</code> хаба: почта не рисует SVG.</p>
       </div>
@@ -514,6 +514,9 @@ code{font:600 12px/1.45 var(--mono);background:#e6edf5;color:var(--navy);padding
   mail.addEventListener('load', fitMail);
   window.addEventListener('resize', fitMail);
   fitMail();
+
+  // QR на карточках раздела «Карточка GG ID» (страница в ручном режиме: init для них не зовём, QR рисуем сами)
+  document.querySelectorAll('#idcard svg[data-gid-qr]').forEach(GGID.qrDraw);
 
   // компоненты: ссылки-заглушки, меню аккаунта, окно поверх страницы
   document.querySelectorAll('[data-noop]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });

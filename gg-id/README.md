@@ -24,7 +24,7 @@
 | `email/gg-logo-navy-2x.png` | прежний navy-логотип Global Generation для писем на светлом фоне (302 x 76), больше не генерируется: разосланные письма ссылаются на его адрес |
 | `email/gg-id-lockup-2x.png` | прежняя подпись «логотип \| ID» для navy-карты (белая на navy-плашке), остаётся для писем, которые её берут, больше не генерируется |
 | `preview/` | картинки карточки для этого README и PR, обновляет `src/check_gg_id.py --preview` |
-| `VERSION` | версия кита (дата релиза, например `2026-10-14.2`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
+| `VERSION` | версия кита (дата релиза, например `2026-10-15.1`); её же отдают `GGID.version` и `GGIDService.version`, сборка сверяет. Поднимать при каждой правке кита |
 
 Хаб копирует `gg-id.css`, `gg-id-stage.css`, `gg-id.js`, `fonts/`, `sprite.svg`, `gg-id-icon.svg` и `email/` к себе, сервисы берут `gg-id.css` (или нужные блоки), `gg-id-stage.css` для экранов входа, `gg-id-service.js` и `fonts/` (например в `/assets/gg-id/`). Пути к шрифтам в CSS относительные: `fonts/...` рядом с `gg-id.css`. Картинки из `email/` письма берут по https: `https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png`.
 
@@ -169,7 +169,7 @@ GGID.passkeyText('login|enroll|enroll-lead|wait'), GGID.passkeyIcon('login|enrol
 | Код доступа | `screens/pin.html` | Переходный вход по коду для сервисов, которые ещё не на GG ID. | `sso-gate: PIN-ворота` |
 | Недоступен | `screens/unavailable.html` | GG ID не отвечает (5xx или таймаут). Страница сама пробует снова. | `sso-gate: sso-unavailable` |
 | Вы вышли | `screens/signedout.html` | После «Выйти» в меню аккаунта. | `POST /api/v1/sessions/revoke` |
-| Карточка GG ID | `screens/card.html` | Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html. | `GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()` |
+| Карточка GG ID | `screens/card.html` | Карточка сотрудника, как студенческий ID: фото или аватар, имя, должности, команда и страна, QR, без номера. Вверху кабинета «Мои сервисы», на первом входе после приглашения (онбординг), на панели экрана входа и в Apple Wallet. В письме-приглашении её копия gg-id/email-card.html. | `GET /api/auth/card и /me: display_name, email, positions, qr (уже есть); photo, team, country (добавить: профиль GG ID); GGPasskey.list()` |
 <!-- screens:end -->
 
 ## Компоненты для сервисов
@@ -275,7 +275,7 @@ GGIDService.closeMenu(acct)       // закрыть меню
 GGIDService.sessionExpired()      // открыть окно «Сессия истекла» (то же, что событие gid:session-expired)
 GGIDService.closeSessionExpired() // закрыть окно
 GGIDService.watchFetch({ignore: ['/api/me']})  // включить перехват 401 (автоматически, если на странице есть окно)
-GGIDService.version               // '2026-10-14.2' = gg-id/VERSION (GGID.version в gg-id.js такая же)
+GGIDService.version               // '2026-10-15.1' = gg-id/VERSION (GGID.version в gg-id.js такая же)
 ```
 
 События: `gid:menu-open` и `gid:menu-close` на `.gid-acct`, `gid:expired-open` и `gid:expired-close` на окне. `window.GGID_SERVICE_MANUAL = true` до подключения отключает автозапуск: тогда `GGIDService.init()` и `GGIDService.watchFetch()` вызываются вручную (так делают React-сервисы, у которых разметка появляется позже).
@@ -294,15 +294,15 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
 
 ## Карточка GG ID
 
-Карточка сотрудника, как студенческий ID в Duke или Stanford: имя, должности, рабочая почта и номер GG ID. Один взгляд, и человек видит, под каким аккаунтом вошёл.
+Карточка сотрудника, как студенческий ID в Duke или Stanford: фото или аватар, имя, роль, команда и страна, рабочая почта и QR. Номера GG ID на карте нет (решение 15.10.2026): человек читает не номер, а имя и роль, а номер остаётся в QR и на странице проверки. Один взгляд, и человек видит, под каким аккаунтом вошёл.
 
-Где показываем: вверху кабинета «Мои сервисы» (`/cabinet/` хаба), на первом входе после приглашения и в онбординге, образцом в инструкции «Как войти» (`kak-voyti.html`). В письме-приглашении её копия `email-card.html` (ниже). Эталон: `screens/card.html`; витрина: `gg-id.html#s=card` и раздел «Карточка GG ID».
+Где показываем: вверху кабинета «Мои сервисы» (`/cabinet/` хаба, пропуск на ленте), на панели экрана входа слева, на первом входе после приглашения и в конце онбординга, в Apple Wallet (поля пропуска те же), образцом в инструкции «Как войти» (`kak-voyti.html`). Это один дизайн везде: кабинет, Wallet, вход и финал онбординга не рисуют свои варианты. В письме-приглашении её копия `email-card.html` (ниже). Эталон: `screens/card.html`; витрина: `gg-id.html#s=card` и раздел «Карточка GG ID».
 
-- Вид «Итог» (08.10): белая пластиковая карта с голубым голографическим переливом, ключ GG ID в голографической печати (символ `gid-id-icon`), логотип GG ID (пилюля) navy. Без фото и без плашки инициалов.
+- Вид «Итог» (08.10, версия 15.10): белая пластиковая карта с голубым голографическим переливом, логотип GG ID (пилюля) слева вверху, круглая голографическая печать справа вверху, ниже имя, роль, строка «Команда · Страна» и почта, QR справа внизу. В печати фото или аватар человека (`photo`); нет картинки или она не загрузилась = инициалы; нет и имени (образец до входа) = ключ GG ID (символ `gid-id-icon`). Печать стоит всегда, место под фото не прыгает.
 - Карта светлая в обеих темах, как настоящая; тема меняет только тень (`--g-idc-shadow`). Перелив только в голубых и серебряных тонах.
 - Размер: `width: 100%`, `max-width: var(--gid-idcard-w, 460px)`, высота не меньше ширины x 54 / 85,6 (пропорции настоящей карты 85,6 x 54 мм). На телефоне во всю ширину контейнера. Если данных больше (длинное имя, три длинные должности, длинная почта на узкой карте), карта растёт вниз, ничего не обрезается.
 - Пропорцию держит распорка `.gid-idcard::before`, а не `aspect-ratio`: во flex- и grid-родителях `aspect-ratio` не даёт карте вырасти, и текст вылезает. В flex-ряду с `align-items: stretch` карточка тянется на высоту ряда: поставить ей `align-self: flex-start`.
-- Один акцент: голубая точка статуса «Активен» (в строке под почтой, рядом «Face ID / Touch ID подключён»). Больше на карточке ничего не подсвечиваем.
+- Один акцент: голубая точка статуса «Активен» (в строке под почтой, рядом «Face ID / Touch ID подключён»). Больше на карточке ничего не подсвечиваем. Слева направо и сверху вниз читается одно: кто это (фото, имя), чем занят (роль, команда, страна), как проверить (QR).
 - Та же карта висит героем на панели сплита (раздел «Экран входа: панель с картой»).
 - Ставится внутри `.gid` или `.gid-kit` (оттуда шрифт и токены). Над заголовком экрана карточку не ставим: сначала заголовок, потом карточка.
 
@@ -324,22 +324,22 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
   <span class="gid-idcard-holo" aria-hidden="true"></span>
   <div class="gid-idcard-top">
     <div class="gid-lockup"><svg class="gid-pill" viewBox="0 0 360.931 156" role="img" aria-label="GG ID"><use href="#gid-pill"/></svg></div>
-    <span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg></span>
+    <span class="gid-idcard-seal" data-gid-field="photo" data-state="initials" aria-hidden="true"><span class="gid-idcard-ini">ИО</span></span>
   </div>
   <div class="gid-idcard-who">
     <p class="gid-idcard-name" data-gid-field="name">Иван Образцов</p>
     <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"><li>Ментор</li><li>Продажи</li></ul>
+    <p class="gid-idcard-where" data-gid-field="where">Менторы · Казахстан</p>
     <p class="gid-idcard-mail" data-gid-field="email">ivan.<wbr>obraztsov<wbr><span>@global-generations.com</span></p>
-    <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID / Touch ID подключён</span></p>
   </div>
   <div class="gid-idcard-facts">
-    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">GG 0042-7F3A</dd></dl>
-    <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">марта 2024</dd></dl>
+    <p class="gid-idcard-meta"><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span><span class="gid-idcard-passkey" data-gid-field="passkey"><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID / Touch ID подключён</span></p>
   </div>
+  <svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="https://id.global-generations-edu.com/v/GG-0042-7F3A" viewBox="0 0 37 37" role="img" aria-label="QR-код GG ID"><path fill="#13445d" d=""/></svg>
 </article>
 
 <!-- компактная строка -->
-<div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">ИО</span><span class="gid-idrow-tx"><b data-gid-field="name">Иван Образцов</b><span class="gid-idrow-num" data-gid-field="id">GG 0042-7F3A</span></span><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span></div>
+<div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">ИО</span><span class="gid-idrow-tx"><b data-gid-field="name">Иван Образцов</b><span class="gid-idrow-role" data-gid-field="role">Ментор · Продажи</span></span><span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span></div>
 ```
 <!-- idcard:end -->
 
@@ -353,52 +353,57 @@ GGAccountMenu.mount('#account', { name, email, onLogout: logout, items: [{ id: '
   <div class="gid-aside-hero"><div class="gid-hero" aria-hidden="true"><div class="gid-hero-hang">
     <div class="gid-hero-lan"><span class="gid-hero-strap"></span><svg class="gid-hero-clip" viewBox="0 0 30 36">…</svg></div>
     <div class="gid-hero-holder"><span class="gid-hero-gloss"></span>
-      <article class="gid-idcard gid-idcard--hero">…GG ID, имя, должность, номер, QR…</article>
+      <article class="gid-idcard gid-idcard--hero">…пилюля GG ID, печать с фото, «GG ID», имя, должность, «Команда · Страна», QR…</article>
     </div>
   </div></div></div>
   <div class="gid-aside-copy">…</div>
 </aside>
 ```
 
-- Разметку брать целиком из `screens/login.html`. До входа на карте данные-шаблон: «Имя Фамилия», «Должность», `GG 0042-7F3A`.
+- Разметку брать целиком из `screens/login.html`. До входа на карте данные-шаблон: «Имя Фамилия», «Должность», «Команда · Страна», в печати ключ GG ID, QR-образец. Номера на карте нет нигде, вместо него слова «GG ID» крупно (так и в Wallet).
 - Текст панели (правило 08.10): страницы входа публичные, поэтому списка внутренних сервисов на них нет. Заголовок «Один вход во все сервисы Global&nbsp;Generation», под ним ровно «Все рабочие сервисы команды открываются с одним GG&nbsp;ID, без отдельного пароля в каждом.» Неразрывный пробел держит «GG ID» и «Global Generation» на одной строке. Сборка падает, если в тексте панели появится название сервиса.
 - Панель по высоте (низкое окно, масштаб 200 %): ничего не наезжает и не обрезается, карта не уже 300 px. Окно от 614 px в высоту: подпись, карта и текст; от 480 до 613 px текст панели уходит, карта занимает его место; ниже 480 px карты нет, остаются подпись и текст. Если места на карту всё равно мало (длинный текст, панель в окне сервиса), карты тоже нет. Проверка: `check_gg_id.py`, окна от 1920 x 400 до 320 x 568.
-- Данные на карте-герое её не вытягивают: имя не длиннее двух строк (на узкой карте шрифт меньше, слово не рвётся по буквам), должности одной строкой с многоточием, номер в одну строку. Полные данные показывает карточка кабинета (`.gid-idcard` без `--hero`), она растёт вниз, как раньше.
-- «Продолжить как»: аккаунт известен, карта оживает его именем: `GGID.card(document.querySelector('.gid-aside .gid-idcard'), {name, positions, id, qr})` и класс `is-alive` (плавное появление). Эталон: `screens/continue.html`.
-- QR: `<svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="текст"><path/></svg>`, рисует `gg-id.js` сам (кодер без зависимостей, уровень M). На карте-образце (до входа, публичные страницы) QR кодирует просто номер-образец `GG 0042-7F3A`, без адреса хаба. У карты аккаунта («Продолжить как», `GGID.card(el, {qr})`) это адрес страницы проверки карты: в ките `https://id.global-generations-edu.com/v/<номер через дефис>`, окончательный адрес решает хаб. `GGID.qrDraw(svg)` перерисовать, `GGID.qrMatrix(text)` матрица для тестов.
+- Данные на карте-герое её не вытягивают: имя не длиннее двух строк (на узкой карте шрифт меньше, слово не рвётся по буквам), должности одной строкой с многоточием, «Команда · Страна» одной строкой. Полные данные показывает карточка кабинета (`.gid-idcard` без `--hero`), она растёт вниз, как раньше.
+- «Продолжить как»: аккаунт известен, карта оживает его именем: `GGID.card(document.querySelector('.gid-aside .gid-idcard'), {name, positions, team, country, photo, qr})` и класс `is-alive` (плавное появление). Эталон: `screens/continue.html`.
+- QR: `<svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="текст"><path/></svg>`, рисует `gg-id.js` сам (кодер без зависимостей, уровень M). На карте-образце (до входа, публичные страницы) QR кодирует просто образец `GG 0042-7F3A` текстом, без адреса хаба (номер на карте не виден, в QR он остаётся ключом страницы проверки). У карты аккаунта («Продолжить как», `GGID.card(el, {qr})`) это адрес страницы проверки карты: в ките `https://id.global-generations-edu.com/v/<номер через дефис>`, окончательный адрес решает хаб. `GGID.qrDraw(svg)` перерисовать, `GGID.qrMatrix(text)` матрица для тестов.
 
 ### Поля и что нужно от хаба
 
 | Поле | `data-gid-field` | Как выглядит | Ограничения | Откуда в хабе |
 |---|---|---|---|---|
+| Фото или аватар | `photo` | круглая голографическая печать справа вверху (картинка по размеру печати, `object-fit: cover`) | только `https://` или свой путь сайта (`/avatars/ab.png`); `http:`, `data:`, `javascript:`, `//чужой.хост` и пробелы отбрасываются; картинка без `Referer`; не загрузилась = инициалы | новое поле `photo` профиля GG ID (аватарки собирает отдельная полоса, подключатся через это поле) |
 | Имя | `name` | полное имя, крупно | переносится по словам | `display_name`, уже есть в `GET /api/auth/me` |
-| Инициалы | `initials` | 1-2 буквы navy на светло-голубом круге (`--g-avatar`), только в компактной строке `.gid-idrow` (на карте их нет) | первые буквы двух первых слов имени | считаются из имени (`GGID.cardInitials`) |
+| Инициалы | `initials` | 1-2 буквы navy на светло-голубом круге (`--g-avatar`): в печати, пока нет фото, и в компактной строке `.gid-idrow` | первые буквы двух первых слов имени | считаются из имени (`GGID.cardInitials`) |
 | Должности | `positions` | `<ul>`, до трёх `<li>` в строку через « · » | 0-3, длинные названия переносятся; нет должностей = `hidden` | названия из `user_positions` + `positions.title`: добавить в `/api/auth/me` |
 | Почта | `email` | рабочая почта | только @global-generations.com; перенос перед @ и после точек в имени: `ivan.<wbr>obraztsov<wbr><span>@global-generations.com</span>` | `email`, уже есть |
-| Номер GG ID | `id` | строка, цифры моноширинные (`tabular-nums`) | до 14 символов; формат решает хаб, пример `GG 0042-7F3A` | новое поле `gg_id` |
-| В команде с | `since` | «марта 2024» (месяц в родительном падеже и год) | `YYYY-MM` или готовая строка | новое поле: месяц прихода в команду. `users.created_at` не подходит: аккаунты заведены при переезде на GG ID |
+| Команда и страна | `where` (`team`, `country`) | одна строка «Команда · Страна» под ролью | нет одной части = остаётся другая, нет обеих = строки нет (`hidden`) | новые поля `team` и `country` профиля GG ID |
 | Статус | `status` | «Активен» с голубой точкой; `data-status="disabled"` = «Отключён», точка серая | `active` или `disabled` | `users.status` |
 | Face ID / Touch ID | `passkey` | «Face ID / Touch ID подключён» со значком `gi-scan-face` | только если у аккаунта есть ключ входа, иначе `hidden` | `GGPasskey.list()` не пустой (или число ключей в `/api/auth/me`) |
+| QR | `qr` | код справа внизу, navy на светлом | текст QR; у карты аккаунта это адрес страницы проверки (`/v/<номер>`) | `qr` из `GET /api/auth/card`, уже есть |
+
+Поля `id` (номер) и `since` («в команде с») карта больше не рисует (15.10.2026). `GGID.card` их по-прежнему принимает и пишет в старую разметку, если она осталась у сервиса, новая разметка их не содержит, и хабу номер для видимого места слать не нужно.
 
 Данные для `GGID.card(el, data)`:
 
 ```js
 GGID.card(document.querySelector('.gid-idcard'), {
   name: 'Иван Образцов',
-  positions: ['Ментор', 'Продажи'],               // 0-3
+  positions: ['Ментор', 'Продажи'],               // роль: 0-3
+  team: 'Менторы',                                  // «Команда · Страна» одной строкой; можно одно из двух
+  country: 'Казахстан',
+  photo: 'https://id.global-generations-edu.com/avatars/ab12.png',   // фото или аватар; нет или не загрузилось = инициалы
   email: 'ivan.obraztsov@global-generations.com',
-  id: 'GG 0042-7F3A',                               // до 14 символов
-  since: '2024-03',                                 // или готовая строка «марта 2024»
   status: 'active',                                 // active | disabled
-  passkey: true                                     // Face ID / Touch ID подключён
+  passkey: true,                                    // Face ID / Touch ID подключён
+  qr: 'https://id.global-generations-edu.com/v/GG-0042-7F3A'   // страница проверки карты
 });
 ```
 
-`GGID.card` пишет только через `textContent` (имя с разметкой остаётся текстом), сам считает инициалы, ставит перенос почты перед @, оставляет не больше трёх должностей и прячет пустые поля. Тот же вызов заполняет компактную строку. Можно отдать разметку уже заполненной с сервера: тогда JS не нужен, правила те же (значения экранировать, нет должностей или ключа = `hidden`).
+`GGID.card` пишет только через `textContent` (имя, роль, команда и страна с разметкой остаются текстом), сам считает инициалы, ставит перенос почты перед @, оставляет не больше трёх должностей и прячет пустые поля. Фото ставит как `<img>` с пустым `alt` и `referrerpolicy="no-referrer"` (адрес проверяет `GGID.cardPhotoUrl`) и при ошибке загрузки подставляет инициалы. Тот же вызов заполняет компактную строку. Можно отдать разметку уже заполненной с сервера: тогда JS не нужен, правила те же (значения экранировать, нет должностей или ключа = `hidden`).
 
 ### Компактная строка
 
-`.gid-idrow`: инициалы (`.gid-avatar--sm`), имя, номер и по желанию статус. Поверхность по теме, как у `.gid-chip`. Для шапки хаба, меню аккаунта и списков людей.
+`.gid-idrow`: инициалы (`.gid-avatar--sm`), имя, роль и по желанию статус. Поверхность по теме, как у `.gid-chip`. Для шапки хаба, меню аккаунта и списков людей.
 
 ### В письме: `email-card.html`
 
