@@ -97,6 +97,8 @@ def sources():
     wallet_const = re.search(r'var WALLET = \{[^}]*\};', js)
     check('sources', 'the Apple Wallet badge text is English only (no Cyrillic in the WALLET constant)', bool(wallet_const) and not re.search('[Ѐ-ӿ]', wallet_const.group(0)))
     check('sources', 'no side stripe in the css (border-left)', not re.search(r'border-left\s*:\s*[^;}]*\d', css))
+    check('sources', 'the services panel has no height limit of its own: the js gives it gam-sub--all, the css lifts the limit of the panels (max-height:none, overflow visible)',
+          "panelClass: 'gam-sub--all'" in js and '.gam .gam-sub--all{max-height:none;overflow:visible}' in css)
     paths = [bam.JS, bam.OUT, bam.LOCAL, os.path.join(DIR, 'demo.html'), os.path.join(DIR, 'README.md'), bam.__file__, os.path.abspath(__file__)]
     for p in paths:
         if not os.path.exists(p):
@@ -225,6 +227,8 @@ def hub_handler():
                 return self.json(200, services()[:3], cors)
             if mode == 'many':
                 return self.json(200, {'services': services(60)}, cors)
+            if mode == 'thirteen':          # what the hub gives its administrator (14.10.2026: 13 services, the list showed six)
+                return self.json(200, {'services': services(13)}, cors)
             if mode == 'evil':
                 bad = [
                     {'key': 'x1', 'title': '<img src=x onerror="window.__pwned=1">Сервис <b>один</b>', 'url': f'{ORIGINS["svc"]}/svc/x1', 'icon': 'users'},
@@ -618,6 +622,23 @@ LINK = '''() => { const r = document.getElementById('account'), a = r.querySelec
           panel: [...r.querySelectorAll('.gam-sub')].some(p => !p.hidden)}; }'''
 
 
+# the open services list and the card around it: what is in view (the element at the middle of the row is the row itself, so a row clipped by a box
+# that scrolls does not count), whether the list or the card scrolls, how the card sits in the window
+CARD_GEO = '''() => {
+  const menu = document.querySelector('#account .gid-menu'), panel = document.querySelector('#account .gam-sub:not([hidden])');
+  const m = menu.getBoundingClientRect(), cs = getComputedStyle(panel), vh = innerHeight, de = document.documentElement;
+  const rows = [...panel.querySelectorAll('.gam-svc')], all = panel.querySelector('.gam-all'), out = document.querySelector('#account [data-gam-id="logout"]');
+  const seen = e => { if (!e) return false; const r = e.getBoundingClientRect();
+    if (!(r.top >= m.top - 0.5 && r.bottom <= m.bottom + 0.5 && r.top >= -0.5 && r.bottom <= vh + 0.5)) return false;
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!hit && e.contains(hit); };
+  return {rows: rows.length, seen: rows.filter(seen).length, allSeen: seen(all), logoutSeen: seen(out),
+          panelMax: cs.maxHeight, panelOverflow: cs.overflowY, panelScroll: panel.scrollHeight > panel.clientHeight + 1, panelH: Math.round(panel.getBoundingClientRect().height),
+          cardScrolls: menu.scrollHeight > menu.clientHeight + 1, cardOverflow: getComputedStyle(menu).overflowY, cardH: Math.round(m.height), top: Math.round(m.top),
+          bottom: Math.round(m.bottom), left: Math.round(m.left), right: Math.round(m.right), w: Math.round(m.width), vh: vh, vw: innerWidth, hscroll: de.scrollWidth > de.clientWidth};
+}'''
+SCROLL_CARD_END = "(() => { const m = document.querySelector('#account .gid-menu'); m.scrollTop = m.scrollHeight; })()"
+
+
 def open_services(pg):
     pg.click(CHIP)
     pg.click(MENU + ' button[data-gam-id="services"]')
@@ -668,14 +689,50 @@ def listing(b):
     pg.wait_for_url('**/svc/production')
     check('services', 'a click on a row opens that service in this tab', pg.url == svc + '/svc/production', pg.url)
 
-    # the list scrolls inside, the card stays on the screen
+    # a long list: the list has no box of its own (every row is in the flow), the whole card scrolls and stays on the screen
     HUB['mode'] = 'many'
     goto(pg, 'svc-many', page(mount_js()))
     open_services(pg)
     pg.wait_for_selector('#account .gam-svc')
-    geo = pg.evaluate('''() => { const m = document.querySelector('#account .gid-menu').getBoundingClientRect(), p = document.querySelector('#account .gam-sub');
-      return {rows: p.querySelectorAll('.gam-svc').length, scroll: p.scrollHeight > p.clientHeight + 2, h: p.clientHeight, bottom: m.bottom, vh: innerHeight}; }''')
-    check('services', '60 services: the list scrolls inside its own box (max 272 px), the card is inside the window', geo['rows'] == 60 and geo['scroll'] and geo['h'] <= 273 and geo['bottom'] <= geo['vh'], geo)
+    geo = pg.evaluate(CARD_GEO)
+    check('services', '60 services: the list has no box of its own (no height limit, no scroll of its own, every row in the flow), the card is inside the window',
+          geo['rows'] == 60 and geo['panelMax'] == 'none' and geo['panelOverflow'] == 'visible' and not geo['panelScroll'] and geo['panelH'] > 60 * 40 and geo['bottom'] <= geo['vh'], geo)
+    check('services', '60 services: the whole card scrolls (one scroll, not a scroll inside a scroll)', geo['cardScrolls'] and geo['cardOverflow'] == 'auto', geo)
+    pg.evaluate(SCROLL_CARD_END)
+    end = pg.evaluate(CARD_GEO)
+    check('services', '60 services: scrolled to its end the card shows the last row of the list, «Все сервисы» and «Выйти»', end['allSeen'] and end['logoutSeen'], end)
+    pg.keyboard.press('Escape')
+
+    # what the hub gives its administrator (13 services; the list used to show six): every row, «Все сервисы» and «Выйти» in view with no scroll anywhere
+    HUB['mode'] = 'thirteen'
+    goto(pg, 'svc-13', page(mount_js()))
+    open_services(pg)
+    pg.wait_for_selector('#account .gam-svc')
+    geo = pg.evaluate(CARD_GEO)
+    check('services', '13 services in a window of 1000 px: all 13 rows, «Все сервисы» and «Выйти» are in view, the list has no scroll of its own and the card needs none',
+          geo['rows'] == 13 and geo['seen'] == 13 and geo['allSeen'] and geo['logoutSeen'] and geo['panelMax'] == 'none' and not geo['panelScroll'] and not geo['cardScrolls'], geo)
+    # the same list in a low window: the list stays whole (no scroll of its own), the whole card scrolls and ends with «Все сервисы» and «Выйти»
+    pg.set_viewport_size({'width': 1440, 'height': 600})
+    pg.wait_for_timeout(150)
+    geo = pg.evaluate(CARD_GEO)
+    check('services', '13 services in a window of 600 px: the list keeps all 13 rows without a scroll of its own, the whole card scrolls and stays inside the window',
+          geo['rows'] == 13 and not geo['panelScroll'] and geo['cardScrolls'] and geo['cardOverflow'] == 'auto' and geo['bottom'] <= geo['vh'], geo)
+    pg.evaluate(SCROLL_CARD_END)
+    end = pg.evaluate(CARD_GEO)
+    check('services', '13 services in a window of 600 px: scrolled to its end the card shows «Все сервисы» and «Выйти»', end['allSeen'] and end['logoutSeen'], end)
+    pg.keyboard.press('Escape')
+    pg.set_viewport_size({'width': 1440, 'height': 1000})
+
+    # the panel of an item of the service itself (a long list of people) keeps its own box: only «Мои сервисы» lost the limit
+    people = ', '.join("{label: 'Ментор %d'}" % i for i in range(40))
+    goto(pg, 'svc-people', page(mount_js("items: [{id: 'viewas', label: 'Открыть кабинет как ментор', icon: 'eye', panel: {items: [" + people + "]}}]")))
+    pg.click(CHIP)
+    pg.click(MENU + ' button[data-gam-id="viewas"]')
+    pg.wait_for_selector('#account .gam-sub:not([hidden]) .gid-menu-item')
+    own = pg.evaluate('''() => { const p = document.querySelector('#account .gam-sub:not([hidden])'), cs = getComputedStyle(p);
+      return {rows: p.querySelectorAll('.gid-menu-item').length, max: cs.maxHeight, overflow: cs.overflowY, scroll: p.scrollHeight > p.clientHeight + 1, h: p.clientHeight}; }''')
+    check('services', 'the panel of an item of the service itself (40 people) keeps its own box: max 272 px and a scroll of its own',
+          own['rows'] == 40 and own['max'] == '272px' and own['overflow'] == 'auto' and own['scroll'] and own['h'] <= 273, own)
     pg.keyboard.press('Escape')
 
     # a low window: the whole menu scrolls instead of leaving the screen
@@ -847,11 +904,12 @@ def phone(b, engine):
     pg.click(MENU + ' button[data-gam-id="services"]') if engine == 'firefox' else pg.locator(MENU + ' button[data-gam-id="services"]').tap()
     pg.wait_for_selector('#account .gam-svc')
     pg.wait_for_timeout(300)
-    sub = pg.evaluate('''() => { const p = document.querySelector('#account .gam-sub'), r = p.getBoundingClientRect(), m = document.querySelector('#account .gid-menu').getBoundingClientRect();
-      return {rows: p.querySelectorAll('.gam-svc').length, inside: r.left >= m.left && r.right <= m.right, scroll: p.scrollHeight > p.clientHeight, menuBottom: m.bottom, vh: innerHeight,
+    sub = pg.evaluate('''() => { const p = document.querySelector('#account .gam-sub'), r = p.getBoundingClientRect(), menu = document.querySelector('#account .gid-menu'), m = menu.getBoundingClientRect();
+      return {rows: p.querySelectorAll('.gam-svc').length, inside: r.left >= m.left && r.right <= m.right, scroll: p.scrollHeight > p.clientHeight + 1, menuScroll: menu.scrollHeight > menu.clientHeight + 1,
+              menuBottom: m.bottom, vh: innerHeight,
               names: [...p.querySelectorAll('.gam-name')].every(n => n.scrollWidth <= n.clientWidth + 1 || getComputedStyle(n).textOverflow === 'ellipsis')}; }''')
-    check('phone', 'the services list inside the card at 390 px: 60 rows scroll inside, the card stays in the window, long names are cut with an ellipsis',
-          sub['rows'] == 60 and sub['inside'] and sub['scroll'] and sub['menuBottom'] <= sub['vh'] and sub['names'], sub)
+    check('phone', 'the services list inside the card at 390 px: 60 rows, no scroll of its own, the whole card scrolls and stays in the window, long names are cut with an ellipsis',
+          sub['rows'] == 60 and sub['inside'] and not sub['scroll'] and sub['menuScroll'] and sub['menuBottom'] <= sub['vh'] and sub['names'], sub)
     pg.screenshot(path=os.path.join(OUT, 'phone-services.png'))
     # a tap outside closes (pointerdown, because iOS sends no click for taps on plain page areas)
     if engine == 'firefox':
@@ -860,6 +918,34 @@ def phone(b, engine):
         pg.touchscreen.tap(20, 700)
     pg.wait_for_timeout(150)
     check('phone', 'a tap outside the card closes it', not state(pg)['open'], state(pg))
+
+    # what the hub gives its administrator (13 services) on the phone: the card stays inside the screen, the list has no box of its own, the whole card scrolls
+    def press(sel):
+        if engine == 'firefox':
+            pg.click(sel)
+        else:
+            pg.locator(sel).tap()
+    HUB['mode'] = 'thirteen'
+    goto(pg, 'ph13', page(mount_js(ITEMS)))
+    press(CHIP)
+    pg.wait_for_timeout(350)
+    press(MENU + ' button[data-gam-id="services"]')
+    pg.wait_for_selector('#account .gam-svc')
+    pg.wait_for_timeout(300)
+    geo = pg.evaluate(CARD_GEO)
+    check('phone', '13 services at 390 px: the card is 300 px wide, inside the screen (margin at least 8 px), no horizontal scroll; the list has no box of its own and the whole card scrolls',
+          geo['rows'] == 13 and abs(geo['w'] - 300) < 1.5 and geo['left'] >= 8 and geo['right'] <= geo['vw'] - 8 and not geo['hscroll'] and geo['panelMax'] == 'none'
+          and not geo['panelScroll'] and geo['cardScrolls'] and geo['bottom'] <= geo['vh'], geo)
+    pg.screenshot(path=os.path.join(OUT, 'phone-services-13.png'))
+    pg.evaluate(SCROLL_CARD_END)
+    end = pg.evaluate(CARD_GEO)
+    check('phone', '13 services at 390 px: scrolled to its end the card shows «Все сервисы» and «Выйти», still inside the screen', end['allSeen'] and end['logoutSeen'] and end['bottom'] <= end['vh']
+          and end['left'] >= 8 and end['right'] <= end['vw'] - 8 and not end['hscroll'], end)
+    if engine == 'firefox':
+        pg.mouse.click(20, 700)
+    else:
+        pg.touchscreen.tap(20, 700)
+    pg.wait_for_timeout(150)
     # a long name and a long address inside 300 px
     PAGES['ph2'] = page(f"GGAccountMenu.mount('#account', {{name: 'Александра Образцова-Константинопольская', email: 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', logoutUrl: '/logout', {MIN}}}).open();")
     pg.goto(f'{svc}/app.html?p=ph2')
@@ -1239,7 +1325,8 @@ def demo_page(b):
             res = fr.evaluate(DEMO_LINK)
             rows = fr.evaluate(DEMO_ROWS)
             if state in ('ok', 'slow'):
-                check('demo', f'{state} / {k}: the list is drawn (12 services), the expander stays', rows == 12 and res['btn'] and not res['link'], (rows, res))
+                own = fr.evaluate("(() => { const p = document.querySelector('#account .gam-sub:not([hidden])'); return p.scrollHeight > p.clientHeight + 1; })()")
+                check('demo', f'{state} / {k}: the list is drawn (13 services) whole, with no scroll of its own, the expander stays', rows == 13 and not own and res['btn'] and not res['link'], (rows, own, res))
             else:
                 check('demo', f'{state} / {k}: a plain link to the cabinet, no list', rows == 0 and res['link'] and not res['btn'], (rows, res))
             bd = fr.evaluate("(() => { const a = document.querySelector('#account a.gam-wallet'); return a && [a.getAttribute('href'), a.getClientRects().length > 0]; })()")
@@ -1256,8 +1343,8 @@ def pictures(b):
     """The pictures of the README: the demo frames, opened as a person sees them."""
     svc = ORIGINS['svc']
     shots = (('menu-desktop.png', 'desktop', 'ok', False, (1440, 640), {'x': 1040, 'y': 0, 'width': 400, 'height': 600}),
-             ('services-desktop.png', 'desktop', 'ok', True, (1440, 860), {'x': 1040, 'y': 0, 'width': 400, 'height': 840}),
-             ('services-390.png', 'phone', 'ok', True, (390, 860), None),
+             ('services-desktop.png', 'desktop', 'ok', True, (1440, 1160), {'x': 1040, 'y': 0, 'width': 400, 'height': 1140}),
+             ('services-390.png', 'phone', 'ok', True, (390, 1160), None),
              ('services-fallback.png', 'phone', 'nologin', False, (390, 700), None))
     for name, embed, state, expand, (w, h), clip in shots:
         ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
