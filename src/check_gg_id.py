@@ -17,6 +17,8 @@ localStorage memory, the real WebAuthn of Chromium (virtual authenticators), a b
 The scene of the sign-in screen (rule of 10.10.2026, src/check_gg_id_stage.py, also runnable alone): on login, password, forgot, error and noaccess in the four windows of
 the contract (1440 x 900, 1280 x 720, 1920 x 1080, 390 x 844) the title stands on max(28 px, (window height - 260 px) / 2) and does not move between the screens, the card,
 the panel and the footer stand on the numbers of the sign-in page of the hub; the footer links the instruction; the tabs of the showcase change the screen in place.
+A view taller than the window grows downwards and scrolls, so «taller than the window» on the desktop screens counts the height without the lift of the scene (a view that
+does not fit even with the top of 28 px is still a failure).
 Screenshots: shots/gg-id/. Run: uv run --with playwright python src/check_gg_id.py
 With --preview it also refreshes the card pictures in gg-id/preview/ (README and PR).
 """
@@ -49,8 +51,11 @@ PROBE = '''async () => {
     }
   });
   const card = document.querySelector('.gid-card').getBoundingClientRect();
+  // подъём, который добавляет сцена (gg-id-stage.css): верх колонки стоит на (высота окна - 260) / 2, а не на минимальных 28 px; только раскладка split
+  const split = document.querySelector('.gid').getAttribute('data-layout') === 'split';
+  const lift = split ? Math.max(0, (parseFloat(getComputedStyle(document.querySelector('.gid-main')).paddingTop) || 0) - 28) : 0;
   return {
-    scrollW: de.scrollWidth, clientW: W, height: de.scrollHeight, viewH: innerHeight,
+    scrollW: de.scrollWidth, clientW: W, height: de.scrollHeight, viewH: innerHeight, sceneLift: lift,
     font: document.fonts.check('700 16px Montserrat') && document.fonts.check('500 16px Montserrat'),
     usedFont: getComputedStyle(document.querySelector('.gid-h') || document.body).fontFamily,
     dashes: (document.body.innerText.match(/[\\u2014\\u2013]/g) || []).length,
@@ -421,8 +426,10 @@ with sync_playwright() as p:
                               key: !!a.querySelector('.gid-idcard-seal use[href="#gid-id-icon"]')}; }''')
                         if not (h['hero'] and h['inside'] and h['qr'] and h['key']):
                             problems.append(f'{label}: hero card of the split panel {h}')
-                    if r['height'] > r['viewH'] and tag == 'desktop':
-                        problems.append(f'{label}: taller than the window {r["height"]} > {r["viewH"]}')
+                    # Сцена ставит карточку по центру окна, поэтому вид, который не помещается ниже этого подъёма, растёт вниз и прокручивается: это её правило (рабочая высота
+                    # 260 px, 13.10), а не раздутая вёрстка. Лишнюю высоту считаем без подъёма: вид, который не помещается в окно даже с верхом 28 px, по-прежнему ошибка.
+                    if r['height'] - r['sceneLift'] > r['viewH'] and tag == 'desktop':
+                        problems.append(f'{label}: taller than the window {r["height"]} > {r["viewH"]} even without the {round(r["sceneLift"])} px the scene adds above the top of 28 px')
                     shot = (theme == 'light' and layout == 'split') or key in ('login', 'setpass', 'done', 'pin', 'card')
                     if shot:
                         pg.wait_for_timeout(900 if key == 'done' else 150)
