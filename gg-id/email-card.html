@@ -11,7 +11,8 @@
 <title>Global Generation ID</title>
 <!--
   Карточка GG ID и кнопки письма-приглашения в финальном стиле «Итог» (как письмо Infra-AWS #93, portal-auth invite_email.py):
-  светлая карта, как в «Мои сервисы», с номером GG ID; белая кнопка «Задать пароль» с тонкой рамкой (стиль A кита); ссылка текстом
+  светлая карта, как в «Мои сервисы», без номера GG ID (решение владельца 14.10.2026; живое письмо Infra-Auth gg_auth/invite_email.py
+  без номера с #72); белая кнопка «Задать пароль» с тонкой рамкой (стиль A кита); ссылка текстом
   «Инструкция: как войти»; вход в сервисах называется «Войти через GG ID». Источник: Global-Generation/Infra-Brand-Identity,
   gg-id/email-card.html (контракт и проверки: gg-id/README.md, раздел «В письме», и src/build_gg_id.py).
 
@@ -19,7 +20,6 @@
     {{name}}       полное имя: «Иван Образцов»
     {{positions}}  должности через « · », от 0 до 3; нет должностей = строку убрать
     {{email}}      рабочая почта @global-generations.com (два места: текст и mailto)
-    {{id}}         номер GG ID, до 14 символов: «GG 0042-7F3A»
     {{link}}       одноразовая ссылка «Задать пароль» (кнопка и строка под ней)
     {{guide_url}}  открытая инструкция «Как войти» хаба: https://id.global-generations-edu.com/instructions/
 
@@ -63,8 +63,6 @@
   <div style="padding-top:3px;font-family:Montserrat,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;font-weight:600;line-height:19px;color:#284a5f;">{{positions}}</div>
   <div style="padding-top:2px;font-family:Montserrat,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:12.5px;font-weight:500;line-height:18px;color:#284a5f;word-break:break-all;"><a href="mailto:{{email}}" style="color:#284a5f;text-decoration:none;">{{email}}</a></div>
   <div style="padding-top:8px;font-family:Montserrat,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:12.5px;font-weight:600;line-height:16px;color:#284a5f;"><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background:#009CDC;vertical-align:middle;margin:0 7px 2px 0;"></span>Активен</div>
-  <div style="padding-top:16px;font-family:Montserrat,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.4px;line-height:13px;color:#3b5568;text-transform:uppercase;">Номер GG ID</div>
-  <div style="padding-top:4px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;line-height:20px;color:#0b2433;white-space:nowrap;">{{id}}</div>
 </td></tr>
 </table>
 <!--[if mso]></td></tr></table><![endif]-->
