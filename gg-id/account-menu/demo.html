@@ -46,8 +46,9 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
 (function () {
   var q = new URLSearchParams(location.search), state = q.get('state') || 'ok';
   /* the hub sends the services in four groups, the same in the menu and in the cabinet «Мои сервисы»: `group` is the caption, `group_icon` its icon (a name of the kit set);
-     an old answer without them draws no captions. The last service is one the kit does not know: its icon falls back to the grid */
-  var P = { group: 'Product', group_icon: 'graduation-cap' }, M = { group: 'Маркетинг', group_icon: 'megaphone' }, Y = { group: 'YouTube', group_icon: 'video' }, I = { group: 'Infrastructure', group_icon: 'server' };
+     an old answer without them draws no captions. Найм and Онбординг are Product (the section «Веб/Прочее» of the board is going away), Маркетинг has no service of GG ID today and an
+     empty group is not drawn: ?groups=4 adds a sample service to it, to show the four captions. The last service is one the kit does not know: its icon falls back to the grid */
+  var P = { group: 'Product', group_icon: 'box' }, M = { group: 'Маркетинг', group_icon: 'trending-up' }, Y = { group: 'YouTube', group_icon: 'play' }, I = { group: 'Infrastructure', group_icon: 'server' };
   function svc(g, key, title, url, icon) { return { key: key, title: title, url: url, icon: icon, group: g.group, group_icon: g.group_icon }; }
   var SERVICES = [
     svc(P, 'akb', 'АКБ', 'https://akb.global-generations-edu.com', 'briefcase'),
@@ -56,14 +57,15 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
     svc(P, 'consultation-intake', 'Консультации', 'https://apply.global-generations-edu.com', 'messages-square'),
     svc(P, 'gg-notetaker', 'Notetaker', 'https://notetaker.global-generations.com/admin', 'mic'),
     svc(P, 'merch-store', 'Мерч', 'https://global-generations.com/merch', 'shopping-bag'),
-    svc(M, 'hr', 'Найм', 'https://global-generations.com/careers', 'user-plus'),
-    svc(M, 'onboarding-hub', 'Онбординг', 'https://onboarding.global-generations-edu.com', 'map'),
+    svc(P, 'hr', 'Найм', 'https://global-generations.com/careers', 'user-plus'),
+    svc(P, 'onboarding-hub', 'Онбординг', 'https://onboarding.global-generations-edu.com', 'map'),
     svc(Y, 'production', 'Production', 'https://production.global-generations-edu.com', 'clapperboard'),
     svc(Y, 'video-factory', 'Видеофабрика', 'https://factory.global-generations-edu.com', 'film'),
     svc(Y, 'ai-teleprompter', 'Телесуфлёр', 'https://teleprompter.global-generations-edu.com', 'scroll-text'),
     svc(Y, 'yt', 'YouTube-трекер', 'https://youtube.global-generations-edu.com', 'youtube'),
     svc(I, 'something-new', 'Сервис, которого кит ещё не знает', 'https://new.global-generations-edu.com', 'rocket')
   ];
+  if (q.get('groups') === '4') SERVICES.splice(8, 0, svc(M, 'marketing-sample', 'Пример: сервис маркетинга', 'https://marketing.global-generations-edu.com', 'megaphone'));
   function reply(status, body, wait) {
     return new Promise(function (resolve) {
       setTimeout(function () { resolve(new Response(JSON.stringify(body), { status: status, headers: { 'Content-Type': 'application/json' } })); }, wait || 120);

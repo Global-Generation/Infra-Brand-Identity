@@ -153,7 +153,7 @@ SERVICE_BASE = [
     ('hr', 'Найм', 'user-plus'), ('onboarding-hub', 'Онбординг', 'map'),
     ('production', 'Production', 'clapperboard'), ('video-factory', 'Видеофабрика', 'film'), ('ai-teleprompter', 'Телесуфлёр', 'scroll-text'), ('yt', 'YouTube-трекер', 'youtube'),
 ]
-GROUPS4 = [('Product', 'graduation-cap'), ('Маркетинг', 'megaphone'), ('YouTube', 'video'), ('Infrastructure', 'server')]
+GROUPS4 = [('Product', 'box'), ('Маркетинг', 'trending-up'), ('YouTube', 'play'), ('Infrastructure', 'server')]      # the captions and the icons of the sections of the board
 GROUP_SIZES = [6, 2, 4, 1]      # the 13 services of the mock: Product 6, Маркетинг 2, YouTube 4, Infrastructure 1 (the thirteenth)
 
 
@@ -244,7 +244,7 @@ def hub_handler():
                 grp = [g for g, size in zip(GROUPS4, GROUP_SIZES) for _ in range(size)]
                 return self.json(200, {'services': [dict(e, group=grp[n][0], group_icon=grp[n][1]) for n, e in enumerate(services(13))]}, cors)
             if mode == 'grouped_evil':      # captions and icons that are not what they should be: markup, a long text, a name that is not in the set, a number, a prototype name
-                grp = [('Product', 'graduation-cap')] * 3 + [('Маркетинг', '"><script>window.__pwned=7</script>')] * 2 + [('YouTube', 'constructor')] * 2 \
+                grp = [('Product', 'box')] * 3 + [('Маркетинг', '"><script>window.__pwned=7</script>')] * 2 + [('YouTube', 'constructor')] * 2 \
                     + [('Infrastructure', 7)] * 2 + [('<img src=x onerror="window.__pwned=9">' + 'Я' * 60, '__proto__')] * 4
                 return self.json(200, {'services': [dict(e, group=grp[n][0], group_icon=grp[n][1]) for n, e in enumerate(services(13))]}, cors)
             if mode == 'evil':
@@ -588,7 +588,7 @@ def behaviour(b):
     thrown = pg.evaluate("(() => { try { GGAccountMenu.mount('#nope', {}); return 'no error'; } catch (e) { return e.name; } })()")
     check('api', 'mount on a missing element throws TypeError', thrown == 'TypeError', thrown)
     check('api', 'GGAccountMenu.version equals gg-id/VERSION', pg.evaluate('GGAccountMenu.version') == read(os.path.join(KIT, 'VERSION')).strip())
-    known = pg.evaluate("['layout-grid', 'graduation-cap', 'megaphone', 'globe', 'server', 'activity', 'message-square', 'users', 'video', 'scale', 'user', 'log-out', 'chevron-down', 'chevron-right', 'external-link', 'settings', 'eye', 'clock', 'pencil'].filter(n => GGAccountMenu.icons.indexOf(n) < 0)")
+    known = pg.evaluate("['layout-grid', 'graduation-cap', 'megaphone', 'globe', 'server', 'activity', 'message-square', 'users', 'video', 'scale', 'user', 'log-out', 'chevron-down', 'chevron-right', 'external-link', 'settings', 'eye', 'clock', 'pencil', 'box', 'trending-up', 'play'].filter(n => GGAccountMenu.icons.indexOf(n) < 0)")
     check('api', 'the icons the hub mapping names (service key to icon, section to icon) and the icons of AKB items are in the kit set', known == [], known)
     check('api', 'initials: two words, one word, empty', pg.evaluate("[GGAccountMenu.initials('лёв авдошин'), GGAccountMenu.initials('Анна'), GGAccountMenu.initials(''), GGAccountMenu.initials('a b c')]") == ['ЛА', 'А', 'U', 'AB'])
 
@@ -666,7 +666,6 @@ GROUPS_PROBE = '''() => {
     icons: caps.map(c => c.querySelectorAll('svg').length), iconHidden: caps.map(c => { const v = c.querySelector('svg'); return v ? v.getAttribute('aria-hidden') : null; }),
     iconSize: caps.map(c => { const v = c.querySelector('svg'); return v ? Math.round(v.getBoundingClientRect().width) : 0; }), sig: caps.map(c => sig(c.querySelector('svg'))),
     childKinds: [...panel.children].map(c => c.classList.contains('gam-grp') ? 'grp' : (c.classList.contains('gam-all') ? 'all' : c.tagName)),
-    mentorSig: sig(panel.querySelector('.gam-svc[data-gam-key="mentor-cabinet"] .gam-tile svg')),
     size: cs.fontSize, weight: cs.fontWeight, transform: cs.textTransform, color: cs.color, rowColor: getComputedStyle(panel.querySelector('.gam-name')).color,
     imgs: panel.querySelectorAll('img').length, scripts: panel.querySelectorAll('script').length, pwned: window.__pwned || 0};
 }'''
@@ -771,8 +770,9 @@ def listing(b):
           info['texts'] == [g for g, _ in GROUPS4] and info['sizes'] == GROUP_SIZES and info['rows'] == 13, info)
     check('groups', 'a group is a box of its own: role=group named by its caption (aria-labelledby), the caption is its first child; «Все сервисы» stands after the groups, outside them',
           info['roles'] == ['group'] * 4 and all(info['labelled']) and all(info['capClass']) and info['childKinds'] == ['grp'] * 4 + ['all'], info)
-    check('groups', 'every caption has its icon (graduation-cap, megaphone, video, server): a small svg 14 px, hidden from screen readers, four different drawings; Product has the drawing of graduation-cap of the tile',
-          info['icons'] == [1] * 4 and info['iconHidden'] == ['true'] * 4 and info['iconSize'] == [14] * 4 and len(set(info['sig'])) == 4 and info['sig'][0] == info['mentorSig'], info)
+    check('groups', 'every caption has its icon, the one of the section of the board (box, trending-up, play, server): a small svg 14 px, hidden from screen readers, four different drawings (3, 2, 1 and 4 shapes)',
+          info['icons'] == [1] * 4 and info['iconHidden'] == ['true'] * 4 and info['iconSize'] == [14] * 4 and len(set(info['sig'])) == 4
+          and [x.split('#')[1] for x in info['sig']] == ['3', '2', '1', '4'], info)
     check('groups', 'captions: 12 px, weight 600, not upper-cased, muted colour (not the colour of the service names)',
           info['size'] == '12px' and info['weight'] == '600' and info['transform'] == 'none' and info['color'] != info['rowColor'], info)
     geo = pg.evaluate(CARD_GEO)
