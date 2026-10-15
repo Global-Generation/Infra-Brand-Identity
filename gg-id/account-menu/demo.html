@@ -38,6 +38,13 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
 .app-card{height:84px;margin-bottom:12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0}
 .app-log{margin:0;font-size:12.5px;line-height:1.4;color:#64748b;min-height:18px}
 .app-h{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* ?theme=dark: the page of the service and the menu in the dark theme (the menu option `theme`, a service passes 'auto' or 'dark' the same way) */
+body.is-dark{background:#0b1720;color:#e8f1f6}
+body.is-dark .app-head{background:#0f2230;border-bottom-color:#26404f}
+body.is-dark .app-brand{color:#e8f1f6}
+body.is-dark .app-brand span{border-left-color:rgba(232,241,246,.28)}
+body.is-dark .app-card{background:#13242f;border-color:#26404f}
+body.is-dark .app-log{color:#9db3c1}
 </style>
 </head>
 <body>
@@ -143,9 +150,11 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
     return;
   }
   doc.getElementById('app').hidden = false;
-  doc.body.style.background = '#f8fafc';
+  var dark = q.get('theme') === 'dark';
+  if (dark) doc.body.className = 'is-dark'; else doc.body.style.background = '#f8fafc';
   var log = doc.getElementById('log');
   var menu = GGAccountMenu.mount('#account', {
+    theme: dark ? 'dark' : 'light',
     name: 'Лёв Авдошин',
     email: 'lev.avdoshin@global-generations.com',
     hubOrigin: 'https://id.global-generations-edu.com',   // это и есть адрес по умолчанию; в сервисе его задаёт GG_AUTH_ORIGIN, только если хаб не боевой
