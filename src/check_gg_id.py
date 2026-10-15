@@ -125,10 +125,10 @@ EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-id-
 EMAIL_LINKS = {'link': 'https://id.global-generations-edu.com/set-password.html#token=demo&invite=1',
                'guide_url': 'https://id.global-generations-edu.com/instructions/'}
 EMAIL_DEMO = {'name': 'Иван Образцов', 'positions': 'Ментор · Продажи', 'email': 'ivan.obraztsov@global-generations.com',
-              'id': 'GG 0042-7F3A', **EMAIL_LINKS}
+              **EMAIL_LINKS}
 EMAIL_LONG = {'name': 'Александра Образцова-Константинопольская',
               'positions': 'Ментор · Руководитель направления «Магистратура в Европе» · Ведущая роликов YouTube-канала',
-              'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', **EMAIL_LINKS}
+              'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', **EMAIL_LINKS}
 INVERT = '''() => {   // like Gmail on iPhone in dark mode: lightness of every colour flipped, images untouched
   const parse = v => { const m = v.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(',').map(Number); return {r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1}; };
   const flip = c => { let r = c.r / 255, g = c.g / 255, b = c.b / 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0, l = (mx + mn) / 2;
@@ -167,6 +167,7 @@ CONTRAST = '''() => {
     scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth, cardW: cb.width,
     actions: [...document.querySelectorAll('a')].some(a => a.textContent.trim() === 'Задать пароль') && [...document.querySelectorAll('a')].some(a => a.textContent.trim() === 'Инструкция: как войти'),
     left: (document.body.innerText.match(/\\{\\{|\\}\\}/g) || []).length,
+    num: /GG\\s*\\d{3,}|НОМЕР\\s+GG/i.test(card.innerText || ''),   // номера GG ID в письме нет (решение владельца 14.10.2026)
     dashes: (document.body.innerText.match(/[\\u2014\\u2013]/g) || []).length};
 }'''
 
@@ -659,6 +660,8 @@ with sync_playwright() as p:
                     problems.append(f'{label}: no «Задать пароль» button or «Инструкция: как войти» link in the letter')
                 if r['left']:
                     problems.append(f'{label}: placeholders left in text')
+                if r['num']:
+                    problems.append(f'{label}: a GG ID number on the card (the letter has none)')
                 if r['dashes']:
                     problems.append(f'{label}: dashes {r["dashes"]}')
                 if r['cardW'] > 440.5:

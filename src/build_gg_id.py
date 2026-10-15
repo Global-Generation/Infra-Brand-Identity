@@ -545,7 +545,7 @@ for fn in os.listdir(os.path.join(KIT, 'screens')):
 EMAIL_PATH = os.path.join(KIT, 'email-card.html')
 EMAIL_PNG = os.path.join(KIT, 'email', 'gg-id-pill-3x.png')
 EMAIL_PNG_URL = 'https://id.global-generations-edu.com/assets/gg-id/email/gg-id-pill-3x.png'
-EMAIL_FIELDS = ('name', 'positions', 'email', 'id')            # карта
+EMAIL_FIELDS = ('name', 'positions', 'email')                  # карта, без номера GG ID (решение владельца 14.10.2026)
 EMAIL_ACTION_FIELDS = ('link', 'guide_url')                   # кнопка «Задать пароль» и ссылка «Инструкция: как войти» (GUIDE_URL выше, как в подвале экранов)
 email_html = read(EMAIL_PATH)
 brand_check('gg-id/email-card.html', email_html)
@@ -583,8 +583,10 @@ def email_problems(text):
     for want in ('Задать пароль', 'Инструкция: как войти', 'Войти через GG&nbsp;ID', 'border:1px solid #c9d5e1'):
         if want not in actions:
             problems.append(f'actions: no {want!r} (white button with the thin border, text link, «Войти через GG ID»)')
-    if 'Номер GG ID' not in block or 'Активен' not in block:
-        problems.append('card: the number «Номер GG ID» and the status «Активен» are part of the card')
+    if 'Активен' not in block:
+        problems.append('card: the status «Активен» is part of the card')
+    if re.search(r'Номер GG ID|GG\s*\d{3,}', block, flags=re.I):
+        problems.append('card: no GG ID number in the letter (the owner, 14.10.2026; Infra-Auth invite_email.py has none since #72)')
     png = open(EMAIL_PNG, 'rb').read()
     pw, ph = int.from_bytes(png[16:20], 'big'), int.from_bytes(png[20:24], 'big')
     tag = re.search(r'<img [^>]*' + re.escape(EMAIL_PNG_URL) + r'[^>]*>', block)
@@ -605,7 +607,7 @@ if bad_mail:
 
 def email_filled(d, logo_src=EMAIL_PNG_URL):
     """The e-mail card and buttons with the values of d, every value HTML-escaped, the way the hub fills it."""
-    vals = {'name': d['name'], 'positions': ' · '.join(d['positions']), 'email': d['email'], 'id': d['id'],
+    vals = {'name': d['name'], 'positions': ' · '.join(d['positions']), 'email': d['email'],
             'link': 'https://id.global-generations-edu.com/set-password.html#token=demo&invite=1', 'guide_url': GUIDE_URL}
     out = re.sub(r'\{\{([a-z_]+)\}\}', lambda mm: htmlmod.escape(vals[mm.group(1)], quote=True), email_html)
     return out.replace(EMAIL_PNG_URL, logo_src)
