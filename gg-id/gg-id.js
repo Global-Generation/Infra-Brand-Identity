@@ -1,4 +1,4 @@
-/* GG ID: поведение экранов входа (версия 2026-10-14.2, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
+/* GG ID: поведение экранов входа (версия 2026-10-15.1, gg-id/VERSION). Без зависимостей и без сетевых вызовов:
    запросы к /api/auth/* делает страница хаба, кит только оживляет разметку.
    Подключение: тег script с src="gg-id.js" в конце body, всё размечается data-атрибутами (см. README.md). */
 (function () {
@@ -456,6 +456,7 @@
 
   // Карточка GG ID (.gid-idcard) и компактная строка (.gid-idrow): заполнить поля [data-gid-field] данными хаба.
   // Только textContent, поэтому имя или должность с разметкой остаются текстом. Контракт данных: README.md, «Карточка GG ID».
+  // Номера на карте нет (15.10.2026): поле id больше не рисуется; photo, team и country новые (команда и страна одной строкой «Команда · Страна»).
   var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
   // «2024-03» или «2024-03-18» = «марта 2024» (после «В команде с»); любая другая строка остаётся как есть.
   function cardSince(v) {
@@ -466,6 +467,12 @@
   function cardInitials(name) {
     return String(name || '').trim().split(/\s+/).slice(0, 2)
       .map(function (w) { return Array.from(w)[0] || ''; }).join('').toUpperCase();
+  }
+  // Адрес фото или аватара: только https или свой путь сайта (/avatars/ab.png), больше ничего (ни data:, ни javascript:, ни http:, ни //чужой.хост).
+  function cardPhotoUrl(u) {
+    u = String(u == null ? '' : u).trim();
+    if (/[\u0000-\u001f\u007f\s]/.test(u)) return '';
+    return /^https:\/\/[^\/]/i.test(u) || /^\/(?![\/\\])/.test(u) ? u : '';
   }
   function card(root, d) {
     if (!root) return;
@@ -497,7 +504,39 @@
         el.appendChild(dom);
       } else el.textContent = v;
     });
-    each('id', function (el) { el.textContent = d.id || ''; });
+    each('id', function (el) { el.textContent = d.id || ''; });   // разметка до 2026-10-15 (с номером): новая его не содержит и хаб номер не шлёт
+    each('role', function (el) {          // компактная строка: должности одной строкой «Ментор · Продажи»
+      el.textContent = [].concat(d.positions || []).filter(Boolean).slice(0, 3).join(' \u00b7 ');
+    });
+    each('where', function (el) {         // «Команда · Страна»: нет одной части, остаётся другая; нет обеих, строки нет
+      var v = [d.team, d.country].map(function (x) { return String(x == null ? '' : x).replace(/\s+/g, ' ').trim(); }).filter(Boolean).join(' \u00b7 ');
+      el.textContent = v;
+      el.hidden = !v;
+    });
+    each('photo', function (el) {         // рамка справа вверху: фото или аватар; нет картинки или она не загрузилась = инициалы; нет и имени = как в разметке (ключ образца)
+      var url = cardPhotoUrl(d.photo), ini = d.initials || cardInitials(d.name);
+      function initialsOnly() {
+        if (!ini) return;
+        var sp = document.createElement('span');
+        sp.className = 'gid-idcard-ini';
+        sp.textContent = ini;
+        el.textContent = '';
+        el.appendChild(sp);
+        el.setAttribute('data-state', 'initials');
+      }
+      if (url) {
+        var img = document.createElement('img');
+        img.className = 'gid-idcard-img';
+        img.alt = '';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = function () { if (img.parentNode === el) initialsOnly(); };   // картинку уже заменили новым вызовом: её запоздалая ошибка ничего не трогает
+        img.src = url;
+        el.textContent = '';
+        el.appendChild(img);
+        el.setAttribute('data-state', 'photo');
+      } else initialsOnly();
+    });
     each('since', function (el) { el.textContent = cardSince(d.since); });
     each('status', function (el) {
       var on = (d.status || 'active') === 'active';
@@ -515,9 +554,9 @@
     passkeyMemory: passkeyMemory, passkeyRemember: passkeyRemember, passkeyCreated: passkeyCreated, passkeyMissed: passkeyMissed,
     passkeySnooze: passkeySnooze, passkeyWatch: passkeyWatch, passkeySeen: passkeySeen,
     passwordChecks: passwordChecks, passwordLevel: passwordLevel,
-    card: card, cardSince: cardSince, cardInitials: cardInitials,
+    card: card, cardSince: cardSince, cardInitials: cardInitials, cardPhotoUrl: cardPhotoUrl,
     qrDraw: qrDraw, qrMatrix: function (text) { return QR.encode(text); },
-    version: '2026-10-14.2'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
+    version: '2026-10-15.1'   // версия кита = gg-id/VERSION (та же у GGIDService.version)
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (!window.GGID_MANUAL) init(document); });
   else if (!window.GGID_MANUAL) init(document);

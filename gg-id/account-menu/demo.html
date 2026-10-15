@@ -38,6 +38,13 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
 .app-card{height:84px;margin-bottom:12px;border-radius:16px;background:#fff;border:1px solid #e2e8f0}
 .app-log{margin:0;font-size:12.5px;line-height:1.4;color:#64748b;min-height:18px}
 .app-h{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* ?theme=dark: the page of the service and the menu in the dark theme (the menu option `theme`, a service passes 'auto' or 'dark' the same way) */
+body.is-dark{background:#0b1720;color:#e8f1f6}
+body.is-dark .app-head{background:#0f2230;border-bottom-color:#26404f}
+body.is-dark .app-brand{color:#e8f1f6}
+body.is-dark .app-brand span{border-left-color:rgba(232,241,246,.28)}
+body.is-dark .app-card{background:#13242f;border-color:#26404f}
+body.is-dark .app-log{color:#9db3c1}
 </style>
 </head>
 <body>
@@ -45,21 +52,27 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
 /* ---- демо: хаб GG ID здесь изображён (fetch на его адрес отвечает заготовкой), сети нет. Состояние списка: ?state=ok|slow|nologin|error|empty|offline ---- */
 (function () {
   var q = new URLSearchParams(location.search), state = q.get('state') || 'ok';
+  /* the hub sends the services in four groups, the same in the menu and in the cabinet «Мои сервисы»: `group` is the caption, `group_icon` its icon (a name of the kit set);
+     an old answer without them draws no captions. Найм and Онбординг are Product (the section «Веб/Прочее» of the board is going away), Маркетинг has no service of GG ID today and an
+     empty group is not drawn: ?groups=4 adds a sample service to it, to show the four captions. The last service is one the kit does not know: its icon falls back to the grid */
+  var P = { group: 'Product', group_icon: 'box' }, M = { group: 'Маркетинг', group_icon: 'trending-up' }, Y = { group: 'YouTube', group_icon: 'play' }, I = { group: 'Infrastructure', group_icon: 'server' };
+  function svc(g, key, title, url, icon) { return { key: key, title: title, url: url, icon: icon, group: g.group, group_icon: g.group_icon }; }
   var SERVICES = [
-    { key: 'akb', title: 'Mentorship-AKB', url: 'https://akb.global-generations-edu.com', icon: 'users' },
-    { key: 'mentorship-pulse', title: 'Pulse Analytics', url: 'https://pulse.global-generations-edu.com', icon: 'activity' },
-    { key: 'consultation-intake', title: 'Consultation Onboarding', url: 'https://apply.global-generations-edu.com', icon: 'message-square' },
-    { key: 'production', title: 'Production', url: 'https://production.global-generations-edu.com', icon: 'video' },
-    { key: 'legal', title: 'GG-Legal - юротдел как код', url: 'https://id.global-generations-edu.com/admin/legal/', icon: 'scale' },
-    { key: 'yt', title: 'YouTube Tracker', url: 'https://youtube.global-generations-edu.com', icon: 'video' },
-    { key: 'infra-aws', title: 'Infra-AWS', url: 'https://infra-cost.global-generations-edu.com', icon: 'globe' },
-    { key: 'hr', title: 'HR Platform', url: 'https://global-generations.com/careers', icon: 'globe' },
-    { key: 'merch-store', title: 'Merch Store', url: 'https://global-generations.com/merch', icon: 'megaphone' },
-    { key: 'gg-notetaker', title: 'Notetaker', url: 'https://notetaker.global-generations.com/admin', icon: 'globe' },
-    { key: 'mentor-report', title: 'Квартальный отчёт', url: 'https://report.global-generations-edu.com', icon: 'graduation-cap' },
-    { key: 'ai-teleprompter', title: 'Суфлёр', url: 'https://teleprompter.global-generations-edu.com', icon: 'file-text' },
-    { key: 'something-new', title: 'Сервис, которого кит ещё не знает', url: 'https://new.global-generations-edu.com', icon: 'rocket' }
+    svc(P, 'akb', 'АКБ', 'https://akb.global-generations-edu.com', 'briefcase'),
+    svc(P, 'mentor-cabinet', 'Кабинет ментора', 'https://mentor.global-generations-edu.com', 'graduation-cap'),
+    svc(P, 'mentor-report', 'Квартальный отчёт', 'https://report.global-generations-edu.com', 'clipboard-list'),
+    svc(P, 'consultation-intake', 'Консультации', 'https://apply.global-generations-edu.com', 'messages-square'),
+    svc(P, 'gg-notetaker', 'Notetaker', 'https://notetaker.global-generations.com/admin', 'mic'),
+    svc(P, 'merch-store', 'Мерч', 'https://global-generations.com/merch', 'shopping-bag'),
+    svc(P, 'hr', 'Найм', 'https://global-generations.com/careers', 'user-plus'),
+    svc(P, 'onboarding-hub', 'Онбординг', 'https://onboarding.global-generations-edu.com', 'map'),
+    svc(Y, 'production', 'Production', 'https://production.global-generations-edu.com', 'clapperboard'),
+    svc(Y, 'video-factory', 'Видеофабрика', 'https://factory.global-generations-edu.com', 'film'),
+    svc(Y, 'ai-teleprompter', 'Телесуфлёр', 'https://teleprompter.global-generations-edu.com', 'scroll-text'),
+    svc(Y, 'yt', 'YouTube-трекер', 'https://youtube.global-generations-edu.com', 'youtube'),
+    svc(I, 'something-new', 'Сервис, которого кит ещё не знает', 'https://new.global-generations-edu.com', 'rocket')
   ];
+  if (q.get('groups') === '4') SERVICES.splice(8, 0, svc(M, 'marketing-sample', 'Пример: сервис маркетинга', 'https://marketing.global-generations-edu.com', 'megaphone'));
   function reply(status, body, wait) {
     return new Promise(function (resolve) {
       setTimeout(function () { resolve(new Response(JSON.stringify(body), { status: status, headers: { 'Content-Type': 'application/json' } })); }, wait || 120);
@@ -84,6 +97,7 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
   <p>Одно меню во всех сервисах команды: чип с инициалами справа в шапке, под ним белая карточка. Под именем чёрный значок Add to Apple Wallet (в сервисе он виден на iPhone, iPad и в Safari на Mac, в демо на любом устройстве). «Мои сервисы» раскрывается списком: сервис, в который человек может зайти, открывается одним нажатием. «Выйти» делает выход везде (его делает прежний выход сервиса). Хаб здесь изображён заготовкой, сети нет.</p>
   <p>Подключение: <code>gg-account-menu.css</code>, <code>gg-account-menu.js</code>, <code>GGAccountMenu.mount('#account', { name, email, logoutUrl })</code>. Адреса хаба заданы по умолчанию. Правила и примеры: <code>README.md</code> рядом.</p>
   <nav class="states" aria-label="Состояние списка сервисов" id="states"></nav>
+  <nav class="states" aria-label="Плашка входа от имени" id="imps"></nav>
   <div class="frames">
     <section class="frame"><h2>Компьютер, светлая тема</h2><iframe id="fd" title="Меню аккаунта на компьютере" height="1160"></iframe></section>
     <section class="frame frame--phone"><h2>Телефон, 390 px</h2><iframe id="fp" title="Меню аккаунта на телефоне 390 px" height="1160"></iframe></section>
@@ -95,6 +109,7 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
     <div class="app-brand">Global Generation<span>Mentorship-AKB</span></div>
     <div id="account"></div>
   </header>
+  <div id="imp" hidden></div>
   <main class="app-main">
     <h1 class="app-h">Страница сервиса с меню аккаунта (демо)</h1>
     <div class="app-card"></div><div class="app-card"></div><div class="app-card"></div>
@@ -112,23 +127,34 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
     // обёртка: два окна с этой же страницей в режиме embed (media queries в окне считаются по его ширине, то есть настоящие 390 px)
     doc.getElementById('doc').hidden = false;
     var open = q.get('open') === '0' ? '' : '&open=1';
-    doc.getElementById('fd').src = 'demo.html?embed=desktop&state=' + state + open;
-    doc.getElementById('fp').src = 'demo.html?embed=phone&state=' + state + open;
+    var imp = q.get('imp') || 'off', impq = imp === 'on' || imp === 'over' ? '&imp=' + imp : '';
+    doc.getElementById('fd').src = 'demo.html?embed=desktop&state=' + state + open + impq;
+    doc.getElementById('fp').src = 'demo.html?embed=phone&state=' + state + open + impq;
     var names = [['ok', 'Список загружен'], ['slow', 'Грузится долго'], ['nologin', 'Нет входа в хабе (401)'], ['error', 'Хаб не отвечает (503)'], ['empty', 'Список пуст'], ['offline', 'Нет сети']];
     var nav = doc.getElementById('states');
     names.forEach(function (n) {
       var a = doc.createElement('a');
-      a.href = '?state=' + n[0] + (q.get('open') === '0' ? '&open=0' : '');
+      a.href = '?state=' + n[0] + (q.get('open') === '0' ? '&open=0' : '') + (impq ? impq : '');
       a.textContent = n[1];
       if (n[0] === state) a.setAttribute('aria-current', 'true');
       nav.appendChild(a);
     });
+    var impNav = doc.getElementById('imps');
+    [['off', 'Своя сессия'], ['on', 'Вход от имени: идёт'], ['over', 'Вход от имени: закончился']].forEach(function (n) {
+      var a = doc.createElement('a');
+      a.href = '?state=' + state + (q.get('open') === '0' ? '&open=0' : '') + (n[0] === 'off' ? '' : '&imp=' + n[0]);
+      a.textContent = n[1];
+      if (n[0] === imp) a.setAttribute('aria-current', 'true');
+      impNav.appendChild(a);
+    });
     return;
   }
   doc.getElementById('app').hidden = false;
-  doc.body.style.background = '#f8fafc';
+  var dark = q.get('theme') === 'dark';
+  if (dark) doc.body.className = 'is-dark'; else doc.body.style.background = '#f8fafc';
   var log = doc.getElementById('log');
   var menu = GGAccountMenu.mount('#account', {
+    theme: dark ? 'dark' : 'light',
     name: 'Лёв Авдошин',
     email: 'lev.avdoshin@global-generations.com',
     hubOrigin: 'https://id.global-generations-edu.com',   // это и есть адрес по умолчанию; в сервисе его задаёт GG_AUTH_ORIGIN, только если хаб не боевой
@@ -156,6 +182,15 @@ body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',sans-serif;colo
     var a = e.target.closest && e.target.closest('a[href^="https://"]');
     if (a && embed) e.preventDefault();      // в демо наружу не уходим
   });
+  // вход от имени (?imp=on | over): одна и та же плашка кита, полоса на всю ширину под шапкой; «Вернуться к себе» в демо только пишет в журнал
+  var impMode = q.get('imp');
+  if (impMode === 'on' || impMode === 'over') {
+    window.__impBar = GGAccountMenu.impBar('#imp', {
+      name: 'Иван Образцов',
+      until: new Date(Date.now() + (impMode === 'over' ? -60000 : 47 * 60000)),
+      onEnd: function () { log.textContent = 'Нажато: Вернуться к себе (сервис завершает чужую сессию и возвращает администратора на его страницу)'; return false; }
+    });
+  }
   if (q.get('open') === '1') menu.open();
 })();
 </script>

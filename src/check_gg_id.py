@@ -64,7 +64,7 @@ PROBE = '''async () => {
   };
 }'''
 
-# GG ID card: everything inside the padding, one accent (the status dot), monospaced digits, Montserrat
+# GG ID card (15.10.2026, without the number): everything inside the padding, one accent (the status dot), Montserrat, QR drawn, the photo frame and the place line
 CARD_PROBE = '''async (sel) => {
   await document.fonts.ready;
   const ACCENT = '92, 195, 236', LIGHT_ACCENT = '0, 156, 220';
@@ -88,21 +88,19 @@ CARD_PROBE = '''async (sel) => {
         if ([s.color, s.backgroundColor, s.borderTopColor].some(v => v.includes(ACCENT) || v.includes(LIGHT_ACCENT))) accents.push(name(e) + (ps || ''));
       });
     });
-    const num = c.querySelector('[data-gid-field="id"]');
-    let tnum = null;
-    if (num) {
-      const pr2 = document.createElement('span');
-      pr2.className = num.className; pr2.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap';
-      num.parentNode.appendChild(pr2);
-      pr2.textContent = '1111111111'; const w1 = pr2.getBoundingClientRect().width;
-      pr2.textContent = '0000000000'; const w0 = pr2.getBoundingClientRect().width;
-      pr2.remove();
-      tnum = Math.abs(w1 - w0) < 0.5;
-    }
+    // номера на карте нет: ни поля, ни класса, ни цифр вида «GG 0042-7F3A» в видимом тексте
+    const numTrace = !!c.querySelector('.gid-idcard-num, [data-gid-field="id"]') || /GG\\s*\\d{3,}|НОМЕР\\s+GG/i.test(c.innerText || '');
+    const qr = c.querySelector('svg[data-gid-field="qr"], svg.gid-idcard-qr');
+    const qrOk = !qr || (qr.querySelector('path') && (qr.querySelector('path').getAttribute('d') || '').length > 500);
+    const seal = c.querySelector('[data-gid-field="photo"]'), where = c.querySelector('[data-gid-field="where"]');
     const nm = c.querySelector('[data-gid-field="name"]');
     res.push({w: r.width, h: r.height, ratio: r.width / r.height, parentW: c.parentElement.getBoundingClientRect().width,
       parentPad: parseFloat(getComputedStyle(c.parentElement).paddingLeft) + parseFloat(getComputedStyle(c.parentElement).paddingRight),
-      outside: outside.slice(0, 6), accents, tnum, font: nm ? getComputedStyle(nm).fontFamily : getComputedStyle(c).fontFamily});
+      outside: outside.slice(0, 6), accents, numTrace, qrOk, hasQr: !!qr,
+      seal: seal ? {state: seal.getAttribute('data-state'), img: !!seal.querySelector('img.gid-idcard-img'),
+                    ini: (seal.querySelector('.gid-idcard-ini') || {}).textContent || '', w: Math.round(seal.getBoundingClientRect().width)} : null,
+      where: where ? {shown: getComputedStyle(where).display !== 'none', text: where.textContent} : null,
+      font: nm ? getComputedStyle(nm).fontFamily : getComputedStyle(c).fontFamily});
   });
   return {cards: res, fontOk: document.fonts.check('700 16px Montserrat') && document.fonts.check('600 16px Montserrat'),
     scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth,
@@ -112,10 +110,13 @@ CARD_PROBE = '''async (sel) => {
 RATIO = 85.6 / 54
 LONG = {'name': 'Александра Образцова-Константинопольская',
         'positions': ['Ментор', 'Руководитель направления «Магистратура в Европе»', 'Ведущая роликов YouTube-канала'],
-        'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': '2025-09',
-        'status': 'active', 'passkey': True}
-EMPTY = {'name': 'Лёв', 'positions': [], 'email': 'lev.demo@global-generations.com', 'id': 'GG 1', 'since': '2026-10',
-         'status': 'disabled', 'passkey': False}
+        'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'team': 'Менторы · Магистратура в Европе',
+        'country': 'Соединённые Штаты Америки', 'qr': 'https://id.global-generations-edu.com/v/GG-9031-55C0E7', 'status': 'active', 'passkey': True}
+EMPTY = {'name': 'Лёв', 'positions': [], 'email': 'lev.demo@global-generations.com', 'status': 'disabled', 'passkey': False}
+# фото: https и путь сайта принимаются, всё остальное нет (ни http, ни //чужой, ни javascript:, ни data:, ни пробелов); картинка, которая не загрузилась = инициалы
+PHOTO_OK = ['https://id.global-generations-edu.com/avatars/ab.png', '/avatars/ab.png']
+PHOTO_BAD = ['http://id.global-generations-edu.com/a.png', '//evil.example/a.png', 'javascript:alert(1)', 'data:image/png;base64,AAAA',
+             '/\\evil.example/a.png', 'https://x.example/a b.png', '', ' ']
 
 # e-mail card: the hub fills the placeholders (escaped), Gmail on iPhone inverts colours but not images
 EMAIL = os.path.join(ROOT, 'gg-id', 'email-card.html')
@@ -318,7 +319,8 @@ WIDTHS = [(360, 740, 2, '360'), (375, 812, 2, '375'), (768, 1024, 1, '768'), (10
 SHORT = [(1280, 560), (1280, 450), (1024, 500), (960, 480), (1366, 640), (1440, 600), (1920, 400), (320, 568), (360, 640), (390, 664), (844, 390), (740, 360)]
 LONG_HERO = {'name': 'Константин Александрович Преображенский',
              'positions': ['Руководитель направления «Магистратура в Европе»', 'Ведущий роликов YouTube-канала', 'Старший ментор по поступлению'],
-             'id': 'GG 9031-55C0E7', 'qr': 'https://id.global-generations-edu.com/v/GG-9031-55C0E7'}
+             'team': 'Менторы · Магистратура в Европе', 'country': 'Соединённые Штаты Америки',
+             'qr': 'https://id.global-generations-edu.com/v/GG-9031-55C0E7'}
 # панель сплита: карта не наезжает на подпись и текст, не обрезана панелью, не уже 240 px, её содержимое внутри полей, имя не длиннее 2 строк
 PANEL = '''() => {
   const a = document.querySelector('.gid-aside'); if (!a || getComputedStyle(a).display === 'none') return [];
@@ -339,7 +341,7 @@ PANEL = '''() => {
   if (vis(card) && !badge) {
     const C = R(card), cs = getComputedStyle(card);
     if (C.width < 240) out.push('card narrower than 240 px: ' + Math.round(C.width));
-    card.querySelectorAll('.gid-lockup, .gid-idcard-seal, .gid-idcard-big, .gid-idcard-name, .gid-idcard-roles, .gid-idcard-num, .gid-idcard-qr').forEach(e => {
+    card.querySelectorAll('.gid-lockup, .gid-idcard-seal, .gid-idcard-big, .gid-idcard-name, .gid-idcard-roles, .gid-idcard-where, .gid-idcard-qr').forEach(e => {
       const q = R(e); if (!q.width) return;
       if (q.left < C.left + parseFloat(cs.paddingLeft) * .9 - 1 || q.right > C.right - parseFloat(cs.paddingRight) * .9 + 1 || q.bottom > C.bottom - parseFloat(cs.paddingBottom) * .9 + 1)
         out.push('card content outside its padding: ' + (e.className.baseVal !== undefined ? e.className.baseVal : e.className));
@@ -423,8 +425,11 @@ with sync_playwright() as p:
                             const badge = getComputedStyle(a.querySelector('.gid-hero')).transform !== 'none';   // телефон в низком окне: бейдж карты в строке над формой
                             return {hero: !!hc && hr.width > (badge ? 60 : 150), inside: hr.top >= ar.top - 1 && hr.bottom <= ar.bottom + 1 && hr.left >= ar.left - 1 && hr.right <= ar.right + 1,
                               qr: (q.querySelector('path').getAttribute('d') || '').length > 500 && m.size === m.version * 4 + 17 && m.get(0, 0) && m.get(6, 6) && !m.get(7, 7) && m.get(8, m.size - 8),
-                              key: !!a.querySelector('.gid-idcard-seal use[href="#gid-id-icon"]')}; }''')
-                        if not (h['hero'] and h['inside'] and h['qr'] and h['key']):
+                              seal: (a.querySelector('.gid-idcard-seal[data-gid-field="photo"]') || {getAttribute: () => null}).getAttribute('data-state'),
+                              key: !!a.querySelector('.gid-idcard-seal use[href="#gid-id-icon"]'),
+                              num: !!a.querySelector('.gid-idcard-num, [data-gid-field="id"]') || /GG\\s*\\d{3,}|НОМЕР\\s+GG/i.test(a.innerText || '')}; }''')
+                        want_seal = 'initials' if key == 'continue' else 'key'
+                        if not (h['hero'] and h['inside'] and h['qr'] and h['seal'] == want_seal and (h['key'] if want_seal == 'key' else True) and not h['num']):
                             problems.append(f'{label}: hero card of the split panel {h}')
                     # Сцена ставит карточку по центру окна, поэтому вид, который не помещается ниже этого подъёма, растёт вниз и прокручивается: это её правило (рабочая высота
                     # 260 px, 13.10, ниже 920 px запас 590 px, 14.10), а не раздутая вёрстка. Лишнюю высоту считаем без подъёма: вид, который не помещается в окно даже с верхом 28 px, по-прежнему ошибка.
@@ -456,8 +461,12 @@ with sync_playwright() as p:
                     problems.append(f'{label}: dashes in text {r["dashes"]}')
                 if errs:
                     problems.append(f'{label}: console {errs[:3]}')
-                if c['tnum'] is not True:
-                    problems.append(f'{label}: digits of the GG ID number are not monospaced')
+                if c['numTrace']:
+                    problems.append(f'{label}: the card still shows a GG ID number (the card carries only «GG ID», 15.10.2026)')
+                if not c['hasQr'] or not c['qrOk']:
+                    problems.append(f'{label}: QR of the card is missing or not drawn ({c["hasQr"]}, {c["qrOk"]})')
+                if c['seal'] is None or c['seal']['w'] < 40:
+                    problems.append(f'{label}: the frame for the photo is missing or too small {c["seal"]}')
                 expect_accents = [] if data_name == 'empty' else ['gid-idcard-status::before']
                 if c['accents'] != expect_accents:
                     problems.append(f'{label}: accent colour on {c["accents"]}, expected {expect_accents}')
@@ -467,18 +476,42 @@ with sync_playwright() as p:
                     problems.append(f'{label}: proportions {c["ratio"]:.3f}, a real card is {RATIO:.3f}')
                 if tag == 'phone' and c['w'] < c['parentW'] - c['parentPad'] - 1:
                     problems.append(f'{label}: not full width on the phone ({c["w"]:.0f} of {c["parentW"]:.0f})')
+                if data_name == 'demo' and not (c['where'] and c['where']['shown'] and ' \u00b7 ' in c['where']['text']):
+                    problems.append(f'{label}: the demo card must show «Команда · Страна» ({c["where"]})')
                 if data_name == 'long':
                     if pg.evaluate('document.querySelectorAll(".gid-main .gid-idcard-roles li").length') != 3:
                         problems.append(f'{label}: three positions expected')
+                    if not (c['where'] and c['where']['shown'] and 'Магистратура' in c['where']['text'] and 'Соединённые' in c['where']['text']):
+                        problems.append(f'{label}: the long team and country must both be on the card ({c["where"]})')
+                    if c['seal'] and c['seal']['ini'] != 'АО':
+                        problems.append(f'{label}: initials of the long name must be «АО» ({c["seal"]})')
                 if data_name == 'empty':
-                    hid = pg.evaluate('[...document.querySelectorAll(\'.gid-main [data-gid-field="positions"],.gid-main [data-gid-field="passkey"]\')].map(e => getComputedStyle(e).display)')
-                    if hid != ['none', 'none']:
-                        problems.append(f'{label}: empty positions and passkey must be hidden ({hid})')
+                    hid = pg.evaluate('[...document.querySelectorAll(\'.gid-main [data-gid-field="positions"],.gid-main [data-gid-field="where"],.gid-main [data-gid-field="passkey"]\')].map(e => getComputedStyle(e).display)')
+                    if hid != ['none', 'none', 'none']:
+                        problems.append(f'{label}: empty positions, place and passkey must be hidden ({hid})')
                 pg.locator('.gid-main .gid-idcard').screenshot(path=os.path.join(OUT, f'card-{tag}-{theme}-{data_name}.png'))
             # GGID.card never parses markup from the data
-            pg.evaluate('() => GGID.card(document.querySelector(".gid-main .gid-idcard"), {name: "<img src=x onerror=alert(1)>", positions: ["<b>x</b>"], email: "a<i>@global-generations.com", id: "<s>", since: "<u>"})')
+            pg.evaluate('() => GGID.card(document.querySelector(".gid-main .gid-idcard"), {name: "<img src=x onerror=alert(1)>", positions: ["<b>x</b>"], email: "a<i>@global-generations.com", id: "<s>", since: "<u>", team: "<u>team</u>", country: "<s>c</s>", photo: "javascript:alert(1)"})')
             if pg.evaluate('document.querySelector(".gid-main .gid-idcard").querySelectorAll("img,b,i,s,u").length'):
                 problems.append(f'card/{tag}/{theme}: GGID.card inserted markup from data')
+            # the photo: only https and a path of the site; a broken picture falls back to the initials (no real requests: https is cut off)
+            pg.route('https://**', lambda r: r.abort())
+            for u in PHOTO_OK:
+                st = pg.evaluate('''(u) => { const c = document.querySelector(".gid-main .gid-idcard"); GGID.card(c, {name: "Иван Образцов", photo: u});
+                    const s = c.querySelector('[data-gid-field="photo"]'), i = s.querySelector("img");
+                    return {state: s.getAttribute("data-state"), img: !!i, ref: i && i.referrerPolicy, alt: i && i.getAttribute("alt")}; }''', u)
+                if not (st['state'] == 'photo' and st['img'] and st['ref'] == 'no-referrer' and st['alt'] == ''):
+                    problems.append(f'card/{tag}/{theme}: photo {u!r} must be drawn as an image with no-referrer ({st})')
+            for u in PHOTO_BAD:
+                st = pg.evaluate('''(u) => { const c = document.querySelector(".gid-main .gid-idcard"); GGID.card(c, {name: "Иван Образцов", photo: u});
+                    const s = c.querySelector('[data-gid-field="photo"]'); return {state: s.getAttribute("data-state"), img: !!s.querySelector("img"), ini: s.textContent}; }''', u)
+                if st['img'] or st['state'] != 'initials' or st['ini'] != 'ИО':
+                    problems.append(f'card/{tag}/{theme}: photo {u!r} must not be drawn, only the initials ({st})')
+            st = pg.evaluate('''() => new Promise(res => { const c = document.querySelector(".gid-main .gid-idcard");
+                GGID.card(c, {name: "Иван Образцов", photo: "https://127.0.0.1:9/none.png"});
+                setTimeout(() => { const s = c.querySelector('[data-gid-field="photo"]'); res({state: s.getAttribute("data-state"), img: !!s.querySelector("img"), ini: s.textContent}); }, 1200); })''')
+            if st['img'] or st['state'] != 'initials' or st['ini'] != 'ИО':
+                problems.append(f'card/{tag}/{theme}: a photo that did not load must fall back to the initials ({st})')
             ctx.close()
 
     # ---- QA 08.10: ширины 360/375/768/1024 и масштаб 200 %, низкие окна, кольцо фокуса, «меньше движения», подсказки в полях ----
@@ -822,6 +855,10 @@ with sync_playwright() as p:
                 problems.append(f'showcase/{tag}/idcard {i}: outside the card padding {c["outside"]}')
             if c['accents'] != ['gid-idcard-status::before']:
                 problems.append(f'showcase/{tag}/idcard {i}: accent colour on {c["accents"]}')
+            if c['numTrace']:
+                problems.append(f'showcase/{tag}/idcard {i}: the card still shows a GG ID number')
+            if not c['hasQr'] or not c['qrOk']:
+                problems.append(f'showcase/{tag}/idcard {i}: QR of the card is missing or not drawn')
         rows = pg.evaluate('''() => [...document.querySelectorAll('#idcard .gid-idrow')].map(row => { const r = row.getBoundingClientRect();
             return [...row.querySelectorAll('*')].filter(e => { const q = e.getBoundingClientRect(); return q.width && (q.right > r.right + 1 || q.left < r.left - 1); }).length; })''')
         if len(rows) != 2 or any(rows):

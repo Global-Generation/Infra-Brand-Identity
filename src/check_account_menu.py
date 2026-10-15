@@ -24,6 +24,7 @@ Run: uv run --with playwright python src/check_account_menu.py [--preview]
 GGAM_ENGINE=webkit or firefox runs the same in another engine. Screenshots: shots/account-menu/ (GGAM_SHOTS=<dir> puts them elsewhere).
 With --preview the pictures of gg-id/account-menu/preview/ are refreshed.
 """
+import datetime
 import http.server
 import json
 import os
@@ -97,6 +98,10 @@ def sources():
     wallet_const = re.search(r'var WALLET = \{[^}]*\};', js)
     check('sources', 'the Apple Wallet badge text is English only (no Cyrillic in the WALLET constant)', bool(wallet_const) and not re.search('[Ѐ-ӿ]', wallet_const.group(0)))
     check('sources', 'no side stripe in the css (border-left)', not re.search(r'border-left\s*:\s*[^;}]*\d', css))
+    table = set(re.findall(r"^    '([a-z0-9-]+)': \[\[", js, re.M))
+    need = {i for _, _, i in SERVICE_BASE} | {i for _, i in GROUPS4}
+    check('sources', 'the table of icons holds every icon of the services of the cabinet and of the four groups (the tile of a service is the same in the menu and in the cabinet)',
+          need <= table, sorted(need - table))
     check('sources', 'the services panel has no height limit of its own: the js gives it gam-sub--all, the css lifts the limit of the panels (max-height:none, overflow visible)',
           "panelClass: 'gam-sub--all'" in js and '.gam .gam-sub--all{max-height:none;overflow:visible}' in css)
     paths = [bam.JS, bam.OUT, bam.LOCAL, os.path.join(DIR, 'demo.html'), os.path.join(DIR, 'README.md'), bam.__file__, os.path.abspath(__file__)]
@@ -141,13 +146,19 @@ TYPES = {'.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf
          '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json'}
 
 
+# the services of GG ID with the titles and icons of the cabinet «Мои сервисы» (the hub: cabinet/catalog.js), in the four groups of 15.10.2026
+SERVICE_BASE = [
+    ('akb', 'АКБ', 'briefcase'), ('mentor-cabinet', 'Кабинет ментора', 'graduation-cap'), ('mentor-report', 'Квартальный отчёт', 'clipboard-list'),
+    ('consultation-intake', 'Консультации', 'messages-square'), ('gg-notetaker', 'Notetaker', 'mic'), ('merch-store', 'Мерч', 'shopping-bag'),
+    ('hr', 'Найм', 'user-plus'), ('onboarding-hub', 'Онбординг', 'map'),
+    ('production', 'Production', 'clapperboard'), ('video-factory', 'Видеофабрика', 'film'), ('ai-teleprompter', 'Телесуфлёр', 'scroll-text'), ('yt', 'YouTube-трекер', 'youtube'),
+]
+GROUPS4 = [('Product', 'box'), ('Маркетинг', 'trending-up'), ('YouTube', 'play'), ('Infrastructure', 'server')]      # the captions and the icons of the sections of the board
+GROUP_SIZES = [6, 2, 4, 1]      # the 13 services of the mock: Product 6, Маркетинг 2, YouTube 4, Infrastructure 1 (the thirteenth)
+
+
 def services(n=None):
-    base = [
-        ('akb', 'Mentorship-AKB', 'users'), ('mentorship-pulse', 'Pulse Analytics', 'activity'), ('consultation-intake', 'Consultation Onboarding', 'message-square'),
-        ('production', 'Production', 'video'), ('legal', 'GG-Legal - юротдел как код', 'scale'), ('yt', 'YouTube Tracker', 'video'),
-        ('infra-aws', 'Infra-AWS', 'globe'), ('merch-store', 'Merch Store', 'megaphone'), ('sat', 'SAT Platform', 'graduation-cap'),
-        ('mentor-cabinet', 'Кабинет ментора', 'user'), ('hr', 'HR Platform', 'globe'), ('gg-notetaker', 'Notetaker', 'globe'),
-    ]
+    base = SERVICE_BASE
     out = [{'key': k, 'title': t, 'url': f'{ORIGINS["svc"]}/svc/{k}', 'icon': i} for k, t, i in base]
     while n and len(out) < n:
         k = f'extra-{len(out)}'
@@ -229,6 +240,13 @@ def hub_handler():
                 return self.json(200, {'services': services(60)}, cors)
             if mode == 'thirteen':          # what the hub gives its administrator (14.10.2026: 13 services, the list showed six)
                 return self.json(200, {'services': services(13)}, cors)
+            if mode == 'grouped':           # the hub of 15.10.2026: the four groups with `group` and `group_icon` on every service, in the order of the groups
+                grp = [g for g, size in zip(GROUPS4, GROUP_SIZES) for _ in range(size)]
+                return self.json(200, {'services': [dict(e, group=grp[n][0], group_icon=grp[n][1]) for n, e in enumerate(services(13))]}, cors)
+            if mode == 'grouped_evil':      # captions and icons that are not what they should be: markup, a long text, a name that is not in the set, a number, a prototype name
+                grp = [('Product', 'box')] * 3 + [('Маркетинг', '"><script>window.__pwned=7</script>')] * 2 + [('YouTube', 'constructor')] * 2 \
+                    + [('Infrastructure', 7)] * 2 + [('<img src=x onerror="window.__pwned=9">' + 'Я' * 60, '__proto__')] * 4
+                return self.json(200, {'services': [dict(e, group=grp[n][0], group_icon=grp[n][1]) for n, e in enumerate(services(13))]}, cors)
             if mode == 'evil':
                 bad = [
                     {'key': 'x1', 'title': '<img src=x onerror="window.__pwned=1">Сервис <b>один</b>', 'url': f'{ORIGINS["svc"]}/svc/x1', 'icon': 'users'},
@@ -570,7 +588,7 @@ def behaviour(b):
     thrown = pg.evaluate("(() => { try { GGAccountMenu.mount('#nope', {}); return 'no error'; } catch (e) { return e.name; } })()")
     check('api', 'mount on a missing element throws TypeError', thrown == 'TypeError', thrown)
     check('api', 'GGAccountMenu.version equals gg-id/VERSION', pg.evaluate('GGAccountMenu.version') == read(os.path.join(KIT, 'VERSION')).strip())
-    known = pg.evaluate("['layout-grid', 'graduation-cap', 'megaphone', 'globe', 'server', 'activity', 'message-square', 'users', 'video', 'scale', 'user', 'log-out', 'chevron-down', 'chevron-right', 'external-link', 'settings', 'eye', 'clock', 'pencil'].filter(n => GGAccountMenu.icons.indexOf(n) < 0)")
+    known = pg.evaluate("['layout-grid', 'graduation-cap', 'megaphone', 'globe', 'server', 'activity', 'message-square', 'users', 'video', 'scale', 'user', 'log-out', 'chevron-down', 'chevron-right', 'external-link', 'settings', 'eye', 'clock', 'pencil', 'box', 'trending-up', 'play'].filter(n => GGAccountMenu.icons.indexOf(n) < 0)")
     check('api', 'the icons the hub mapping names (service key to icon, section to icon) and the icons of AKB items are in the kit set', known == [], known)
     check('api', 'initials: two words, one word, empty', pg.evaluate("[GGAccountMenu.initials('лёв авдошин'), GGAccountMenu.initials('Анна'), GGAccountMenu.initials(''), GGAccountMenu.initials('a b c')]") == ['ЛА', 'А', 'U', 'AB'])
 
@@ -616,7 +634,8 @@ def behaviour(b):
 # ---------------------------------------------------------------------------------------------------------------- services list
 
 ROWS = '''() => [...document.querySelectorAll('#account .gam-svc')].map(a => ({title: a.querySelector('.gam-name').textContent, href: a.getAttribute('href'), key: a.getAttribute('data-gam-key'),
-    current: a.getAttribute('aria-current'), icon: !!a.querySelector('.gam-tile svg'), tile: getComputedStyle(a.querySelector('.gam-tile')).backgroundImage, meta: (a.querySelector('.gid-menu-meta') || {}).textContent || ''}))'''
+    current: a.getAttribute('aria-current'), icon: !!a.querySelector('.gam-tile svg'),
+    grid: (() => { const s = a.querySelector('.gam-tile svg'); return !!s && s.children.length === 4 && [...s.children].every(c => c.tagName.toLowerCase() === 'rect'); })(), tile: getComputedStyle(a.querySelector('.gam-tile')).backgroundImage, meta: (a.querySelector('.gid-menu-meta') || {}).textContent || ''}))'''
 LINK = '''() => { const r = document.getElementById('account'), a = r.querySelector('a[data-gam-id="services"]'), b = r.querySelector('button[data-gam-id="services"]');
   return {link: !!a && !a.hidden, href: a && a.getAttribute('href'), btn: !!b && !b.hidden, expanded: b && b.getAttribute('aria-expanded'),
           panel: [...r.querySelectorAll('.gam-sub')].some(p => !p.hidden)}; }'''
@@ -635,6 +654,20 @@ CARD_GEO = '''() => {
           panelMax: cs.maxHeight, panelOverflow: cs.overflowY, panelScroll: panel.scrollHeight > panel.clientHeight + 1, panelH: Math.round(panel.getBoundingClientRect().height),
           cardScrolls: menu.scrollHeight > menu.clientHeight + 1, cardOverflow: getComputedStyle(menu).overflowY, cardH: Math.round(m.height), top: Math.round(m.top),
           bottom: Math.round(m.bottom), left: Math.round(m.left), right: Math.round(m.right), w: Math.round(m.width), vh: vh, vw: innerWidth, hscroll: de.scrollWidth > de.clientWidth};
+}'''
+GROUPS_PROBE = '''() => {
+  const panel = document.querySelector('#account .gam-sub:not([hidden])') || document.querySelector('#account .gam-sub');
+  const boxes = [...panel.querySelectorAll(':scope > .gam-grp')], caps = boxes.map(b => b.firstElementChild);
+  const sig = svg => svg ? [...svg.querySelectorAll('path')].map(p => p.getAttribute('d')).join('|') + '#' + svg.children.length : '';
+  const cs = getComputedStyle(caps[0]);
+  return {texts: caps.map(c => (c.querySelector('span') || c).textContent), sizes: boxes.map(b => b.querySelectorAll(':scope > .gam-svc').length),
+    rows: panel.querySelectorAll('.gam-svc').length, roles: boxes.map(b => b.getAttribute('role')),
+    labelled: boxes.map((b, i) => !!caps[i].id && b.getAttribute('aria-labelledby') === caps[i].id), capClass: caps.map(c => c.classList.contains('gam-group')),
+    icons: caps.map(c => c.querySelectorAll('svg').length), iconHidden: caps.map(c => { const v = c.querySelector('svg'); return v ? v.getAttribute('aria-hidden') : null; }),
+    iconSize: caps.map(c => { const v = c.querySelector('svg'); return v ? Math.round(v.getBoundingClientRect().width) : 0; }), sig: caps.map(c => sig(c.querySelector('svg'))),
+    childKinds: [...panel.children].map(c => c.classList.contains('gam-grp') ? 'grp' : (c.classList.contains('gam-all') ? 'all' : c.tagName)),
+    size: cs.fontSize, weight: cs.fontWeight, transform: cs.textTransform, color: cs.color, rowColor: getComputedStyle(panel.querySelector('.gam-name')).color,
+    imgs: panel.querySelectorAll('img').length, scripts: panel.querySelectorAll('script').length, pwned: window.__pwned || 0};
 }'''
 SCROLL_CARD_END = "(() => { const m = document.querySelector('#account .gid-menu'); m.scrollTop = m.scrollHeight; })()"
 
@@ -674,6 +707,8 @@ def listing(b):
     check('services', 'every service of the answer is a row, in the order of the answer', [r['title'] for r in rows] == [x['title'] for x in want], [r['title'] for r in rows])
     check('services', 'one click goes straight into the service: the row is a link to its address', [r['href'] for r in rows] == [x['url'] for x in want], [r['href'] for r in rows][:3])
     check('services', 'every row has an icon tile with the light gradient of the kit (rule 4a)', all(r['icon'] and 'linear-gradient' in r['tile'] and '143, 186, 221' in r['tile'] for r in rows), rows[0])
+    check('services', 'the icons of the cabinet are drawn (not the grid of an unknown name): briefcase, graduation-cap, clipboard-list, messages-square, mic, shopping-bag, user-plus, map, clapperboard, film, scroll-text, youtube',
+          not any(r['grid'] for r in rows), [r['key'] for r in rows if r['grid']])
     cur = [r for r in rows if r['current']]
     check('services', 'the service the page is in (currentKey) is marked: aria-current and the words «Вы здесь», and only it', len(cur) == 1 and cur[0]['key'] == 'akb' and cur[0]['meta'] == 'Вы здесь', cur)
     allrow = pg.evaluate("(() => { const a = document.querySelector('#account .gam-all'); return a && [a.textContent.trim(), a.getAttribute('href')]; })()")
@@ -722,6 +757,50 @@ def listing(b):
     check('services', '13 services in a window of 600 px: scrolled to its end the card shows «Все сервисы» and «Выйти»', end['allSeen'] and end['logoutSeen'], end)
     pg.keyboard.press('Escape')
     pg.set_viewport_size({'width': 1440, 'height': 1000})
+
+    # the groups of 15.10.2026: the hub sends `group` and `group_icon`; the list draws a small grey caption (icon and name) before the first service of each group,
+    # the services of a group stand in a group of their own; no `group` = no captions
+    check('groups', 'an answer without `group` (the old hub) draws no captions', pg.evaluate("document.querySelectorAll('#account .gam-group').length") == 0)
+    HUB['mode'] = 'grouped'
+    goto(pg, 'svc-groups', page(mount_js()))
+    open_services(pg)
+    pg.wait_for_selector('#account .gam-group')
+    info = pg.evaluate(GROUPS_PROBE)
+    check('groups', 'four groups in the order of the cabinet: Product, Маркетинг, YouTube, Infrastructure (6, 2, 4 and 1 services), all 13 rows',
+          info['texts'] == [g for g, _ in GROUPS4] and info['sizes'] == GROUP_SIZES and info['rows'] == 13, info)
+    check('groups', 'a group is a box of its own: role=group named by its caption (aria-labelledby), the caption is its first child; «Все сервисы» stands after the groups, outside them',
+          info['roles'] == ['group'] * 4 and all(info['labelled']) and all(info['capClass']) and info['childKinds'] == ['grp'] * 4 + ['all'], info)
+    check('groups', 'every caption has its icon, the one of the section of the board (box, trending-up, play, server): a small svg 14 px, hidden from screen readers, four different drawings (3, 2, 1 and 4 shapes)',
+          info['icons'] == [1] * 4 and info['iconHidden'] == ['true'] * 4 and info['iconSize'] == [14] * 4 and len(set(info['sig'])) == 4
+          and [x.split('#')[1] for x in info['sig']] == ['3', '2', '1', '4'], info)
+    check('groups', 'captions: 12 px, weight 600, not upper-cased, muted colour (not the colour of the service names)',
+          info['size'] == '12px' and info['weight'] == '600' and info['transform'] == 'none' and info['color'] != info['rowColor'], info)
+    geo = pg.evaluate(CARD_GEO)
+    check('groups', 'grouped list of 13 in a window of 1000 px: all rows, «Все сервисы» and «Выйти» in view, no scroll of its own',
+          geo['rows'] == 13 and geo['seen'] == 13 and geo['allSeen'] and geo['logoutSeen'] and not geo['panelScroll'], geo)
+    # the keyboard walks the services of all groups in the order of the list (the captions are not stops), then «Все сервисы»
+    pg.focus(MENU + ' button[data-gam-id="services"]')
+    walk = []
+    for _ in range(14):
+        pg.keyboard.press('ArrowDown')
+        walk.append(pg.evaluate("(() => { const a = document.activeElement; return a ? (a.getAttribute('data-gam-key') || (a.classList.contains('gam-all') ? 'all' : a.tagName)) : ''; })()"))
+    check('groups', 'the arrow keys walk the 13 services across the groups in the order of the list and then «Все сервисы»',
+          walk == [k for k, _, _ in SERVICE_BASE] + ['extra-12', 'all'], walk)
+    pg.screenshot(path=os.path.join(OUT, 'groups-desktop.png'), clip={'x': 1000, 'y': 0, 'width': 440, 'height': 1000})
+    pg.keyboard.press('Escape')
+    # captions and icons that are not what they should be: text only, cut to 40 letters, a name that is not in the set draws no icon
+    HUB['mode'] = 'grouped_evil'
+    goto(pg, 'svc-groups-evil', page(mount_js()))
+    open_services(pg)
+    pg.wait_for_selector('#account .gam-group')
+    ev = pg.evaluate(GROUPS_PROBE)
+    check('groups', 'captions are text only: markup and 60 letters are cut to 40 and shown as text, nothing runs',
+          len(ev['texts']) == 5 and ev['texts'][:4] == [g for g, _ in GROUPS4] and len(ev['texts'][4]) == 40 and ev['texts'][4].startswith('<img')
+          and ev['imgs'] == 0 and ev['scripts'] == 0 and ev['pwned'] == 0 and ev['rows'] == 13, ev)
+    check('groups', 'an icon of a group that is not in the set (markup, a prototype name, a number) draws no icon; a known one draws it',
+          ev['icons'] == [1, 0, 0, 0, 0], ev['icons'])
+    pg.keyboard.press('Escape')
+    HUB['mode'] = 'thirteen'
 
     # the panel of an item of the service itself (a long list of people) keeps its own box: only «Мои сервисы» lost the limit
     people = ', '.join("{label: 'Ментор %d'}" % i for i in range(40))
@@ -1304,6 +1383,283 @@ DEMO_LINK = """() => { const a = document.querySelector('#account a[data-gam-id=
   return {link: !!a && !a.hidden, btn: !!b && !b.hidden}; }"""
 
 
+# ---------------------------------------------------------------------------------------------------------------- the bar of a sign-in on behalf
+
+IMP_SETUP = """
+window.__ev = []; window.__until = Date.now() + 47 * 60000;
+window.__bar = function (opts) {
+  var el = document.getElementById('imp');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'imp';
+    document.querySelector('header').insertAdjacentElement('afterend', el);
+    el.addEventListener('gimp:end', function () { window.__ev.push('end'); });
+    el.addEventListener('gimp:over', function () { window.__ev.push('over'); });
+  }
+  return GGAccountMenu.impBar(el, opts);
+};
+"""
+HM = "(() => { const d = new Date(window.__until); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); })()"
+IMP_PROBE = """() => {
+  const b = document.getElementById('imp'), r = b.getBoundingClientRect(), hd = document.querySelector('header').getBoundingClientRect(), cs = getComputedStyle(b);
+  const btn = b.querySelector('.gimp-btn'), br = btn ? btn.getBoundingClientRect() : null, l1 = b.querySelector('.gimp-l1'), l2 = b.querySelector('.gimp-l2');
+  const ok = ['div', 'b', 'span', 'a', 'button', 'form', 'input', 'svg', 'path', 'rect', 'circle', 'line'];
+  const bad = [...b.querySelectorAll('*')].map(e => e.tagName.toLowerCase()).filter(t => ok.indexOf(t) < 0);
+  const lum = c => { const f = x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+  const rgb = v => { const m = v.match(/rgba?\\(([^)]+)\\)/); const p = m[1].split(',').map(Number); return p.length > 3 ? p : p.concat([1]); };
+  const over = (t, bg) => [t[0] * t[3] + bg[0] * (1 - t[3]), t[1] * t[3] + bg[1] * (1 - t[3]), t[2] * t[3] + bg[2] * (1 - t[3])];
+  const ratio = (a, c) => { const x = lum(a), y = lum(c); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  const bg = rgb(cs.backgroundColor).slice(0, 3);
+  return {cls: b.className, role: b.getAttribute('role'), label: b.getAttribute('aria-label'), state: b.getAttribute('data-gimp-state'),
+    l1: l1 ? l1.textContent : null, l2: l2 ? l2.textContent : null, l2role: l2 ? l2.getAttribute('role') : null,
+    btn: btn ? btn.textContent.trim() : null, tag: btn ? btn.tagName.toLowerCase() : null, href: btn ? btn.getAttribute('href') : null, form: !!b.querySelector('form'),
+    left: Math.round(r.left), width: Math.round(r.width), vw: innerWidth, top: Math.round(r.top), headBottom: Math.round(hd.bottom), h: Math.round(r.height),
+    bg: cs.backgroundColor, color: cs.color, padTop: cs.paddingTop, padLeft: cs.paddingLeft, mb: cs.marginBottom,
+    btnW: br ? Math.round(br.width) : 0, btnH: br ? Math.round(br.height) : 0, btnRight: br ? Math.round(r.right - br.right) : 0,
+    hscroll: document.documentElement.scrollWidth > document.documentElement.clientWidth, bad: bad, busy: btn ? btn.getAttribute('aria-busy') : null,
+    disabled: btn ? !!btn.disabled : null, err: !!b.querySelector('.gimp-err'), errRole: (b.querySelector('.gimp-err') || {getAttribute: () => null}).getAttribute('role'),
+    c1: l1 ? ratio(rgb(getComputedStyle(l1).color).slice(0, 3), bg) : 0,
+    c2: l2 ? ratio(over(rgb(getComputedStyle(l2).color), bg), bg) : 0,
+    cb: btn ? ratio(rgb(getComputedStyle(btn).color).slice(0, 3), rgb(getComputedStyle(btn).backgroundColor).slice(0, 3)) : 0,
+    pwned: window.__pwned || 0};
+}"""
+
+
+def imp_bar(b):
+    """The one bar of a sign-in on behalf of a person (GGAccountMenu.impBar): texts, the three ways back, busy and failed states, the end of the time, safety, looks."""
+    svc = ORIGINS['svc']
+    HUB['allowed'] = {svc}
+    errs = []
+
+    def new_page(width, height, scheme='light'):
+        ctx = b.new_context(viewport={'width': width, 'height': height}, color_scheme=scheme)
+        ctx.add_cookies([{'name': 'gg_portal_session', 'value': 'test-session', 'url': svc + '/'}])
+        pg = ctx.new_page()
+        pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}'))
+        return ctx, pg
+
+    ON = "window.bar = window.__bar({name: 'Иван Образцов', until: window.__until, endHref: '/logout'});"
+
+    # --- a strip over the whole width right under the header, the words, the way back as a link
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-on', page(IMP_SETUP + mount_js() + ON))
+    r = pg.evaluate(IMP_PROBE)
+    hm = pg.evaluate(HM)
+    check('imp', 'the bar says whose GG ID is open and until when: «Вы смотрите как <имя>» and «Только просмотр до ЧЧ:ММ. Изменения не сохраняются.»',
+          r['l1'] == 'Вы смотрите как Иван Образцов' and r['l2'] == f'Только просмотр до {hm}. Изменения не сохраняются.', (r['l1'], r['l2'], hm))
+    check('imp', 'the way back is one white button «Вернуться к себе» (a link for endHref)', r['btn'] == 'Вернуться к себе' and r['tag'] == 'a' and (r['href'] or '').endswith('/logout'), r)
+    check('imp', 'a region with a name for the screen readers (Вход от имени)', r['role'] == 'region' and r['label'] == 'Вход от имени', r)
+    check('imp', 'a strip over the whole width: from the left edge to the right edge of the window, its top at the bottom of the header (right under the menu)',
+          r['left'] == 0 and r['width'] == r['vw'] and abs(r['top'] - r['headBottom']) <= 1, r)
+    check('imp', 'navy 13445d with white words, padding 18 and 28 px, 20 px of air below it, the button at the right edge, no sideways scroll',
+          r['bg'] == 'rgb(19, 68, 93)' and r['color'] == 'rgb(255, 255, 255)' and r['padTop'] == '18px' and r['padLeft'] == '28px' and r['mb'] == '20px'
+          and r['btnRight'] == 28 and r['btnH'] >= 38 and not r['hscroll'], r)
+    check('imp', 'contrast: the first line, the second line and the label of the button are at least 4.5 to 1', r['c1'] >= 4.5 and r['c2'] >= 4.5 and r['cb'] >= 4.5, (r['c1'], r['c2'], r['cb']))
+    check('imp', 'nothing but the allowed tags in the bar', r['bad'] == [], r['bad'])
+    pg.screenshot(path=os.path.join(OUT, 'imp-desktop-light.png'), clip={'x': 0, 'y': 0, 'width': 1440, 'height': 220})
+    # the account menu opens above the bar, the strip does not cover the card
+    pg.click(CHIP)
+    pg.wait_for_selector(MENU + ':not([hidden])')
+    ov = pg.evaluate("""(() => { const m = document.querySelector('#account .gid-menu').getBoundingClientRect(), b = document.getElementById('imp').getBoundingClientRect();
+      const y = Math.max(m.top, b.top) + 10, x = m.left + m.width / 2, e = document.elementFromPoint(x, y); return {overlap: m.top < b.bottom && m.bottom > b.top, inMenu: !!(e && e.closest('.gid-menu'))}; })()""")
+    check('imp', 'the account menu opens over the bar', ov['overlap'] and ov['inMenu'], ov)
+    pg.keyboard.press('Escape')
+    # the keyboard: from the chip one Tab reaches the button, with the ring of the kit (2 px)
+    pg.focus(CHIP)
+    pg.keyboard.press('Tab')
+    ring = pg.evaluate("(() => { const a = document.activeElement, s = getComputedStyle(a); return {cls: a.className, outline: [s.outlineStyle, s.outlineWidth, s.outlineColor]}; })()")
+    check('imp', 'one Tab from the chip reaches the button «Вернуться к себе»; it has a visible ring of 2 px', 'gimp-btn' in ring['cls'] and ring['outline'][0] == 'solid' and ring['outline'][1] == '2px', ring)
+    # the link goes back to the own session
+    pg.click('#imp .gimp-btn')
+    pg.wait_for_url('**/logout')
+    check('imp', 'the link leads to the address of the service (the own sign-out)', pg.url.endswith('/logout'), pg.url)
+    ctx.close()
+
+    # --- the phone, the dark theme: the same strip, the button on the whole width
+    ctx, pg = new_page(390, 844, 'dark')
+    goto(pg, 'imp-phone', page(IMP_SETUP + mount_js() + ON))
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', '390 px, dark theme: the same navy strip over the whole width, the button on the whole width of the strip (16 px of padding), no sideways scroll',
+          r['bg'] == 'rgb(19, 68, 93)' and r['left'] == 0 and r['width'] == 390 and r['btnW'] == 390 - 32 and r['padLeft'] == '16px' and not r['hscroll'], r)
+    check('imp', '390 px: the strip sits right under the header', abs(r['top'] - r['headBottom']) <= 1, r)
+    pg.screenshot(path=os.path.join(OUT, 'imp-phone-dark.png'), clip={'x': 0, 'y': 0, 'width': 390, 'height': 260})
+    ctx.close()
+
+    # --- the way back is the service's own call: busy, one call, false = it stayed, a failure is said in words, a silent one is not
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-fn', page(IMP_SETUP + mount_js() + """window.__calls = 0;
+      window.bar = window.__bar({name: 'Иван Образцов', until: window.__until, onEnd: function () { window.__calls++; return new Promise(function (res, rej) { window.__settle = {res: res, rej: rej}; }); }});"""))
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'onEnd: the way back is a button', r['tag'] == 'button' and r['btn'] == 'Вернуться к себе' and not r['form'], r)
+    pg.click('#imp .gimp-btn')
+    r = pg.evaluate(IMP_PROBE)
+    pg.evaluate("document.querySelector('#imp .gimp-btn').click()")
+    check('imp', 'while the call runs: «Возвращаем…», aria-busy, the button is locked, a second click starts nothing',
+          r['btn'] == 'Возвращаем…' and r['busy'] == 'true' and r['disabled'] and pg.evaluate('window.__calls') == 1, (r, pg.evaluate('window.__calls')))
+    pg.evaluate('window.__settle.res(false)')
+    pg.wait_for_function("document.querySelector('#imp .gimp-btn') && !document.querySelector('#imp .gimp-btn').disabled")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'false from the call = the service stayed: the button works again with its own words', r['btn'] == 'Вернуться к себе' and r['busy'] is None and not r['err'], r)
+    pg.click('#imp .gimp-btn')
+    pg.evaluate("window.__settle.rej(new Error('boom'))")
+    pg.wait_for_selector('#imp .gimp-err')
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a failed call says so in words and the button works again; the visible line has no live role of its own (the quiet alert region says it, see below)',
+          r['l2'] == 'Не получилось вернуться к себе. Попробуйте ещё раз.' and r['errRole'] is None and not r['disabled'] and r['btn'] == 'Вернуться к себе', r)
+    pg.click('#imp .gimp-btn')
+    pg.evaluate("window.__settle.rej(Object.assign(new Error('x'), {silent: true}))")
+    pg.wait_for_function("document.querySelector('#imp .gimp-btn') && !document.querySelector('#imp .gimp-btn').disabled")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a silent failure (the service already said it) adds no line of its own', not r['err'] and (r['l2'] or '').startswith('Только просмотр'), r)
+    check('imp', 'gimp:end is fired on every press (3), nothing else', pg.evaluate('window.__ev') == ['end', 'end', 'end'], pg.evaluate('window.__ev'))
+    # destroy gives the element back as it was
+    pg.evaluate('window.bar.destroy()')
+    gone = pg.evaluate("(() => { const e = document.getElementById('imp'); return {html: e.innerHTML, cls: e.className, role: e.getAttribute('role')}; })()")
+    check('imp', 'destroy() empties the element and takes its class and role away', gone == {'html': '', 'cls': '', 'role': None}, gone)
+    pg.evaluate("window.bar.update({name: 'Мария'}); window.bar.notice('x', 100)")
+    pg.wait_for_timeout(250)
+    gone = pg.evaluate("(() => { const e = document.getElementById('imp'); return {html: e.innerHTML, cls: e.className, role: e.getAttribute('role')}; })()")
+    check('imp', 'after destroy() update() and notice() do nothing (no bar comes back, no timer draws it)', gone == {'html': '', 'cls': '', 'role': None}, gone)
+    ctx.close()
+
+    # --- the keyboard, the screen reader, the page from the cache, the clock after sleep
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-robust', page(IMP_SETUP + mount_js() + """window.__calls = 0;
+      window.bar = window.__bar({name: 'Иван Образцов', until: window.__until, onEnd: function () { window.__calls++; return new Promise(function (res, rej) { window.__settle = {res: res, rej: rej}; }); }});"""))
+    regions = pg.evaluate("[...document.querySelectorAll('[data-gimp-live]')].map(n => [n.getAttribute('data-gimp-live'), n.getAttribute('role'), n.getAttribute('aria-live'), n.getAttribute('aria-atomic'), n.textContent])")
+    check('imp', 'two quiet regions are born with the bar, empty: status (polite) and alert (assertive), so a screen reader hears a change and not a newborn',
+          regions == [['polite', 'status', 'polite', 'true', ''], ['assertive', 'alert', 'assertive', 'true', '']], regions)
+    pg.evaluate("""window.__said = [];
+      new MutationObserver(function () { var t = document.querySelector('[data-gimp-live=assertive]').textContent; if (t) window.__said.push(t); })
+        .observe(document.querySelector('[data-gimp-live=assertive]'), {childList: true, characterData: true, subtree: true});""")
+    pg.focus('#imp .gimp-btn')
+    pg.keyboard.press('Enter')
+    pg.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted: true}))")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a page that comes back from the cache (pageshow, persisted) is not left on «Возвращаем…»: the button works again',
+          r['btn'] == 'Вернуться к себе' and not r['disabled'] and r['busy'] is None, r)
+    pg.focus('#imp .gimp-btn')
+    pg.keyboard.press('Enter')
+    check('imp', 'the second call started (the first one is still unsettled but the bar was reset): busy again', pg.evaluate(IMP_PROBE)['btn'] == 'Возвращаем…')
+    pg.evaluate("window.__settle.rej(new Error('boom'))")
+    pg.wait_for_selector('#imp .gimp-err')
+    f = pg.evaluate("(() => { const a = document.activeElement; return {cls: a.className, inBar: !!a.closest('#imp')}; })()")
+    check('imp', 'after a failed call the focus is back on the new «Вернуться к себе» (a keyboard user is not thrown to the top of the page)', 'gimp-btn' in f['cls'] and f['inBar'], f)
+    pg.wait_for_function("window.__said.length === 1", timeout=3000)
+    check('imp', 'the failure is said once through the quiet alert region, in words', pg.evaluate('window.__said') == ['Не получилось вернуться к себе. Попробуйте ещё раз.'], pg.evaluate('window.__said'))
+    pg.keyboard.press('Enter')
+    pg.evaluate("window.__settle.rej(new Error('boom again'))")
+    pg.wait_for_function("window.__said.length === 2", timeout=3000)
+    check('imp', 'the same failure twice is said twice (the region is emptied before it is filled again)', pg.evaluate('window.__said.length') == 2, pg.evaluate('window.__said'))
+    ctx.close()
+
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-wake', page(IMP_SETUP + mount_js() + ON))
+    check('imp', 'a running bar is on', pg.evaluate(IMP_PROBE)['state'] == 'on')
+    pg.evaluate("(() => { const real = Date.now.bind(Date); Date.now = () => real() + 3600000; })()")
+    pg.wait_for_timeout(300)
+    check('imp', 'a laptop that slept: the clock is an hour ahead but the timer has not fired, the bar still says «on» (that is the trap)', pg.evaluate(IMP_PROBE)['state'] == 'on')
+    pg.evaluate("window.dispatchEvent(new Event('focus'))")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'the window gets the focus back: the bar reads the clock, says «Вход от имени закончился» and fires gimp:over once',
+          r['state'] == 'over' and r['l1'] == 'Вход от имени закончился' and pg.evaluate('window.__ev') == ['over'], (r['state'], pg.evaluate('window.__ev')))
+    pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+    check('imp', 'visibilitychange afterwards changes nothing and fires nothing more', pg.evaluate('window.__ev') == ['over'], pg.evaluate('window.__ev'))
+    pg.wait_for_function("document.querySelector('[data-gimp-live=polite]').textContent === 'Вход от имени закончился. Вернитесь к себе, чтобы продолжить.'", timeout=3000)
+    check('imp', 'the end of the time is said through the quiet status region', True)
+    ctx.close()
+
+    # --- a real POST of the service's own sign-out
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-form', page(IMP_SETUP + mount_js() + "window.bar = window.__bar({name: 'Мария Петрова', until: window.__until, endForm: {action: '/logout', fields: {to: 'gg-id', csrf_token: 'a b&c'}}});"))
+    POSTS.clear()
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'endForm: a form with a button; the fields are hidden inputs', r['form'] and r['tag'] == 'button' and r['btn'] == 'Вернуться к себе', r)
+    pg.click('#imp .gimp-btn')
+    pg.wait_for_url('**/logged-out')
+    check('imp', 'endForm: the press sends a POST with the fields (encoded) and the cookie of the service',
+          len(POSTS) == 1 and POSTS[0]['path'] == '/logout' and 'to=gg-id' in POSTS[0]['body'] and 'csrf_token=a+b%26c' in POSTS[0]['body'] and 'gg_portal_session=test-session' in POSTS[0]['cookie'], POSTS)
+    ctx.close()
+
+    # --- the end of the time: the bar changes by itself, says so once, keeps the button
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-over', page(IMP_SETUP + mount_js() + "window.bar = window.__bar({name: 'Иван Образцов', until: Date.now() + 1200, endHref: '/logout'});"))
+    check('imp', 'before the end the bar is on', pg.evaluate(IMP_PROBE)['state'] == 'on')
+    pg.wait_for_function("document.getElementById('imp').getAttribute('data-gimp-state') === 'over'", timeout=6000)
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'after the end: «Вход от имени закончился», «Вернитесь к себе, чтобы продолжить.», the button stays, isOver() is true',
+          r['l1'] == 'Вход от имени закончился' and r['l2'] == 'Вернитесь к себе, чтобы продолжить.' and 'gimp--over' in r['cls'] and r['btn'] == 'Вернуться к себе'
+          and pg.evaluate('window.bar.isOver()') is True, r)
+    check('imp', 'gimp:over is fired once', pg.evaluate('window.__ev') == ['over'], pg.evaluate('window.__ev'))
+    check('imp', 'the ended bar has the same navy strip and enough contrast', r['bg'] == 'rgb(19, 68, 93)' and r['c1'] >= 4.5 and r['c2'] >= 4.5, r)
+    pg.screenshot(path=os.path.join(OUT, 'imp-over-desktop.png'), clip={'x': 0, 'y': 0, 'width': 1440, 'height': 220})
+    ctx.close()
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-ended', page(IMP_SETUP + mount_js() + "window.bar = window.__bar({name: 'Иван Образцов', ended: true, endHref: '/logout'});"))
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'ended: true is the ended bar at once, no gimp:over for a bar that was never on', r['state'] == 'over' and r['l1'] == 'Вход от имени закончился' and pg.evaluate('window.__ev') == [], (r['state'], pg.evaluate('window.__ev')))
+    pg.evaluate("window.bar.update({ended: false, until: Date.now() + 600000})")
+    check('imp', 'update() puts a running time back: the bar is on again', pg.evaluate(IMP_PROBE)['state'] == 'on' and pg.evaluate('window.bar.isOver()') is False)
+    ctx.close()
+
+    # --- safety: the words go in as text, the addresses are checked, the notice is text and goes away
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-xss', page(IMP_SETUP + mount_js() + """window.bar = window.__bar({name: '<img src=x onerror="window.__pwned=11">Иван', until: window.__until, endHref: '/logout'});
+      window.bar.notice('<b>x</b> wow', 800);"""))
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a name with markup is shown as text; the notice is text too and replaces the second line',
+          r['l1'] == 'Вы смотрите как <img src=x onerror="window.__pwned=11">Иван' and r['l2'] == '<b>x</b> wow' and r['l2role'] is None and r['bad'] == [] and r['pwned'] == 0, r)
+    pg.wait_for_function("document.querySelector('[data-gimp-live=polite]').textContent === '<b>x</b> wow'", timeout=3000)
+    check('imp', 'the notice is said through the quiet status region as text', pg.evaluate("document.querySelectorAll('[data-gimp-live=polite] b').length") == 0)
+    pg.wait_for_function("(document.querySelector('#imp .gimp-l2') || {}).textContent.indexOf('Только просмотр') === 0", timeout=6000)
+    check('imp', 'the notice goes away by itself and the usual line comes back', True)
+    for what, upd in (('a javascript: address', "{endHref: 'javascript:window.__pwned=12'}"), ('a plain http address of a stranger', "{endHref: 'http://evil.example/x'}"),
+                      ('a data: address', "{endHref: 'data:text/html,<script>window.__pwned=14</script>'}"),
+                      ('a javascript: action of the form', "{endHref: '', endForm: {action: 'javascript:window.__pwned=13', fields: {}}}"),
+                      ('a protocol-relative address of a stranger (//evil.example/x)', "{endHref: '//evil.example/x'}"),
+                      ('a backslash address of a stranger (/\\evil.example/x)', "{endHref: '/\\\\evil.example/x'}"),
+                      ('a tab between the slashes (/<tab>/evil.example/x)', "{endHref: '/\\t/evil.example/x'}"),
+                      ('an https address of a stranger', "{endHref: 'https://evil.example/x'}"),
+                      ('a protocol-relative action of the form', "{endHref: '', endForm: {action: '//evil.example/logout', fields: {}}}"),
+                      ('an https action of a stranger in the form', "{endHref: '', endForm: {action: 'https://evil.example/logout', fields: {}}}")):
+        pg.evaluate(f'window.bar.update({upd})')
+        r = pg.evaluate(IMP_PROBE)
+        check('imp', f'{what}: no way back is drawn, nothing runs', r['btn'] is None and r['pwned'] == 0, r)
+    pg.evaluate("window.bar.update({endForm: null, endHref: 'https://id.global-generations-edu.com/cabinet/'})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'the address of the hub (https) is a link', r['tag'] == 'a' and r['href'] == 'https://id.global-generations-edu.com/cabinet/', r)
+    pg.evaluate(f"window.bar.update({{endHref: '{svc}/logout'}})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'an absolute address of the page\'s own origin is a link', r['tag'] == 'a' and r['href'] == svc + '/logout', r)
+    pg.evaluate("window.bar.update({endHref: 'https://id-staging.example/cabinet/'})")
+    check('imp', 'another hub (staging) is a stranger until the page names it', pg.evaluate(IMP_PROBE)['btn'] is None)
+    pg.evaluate("window.bar.update({hubOrigin: 'https://id-staging.example'})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'hubOrigin names the staging hub: its address is a link', r['tag'] == 'a' and r['href'] == 'https://id-staging.example/cabinet/', r)
+    pg.evaluate("window.bar.update({hubOrigin: 'javascript:window.__pwned=15', endHref: 'javascript:window.__pwned=16'})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a hubOrigin that is not an http(s) address names nobody', r['btn'] is None and r['pwned'] == 0, r)
+    ctx.close()
+
+    # --- the attributes alone are enough
+    ctx, pg = new_page(1440, 900)
+    until = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=47)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    goto(pg, 'imp-attr', page('', body=f'<div id="attrbar" data-gg-imp-bar data-name="Мария Петрова" data-until="{until}" data-end-href="/logout"></div>', manual=False))
+    pg.wait_for_selector('#attrbar .gimp-btn')
+    a = pg.evaluate("(() => { const e = document.getElementById('attrbar'); return [e.querySelector('.gimp-l1').textContent, e.querySelector('.gimp-btn').textContent.trim(), e.querySelector('.gimp-btn').tagName]; })()")
+    check('imp', 'data-gg-imp-bar with data-name, data-until and data-end-href draws the bar without a line of script', a == ['Вы смотрите как Мария Петрова', 'Вернуться к себе', 'A'], a)
+    ctx.close()
+    # a bar that markup alone brings to a page must not lead out of it
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-attr-evil', page('', body='<div id="attrbar" data-gg-imp-bar data-name="Мария Петрова" data-end-href="//evil.example/x"></div>'
+                                           '<div id="attrform" data-gg-imp-bar data-name="Мария Петрова" data-end-form=\'{"action":"/\\t/evil.example/logout","fields":{"to":"gg-id"}}\'></div>', manual=False))
+    pg.wait_for_selector('#attrbar .gimp-l1')
+    pg.wait_for_selector('#attrform .gimp-l1')
+    ev = pg.evaluate("[...document.querySelectorAll('#attrbar, #attrform')].map(e => [e.querySelector('.gimp-btn'), e.querySelector('form'), e.querySelector('a')].filter(Boolean).length)")
+    check('imp', 'data-end-href="//evil.example/x" and a tab-broken data-end-form action draw no way back (only the words)', ev == [0, 0], ev)
+    ctx.close()
+    check('imp', 'no script errors on the pages', not errs, errs[:3])
+
+
 def demo_page(b):
     svc = ORIGINS['svc']
     ctx = b.new_context(viewport={'width': 1440, 'height': 1000}, device_scale_factor=2)
@@ -1329,12 +1685,21 @@ def demo_page(b):
                 check('demo', f'{state} / {k}: the list is drawn (13 services) whole, with no scroll of its own, the expander stays', rows == 13 and not own and res['btn'] and not res['link'], (rows, own, res))
             else:
                 check('demo', f'{state} / {k}: a plain link to the cabinet, no list', rows == 0 and res['link'] and not res['btn'], (rows, res))
+            check('demo', f'{state} / {k}: no bar of a sign-in on behalf without ?imp', fr.evaluate("document.querySelectorAll('#imp .gimp').length") == 0)
             bd = fr.evaluate("(() => { const a = document.querySelector('#account a.gam-wallet'); return a && [a.getAttribute('href'), a.getClientRects().length > 0]; })()")
             check('demo', f'{state} / {k}: the Wallet badge is in the card (the demo shows it on every device) and links to the pass of the hub', bd == [HUB_URL + WALLET_PATH, True], bd)
         phone_scroll = frames['phone'].evaluate('[document.documentElement.scrollWidth, document.documentElement.clientWidth, innerWidth]')
         check('demo', f'{state}: the 390 px frame is 390 px wide and has no horizontal scroll', phone_scroll[2] == 390 and phone_scroll[0] <= phone_scroll[1], phone_scroll)
         if state == 'ok':
             pg.screenshot(path=os.path.join(OUT, 'demo-page.png'), full_page=True)
+    # the bar of a sign-in on behalf: ?imp=on | over puts it in both frames, right under the header
+    for mode in ('on', 'over'):
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?state=ok&imp={mode}')
+        pg.wait_for_function("[...document.querySelectorAll('iframe')].every(f => f.contentDocument && f.contentDocument.querySelector('#imp .gimp-btn'))", timeout=15000)
+        for fr in [f for f in pg.frames if 'embed=' in f.url]:
+            t = fr.evaluate("document.querySelector('#imp .gimp-l1').textContent")
+            check('demo', f'imp={mode}: the bar is in the frame with the right words', t == ('Вы смотрите как Иван Образцов' if mode == 'on' else 'Вход от имени закончился'), t)
+    check('demo', 'the second row of switches of the demo page has three links (own session, on, ended)', pg.evaluate("document.querySelectorAll('#imps a').length") == 3)
     check('demo', 'the demo page and its frames print no console errors', not errs, errs[:3])
     ctx.close()
 
@@ -1361,6 +1726,17 @@ def pictures(b):
         pg.wait_for_timeout(450)
         pg.screenshot(path=os.path.join(OUT, 'picture-' + name), **({'clip': clip} if clip else {}))
         ctx.close()
+    for name, embed, (w, h) in (('imp-desktop.png', 'desktop', (1440, 300)), ('imp-390.png', 'phone', (390, 330))):
+        ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
+        pg = ctx.new_page()
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state=ok&imp=on')
+        pg.wait_for_function('window.GGAccountMenu !== undefined')
+        pg.evaluate('document.fonts.ready.then(() => 1)')
+        pg.wait_for_selector('#imp .gimp-btn')
+        pg.mouse.move(2, 2)
+        pg.wait_for_timeout(300)
+        pg.screenshot(path=os.path.join(OUT, 'picture-' + name))
+        ctx.close()
 
 
 # ---------------------------------------------------------------------------------------------------------------- run
@@ -1385,7 +1761,7 @@ def main():
             b.new_context = new_context
             for name, fn, args in (('look', look, ()), ('avatar_variant', avatar_variant, ()), ('behaviour', behaviour, ()), ('focus_rings', focus_rings, ()),
                                    ('wallet_badge', wallet_badge, ()), ('hub_defaults', hub_defaults, ()),
-                                   ('listing', listing, ()), ('phone', phone, (ENGINE,)), ('narrow_edges', narrow_edges, ()), ('demo_page', demo_page, ()),
+                                   ('listing', listing, ()), ('imp_bar', imp_bar, ()), ('phone', phone, (ENGINE,)), ('narrow_edges', narrow_edges, ()), ('demo_page', demo_page, ()),
                                    ('pictures', pictures, ())):
                 try:
                     fn(b, *args)
@@ -1406,7 +1782,7 @@ def main():
         pdir = os.path.join(DIR, 'preview')
         os.makedirs(pdir, exist_ok=True)
         import shutil
-        for name in ('menu-desktop.png', 'services-desktop.png', 'services-390.png', 'services-fallback.png'):
+        for name in ('menu-desktop.png', 'services-desktop.png', 'services-390.png', 'services-fallback.png', 'imp-desktop.png', 'imp-390.png'):
             shutil.copyfile(os.path.join(OUT, 'picture-' + name), os.path.join(pdir, name))
         print('preview pictures refreshed in', pdir)
 

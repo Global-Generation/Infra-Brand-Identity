@@ -161,12 +161,12 @@ LOADER = ('<div class="gid-ld" aria-hidden="true">'
 # ---- карта GG ID (08.10, «Итог»): светлая, ключ GG ID в печати, без фото и плашки инициалов. Данные вымышленные ----
 MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
 DEMO = {'name': 'Иван Образцов', 'positions': ['Ментор', 'Продажи'], 'email': 'ivan.obraztsov@global-generations.com',
-        'id': 'GG 0042-7F3A', 'since': '2024-03', 'status': 'active', 'passkey': True}
+        'id': 'GG 0042-7F3A', 'since': '2024-03', 'status': 'active', 'passkey': True, 'team': 'Менторы', 'country': 'Казахстан'}
 LONG = {'name': 'Александра Образцова-Константинопольская',
         'positions': ['Ментор', 'Руководитель направления «Магистратура в Европе»', 'Ведущая роликов YouTube-канала'],
         'email': 'aleksandra.obraztsova-konstantinopolskaya@global-generations.com', 'id': 'GG 9031-55C0E7', 'since': '2025-09',
-        'status': 'active', 'passkey': True}
-TPL = {'name': 'Имя Фамилия', 'positions': ['Должность'], 'id': 'GG 0042-7F3A', 'sample': True}   # карта на экране входа до входа
+        'status': 'active', 'passkey': True, 'team': 'Магистратура в Европе и Великобритании', 'country': 'Соединённое Королевство'}
+TPL = {'name': 'Имя Фамилия', 'positions': ['Должность'], 'id': 'GG 0042-7F3A', 'sample': True, 'team': 'Команда', 'country': 'Страна'}   # карта на экране входа до входа
 VERIFY = 'https://id.global-generations-edu.com/v/'   # QR карты = адрес проверки: VERIFY + номер через дефис (как в варианте «Итог»)
 
 
@@ -186,8 +186,32 @@ def since_text(v):
     return f'{MONTHS_GEN[int(m) - 1]} {y}'
 
 
-KEY_SEAL = ('<span class="gid-idcard-seal" aria-hidden="true"><svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false">'
-            '<use href="#gid-id-icon"/></svg></span>')
+# Условное изображение для витрины и README (не фото человека): силуэт на светло-голубом. На настоящей карте стоит фото или аватар из хаба (поле photo)
+DEMO_PHOTO = 'data:image/svg+xml,' + urllib.parse.quote(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#cfe3f3"/>'
+    '<circle cx="48" cy="38" r="17" fill="#13445d"/><path d="M14 96c2-22 16-34 34-34s32 12 34 34z" fill="#13445d"/></svg>', safe='')
+
+
+def where_text(d):
+    """«Команда · Страна»: what stands under the position. An empty part is left out, nothing at all = the line is hidden."""
+    return ' \u00b7 '.join(x for x in (d.get('team'), d.get('country')) if x)
+
+
+def photo_slot(d, photo=None):
+    """The round holographic frame in the corner of the card. The photo or avatar of the person when there is one (the hub sends `photo`), else the initials,
+    on the sample card (before sign-in, nobody yet) the GG ID key. data-gid-field="photo": gg-id.js fills it from the data of the hub and falls back to the initials
+    when the picture does not load. The frame is always there, so the place of the photo never moves."""
+    e = htmlmod.escape
+    photo = photo or d.get('photo')
+    if photo:
+        inner, state = f'<img class="gid-idcard-img" src="{e(photo, quote=True)}" alt="" decoding="async">', 'photo'
+    elif d.get('sample'):
+        inner, state = '<svg class="gid-idcard-key" viewBox="0 0 64 64" focusable="false"><use href="#gid-id-icon"/></svg>', 'key'
+    else:
+        inner, state = f'<span class="gid-idcard-ini">{e(initials(d["name"]))}</span>', 'initials'
+    return f'<span class="gid-idcard-seal" data-gid-field="photo" data-state="{state}" aria-hidden="true">{inner}</span>'
+
+
 HOLO = '<span class="gid-idcard-holo" aria-hidden="true"></span>'
 
 
@@ -198,43 +222,47 @@ def idcard(d, indent=''):
     local, dom = d['email'].rsplit('@', 1)
     roles = ''.join(f'<li>{e(p)}</li>' for p in d['positions'])
     on = d['status'] == 'active'
+    where = where_text(d)
     lines = [
         f'<article class="gid-idcard" aria-label="Global Generation ID: {e(d["name"])}">',
         '  ' + HOLO,
         '  <div class="gid-idcard-top">',
         '    ' + LOCKUP,
-        '    ' + KEY_SEAL,
+        '    ' + photo_slot(d),
         '  </div>',
         '  <div class="gid-idcard-who">',
         f'    <p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>',
         f'    <ul class="gid-idcard-roles" data-gid-field="positions" aria-label="Должности"{"" if roles else " hidden"}>{roles}</ul>',
+        f'    <p class="gid-idcard-where" data-gid-field="where"{"" if where else " hidden"}>{e(where)}</p>',
         f'    <p class="gid-idcard-mail" data-gid-field="email">{re.sub(r"([._-])", r"\1<wbr>", e(local))}<wbr><span>@{e(dom)}</span></p>',
+        '  </div>',
+        '  <div class="gid-idcard-facts">',
         '    <p class="gid-idcard-meta">'
         f'<span class="gid-idcard-status" data-gid-field="status" data-status="{"active" if on else "disabled"}">{"Активен" if on else "Отключён"}</span>'
         '<span class="gid-idcard-passkey" data-gid-field="passkey"' + ('' if d['passkey'] else ' hidden') +
         '><svg class="gid-ic" aria-hidden="true"><use href="#gi-scan-face"/></svg>Face ID / Touch ID подключён</span></p>',
         '  </div>',
-        '  <div class="gid-idcard-facts">',
-        f'    <dl class="gid-idcard-fact"><dt>Номер GG ID</dt><dd class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</dd></dl>',
-        f'    <dl class="gid-idcard-fact"><dt>В команде с</dt><dd data-gid-field="since">{e(since_text(d["since"]))}</dd></dl>',
-        '  </div>',
+        f'  <svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="{e(verify_url(d["id"]))}" viewBox="0 0 37 37" role="img" aria-label="QR-код GG ID">'
+        '<path fill="#13445d" d=""/></svg>',
         '</article>']
     return '\n'.join(indent + ln for ln in lines)
 
 
 def herocard(d, qr=None):
-    """The sign-in hero card: big GG ID, name, position and number bottom left, QR bottom right (gg-id.js draws it).
+    """The sign-in hero card: big GG ID, the photo or avatar top right, name, position and team with country bottom left, QR bottom right (gg-id.js draws it).
+    No number (15.10.2026): it is the key of the QR address and of the pass, not a thing to read off the card.
     The sample card (before sign-in, public pages) encodes the sample number as plain text, no address of the hub;
     a known account («Продолжить как») encodes the verification address."""
     e = htmlmod.escape
     qr = qr or (d['id'] if d.get('sample') else verify_url(d['id']))
     roles = ''.join(f'<li>{e(p)}</li>' for p in d['positions'])
+    where = where_text(d)
     return ('<article class="gid-idcard gid-idcard--hero">' + HOLO +
-            f'<div class="gid-idcard-top">{LOCKUP}{KEY_SEAL}</div><p class="gid-idcard-big">GG ID</p>'
+            f'<div class="gid-idcard-top">{LOCKUP}{photo_slot(d)}</div><p class="gid-idcard-big">GG ID</p>'
             '<div class="gid-idcard-bot"><div class="gid-idcard-who">'
             f'<p class="gid-idcard-name" data-gid-field="name">{e(d["name"])}</p>'
             f'<ul class="gid-idcard-roles" data-gid-field="positions">{roles}</ul>'
-            f'<p class="gid-idcard-num" data-gid-field="id">{e(d["id"])}</p></div>'
+            f'<p class="gid-idcard-where" data-gid-field="where"{"" if where else " hidden"}>{e(where)}</p></div>'
             f'<svg class="gid-idcard-qr" data-gid-field="qr" data-gid-qr="{e(qr)}" viewBox="0 0 37 37" role="img" aria-label="QR-код GG ID">'
             '<path fill="#13445d" d=""/></svg></div></article>')
 
@@ -266,7 +294,7 @@ FOOT = ('<footer class="gid-foot"><span><b>GG ID</b> · единый вход Gl
         f'<a class="gid-link gid-link--muted gid-link--sm" href="{GUIDE_URL}" target="_blank" rel="noopener">'
         '<svg class="gid-ic" aria-hidden="true"><use href="#gi-book-open"/></svg>Как войти: инструкция</a></footer>')
 # экран «Продолжить как»: аккаунт известен, на карте его имя, должности и номер
-SIDE_FOR = {'continue': aside({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id']})}
+SIDE_FOR = {'continue': aside({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id'], 'team': DEMO['team'], 'country': DEMO['country']})}
 
 
 def shell(layout, card_inner, key, side=None):
@@ -276,12 +304,12 @@ def shell(layout, card_inner, key, side=None):
 
 
 def idrow(d, status=True):
-    """The compact row: initials, name, number (+ status). Same data-gid-field hooks as the card."""
+    """The compact row: initials, name, role (+ status). Same data-gid-field hooks as the card."""
     e = htmlmod.escape
     st = ('<span class="gid-idcard-status" data-gid-field="status" data-status="active">Активен</span>' if status else '')
     return (f'<div class="gid-idrow"><span class="gid-avatar gid-avatar--sm" data-gid-field="initials" aria-hidden="true">{e(initials(d["name"]))}</span>'
             f'<span class="gid-idrow-tx"><b data-gid-field="name">{e(d["name"])}</b>'
-            f'<span class="gid-idrow-num" data-gid-field="id">{e(d["id"])}</span></span>{st}</div>')
+            f'<span class="gid-idrow-role" data-gid-field="role">{e(" · ".join(d["positions"]))}</span></span>{st}</div>')
 
 
 IDCARD = idcard(DEMO)
@@ -330,9 +358,9 @@ INFO = {
     'pin': ('Переходный вход по коду для сервисов, которые ещё не на GG ID.', 'sso-gate: PIN-ворота'),
     'unavailable': ('GG ID не отвечает (5xx или таймаут). Страница сама пробует снова.', 'sso-gate: sso-unavailable'),
     'signedout': ('После «Выйти» в меню аккаунта.', 'POST /api/v1/sessions/revoke'),
-    'card': ('Карточка сотрудника, как студенческий ID: вверху кабинета «Мои сервисы», на первом входе после приглашения '
-             '(онбординг) и образцом в инструкции «Как войти». В письме-приглашении её копия gg-id/email-card.html.',
-             'GET /api/auth/me: display_name, email (уже есть); positions, gg_id, since, status (добавить); GGPasskey.list()'),
+    'card': ('Карточка сотрудника, как студенческий ID: фото или аватар, имя, должности, команда и страна, QR, без номера. Вверху кабинета «Мои сервисы», '
+             'на первом входе после приглашения (онбординг), на панели экрана входа и в Apple Wallet. В письме-приглашении её копия gg-id/email-card.html.',
+             'GET /api/auth/card и /me: display_name, email, positions, qr (уже есть); photo, team, country (добавить: профиль GG ID); GGPasskey.list()'),
 }
 assert set(INFO) == set(KEYS), set(INFO) ^ set(KEYS)
 
@@ -602,12 +630,13 @@ page = (tpl
         .replace('/*@GID_JS@*/', kit_js.replace('</script', '<\\/script'))
         .replace('/*@GID_SERVICE_JS@*/', service_js.replace('</script', '<\\/script'))
         .replace('/*@META@*/', json.dumps(meta, ensure_ascii=False).replace('</', '<\\/'))
-        .replace('/*@HERO_DEMO@*/', json.dumps({'name': DEMO['name'], 'positions': DEMO['positions'], 'id': DEMO['id'], 'qr': verify_url(DEMO['id'])}, ensure_ascii=False))
+        .replace('/*@HERO_DEMO@*/', json.dumps({'name': DEMO['name'], 'positions': DEMO['positions'], 'team': DEMO['team'], 'country': DEMO['country'], 'qr': verify_url(DEMO['id'])}, ensure_ascii=False))
         .replace('<!--@TEMPLATES@-->', templates)
         .replace('<!--@API_ROWS@-->', api_rows)
         .replace('@LOCKUP@', LOCKUP)
         .replace('@FAVICON_URI@', FAVICON_URI)
         .replace('@IDCARD@', idcard(DEMO, '        '))
+        .replace('@IDCARD_PHOTO@', idcard({**DEMO, 'photo': DEMO_PHOTO}, '        '))
         .replace('@IDCARD_LONG@', idcard(LONG, '        '))
         .replace('@IDROW@', idrow(DEMO))
         .replace('@EMAIL_SRCDOC@', htmlmod.escape(email_filled(DEMO, EMAIL_PNG_URI), quote=True))
