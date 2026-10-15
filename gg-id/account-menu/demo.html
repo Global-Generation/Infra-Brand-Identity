@@ -49,7 +49,8 @@ body.is-dark .app-log{color:#9db3c1}
 </head>
 <body>
 <script>
-/* ---- демо: хаб GG ID здесь изображён (fetch на его адрес отвечает заготовкой), сети нет. Состояние списка: ?state=ok|slow|nologin|error|empty|offline ---- */
+/* ---- демо: хаб GG ID здесь изображён (fetch на его адрес отвечает заготовкой), сети нет. Состояние списка: ?state=ok|slow|nologin|error|empty|offline.
+   Аватар: ?avatar=photo|initials|broken (фото из GG ID, нет фото, файл не загрузился). Демо само называет картинку в параметре photo, поэтому карту у хаба не спрашивает ---- */
 (function () {
   var q = new URLSearchParams(location.search), state = q.get('state') || 'ok';
   /* the hub sends the services in four groups, the same in the menu and in the cabinet «Мои сервисы»: `group` is the caption, `group_icon` its icon (a name of the kit set);
@@ -80,6 +81,10 @@ body.is-dark .app-log{color:#9db3c1}
   }
   var real = window.fetch;
   window.fetch = function (url, init) {
+    if (String(url).indexOf('/api/auth/card') >= 0) {      // the card of the hub (the photo): the demo gives the photo itself, so this is never asked; if it is, it is counted and answered "no card"
+      window.__demoCardCalls = (window.__demoCardCalls || 0) + 1;
+      return reply(404, { error: 'no_card' });
+    }
     if (String(url).indexOf('/api/auth/service-links') < 0) return real.apply(this, arguments);
     window.__demoCalls = (window.__demoCalls || 0) + 1;
     if (state === 'slow') return reply(200, { services: SERVICES }, 1800);
@@ -94,10 +99,11 @@ body.is-dark .app-log{color:#9db3c1}
 
 <main class="doc" id="doc" hidden>
   <h1>Меню аккаунта GG</h1>
-  <p>Одно меню во всех сервисах команды: чип с инициалами справа в шапке, под ним белая карточка. Под именем чёрный значок Add to Apple Wallet (в сервисе он виден на iPhone, iPad и в Safari на Mac, в демо на любом устройстве). «Мои сервисы» раскрывается списком: сервис, в который человек может зайти, открывается одним нажатием. «Выйти» делает выход везде (его делает прежний выход сервиса). Хаб здесь изображён заготовкой, сети нет.</p>
-  <p>Подключение: <code>gg-account-menu.css</code>, <code>gg-account-menu.js</code>, <code>GGAccountMenu.mount('#account', { name, email, logoutUrl })</code>. Адреса хаба заданы по умолчанию. Правила и примеры: <code>README.md</code> рядом.</p>
+  <p>Одно меню во всех сервисах команды: круглый аватар справа в шапке, под ним белая карточка. В круге фото, которое человек выбрал в GG ID (сервис фото не загружает и не меняет); нет фото или оно не загрузилось: инициалы. Под именем чёрный значок Add to Apple Wallet (в сервисе он виден на iPhone, iPad и в Safari на Mac, в демо на любом устройстве). «Мои сервисы» раскрывается списком: сервис, в который человек может зайти, открывается одним нажатием. «Выйти» делает выход везде (его делает прежний выход сервиса). Хаб здесь изображён заготовкой, сети нет.</p>
+  <p>Подключение: <code>gg-account-menu.css</code>, <code>gg-account-menu.js</code>, <code>GGAccountMenu.mount('#account', { name, email, logoutUrl })</code>. Адреса хаба заданы по умолчанию, фото кит берёт у хаба сам. Правила и примеры: <code>README.md</code> рядом.</p>
   <nav class="states" aria-label="Состояние списка сервисов" id="states"></nav>
   <nav class="states" aria-label="Плашка входа от имени" id="imps"></nav>
+  <nav class="states" aria-label="Аватар в круге" id="avatars"></nav>
   <div class="frames">
     <section class="frame"><h2>Компьютер, светлая тема</h2><iframe id="fd" title="Меню аккаунта на компьютере" height="1160"></iframe></section>
     <section class="frame frame--phone"><h2>Телефон, 390 px</h2><iframe id="fp" title="Меню аккаунта на телефоне 390 px" height="1160"></iframe></section>
@@ -123,18 +129,20 @@ body.is-dark .app-log{color:#9db3c1}
 (function () {
   var q = new URLSearchParams(location.search), state = q.get('state') || 'ok', embed = q.get('embed');
   var doc = document;
+  var avatar = q.get('avatar') === 'initials' || q.get('avatar') === 'broken' ? q.get('avatar') : 'photo';      // фото из GG ID (по умолчанию), нет фото, фото не загрузилось
   if (!embed) {
     // обёртка: два окна с этой же страницей в режиме embed (media queries в окне считаются по его ширине, то есть настоящие 390 px)
     doc.getElementById('doc').hidden = false;
     var open = q.get('open') === '0' ? '' : '&open=1';
     var imp = q.get('imp') || 'off', impq = imp === 'on' || imp === 'over' ? '&imp=' + imp : '';
-    doc.getElementById('fd').src = 'demo.html?embed=desktop&state=' + state + open + impq;
-    doc.getElementById('fp').src = 'demo.html?embed=phone&state=' + state + open + impq;
+    var avq = avatar === 'photo' ? '' : '&avatar=' + avatar;
+    doc.getElementById('fd').src = 'demo.html?embed=desktop&state=' + state + open + impq + avq;
+    doc.getElementById('fp').src = 'demo.html?embed=phone&state=' + state + open + impq + avq;
     var names = [['ok', 'Список загружен'], ['slow', 'Грузится долго'], ['nologin', 'Нет входа в хабе (401)'], ['error', 'Хаб не отвечает (503)'], ['empty', 'Список пуст'], ['offline', 'Нет сети']];
     var nav = doc.getElementById('states');
     names.forEach(function (n) {
       var a = doc.createElement('a');
-      a.href = '?state=' + n[0] + (q.get('open') === '0' ? '&open=0' : '') + (impq ? impq : '');
+      a.href = '?state=' + n[0] + (q.get('open') === '0' ? '&open=0' : '') + impq + avq;
       a.textContent = n[1];
       if (n[0] === state) a.setAttribute('aria-current', 'true');
       nav.appendChild(a);
@@ -142,10 +150,18 @@ body.is-dark .app-log{color:#9db3c1}
     var impNav = doc.getElementById('imps');
     [['off', 'Своя сессия'], ['on', 'Вход от имени: идёт'], ['over', 'Вход от имени: закончился']].forEach(function (n) {
       var a = doc.createElement('a');
-      a.href = '?state=' + state + (q.get('open') === '0' ? '&open=0' : '') + (n[0] === 'off' ? '' : '&imp=' + n[0]);
+      a.href = '?state=' + state + (q.get('open') === '0' ? '&open=0' : '') + (n[0] === 'off' ? '' : '&imp=' + n[0]) + avq;
       a.textContent = n[1];
       if (n[0] === imp) a.setAttribute('aria-current', 'true');
       impNav.appendChild(a);
+    });
+    var avNav = doc.getElementById('avatars');
+    [['photo', 'Фото из GG ID'], ['initials', 'Нет фото: инициалы'], ['broken', 'Фото не загрузилось']].forEach(function (n) {
+      var a = doc.createElement('a');
+      a.href = '?state=' + state + (q.get('open') === '0' ? '&open=0' : '') + impq + (n[0] === 'photo' ? '' : '&avatar=' + n[0]);
+      a.textContent = n[1];
+      if (n[0] === avatar) a.setAttribute('aria-current', 'true');
+      avNav.appendChild(a);
     });
     return;
   }
@@ -153,10 +169,14 @@ body.is-dark .app-log{color:#9db3c1}
   var dark = q.get('theme') === 'dark';
   if (dark) doc.body.className = 'is-dark'; else doc.body.style.background = '#f8fafc';
   var log = doc.getElementById('log');
+  /* Аватар: в сервисе кит сам берёт фото человека у хаба (карта GET /api/auth/card), а демо хаб изображает, поэтому картинку называет параметром photo: файл рядом с этой страницей
+     (свой путь страницы). ?avatar=initials: нет фото (false), ?avatar=broken: файла нет, картинка не загрузилась и в круге инициалы */
+  var photo = avatar === 'initials' ? false : new URL(avatar === 'broken' ? 'demo-avatar-missing.svg' : 'demo-avatar.svg', location.href).pathname;
   var menu = GGAccountMenu.mount('#account', {
     theme: dark ? 'dark' : 'light',
     name: 'Лёв Авдошин',
     email: 'lev.avdoshin@global-generations.com',
+    photo: photo,
     hubOrigin: 'https://id.global-generations-edu.com',   // это и есть адрес по умолчанию; в сервисе его задаёт GG_AUTH_ORIGIN, только если хаб не боевой
     currentKey: 'akb',
     wallet: true,                                          // значок Apple Wallet в демо виден на любом устройстве; в сервисе по умолчанию только iPhone, iPad и Safari на Mac

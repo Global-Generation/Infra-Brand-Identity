@@ -66,6 +66,18 @@
 .gam .gam-wallet--art{padding:0;border:0;border-radius:0;background:none}
 .gam .gam-wallet--art img{display:block;height:36px;width:auto;max-width:100%}
 
+/* The photo of the person (the option photo): the avatar chosen in GG ID goes over the initials, in the round chip and in the head of the card. The img is out of the flow (absolute, the whole
+   circle, cover), so the circle keeps the size the kit gives it with a picture and without one. The picture is invisible until it has loaded (the js puts .gam-av--photo on the avatar then),
+   the initials show meanwhile; a picture that fails is removed by the js and the initials stay. The avatar is positioned (.gam-av--img) only while it holds a picture, so without one
+   it is the kit's avatar to the last computed style. Shown, the letters turn transparent (a picture with a see-through edge must not let them
+   through) and the thin ring of the avatar is drawn over the picture: the inset shadow of the avatar itself would lie under it. No shadow and no filter of the picture's own. */
+.gam .gid-avatar.gam-av--img{position:relative}
+.gam .gid-avatar.gam-av--img > .gam-photo{position:absolute;top:0;left:0;display:block;width:100%;height:100%;max-width:none;margin:0;padding:0;border:0;border-radius:50%;
+  object-fit:cover;opacity:0;pointer-events:none}
+.gam .gid-avatar.gam-av--photo{color:transparent}
+.gam .gid-avatar.gam-av--photo > .gam-photo{opacity:1}
+.gam .gid-avatar.gam-av--photo::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;box-shadow:inset 0 0 0 1px var(--g-avatar-line);pointer-events:none}
+
 /* ============ The bar of a sign-in on behalf of a person (GGAccountMenu.impBar): one bar for the hub and every service ============
    A strip over the whole width right under the header, navy in both themes (it must never be taken for the page itself), a wide inset (18 px and 28 px, 14 px and 16 px on
    a phone) and a gap below it (--gimp-gap, 20 px). The first line says whose GG ID is open, the second until when, the white button goes back to the administrator's own session.
