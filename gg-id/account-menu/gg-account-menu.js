@@ -33,7 +33,8 @@
    width right under the header. Put an empty element there and call
      GGAccountMenu.impBar('#imp', { name: 'Иван Образцов', until: '2026-10-15T12:30:00Z', endHref: '/logout' });     // or onEnd: function () { return promise } or endForm: { action, fields }
    ("Вы смотрите как Иван Образцов", "Только просмотр до ЧЧ:ММ (по часам устройства). Изменения не сохраняются.", the button «Вернуться к себе»; after `until`: «Вход от имени закончился»).
-   Or with no script of your own: <div data-gg-imp-bar data-name="..." data-until="..." data-end-href="..."></div>. The bar only shows and returns: what the service does in such a session is its own rule. */
+   Or with no script of your own: <div data-gg-imp-bar data-name="..." data-until="..." data-end-href="..."></div>. The bar only shows and returns: what the service does in such a session is its own rule.
+   The way back (endHref, endForm.action) may lead only to the page's own origin or to the hub (hubOrigin, the production hub by default): any other address draws no button. */
 (function (win) {
   'use strict';
   var doc = win.document;
@@ -174,6 +175,15 @@
     return '';
   }
   function origin(u) { try { return new URL(u).origin; } catch (e) { return ''; } }
+  /* The origin of the hub a page names (the hubOrigin option): an absolute http(s) address, else ''. */
+  function hubOf(v) { return (typeof v === 'string' && /^https?:\/\//i.test(v.trim())) ? origin(safeUrl(v)) : ''; }
+  /* An address the way back of the bar of a sign-in on behalf may lead to: this page's own origin or the hub (the production one, or the page's hubOrigin), nothing else.
+     The bar comes alive from an attribute alone (data-gg-imp-bar), so it cannot trust an address the way safeUrl does: «//evil.example/x», «/\evil.example/x» and a tab
+     inside the slashes («/<tab>/evil.example/x») all resolve to another origin, and the administrator would press «Вернуться к себе» and land there. */
+  function backUrl(u, hub) {
+    var s = safeUrl(u), o = s ? origin(s) : '';
+    return o && (o === win.location.origin || o === HUB.origin || (hub && o === hub)) ? s : '';
+  }
   /* The devices that take an Apple Wallet pass straight from a page: iPhone, iPad, iPod (any browser: on iOS they are all WebKit) and Safari on a Mac.
      The same rule as the cabinet of the hub (Infra-Services-Portal, cabinet/wallet.js). An iPad in the "desktop site" mode calls itself a Mac, its touch screen gives it away. */
   function appleWalletDevice(nav) {
@@ -782,30 +792,79 @@
     return (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
   }
 
+  /* The announcer. A screen reader says a live region when its text CHANGES, not when a region is born with its text, and the bar is drawn anew for every state.
+     So the words that matter (a failed way back, a notice of the service, the end of the time) go through two quiet regions of their own, born with the first bar and
+     kept for as long as the page lives; the same words twice in a row are said twice. Hidden by CSSOM, not by a style attribute from markup (a strict CSP is fine). */
+  var live = {};
+  function liveRegion(kind) {
+    var n = live[kind];
+    if (n && doc.body && doc.body.contains(n)) return n;
+    if (!doc.body) return null;
+    n = h('div');
+    n.setAttribute('data-gimp-live', kind);
+    n.setAttribute('role', kind === 'assertive' ? 'alert' : 'status');
+    n.setAttribute('aria-live', kind);
+    n.setAttribute('aria-atomic', 'true');
+    var s = n.style;
+    s.position = 'absolute'; s.width = '1px'; s.height = '1px'; s.margin = '-1px'; s.padding = '0'; s.border = '0'; s.overflow = 'hidden'; s.clip = 'rect(0 0 0 0)'; s.whiteSpace = 'nowrap';
+    doc.body.appendChild(n);
+    live[kind] = n;
+    return n;
+  }
+  function announce(text, assertive) {
+    var msg = str(text).replace(/\s+/g, ' ').trim(), n = msg ? liveRegion(assertive ? 'assertive' : 'polite') : null;
+    if (!n) return;
+    n.textContent = '';
+    setTimeout(function () { n.textContent = msg; }, 60);
+  }
+
   function ImpBar(root, opts) {
+    var self = this;
     this.root = root;
     this.baseClass = root.className || '';
     this.cfg = {};
     this.busy = false;
     this.err = false;
+    this.refocus = false;
     this.note = '';
     this.timer = 0;
     this.noteTimer = 0;
     this.over = null;
     this.dead = false;
+    // the time is read from the clock, not from the timer alone: a laptop that slept makes a timer late, a tab that came back from the cache is still «Возвращаем…»
+    this.onWake = function () { if (!doc.visibilityState || doc.visibilityState === 'visible') self.tick(); };
+    this.onShow = function (e) {
+      if (self.dead) return;
+      if (e && e.persisted && self.busy) { self.busy = false; self.render(); } else self.tick();
+    };
+    liveRegion('polite'); liveRegion('assertive');
     this.update(opts || {});
+    doc.addEventListener('visibilitychange', this.onWake);
+    win.addEventListener('focus', this.onWake);
+    win.addEventListener('pageshow', this.onShow);
   }
   ImpBar.prototype.isOver = function () {
     var t = untilMs(this.cfg.until);
     return this.cfg.ended === true || (t > 0 && t <= Date.now());
   };
   ImpBar.prototype.update = function (opts) {
+    if (this.dead) return;
     for (var k in (opts || {})) this.cfg[k] = opts[k];
     this.render();
   };
-  ImpBar.prototype.render = function () {
-    var self = this, c = this.cfg, root = this.root, over = this.isOver(), t = untilMs(c.until);
+  /* the timer for the end of the time; a late or lost timer is caught by tick() */
+  ImpBar.prototype.arm = function () {
+    var self = this, t = untilMs(this.cfg.until);
     clearTimeout(this.timer);
+    if (!this.dead && !this.isOver() && t) this.timer = setTimeout(function () { self.tick(); }, Math.min(t - Date.now() + 500, 2147483000));
+  };
+  ImpBar.prototype.tick = function () {
+    if (this.dead) return;
+    if (this.isOver() !== this.over) this.render(); else this.arm();
+  };
+  ImpBar.prototype.render = function () {
+    if (this.dead) return;
+    var self = this, c = this.cfg, root = this.root, over = this.isOver(), t = untilMs(c.until);
     root.textContent = '';
     root.className = (this.baseClass + ' gid-kit gimp' + (over ? ' gimp--over' : '')).trim();
     root.hidden = false;
@@ -821,14 +880,15 @@
       l1.appendChild(doc.createTextNode(IMP.watching));
       l1.appendChild(h('span', 'gimp-name', str(c.name).replace(/\s+/g, ' ').trim() || IMP.anon));
     }
-    if (this.err) { l2.textContent = IMP.failed; l2.className += ' gimp-err'; l2.setAttribute('role', 'alert'); }
-    else if (this.note) { l2.textContent = this.note; l2.setAttribute('role', 'status'); }
+    if (this.err) { l2.textContent = IMP.failed; l2.className += ' gimp-err'; }
+    else if (this.note) l2.textContent = this.note;
     else if (over) l2.textContent = IMP.overSub;
     else l2.textContent = IMP.only + (t ? IMP.until + hhmm(t) : '') + '. ' + IMP.notSaved;
     tx.appendChild(l1); tx.appendChild(l2);
     root.appendChild(tx);
 
-    var form = c.endForm && typeof c.endForm === 'object' ? c.endForm : null, formUrl = form ? safeUrl(form.action) : '', href = safeUrl(c.endHref), act = null;
+    var hub = hubOf(c.hubOrigin), form = c.endForm && typeof c.endForm === 'object' ? c.endForm : null;
+    var formUrl = form ? backUrl(form.action, hub) : '', href = backUrl(c.endHref, hub), act = null;
     function face(node) {
       node.appendChild(icon('log-out', 'gid-ic'));
       node.appendChild(h('span', 'gimp-lbl', self.busy ? IMP.busy : IMP.back));
@@ -853,13 +913,21 @@
     }
     if (act) root.appendChild(act);
 
-    if (this.over !== null && this.over !== over && over) fire(root, 'gimp:over');
+    if (this.over !== null && this.over !== over && over) { fire(root, 'gimp:over'); announce(IMP.over + '. ' + IMP.overSub, false); }
     this.over = over;
-    if (!over && t) this.timer = setTimeout(function () { if (!self.dead) self.render(); }, Math.min(t - Date.now() + 500, 2147483000));
+    this.arm();
+  };
+  /* the bar is drawn anew for the busy state and again after a failure: the focus the button had goes back to the new one */
+  ImpBar.prototype.restoreFocus = function () {
+    if (!this.refocus) return;
+    this.refocus = false;
+    var b = this.root.querySelector('.gimp-btn');
+    if (b && !b.disabled) { try { b.focus(); } catch (e) { /* not focusable now */ } }
   };
   ImpBar.prototype.end = function () {
     var self = this;
     if (this.busy || this.dead || typeof this.cfg.onEnd !== 'function') return;
+    this.refocus = !!(doc.activeElement && this.root.contains(doc.activeElement));
     this.busy = true; this.err = false; this.note = '';
     fire(this.root, 'gimp:end');
     this.render();
@@ -867,24 +935,32 @@
     try { r = this.cfg.onEnd(); } catch (e) { oops(e); r = Promise.reject(e); }
     Promise.resolve(r).then(function (v) {
       if (self.dead || v !== false) return;                  // resolved: the service goes on to another page; false = it stayed, the button works again
-      self.busy = false; self.render();
+      self.busy = false; self.render(); self.restoreFocus();
     }, function (e) {
       if (self.dead) return;
-      self.busy = false; self.err = !(e && e.silent); self.render();
+      self.busy = false; self.err = !(e && e.silent); self.render(); self.restoreFocus();
+      if (self.err) announce(IMP.failed, true);
     });
   };
   /* a short line in the place of the second one (the service's «здесь только просмотр»): shown for some seconds, then the usual line comes back */
   ImpBar.prototype.notice = function (text, ms) {
     var self = this;
+    if (this.dead) return;
     clearTimeout(this.noteTimer);
     this.note = str(text).replace(/\s+/g, ' ').trim().slice(0, 200);
     this.render();
-    if (this.note) this.noteTimer = setTimeout(function () { if (!self.dead) { self.note = ''; self.render(); } }, ms > 0 ? ms : 6000);
+    if (this.note) {
+      announce(this.note, false);
+      this.noteTimer = setTimeout(function () { if (!self.dead) { self.note = ''; self.render(); } }, ms > 0 ? ms : 6000);
+    }
   };
   ImpBar.prototype.destroy = function () {
     if (this.dead) return;
     this.dead = true;
     clearTimeout(this.timer); clearTimeout(this.noteTimer);
+    doc.removeEventListener('visibilitychange', this.onWake);
+    win.removeEventListener('focus', this.onWake);
+    win.removeEventListener('pageshow', this.onShow);
     this.root.textContent = '';
     this.root.className = this.baseClass;
     ['role', 'aria-label', 'data-gimp', 'data-gimp-state'].forEach(function (a) { this.root.removeAttribute(a); }, this);
@@ -956,7 +1032,7 @@
   function impConfigFrom(node) {
     var cfg = {}, raw = node.getAttribute('data-gg-imp-bar'), form = node.getAttribute('data-end-form');
     if (raw && raw.charAt(0) === '{') { try { cfg = JSON.parse(raw) || {}; } catch (e) { oops(e); } }
-    var map = { name: 'data-name', until: 'data-until', endHref: 'data-end-href' };
+    var map = { name: 'data-name', until: 'data-until', endHref: 'data-end-href', hubOrigin: 'data-hub-origin' };
     Object.keys(map).forEach(function (k) { if (node.hasAttribute(map[k])) cfg[k] = node.getAttribute(map[k]); });
     if (node.hasAttribute('data-ended')) cfg.ended = node.getAttribute('data-ended') !== 'false';
     if (form) { try { cfg.endForm = JSON.parse(form); } catch (e) { oops(e); } }

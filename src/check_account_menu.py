@@ -1503,8 +1503,8 @@ def imp_bar(b):
     pg.evaluate("window.__settle.rej(new Error('boom'))")
     pg.wait_for_selector('#imp .gimp-err')
     r = pg.evaluate(IMP_PROBE)
-    check('imp', 'a failed call says so in words (role alert) and the button works again',
-          r['l2'] == 'Не получилось вернуться к себе. Попробуйте ещё раз.' and r['errRole'] == 'alert' and not r['disabled'] and r['btn'] == 'Вернуться к себе', r)
+    check('imp', 'a failed call says so in words and the button works again; the visible line has no live role of its own (the quiet alert region says it, see below)',
+          r['l2'] == 'Не получилось вернуться к себе. Попробуйте ещё раз.' and r['errRole'] is None and not r['disabled'] and r['btn'] == 'Вернуться к себе', r)
     pg.click('#imp .gimp-btn')
     pg.evaluate("window.__settle.rej(Object.assign(new Error('x'), {silent: true}))")
     pg.wait_for_function("document.querySelector('#imp .gimp-btn') && !document.querySelector('#imp .gimp-btn').disabled")
@@ -1515,6 +1515,57 @@ def imp_bar(b):
     pg.evaluate('window.bar.destroy()')
     gone = pg.evaluate("(() => { const e = document.getElementById('imp'); return {html: e.innerHTML, cls: e.className, role: e.getAttribute('role')}; })()")
     check('imp', 'destroy() empties the element and takes its class and role away', gone == {'html': '', 'cls': '', 'role': None}, gone)
+    pg.evaluate("window.bar.update({name: 'Мария'}); window.bar.notice('x', 100)")
+    pg.wait_for_timeout(250)
+    gone = pg.evaluate("(() => { const e = document.getElementById('imp'); return {html: e.innerHTML, cls: e.className, role: e.getAttribute('role')}; })()")
+    check('imp', 'after destroy() update() and notice() do nothing (no bar comes back, no timer draws it)', gone == {'html': '', 'cls': '', 'role': None}, gone)
+    ctx.close()
+
+    # --- the keyboard, the screen reader, the page from the cache, the clock after sleep
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-robust', page(IMP_SETUP + mount_js() + """window.__calls = 0;
+      window.bar = window.__bar({name: 'Иван Образцов', until: window.__until, onEnd: function () { window.__calls++; return new Promise(function (res, rej) { window.__settle = {res: res, rej: rej}; }); }});"""))
+    regions = pg.evaluate("[...document.querySelectorAll('[data-gimp-live]')].map(n => [n.getAttribute('data-gimp-live'), n.getAttribute('role'), n.getAttribute('aria-live'), n.getAttribute('aria-atomic'), n.textContent])")
+    check('imp', 'two quiet regions are born with the bar, empty: status (polite) and alert (assertive), so a screen reader hears a change and not a newborn',
+          regions == [['polite', 'status', 'polite', 'true', ''], ['assertive', 'alert', 'assertive', 'true', '']], regions)
+    pg.evaluate("""window.__said = [];
+      new MutationObserver(function () { var t = document.querySelector('[data-gimp-live=assertive]').textContent; if (t) window.__said.push(t); })
+        .observe(document.querySelector('[data-gimp-live=assertive]'), {childList: true, characterData: true, subtree: true});""")
+    pg.focus('#imp .gimp-btn')
+    pg.keyboard.press('Enter')
+    pg.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow', {persisted: true}))")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a page that comes back from the cache (pageshow, persisted) is not left on «Возвращаем…»: the button works again',
+          r['btn'] == 'Вернуться к себе' and not r['disabled'] and r['busy'] is None, r)
+    pg.focus('#imp .gimp-btn')
+    pg.keyboard.press('Enter')
+    check('imp', 'the second call started (the first one is still unsettled but the bar was reset): busy again', pg.evaluate(IMP_PROBE)['btn'] == 'Возвращаем…')
+    pg.evaluate("window.__settle.rej(new Error('boom'))")
+    pg.wait_for_selector('#imp .gimp-err')
+    f = pg.evaluate("(() => { const a = document.activeElement; return {cls: a.className, inBar: !!a.closest('#imp')}; })()")
+    check('imp', 'after a failed call the focus is back on the new «Вернуться к себе» (a keyboard user is not thrown to the top of the page)', 'gimp-btn' in f['cls'] and f['inBar'], f)
+    pg.wait_for_function("window.__said.length === 1", timeout=3000)
+    check('imp', 'the failure is said once through the quiet alert region, in words', pg.evaluate('window.__said') == ['Не получилось вернуться к себе. Попробуйте ещё раз.'], pg.evaluate('window.__said'))
+    pg.keyboard.press('Enter')
+    pg.evaluate("window.__settle.rej(new Error('boom again'))")
+    pg.wait_for_function("window.__said.length === 2", timeout=3000)
+    check('imp', 'the same failure twice is said twice (the region is emptied before it is filled again)', pg.evaluate('window.__said.length') == 2, pg.evaluate('window.__said'))
+    ctx.close()
+
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-wake', page(IMP_SETUP + mount_js() + ON))
+    check('imp', 'a running bar is on', pg.evaluate(IMP_PROBE)['state'] == 'on')
+    pg.evaluate("(() => { const real = Date.now.bind(Date); Date.now = () => real() + 3600000; })()")
+    pg.wait_for_timeout(300)
+    check('imp', 'a laptop that slept: the clock is an hour ahead but the timer has not fired, the bar still says «on» (that is the trap)', pg.evaluate(IMP_PROBE)['state'] == 'on')
+    pg.evaluate("window.dispatchEvent(new Event('focus'))")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'the window gets the focus back: the bar reads the clock, says «Вход от имени закончился» and fires gimp:over once',
+          r['state'] == 'over' and r['l1'] == 'Вход от имени закончился' and pg.evaluate('window.__ev') == ['over'], (r['state'], pg.evaluate('window.__ev')))
+    pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+    check('imp', 'visibilitychange afterwards changes nothing and fires nothing more', pg.evaluate('window.__ev') == ['over'], pg.evaluate('window.__ev'))
+    pg.wait_for_function("document.querySelector('[data-gimp-live=polite]').textContent === 'Вход от имени закончился. Вернитесь к себе, чтобы продолжить.'", timeout=3000)
+    check('imp', 'the end of the time is said through the quiet status region', True)
     ctx.close()
 
     # --- a real POST of the service's own sign-out
@@ -1555,19 +1606,38 @@ def imp_bar(b):
     goto(pg, 'imp-xss', page(IMP_SETUP + mount_js() + """window.bar = window.__bar({name: '<img src=x onerror="window.__pwned=11">Иван', until: window.__until, endHref: '/logout'});
       window.bar.notice('<b>x</b> wow', 800);"""))
     r = pg.evaluate(IMP_PROBE)
-    check('imp', 'a name with markup is shown as text; the notice is text too and replaces the second line (role status)',
-          r['l1'] == 'Вы смотрите как <img src=x onerror="window.__pwned=11">Иван' and r['l2'] == '<b>x</b> wow' and r['l2role'] == 'status' and r['bad'] == [] and r['pwned'] == 0, r)
+    check('imp', 'a name with markup is shown as text; the notice is text too and replaces the second line',
+          r['l1'] == 'Вы смотрите как <img src=x onerror="window.__pwned=11">Иван' and r['l2'] == '<b>x</b> wow' and r['l2role'] is None and r['bad'] == [] and r['pwned'] == 0, r)
+    pg.wait_for_function("document.querySelector('[data-gimp-live=polite]').textContent === '<b>x</b> wow'", timeout=3000)
+    check('imp', 'the notice is said through the quiet status region as text', pg.evaluate("document.querySelectorAll('[data-gimp-live=polite] b').length") == 0)
     pg.wait_for_function("(document.querySelector('#imp .gimp-l2') || {}).textContent.indexOf('Только просмотр') === 0", timeout=6000)
     check('imp', 'the notice goes away by itself and the usual line comes back', True)
     for what, upd in (('a javascript: address', "{endHref: 'javascript:window.__pwned=12'}"), ('a plain http address of a stranger', "{endHref: 'http://evil.example/x'}"),
                       ('a data: address', "{endHref: 'data:text/html,<script>window.__pwned=14</script>'}"),
-                      ('a javascript: action of the form', "{endHref: '', endForm: {action: 'javascript:window.__pwned=13', fields: {}}}")):
+                      ('a javascript: action of the form', "{endHref: '', endForm: {action: 'javascript:window.__pwned=13', fields: {}}}"),
+                      ('a protocol-relative address of a stranger (//evil.example/x)', "{endHref: '//evil.example/x'}"),
+                      ('a backslash address of a stranger (/\\evil.example/x)', "{endHref: '/\\\\evil.example/x'}"),
+                      ('a tab between the slashes (/<tab>/evil.example/x)', "{endHref: '/\\t/evil.example/x'}"),
+                      ('an https address of a stranger', "{endHref: 'https://evil.example/x'}"),
+                      ('a protocol-relative action of the form', "{endHref: '', endForm: {action: '//evil.example/logout', fields: {}}}"),
+                      ('an https action of a stranger in the form', "{endHref: '', endForm: {action: 'https://evil.example/logout', fields: {}}}")):
         pg.evaluate(f'window.bar.update({upd})')
         r = pg.evaluate(IMP_PROBE)
         check('imp', f'{what}: no way back is drawn, nothing runs', r['btn'] is None and r['pwned'] == 0, r)
     pg.evaluate("window.bar.update({endForm: null, endHref: 'https://id.global-generations-edu.com/cabinet/'})")
     r = pg.evaluate(IMP_PROBE)
-    check('imp', 'an https address is a link', r['tag'] == 'a' and r['href'] == 'https://id.global-generations-edu.com/cabinet/', r)
+    check('imp', 'the address of the hub (https) is a link', r['tag'] == 'a' and r['href'] == 'https://id.global-generations-edu.com/cabinet/', r)
+    pg.evaluate(f"window.bar.update({{endHref: '{svc}/logout'}})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'an absolute address of the page\'s own origin is a link', r['tag'] == 'a' and r['href'] == svc + '/logout', r)
+    pg.evaluate("window.bar.update({endHref: 'https://id-staging.example/cabinet/'})")
+    check('imp', 'another hub (staging) is a stranger until the page names it', pg.evaluate(IMP_PROBE)['btn'] is None)
+    pg.evaluate("window.bar.update({hubOrigin: 'https://id-staging.example'})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'hubOrigin names the staging hub: its address is a link', r['tag'] == 'a' and r['href'] == 'https://id-staging.example/cabinet/', r)
+    pg.evaluate("window.bar.update({hubOrigin: 'javascript:window.__pwned=15', endHref: 'javascript:window.__pwned=16'})")
+    r = pg.evaluate(IMP_PROBE)
+    check('imp', 'a hubOrigin that is not an http(s) address names nobody', r['btn'] is None and r['pwned'] == 0, r)
     ctx.close()
 
     # --- the attributes alone are enough
@@ -1577,6 +1647,15 @@ def imp_bar(b):
     pg.wait_for_selector('#attrbar .gimp-btn')
     a = pg.evaluate("(() => { const e = document.getElementById('attrbar'); return [e.querySelector('.gimp-l1').textContent, e.querySelector('.gimp-btn').textContent.trim(), e.querySelector('.gimp-btn').tagName]; })()")
     check('imp', 'data-gg-imp-bar with data-name, data-until and data-end-href draws the bar without a line of script', a == ['Вы смотрите как Мария Петрова', 'Вернуться к себе', 'A'], a)
+    ctx.close()
+    # a bar that markup alone brings to a page must not lead out of it
+    ctx, pg = new_page(1440, 900)
+    goto(pg, 'imp-attr-evil', page('', body='<div id="attrbar" data-gg-imp-bar data-name="Мария Петрова" data-end-href="//evil.example/x"></div>'
+                                           '<div id="attrform" data-gg-imp-bar data-name="Мария Петрова" data-end-form=\'{"action":"/\\t/evil.example/logout","fields":{"to":"gg-id"}}\'></div>', manual=False))
+    pg.wait_for_selector('#attrbar .gimp-l1')
+    pg.wait_for_selector('#attrform .gimp-l1')
+    ev = pg.evaluate("[...document.querySelectorAll('#attrbar, #attrform')].map(e => [e.querySelector('.gimp-btn'), e.querySelector('form'), e.querySelector('a')].filter(Boolean).length)")
+    check('imp', 'data-end-href="//evil.example/x" and a tab-broken data-end-form action draw no way back (only the words)', ev == [0, 0], ev)
     ctx.close()
     check('imp', 'no script errors on the pages', not errs, errs[:3])
 
