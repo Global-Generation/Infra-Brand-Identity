@@ -1,11 +1,15 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-15.2 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-15.3 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
-   No dependencies and no requests of its own except the GG ID hub: one GET for the services list (lazily, on the first open) and, on a page
-   of the hub itself only, the hub sign-out. Everything a person or the hub can send (name, e-mail, titles, addresses) goes into the page through
-   textContent and setAttribute only: nothing is built from HTML strings and nothing is evaluated. Addresses are checked (https, or the page's
-   own origin, or http on localhost).
+   No dependencies and no requests of its own except the GG ID hub: one GET for the card of the person (the photo; once per person and page), one GET for the services
+   list (lazily, on the first open) and, on a page of the hub itself only, the hub sign-out. Everything a person or the hub can send (name, e-mail, titles,
+   addresses) goes into the page through textContent and setAttribute only: nothing is built from HTML strings and nothing is evaluated. Addresses are
+   checked (https, or the page's own origin, or http on localhost).
+
+   The photo: the avatar a person chose in GG ID (and only there: a service never uploads or changes it) is drawn in the round chip and in the head of the card
+   in place of the initials; the initials stay under it and come back when there is no picture or it does not load. Not said = the kit asks the hub once
+   (GET /api/auth/card, any failure is silent); photo: an https address = this picture, no request; photo: false = the initials only, no request.
 
    Look: the same classes as the kit chip and menu (.gid-chip, .gid-menu, .gid-menu-item ...), so it is the AKB menu pixel for pixel;
    gg-account-menu.css carries those blocks verbatim (generated from gg-id.css by src/build_account_menu.py).
@@ -22,11 +26,13 @@
        items: [{ id: 'settings', label: 'Настройки', icon: 'settings', href: '/settings' }]
        // hubOrigin: settings.GG_AUTH_ORIGIN       only when the hub is not the production one (staging) or has moved
        // servicesUrl, servicesApi, profileUrl, walletUrl: single addresses, when one of them differs
+       // photo: false                              the initials only and no request for the picture (an https address in its place = that picture, no request either)
      });
    </script>
 
    Or without a script of your own: <div data-gg-account-menu data-name="..." data-email="..." data-logout-url="..."></div>
-   (items: data-gam-items='[{"label":"Настройки","icon":"settings","href":"/settings"}]'; JSON of the whole config: data-gg-account-menu='{...}').
+   (items: data-gam-items='[{"label":"Настройки","icon":"settings","href":"/settings"}]'; the photo: data-photo with an https address, or data-photo="false";
+   JSON of the whole config: data-gg-account-menu='{...}').
    window.GG_ACCOUNT_MENU_MANUAL = true before this file turns the automatic mounting off (React and other late markup: call mount yourself).
 
    The bar of a sign-in on behalf of a person (the administrator looks at a service with the eyes of a person): one bar for the hub and every service, a strip over the whole
@@ -38,7 +44,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-15.2';
+  var VERSION = '2026-10-15.3';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -49,6 +55,7 @@
     profile: '/cabinet/#face',                 // "Профиль GG ID": the cabinet panel with Face ID / Touch ID (passkey) and the password
     servicesApi: '/api/auth/service-links',    // GET with the hub cookie: {services: [{key, title, url, icon}]}; CORS only for the origins of the registered clients
     wallet: '/api/auth/wallet/apple.pkpass',   // GET with the hub cookie: the signed GG ID card as an Apple Wallet pass (an attachment)
+    card: '/api/auth/card',                    // GET with the hub cookie, once per person and page: the card of the person; only `photo` is read (the avatar chosen in GG ID). CORS as the services list
     logout: '/api/auth/logout',                // POST, from a page of the hub itself only (another Origin gets 403 bad_origin)
     login: '/login.html'                       // where a page of the hub goes after its sign-out
   };
@@ -184,6 +191,16 @@
     var s = safeUrl(u), o = s ? origin(s) : '';
     return o && (o === win.location.origin || o === HUB.origin || (hub && o === hub)) ? s : '';
   }
+  /* The address of a photo the menu may draw: https, or an own path ("/api/auth/avatars/f-1/face-256.png"), which `base` completes: the hub for the path the hub's card gives, the page
+     for the path a service passes in the option photo (no base = the page). The same rule as the card of the sign-in pages (photoUrl in sso-gate/pages.py of the hub, GGID.cardPhotoUrl of
+     the kit): «data:», «javascript:», «http:», «//host» and «/\host» are no photos, nor is an address with a space, a quote, < >, a backslash or a control character, nor one over
+     500 characters. '' = not usable. */
+  function photoUrl(v, base) {
+    v = typeof v === 'string' ? v.trim() : '';
+    if (!v || v.length > 500 || /[\u0000-\u001f\u007f\s"'<>\\]/.test(v)) return '';
+    if (!/^https:\/\/[^\/]/i.test(v) && !/^\/(?![\/\\])/.test(v)) return '';
+    try { return safeUrl(new URL(v, base || win.location.href).href); } catch (e) { return ''; }
+  }
   /* The devices that take an Apple Wallet pass straight from a page: iPhone, iPad, iPod (any browser: on iOS they are all WebKit) and Safari on a Mac.
      The same rule as the cabinet of the hub (Infra-Services-Portal, cabinet/wallet.js). An iPad in the "desktop site" mode calls itself a Mac, its touch screen gives it away. */
   function appleWalletDevice(nav) {
@@ -241,20 +258,33 @@
     });
     return out;
   }
+  /* GET to the hub with its cookie (CORS with credentials: only the origins of the registered clients get an answer), JSON back; any failure rejects */
+  function getJson(api, timeout) {
+    if (!win.fetch || !win.Promise) return Promise.reject(new Error('no fetch'));
+    var ctl = typeof win.AbortController === 'function' ? new win.AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, timeout || 6000);
+    return win.fetch(api, { credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' }, signal: ctl ? ctl.signal : undefined })
+      .then(function (res) { if (!res.ok) throw new Error('http ' + res.status); return res.json(); })
+      .then(function (data) { clearTimeout(timer); return data; }, function (e) { clearTimeout(timer); throw e; });
+  }
   function fetchServices(api, timeout) {
-    if (cache[api]) return cache[api];
-    var p;
-    if (!win.fetch || !win.Promise) p = Promise.reject(new Error('no fetch'));
-    else {
-      var ctl = typeof win.AbortController === 'function' ? new win.AbortController() : null;
-      var timer = setTimeout(function () { if (ctl) ctl.abort(); }, timeout || 6000);
-      p = win.fetch(api, { credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' }, signal: ctl ? ctl.signal : undefined })
-        .then(function (res) { if (!res.ok) throw new Error('http ' + res.status); return res.json(); })
-        .then(function (data) { var list = normalizeServices(data); if (!list || !list.length) throw new Error('empty'); return list; })
-        .then(function (list) { clearTimeout(timer); return list; }, function (e) { clearTimeout(timer); throw e; });
+    if (!cache[api]) cache[api] = getJson(api, timeout).then(function (data) { var list = normalizeServices(data); if (!list || !list.length) throw new Error('empty'); return list; });
+    return cache[api];
+  }
+
+  /* ---------- the photo of the person: one GET to the card of the hub, cached for the page ----------
+     The card answer carries `photo` (the address of the avatar chosen in GG ID; the key is absent when the person has none). Nothing else is read from it.
+     Any failure is silent and cached too (401 no session, 403 an origin the hub does not know, 404, 503, no CORS, a broken answer, no answer in 4 s): the initials stay. */
+  var cards = {};     // card address + person -> promise of the address of the photo ('' = none)
+  var CARD_TIMEOUT = 4000;
+
+  function fetchCard(api, hub, key) {
+    if (!cards[key]) {
+      cards[key] = getJson(api, CARD_TIMEOUT)
+        .then(function (data) { return photoUrl(data && typeof data === 'object' ? data.photo : '', hub); })
+        .catch(function () { return ''; });
     }
-    cache[api] = p;
-    return p;
+    return cards[key];
   }
 
   /* The service the page is in: by key when the service says so, else the entry whose address is the longest prefix of this page. */
@@ -317,6 +347,10 @@
     this.dead = false;
     this.id = ++uid;
     this.sections = [];
+    this.avs = [];            // the two avatars (the chip and the head of the card): the photo is drawn into both
+    this.cardKey = null;      // card address + person the photo was asked for ('' = nothing to ask); a repeated update for the same person asks nothing
+    this.cardPhoto = '';      // the photo the hub gave for that person
+    this.photoBad = '';       // the address that failed to load: not tried again on every redraw
     this.onResize = this.fit.bind(this);
     this.update(opts || {});
     menus.push(this);
@@ -349,8 +383,21 @@
       services: safeUrl(c.servicesUrl) || (o ? o + HUB.services : ''),
       profile: safeUrl(c.profileUrl) || (o ? o + HUB.profile : ''),
       api: c.servicesApi === false || c.servicesApi === '' ? '' : (safeUrl(c.servicesApi) || (o ? o + HUB.servicesApi : '')),
-      wallet: c.walletUrl === false || c.walletUrl === '' ? '' : (safeUrl(c.walletUrl) || (o ? o + HUB.wallet : ''))
+      wallet: c.walletUrl === false || c.walletUrl === '' ? '' : (safeUrl(c.walletUrl) || (o ? o + HUB.wallet : '')),
+      card: o ? o + HUB.card : ''
     };
+    // The photo: false = the initials only; an address = that picture; not said (or empty) = the hub is asked once per person (askCard). Either way the service uploads nothing:
+    // the picture is chosen in GG ID. An address that cannot be used (a word, http:, data:...) is no photo and no request, with one warning for the value.
+    // An own path in the option is a path of this page (the service names its own file); an own path in the hub's answer is completed with the hub (fetchCard).
+    var ph = c.photo, said = typeof ph === 'string' && ph.trim() !== '';
+    this.photoMode = ph === false ? 'off' : (said ? 'given' : 'hub');
+    this.photoGiven = said ? photoUrl(ph) : '';
+    if (said && !this.photoGiven && this.warnedPhoto !== ph) {
+      this.warnedPhoto = ph;
+      warn('GGAccountMenu: photo ' + JSON.stringify(str(ph).slice(0, 80)) + ' is not an https address or a path, the initials are drawn');
+    }
+    var who = this.photoMode === 'hub' && this.urls.card ? this.urls.card + '\n' + (str(c.email).trim().toLowerCase() || str(c.name).replace(/\s+/g, ' ').trim()) : '';
+    if (who !== this.cardKey) { this.cardKey = who; this.cardPhoto = ''; this.cardAsk = !!who; }   // another person or another hub: the old photo goes, the hub is asked
   };
 
   /* The Apple Wallet badge: wanted when there is an address of the pass and the device takes it ('auto', the default, as in the cabinet),
@@ -602,12 +649,61 @@
     f.submit();
   }
 
+  /* ---------- the photo ---------- */
+  /* the address to draw now: the service's own (the photo option) or the one the hub gave; '' = the initials */
+  Instance.prototype.photoNow = function () {
+    var u = this.photoMode === 'given' ? this.photoGiven : (this.photoMode === 'hub' ? this.cardPhoto : '');
+    return u && u !== this.photoBad ? u : '';
+  };
+
+  /* The photo goes into both avatars as an img over the initials; the circle keeps its size (the img is out of the flow). The initials stay in the DOM under it:
+     seen until the picture has loaded and again when it does not load (a missing file, a hub that does not answer). A picture that failed is dropped for good (photoBad). */
+  Instance.prototype.paintPhoto = function () {
+    var self = this, url = this.photoNow();
+    this.avs.forEach(function (av) {
+      var img = av.querySelector('.gam-photo');
+      if (img && img.getAttribute('src') === url) return;
+      if (img) av.removeChild(img);
+      av.classList.remove('gam-av--img');
+      av.classList.remove('gam-av--photo');
+      if (!url) return;
+      img = doc.createElement('img');
+      img.className = 'gam-photo';
+      img.setAttribute('alt', '');
+      img.setAttribute('decoding', 'async');
+      img.setAttribute('referrerpolicy', 'no-referrer');
+      function live() { return !self.dead && self.avs.indexOf(av) !== -1 && img.parentNode === av; }       // a late event of a picture that was already replaced does nothing
+      function shown() { if (live()) av.classList.add('gam-av--photo'); }
+      img.addEventListener('load', shown);
+      img.addEventListener('error', function () { if (live()) { self.photoBad = url; self.paintPhoto(); } });
+      img.setAttribute('src', url);
+      av.classList.add('gam-av--img');                                                                       // the circle is the frame of the img only while there is one: without a photo it is the kit's avatar as it was
+      av.appendChild(img);
+      if (img.complete && img.naturalWidth > 0) shown();                                                    // already in the cache of the page: no flash of the initials
+    });
+  };
+
+  /* The photo from the hub: one GET per person (a repeated update and a second menu of the page are answered from the cache of the page);
+     the answer of a person who has gone, or of a menu that was destroyed, is dropped. Only the avatars are redrawn: an open card stays open. */
+  Instance.prototype.askCard = function () {
+    var self = this, key = this.cardKey;
+    if (!this.cardAsk || !key) return;
+    this.cardAsk = false;
+    fetchCard(this.urls.card, this.hub, key).then(function (photo) {
+      if (self.dead || self.cardKey !== key || !photo) return;
+      self.cardPhoto = photo;
+      self.paintPhoto();
+    });
+  };
+
   /* ---------- render ---------- */
   Instance.prototype.update = function (opts) {
     var wasOpen = this.open;
     for (var k in (opts || {})) this.cfg[k] = opts[k];
+    if (opts && Object.prototype.hasOwnProperty.call(opts, 'photo')) this.photoBad = '';     // the service speaks about the picture again: it may be tried again
     this.resolve();
     this.render();
+    this.askCard();
     if (wasOpen) this.show();
   };
 
@@ -661,6 +757,8 @@
     this.root.appendChild(menu);
     this.chip = chip;
     this.menu = menu;
+    this.avs = [av, av2];
+    this.paintPhoto();                                       // the photo already known (given by the service, or the hub's from an earlier answer) goes in at once
 
     this.addServices(menu);
     if (c.profile !== false && this.urls.profile) menu.appendChild(this.item({ id: 'profile', label: L.profile, icon: 'user', href: this.urls.profile, title: L.profileTitle }));
@@ -1015,11 +1113,11 @@
     if (raw && raw.charAt(0) === '{') { try { cfg = JSON.parse(raw) || {}; } catch (e) { oops(e); } }
     var map = { name: 'data-name', email: 'data-email', subtitle: 'data-subtitle', hubOrigin: 'data-hub-origin', servicesUrl: 'data-services-url',
                 profileUrl: 'data-profile-url', servicesApi: 'data-services-api', services: 'data-services', profile: 'data-profile',
-                walletUrl: 'data-wallet-url', wallet: 'data-wallet', walletImage: 'data-wallet-image',
+                walletUrl: 'data-wallet-url', wallet: 'data-wallet', walletImage: 'data-wallet-image', photo: 'data-photo',
                 logoutUrl: 'data-logout-url', logoutMethod: 'data-logout-method', logoutNext: 'data-logout-next',
                 theme: 'data-gam-theme', placement: 'data-gam-placement', variant: 'data-gam-variant', currentKey: 'data-current-key' };
     Object.keys(map).forEach(function (k) { if (node.hasAttribute(map[k])) cfg[k] = node.getAttribute(map[k]); });
-    ['services', 'servicesApi', 'profile', 'hubOrigin', 'walletUrl', 'wallet'].forEach(function (k) {       // an attribute cannot hold the boolean false (or true)
+    ['services', 'servicesApi', 'profile', 'hubOrigin', 'walletUrl', 'wallet', 'photo'].forEach(function (k) {       // an attribute cannot hold the boolean false (or true)
       if (cfg[k] === 'false') cfg[k] = false;
       else if (k === 'wallet' && cfg[k] === 'true') cfg[k] = true;
     });
@@ -1062,7 +1160,7 @@
     icons: Object.keys(ICONS),
     hub: (function () { var o = {}; for (var k in HUB) o[k] = HUB[k]; return o; })(),   // the canonical hub addresses the defaults are made of (a copy: read only)
     walletDevice: appleWalletDevice,                       // walletDevice(navigator): does this device take an Apple Wallet pass from a page (the 'auto' rule)
-    reset: function () { cache = {}; }                     // forget the cached services answer (tests, a login in another tab)
+    reset: function () { cache = {}; cards = {}; }         // forget the cached services and card answers (tests, a login in another tab)
   };
 
   function auto() { if (!win.GG_ACCOUNT_MENU_MANUAL) init(doc); }

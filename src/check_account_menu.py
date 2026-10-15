@@ -17,6 +17,10 @@ What it holds (a failed line names the rule):
   the device rule of the cabinet (iPhone, iPad, Safari on a Mac; wallet true and false override it), walletUrl, walletImage, 390 px, dark;
 * the kit defaults: no hubOrigin = the production hub, every address of the menu is the canonical one (requested without leaving the machine: the
   context answers for the hub), hubOrigin false = no hub addresses, a page of the hub itself signs out through the hub (POST /api/auth/logout, then its sign-in page);
+* the photo of the person (option photo, kit 2026-10-15.3): an address draws the picture in the chip and in the head of the card and asks nothing, false draws the initials and asks
+  nothing, not said asks the hub once per person (real CORS with the cookie, GET /api/auth/card) and takes `photo`; every refusal of the hub is silent; addresses that are not an https address
+  or an own path are dropped (data:, javascript:, http:, //host, a slash followed by a backslash, a tab, a space, a quote, < >, a backslash, over 500 characters) and nothing runs or leaves the machine; a picture that does not
+  load gives the initials back; a repeated update of the same person asks nothing, another person asks once; the circle keeps its size; the picture fills the whole round shape (pixels), in both themes;
 * safety: names, e-mail and titles with markup stay text, javascript: and data: addresses are dropped, nothing runs;
 * 390 px: no horizontal scroll, the round initials chip, the card inside the screen, a long list scrolls inside.
 
@@ -24,15 +28,19 @@ Run: uv run --with playwright python src/check_account_menu.py [--preview]
 GGAM_ENGINE=webkit or firefox runs the same in another engine. Screenshots: shots/account-menu/ (GGAM_SHOTS=<dir> puts them elsewhere).
 With --preview the pictures of gg-id/account-menu/preview/ are refreshed.
 """
+import base64
 import datetime
 import http.server
 import json
+import math
 import os
 import re
+import struct
 import sys
 import threading
 import time
 import urllib.parse
+import zlib
 
 from playwright.sync_api import sync_playwright
 
@@ -80,8 +88,11 @@ def sources():
     for pat in (r'\binnerHTML\b', r'\bouterHTML\b', r'insertAdjacentHTML', r'document\.write', r'\beval\s*\(', r'new Function', r'XMLHttpRequest',
                 r'localStorage', r'sessionStorage', r'indexedDB', r'document\.cookie', r'\.postMessage', r'sendBeacon', r'WebSocket', r'importScripts'):
         check('sources', f'gg-account-menu.js has no {pat}', not re.search(pat, js))
-    check('sources', 'gg-account-menu.js makes two kinds of request, both to the hub: GET of the services list and the POST sign-out of a page of the hub itself (same origin, its cookie)',
-          len(re.findall(r'\bfetch\(', js)) == 2 and len(re.findall(r"method: 'POST', credentials: 'same-origin'", js)) == 1)
+    check('sources', 'gg-account-menu.js makes two kinds of request, both to the hub: GET (one helper: the services list and the card with the photo) and the POST sign-out of a page of the hub itself (same origin, its cookie)',
+          len(re.findall(r'\bfetch\(', js)) == 2 and len(re.findall(r"method: 'POST', credentials: 'same-origin'", js)) == 1
+          and len(re.findall(r"credentials: 'include', cache: 'no-store'", js)) == 1)
+    check('sources', 'the photo is an img made with createElement: alt empty, no-referrer, decoding async, the address only through setAttribute (never markup)',
+          all(t in js for t in ("img.setAttribute('alt', '')", "img.setAttribute('referrerpolicy', 'no-referrer')", "img.setAttribute('decoding', 'async')", "img.setAttribute('src', url)")))
     urls = [u for u in re.findall(r'https?://[^\s\'")<>]+', js + css) if u not in ('http://www.w3.org/2000/svg', HUB_URL)]
     check('sources', 'no external address in the js and css (only the svg namespace and the one canonical hub address)', not urls, urls[:3])
     hub_lits = re.findall(r'global-generations[\w.-]*', js + css, re.I)
@@ -90,14 +101,19 @@ def sources():
         check('sources', f'no Aura and no levauth in the {name}', not re.search(r'aura|levauth', text, re.I))
     block = re.search(r'var HUB = \{(.*?)\n  \};', js, re.S)
     hub = dict(re.findall(r"(\w+):\s*'([^']*)'", block.group(1))) if block else {}
-    check('sources', 'the HUB constant holds the origin and the six canonical paths',
-          set(hub) == {'origin', 'services', 'profile', 'servicesApi', 'wallet', 'logout', 'login'} and hub.get('origin') == HUB_URL, hub)
+    check('sources', 'the HUB constant holds the origin and the seven canonical paths',
+          set(hub) == {'origin', 'services', 'profile', 'servicesApi', 'wallet', 'card', 'logout', 'login'} and hub.get('origin') == HUB_URL, hub)
     readme = read(os.path.join(DIR, 'README.md'))
-    for k in ('services', 'profile', 'servicesApi', 'wallet', 'logout'):
+    for k in ('services', 'profile', 'servicesApi', 'wallet', 'card', 'logout'):
         check('sources', f'the README lists the canonical address of {k} ({hub.get("origin", "")}{hub.get(k, "")})', hub.get('origin', '') + hub.get(k, '#') in readme)
     wallet_const = re.search(r'var WALLET = \{[^}]*\};', js)
     check('sources', 'the Apple Wallet badge text is English only (no Cyrillic in the WALLET constant)', bool(wallet_const) and not re.search('[Ѐ-ӿ]', wallet_const.group(0)))
     check('sources', 'no side stripe in the css (border-left)', not re.search(r'border-left\s*:\s*[^;}]*\d', css))
+    photo_rules = re.findall(r'[^{}]*\.gam-(?:photo|av--img|av--photo)[^{}]*\{[^}]*\}', re.sub(r'/\*.*?\*/', '', css, flags=re.S))      # the rules, not the comments around them
+    check('sources', 'the css of the photo: the img fills the circle (absolute, object-fit cover, round), tokens only, no filter, no shadow but the ring of the avatar',
+          len(photo_rules) >= 4 and any('object-fit:cover' in r and 'border-radius:50%' in r and 'position:absolute' in r for r in photo_rules)
+          and not any(re.search(r'filter|#[0-9a-fA-F]{3,8}\b|rgb\(', r) for r in photo_rules)
+          and all(set(re.findall(r'box-shadow:([^;}]*)', r)) <= {'inset 0 0 0 1px var(--g-avatar-line)'} for r in photo_rules), photo_rules[:2])
     table = set(re.findall(r"^    '([a-z0-9-]+)': \[\[", js, re.M))
     need = {i for _, _, i in SERVICE_BASE} | {i for _, i in GROUPS4}
     check('sources', 'the table of icons holds every icon of the services of the cabinet and of the four groups (the tile of a service is the same in the menu and in the cabinet)',
@@ -141,9 +157,25 @@ class Quiet(http.server.BaseHTTPRequestHandler):
 ORIGINS = {}                 # svc, hub, evil -> http://localhost:port
 PAGES = {}                   # page id -> html of /app.html?p=<id>
 POSTS = []                   # what the service saw on POST /logout
-HUB = {'mode': 'ok', 'delay': 0, 'calls': [], 'allowed': set(), 'wallet': [], 'logouts': []}   # calls: the services list; wallet: the pass; logouts: the sign-out of a hub page
+HUB = {'mode': 'ok', 'delay': 0, 'calls': [], 'allowed': set(), 'wallet': [], 'logouts': [],   # calls: the services list; wallet: the pass; logouts: the sign-out of a hub page
+       'cards': [], 'card_mode': 'nophoto', 'card_delay': 0, 'card_photo': '/api/auth/avatars/f-1-long-black/face-256.png', 'card_body': None}   # cards: the card with the photo
+AVATARS = []                 # the requests for a picture of an avatar (either server): host, path, referer, cookie
 TYPES = {'.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.svg': 'image/svg+xml',
          '.woff2': 'font/woff2', '.png': 'image/png', '.json': 'application/json'}
+
+
+def make_png(width=160, height=80):
+    """A picture that is not square on purpose, made on the spot (no binary in the repo): red on the left, green in the middle, blue on the right. The green band (36 to 124 of 160)
+    is wider than the part a square circle shows (40 to 120: with object-fit cover only the middle half of a picture twice as wide as it is tall is in view), so a circle that is
+    green all over has been filled by the picture and cropped, not squeezed (the red and the blue would show) and not left empty."""
+    def chunk(tag, data):
+        return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data) & 0xffffffff)
+    band = lambda x: (220, 30, 30) if x < width * 9 // 40 else ((0, 170, 70) if x < width * 31 // 40 else (30, 60, 220))
+    row = b'\x00' + b''.join(bytes(band(x)) for x in range(width))
+    return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(row * height)) + chunk(b'IEND', b'')
+
+
+PNG = make_png()
 
 
 # the services of GG ID with the titles and icons of the cabinet «Мои сервисы» (the hub: cabinet/catalog.js), in the four groups of 15.10.2026
@@ -181,6 +213,14 @@ def site_handler():
                     with open(full, 'rb') as f:
                         return self.send(200, TYPES.get(os.path.splitext(full)[1], 'application/octet-stream'), f.read())
                 return self.send(404, 'text/plain', 'no')
+            if path.startswith('/api/auth/avatars/'):          # the pictures of GG ID: /api/auth/avatars/<code>/face-256.png, open without a login, either server answers
+                AVATARS.append({'host': self.headers.get('Host'), 'path': path, 'referer': self.headers.get('Referer'), 'cookie': self.headers.get('Cookie') or '',
+                                'dest': self.headers.get('Sec-Fetch-Dest'), 'at': time.time()})
+                if 'missing' in path:
+                    return self.send(404, 'text/plain', 'no')
+                if 'broken' in path:
+                    return self.send(200, 'text/plain', 'this is not a picture')
+                return self.send(200, 'image/png', PNG, {'Cross-Origin-Resource-Policy': 'cross-origin'})
             if path.startswith('/svc/') or path in ('/cabinet', '/cabinet/', '/profile', '/logout', '/logged-out', '/settings', '/login.html', '/after', '/pass'):
                 return self.send(200, 'text/html; charset=utf-8', f'<!doctype html><meta charset="utf-8"><title>{path}</title><p id="here">{path}</p>')
             return self.send(404, 'text/plain', 'no')
@@ -207,6 +247,8 @@ def hub_handler():
                 if 'gg_portal_session=' not in cookie:
                     return self.json(401, {'error': 'unauthenticated'})
                 return self.send(200, 'application/vnd.apple.pkpass', b'PK\x03\x04 a test pass, not a real one', {'Content-Disposition': 'attachment; filename="gg-id.pkpass"'})
+            if path == '/api/auth/card':
+                return self.card()
             if path != '/api/auth/service-links':
                 return Site.do_GET(self)
             origin = self.headers.get('Origin')
@@ -263,6 +305,41 @@ def hub_handler():
                 ]
                 return self.json(200, {'services': bad}, cors)
             return self.json(200, {'services': services()}, cors)
+
+        def card(self):
+            """GET /api/auth/card as the hub answers it (Infra-Auth docs/gg-auth-api.md): the session cookie is needed, a foreign Origin gets 403 and not one CORS header,
+            `photo` is there only when the person has chosen an avatar. HUB['card_mode'] picks the answer."""
+            origin = self.headers.get('Origin')
+            cookie = self.headers.get('Cookie') or ''
+            HUB['cards'].append({'origin': origin, 'cookie': cookie, 'accept': self.headers.get('Accept'), 'dest': self.headers.get('Sec-Fetch-Dest'), 'at': time.time()})
+            cors = {}
+            if origin:
+                if origin not in HUB['allowed']:
+                    return self.json(403, {'error': 'bad_origin'}, {'Vary': 'Origin'})
+                cors = {'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true', 'Vary': 'Origin'}
+            if HUB['card_delay']:
+                time.sleep(HUB['card_delay'])
+            mode = HUB['card_mode']
+            card = {'display_name': 'Лёв Авдошин', 'position_title': 'Основатель', 'positions': ['Основатель'], 'gg_number': 'GG0AAAA-0AAAA', 'qr': '/v/GG0AAAA-0AAAA'}
+            if 'gg_portal_session=' not in cookie or mode == 'nologin':
+                return self.json(401, {'error': 'unauthenticated'}, cors)
+            if mode == 'forbidden':
+                return self.json(403, {'error': 'forbidden'}, cors)
+            if mode == 'notfound':
+                return self.json(404, {'error': 'no_card'}, cors)
+            if mode == 'error':
+                return self.json(503, {'error': 'unavailable'}, cors)
+            if mode == 'broken':
+                return self.send(200, 'application/json', '{"photo": [', cors)
+            if mode == 'array':
+                return self.json(200, ['not', 'a', 'card'], cors)
+            if mode == 'no_cors':
+                return self.json(200, dict(card, photo=HUB['card_photo']), {})
+            if mode == 'custom':
+                return self.json(200, dict(card, **(HUB['card_body'] or {})), cors)
+            if mode == 'ok':
+                return self.json(200, dict(card, photo=HUB['card_photo']), cors)
+            return self.json(200, card, cors)              # nophoto: the person has not chosen an avatar, the key is absent
 
         def do_POST(self):
             if urllib.parse.urlparse(self.path).path != '/api/auth/logout':
@@ -339,6 +416,8 @@ ITEMS = ("items: ["
 def goto(pg, pid, html):
     PAGES[pid] = html
     HUB['calls'].clear()
+    HUB['cards'].clear()
+    AVATARS.clear()
     pg.goto(f'{ORIGINS["svc"]}/app.html?p={pid}')
     pg.wait_for_function('window.GGAccountMenu !== undefined')
     pg.evaluate('document.fonts.ready.then(() => 1)')
@@ -1096,6 +1175,7 @@ def focus_rings(b):
 # ---------------------------------------------------------------------------------------------------------------- the Apple Wallet badge
 
 WALLET_PATH = '/api/auth/wallet/apple.pkpass'
+CARD_PATH = '/api/auth/card'
 UAS = {
     'iPhone Safari': ('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1', True),
     'iPhone Chrome': ('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/126.0.6478.153 Mobile/15E148 Safari/604.1', True),
@@ -1309,9 +1389,9 @@ def hub_defaults(b):
     PAGES['d-def'] = page("window.menu = GGAccountMenu.mount('#account', {name: 'Лёв Авдошин', email: 'lev@global-generations.com', wallet: true, logoutUrl: '/logout'});")
     goto(pg, 'd-def', PAGES['d-def'])
     kit = pg.evaluate('GGAccountMenu.hub')
-    check('defaults', 'GGAccountMenu.hub lists the canonical addresses: the origin id.global-generations-edu.com and the six paths',
+    check('defaults', 'GGAccountMenu.hub lists the canonical addresses: the origin id.global-generations-edu.com and the seven paths',
           kit == {'origin': HUB_URL, 'services': '/cabinet/', 'profile': '/cabinet/#face', 'servicesApi': '/api/auth/service-links', 'wallet': WALLET_PATH,
-                  'logout': '/api/auth/logout', 'login': '/login.html'}, kit)
+                  'card': CARD_PATH, 'logout': '/api/auth/logout', 'login': '/login.html'}, kit)
     pg.click(CHIP)
     pg.wait_for_function('document.querySelector("#account a[data-gam-id=services]") && document.querySelector("#account a[data-gam-id=services]").getClientRects().length > 0', timeout=6000)
     links = pg.evaluate('''() => ({services: document.querySelector('#account a[data-gam-id="services"]').getAttribute('href'), profile: document.querySelector('#account a[data-gam-id="profile"]').getAttribute('href'),
@@ -1319,7 +1399,8 @@ def hub_defaults(b):
     check('defaults', 'no hubOrigin: «Мои сервисы» is <hub>/cabinet/, «Профиль GG ID» is <hub>/cabinet/#face, the badge is <hub>/api/auth/wallet/apple.pkpass',
           links['services'] == HUB_URL + '/cabinet/' and links['profile'] == HUB_URL + '/cabinet/#face' and links['wallet'] == HUB_URL + WALLET_PATH, links)
     check('defaults', 'the profile row says in its tooltip what is behind it: «Face ID / Touch ID (passkey)», with the slash', 'Face ID / Touch ID (passkey)' in (links['title'] or ''), links)
-    check('defaults', 'the services list is asked once, at the canonical address, by GET', seen == [{'url': HUB_URL + '/api/auth/service-links', 'method': 'GET'}], seen)
+    check('defaults', 'the photo is asked once at the mount (the card) and the services list once on the first open, both at the canonical address, by GET, in that order',
+          seen == [{'url': HUB_URL + CARD_PATH, 'method': 'GET'}, {'url': HUB_URL + '/api/auth/service-links', 'method': 'GET'}], seen)
     pg.keyboard.press('Escape')
 
     # an empty (an unset setting), null or unusable hubOrigin is the production hub too, not "no hub": a mistake in a setting must not take «Мои сервисы» away
@@ -1339,10 +1420,12 @@ def hub_defaults(b):
         pg.keyboard.press('Escape')
 
     # hubOrigin false and the attribute "false": no hub addresses at all
+    asked = len(seen)
     goto(pg, 'd-none', page('', manual=False, body='<div id="auto" data-gg-account-menu data-name="Лёв" data-hub-origin="false" data-logout-url="/logout"></div>'))
     pg.click('#auto .gid-chip')
     labels = pg.evaluate('[...document.querySelectorAll("#auto [role=menuitem]")].filter(e => e.getClientRects().length).map(e => e.textContent.trim())')
     check('defaults', 'data-hub-origin="false": no hub addresses, only «Выйти»', labels == ['Выйти'], labels)
+    check('defaults', 'data-hub-origin="false": no request to the hub at all (no card either), initials only', len(seen) == asked and pg.evaluate("document.querySelectorAll('#auto .gam-photo').length") == 0, seen[asked:])
 
     # a page of a service signs out through its own sign-out; the hub is not asked to
     HUB['logouts'].clear()
@@ -1374,6 +1457,360 @@ def hub_defaults(b):
               len(HUB['logouts']) == 1 and 'gg_portal_session=test-session' in got.get('cookie', '') and got.get('origin') in (hub, None) and hp.url == hub + want, (HUB['logouts'], hp.url))
     check('defaults', 'no page errors on the hub pages', not errs, errs[:3])
     ctx2.close()
+
+
+# ---------------------------------------------------------------------------------------------------------------- the photo of the person
+
+AV_PATH = '/api/auth/avatars/f-1-long-black/face-256.png'        # a picture of GG ID as the hub names it: an own path of the hub
+AV_PATH2 = '/api/auth/avatars/m-2-short-brown/face-256.png'
+AV_HTTPS = HUB_URL + AV_PATH                                       # what the hub really puts into `photo`: a full https address
+AV_MISSING = '/api/auth/avatars/missing-1/face-256.png'            # the server answers 404
+AV_BROKEN = '/api/auth/avatars/broken-1/face-256.png'              # the server answers 200, but it is not a picture
+DEMO_AVATAR = '/gg-id/account-menu/demo-avatar.svg'                # the picture of the demo page and of the screenshots
+
+# the two circles of a menu (the chip and the head of the card): what is in them
+AVS = """(root) => [...document.querySelectorAll(root + ' .gid-avatar')].map(a => { const i = a.querySelector('img.gam-photo'), cs = getComputedStyle(a);
+  return {text: a.textContent, cls: a.className, hasImg: !!i, src: i ? i.getAttribute('src') : null, color: cs.color, w: a.offsetWidth, h: a.offsetHeight, after: getComputedStyle(a, '::after').content}; })"""
+IMG_CSS = """() => [...document.querySelectorAll('#account img.gam-photo')].map(i => { const cs = getComputedStyle(i), p = i.parentNode.getBoundingClientRect(), r = i.getBoundingClientRect();
+  return {fit: cs.objectFit, radius: cs.borderTopLeftRadius, pos: cs.position, filter: cs.filter, shadow: cs.boxShadow, opacity: cs.opacity, events: cs.pointerEvents, pw: p.width,
+          dw: r.width - p.width, dh: r.height - p.height, dx: r.left - p.left, dy: r.top - p.top}; })"""
+GEOM = """() => { const r = document.getElementById('account'), m = r.querySelector('.gid-menu'), n = v => Math.round(v * 100) / 100;
+  const q = s => { const e = r.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return [n(b.width), n(b.height)]; };
+  const me = r.getBoundingClientRect();
+  return {root: [n(me.width), n(me.height)], chip: q('.gid-chip'), chipAv: q('.gid-chip .gid-avatar'), chipName: q('.gid-chip-name'), head: q('.gid-menu-head'), headAv: q('.gid-menu-head .gid-avatar'),
+          headTx: q('.gid-menu-head-tx'), menu: [m.offsetWidth, m.offsetHeight], scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth}; }"""
+# a screenshot of a circle, read back through a canvas: how much of the round shape is the green of the generated picture (see make_png). g = where the circle lies in the shot, in device pixels.
+# The thin ring of the avatar lies on the outer 1 px (out of 0.93 of the radius in the chip), so the band that must be picture all over ends at 0.9 of the radius.
+PIXELS = """async ([b64, g]) => {
+  const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d', {willReadFrequently: true}); x.drawImage(img, 0, 0);
+  const w = img.width, h = img.height, R = g.R, cx = g.cx, cy = g.cy, d = x.getImageData(0, 0, w, h).data;
+  const px = (i, j) => { const k = (Math.round(j) * w + Math.round(i)) * 4; return [d[k], d[k + 1], d[k + 2]]; };
+  const green = p => Math.abs(p[0]) < 16 && Math.abs(p[1] - 170) < 16 && Math.abs(p[2] - 70) < 16;
+  let inner = 0, innerBad = 0, band = 0, bandGreen = 0;
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
+    const r = Math.hypot(i + .5 - cx, j + .5 - cy) / R;
+    if (r < .8) { inner++; if (!green(px(i, j))) innerBad++; } else if (r < .9) { band++; if (green(px(i, j))) bandGreen++; }
+  }
+  const k = .98 * R, corners = [[cx - k, cy - k], [cx + k, cy - k], [cx - k, cy + k], [cx + k, cy + k]].filter(([i, j]) => i >= 0 && j >= 0 && i < w && j < h).map(([i, j]) => px(i, j));
+  return {w, h, inner, innerBad, band, bandGreen, corners: corners.length, cornersGreen: corners.filter(green).length};
+}"""
+MOUNT_WITH = ("(o) => { if (window.menu) window.menu.destroy(); window.menu = GGAccountMenu.mount('#account', Object.assign({name: 'Лёв Авдошин', email: 'lev@global-generations.com', "
+              "hubOrigin: '%s', servicesApi: false, wallet: false, logoutUrl: '/logout'}, o)); }")
+# addresses that are no photos: the option and the answer of the hub are held to the same rule (the rule of the card of the sign-in pages)
+BAD_PHOTOS = [
+    ('data:', 'data:image/png;base64,iVBORw0KGgo='), ('javascript:', 'javascript:window.__pwned=41'), ('plain http to a stranger', 'http://example.com/a.png'),
+    ('protocol-relative (//host)', '//evil.example/a.png'), ('backslash (/\\host)', '/\\evil.example/a.png'), ('a tab between the slashes', '/\t/evil.example/a.png'),
+    ('a space', 'https://example.com/a b.png'), ('a double quote', 'https://example.com/a"b.png'), ('a single quote', "https://example.com/a'b.png"),
+    ('a less-than sign', 'https://example.com/a<b.png'), ('a greater-than sign', 'https://example.com/a>b.png'), ('a backslash inside', 'https://example.com/a\\b.png'),
+    ('a control character', 'https://example.com/a\x01b.png'), ('over 500 characters', 'https://example.com/' + 'a' * 500 + '.png'), ('a bare word', 'avatar.png'),
+    ('a relative address', './a.png'), ('ftp', 'ftp://example.com/a.png'), ('blob', 'blob:https://example.com/0000'), ('https with nothing after it', 'https://'),
+]
+
+
+def circle_pixels(pg, sel, scale=2):
+    """The shot of one round avatar and where its circle lies in it. The box of the avatar is fractional, so the shot is cut on whole pixels around it and the centre is worked out from the box
+    (a shot of the element itself is rounded outwards and the circle would sit off its middle). `scale` is the device_scale_factor of the context."""
+    box = pg.locator(sel).first.bounding_box()
+    x0, y0 = math.floor(box['x']) - 2, math.floor(box['y']) - 2
+    clip = {'x': x0, 'y': y0, 'width': math.ceil(box['width']) + 5, 'height': math.ceil(box['height']) + 5}
+    geo = {'cx': (box['x'] + box['width'] / 2 - x0) * scale, 'cy': (box['y'] + box['height'] / 2 - y0) * scale, 'R': box['width'] / 2 * scale}
+    return pg.evaluate(PIXELS, [base64.b64encode(pg.screenshot(clip=clip)).decode('ascii'), geo])
+
+
+def round_ok(px):
+    """The picture fills the whole round shape: nothing but the picture inside 80 percent of the radius (letters included), 97 percent of the band out to 90 percent, the corners of the box stay empty."""
+    return px['inner'] > 100 and px['innerBad'] == 0 and px['band'] > 20 and px['bandGreen'] >= px['band'] * 0.97 and px['corners'] == 4 and px['cornersGreen'] == 0
+
+
+def photo(b):
+    """The photo of the person (option photo, kit 2026-10-15.3): the avatar chosen in GG ID goes over the initials in the chip and in the head of the card.
+    An address in the option draws it and asks nothing; false draws the initials and asks nothing; not said asks the hub once per person (GET /api/auth/card, real CORS with the cookie)."""
+    svc, hub = ORIGINS['svc'], ORIGINS['hub']
+    svc_host, hub_host = urllib.parse.urlparse(svc).netloc, urllib.parse.urlparse(hub).netloc
+    HUB['allowed'] = {svc}
+    HUB['card_mode'], HUB['card_delay'], HUB['card_body'], HUB['card_photo'] = 'nophoto', 0, None, AV_PATH
+    ctx = b.new_context(viewport={'width': 1440, 'height': 900}, device_scale_factor=2)
+    ctx.add_cookies([{'name': 'gg_portal_session', 'value': 'test-session', 'url': svc + '/'}])
+    errs, warns, reqs = [], [], []
+    pg = ctx.new_page()
+    # WebKit reports the answer the browser blocked on purpose (the run "without CORS headers") as a page error, other engines only log it
+    pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}') if 'access control checks' not in str(e) else None)
+    pg.on('console', lambda m: warns.append(m.text) if m.type == 'warning' else None)
+    pg.on('request', lambda r: reqs.append(r.url))
+    base = 'servicesApi: false'
+    avs = lambda root='#account': pg.evaluate(AVS, root)
+
+    def up(n=2, root='#account', timeout=8000):
+        pg.wait_for_function(f"document.querySelectorAll('{root} .gid-avatar.gam-av--photo').length === {n}", timeout=timeout)
+
+    def gone(root='#account', timeout=8000):
+        pg.wait_for_function(f"document.querySelectorAll('{root} img.gam-photo').length === 0", timeout=timeout)
+
+    # --- an address in the option: both circles, nothing is asked of the hub
+    goto(pg, 'p-opt', page(mount_js(f"photo: '{AV_PATH}', {base}")))
+    up()
+    av = avs()
+    check('photo', 'photo as an own path draws the picture in both circles, the chip and the head of the card; the path is a path of this page (the service names its own file)',
+          len(av) == 2 and all(a['hasImg'] for a in av) and [a['src'] for a in av] == [svc + AV_PATH] * 2, av)
+    check('photo', 'an address in the option asks nothing of the hub (no card request)', len(HUB['cards']) == 0, HUB['cards'])
+    check('photo', 'the picture is requested from the page\'s own server, without a Referer (referrerpolicy no-referrer)',
+          len(AVATARS) >= 1 and all(a['host'] == svc_host and a['referer'] is None for a in AVATARS), AVATARS)
+    attrs = pg.evaluate("() => [...document.querySelectorAll('#account img.gam-photo')].map(i => [i.getAttribute('alt'), i.getAttribute('referrerpolicy'), i.getAttribute('decoding'), "
+                        "i.parentNode.classList.contains('gid-avatar'), i.parentNode.querySelectorAll('img').length, i.hasAttribute('srcset'), i.hasAttribute('onerror')])")
+    check('photo', 'the img is alt="" (the name is in the text next to it), referrerpolicy no-referrer, decoding async, one per circle, no srcset, no handler attribute',
+          attrs == [['', 'no-referrer', 'async', True, 1, False, False]] * 2, attrs)
+    check('photo', 'the initials stay in the DOM under the picture and turn transparent while it shows (the ring of the avatar is drawn over it)',
+          [a['text'] for a in av] == ['ЛА', 'ЛА'] and all(a['color'] == 'rgba(0, 0, 0, 0)' and a['after'] in ('""', "''") for a in av), av)
+    pg.click(CHIP)
+    pg.wait_for_timeout(450)
+    css = pg.evaluate(IMG_CSS)
+    check('photo', 'the picture fills the circle and nothing more: absolute, the whole box, object-fit cover, round, no filter, no shadow, no mouse of its own',
+          len(css) == 2 and all(c['fit'] == 'cover' and c['pos'] == 'absolute' and c['radius'] == '50%' and c['filter'] == 'none' and c['shadow'] == 'none' and c['opacity'] == '1'
+                                and c['events'] == 'none' and c['pw'] > 20 and abs(c['dw']) < 0.01 and abs(c['dh']) < 0.01 and abs(c['dx']) < 0.01 and abs(c['dy']) < 0.01 for c in css), css)
+    av = avs()
+    check('photo', 'the two circles keep the sizes of the kit: 28 px in the chip, 44 px in the head of the card', [a['w'] for a in av] == [28, 44] and [a['h'] for a in av] == [28, 44], av)
+    for tag, sel in (('the chip', '#account .gid-chip .gid-avatar'), ('the head of the card', '#account .gid-menu-head .gid-avatar')):
+        px = circle_pixels(pg, sel)
+        check('photo', f'{tag}, light: the picture fills the whole round shape (a wide picture is cut to its middle, not squeezed), no letter shows through, the corners stay empty', round_ok(px), px)
+    pg.keyboard.press('Escape')
+    # the dark theme, the same pixels
+    goto(pg, 'p-opt-dark', page(mount_js(f"photo: '{AV_PATH}', theme: 'dark', {base}") + 'menu.open();'))
+    up()
+    pg.wait_for_timeout(450)
+    for tag, sel in (('the chip', '#account .gid-chip .gid-avatar'), ('the head of the card', '#account .gid-menu-head .gid-avatar')):
+        px = circle_pixels(pg, sel)
+        check('photo', f'{tag}, dark: the same, the picture fills the round shape', round_ok(px), px)
+
+    # --- the circle keeps its size: with a picture, without one, on a wide screen and on a phone
+    def geom(pid, extra, width, wait_img):
+        pg.set_viewport_size({'width': width, 'height': 900})
+        goto(pg, pid, page(mount_js(extra) + 'menu.open();'))
+        if wait_img:
+            up()
+        pg.wait_for_timeout(450)
+        return pg.evaluate(GEOM)
+    for width in (1440, 390):
+        off = geom('p-g0', f'photo: false, wallet: true, {base}', width, False)
+        on = geom('p-g1', f"photo: '{AV_PATH}', wallet: true, {base}", width, True)
+        check('photo', f'{width} px: every size is the same with and without the picture (the chip, both circles, the name, the head of the card, the card itself) and the page has no sideways scroll',
+              on == off and on['scrollW'] <= on['clientW'] and on['chipAv'] == [28, 28] and on['headAv'] == [44, 44], (off, on))
+    pg.set_viewport_size({'width': 1440, 'height': 900})
+
+    # --- false and the attribute: initials, no request
+    HUB['card_mode'] = 'ok'
+    goto(pg, 'p-false', page(mount_js(f'photo: false, {base}')))
+    pg.wait_for_timeout(500)
+    av = avs()
+    check('photo', 'photo false: the initials only, and the hub is not asked even though it would give a picture', len(HUB['cards']) == 0 and not any(a['hasImg'] for a in av) and [a['text'] for a in av] == ['ЛА', 'ЛА'], (av, HUB['cards']))
+    data_menu = ('<div id="auto" data-gg-account-menu data-name="Лёв Авдошин" data-email="lev@global-generations.com" data-hub-origin="__HUB__" data-services-api="false" '
+                 'data-wallet="false" data-logout-url="/logout" %s></div>')
+    goto(pg, 'p-data-false', page('', manual=False, body=data_menu % 'data-photo="false"'))
+    pg.wait_for_timeout(500)
+    av = avs('#auto')
+    check('photo', 'data-photo="false" is the same: initials, no request (the string false is the boolean false, as in the other attributes)',
+          len(HUB['cards']) == 0 and len(av) == 2 and not any(a['hasImg'] for a in av), (av, HUB['cards']))
+    goto(pg, 'p-data-path', page('', manual=False, body=data_menu % f'data-photo="{AV_PATH}"'))
+    up(root='#auto')
+    av = avs('#auto')
+    check('photo', 'data-photo="<path>" draws the picture without a line of script, and asks nothing', len(HUB['cards']) == 0 and [a['src'] for a in av] == [svc + AV_PATH] * 2, (av, HUB['cards']))
+
+    # --- not said: the kit asks the hub once
+    HUB['card_mode'], HUB['card_photo'] = 'ok', AV_PATH
+    goto(pg, 'p-hub', page(mount_js(base)))
+    up()
+    cards = list(HUB['cards'])
+    check('photo', 'photo not said: the kit asks the card of the hub once, at the mount (GET, cross-origin, the hub cookie goes along, JSON asked for)',
+          len(cards) == 1 and cards[0]['origin'] == svc and 'gg_portal_session=test-session' in cards[0]['cookie'] and 'application/json' in (cards[0]['accept'] or ''), cards)
+    av = avs()
+    check('photo', 'the own path of the answer is completed with the hub address: the picture comes from the hub, without a Referer',
+          [a['src'] for a in av] == [hub + AV_PATH] * 2 and len(AVATARS) >= 1 and all(a['host'] == hub_host and a['referer'] is None for a in AVATARS), (av, AVATARS))
+    pg.evaluate("window.menu.update({}); window.menu.update({placement: 'start'}); window.menu.update({name: 'Лёв Авдошин', email: 'LEV.AVDOSHIN@global-generations.com'}); window.menu.update({theme: 'dark'}); window.menu.update({theme: 'light'});")
+    pg.wait_for_timeout(600)
+    up()
+    check('photo', 'update() five times for the same person (the e-mail in another case, a theme, a placement) sends no second request, and the picture stays', len(HUB['cards']) == 1, HUB['cards'])
+    # a second menu for the same person shares the answer, another person asks once more
+    goto(pg, 'p-two', page(mount_js(base) + "document.getElementById('account').insertAdjacentElement('afterend', Object.assign(document.createElement('div'), {id: 'second'}));"
+                           + f"GGAccountMenu.mount('#second', {opts_js(base)});"))
+    pg.wait_for_function("document.querySelectorAll('img.gam-photo').length === 4")
+    check('photo', 'two menus on a page for the same person make one request, both draw the picture', len(HUB['cards']) == 1, HUB['cards'])
+    pg.evaluate("(() => { document.getElementById('second').insertAdjacentElement('afterend', Object.assign(document.createElement('div'), {id: 'third'})); "
+                "GGAccountMenu.mount('#third', {name: 'Вера Петрова', email: 'vera.petrova@global-generations.com', hubOrigin: '" + hub + "', wallet: false, servicesApi: false, logoutUrl: '/logout'}); })()")
+    pg.wait_for_function("document.querySelectorAll('img.gam-photo').length === 6")
+    check('photo', 'a third menu for another person asks once more (two requests in all)', len(HUB['cards']) == 2, HUB['cards'])
+    # another person in one menu: the old picture goes at once, never shown for someone else
+    goto(pg, 'p-person', page(mount_js(base)))
+    up()
+    HUB['card_photo'] = AV_PATH2
+    n = pg.evaluate("() => { window.menu.update({name: 'Вера Петрова', email: 'vera.petrova@global-generations.com'}); return document.querySelectorAll('#account img.gam-photo').length; }")
+    check('photo', 'update() with another person: the picture of the one before is gone at once (initials), it is never shown for someone else', n == 0 and len(HUB['cards']) == 1, (n, HUB['cards']))
+    pg.wait_for_function(f"document.querySelectorAll('#account img.gam-photo').length === 2 && document.querySelector('#account img.gam-photo').getAttribute('src').endsWith('{AV_PATH2}')")
+    check('photo', 'then one request for the new person and her picture', len(HUB['cards']) == 2, HUB['cards'])
+    pg.evaluate("window.menu.update({name: 'Лёв Авдошин', email: 'lev.avdoshin@global-generations.com'})")
+    pg.wait_for_function(f"document.querySelector('#account img.gam-photo') && document.querySelector('#account img.gam-photo').getAttribute('src').endsWith('{AV_PATH}')")
+    check('photo', 'back to the first person: the answer of the page is reused, no third request', len(HUB['cards']) == 2, HUB['cards'])
+    r = pg.evaluate("() => { window.menu.update({photo: false}); return document.querySelectorAll('#account img.gam-photo').length; }")
+    check('photo', 'update({photo: false}) takes the picture away at once and asks nothing', r == 0 and len(HUB['cards']) == 2, (r, HUB['cards']))
+    pg.evaluate("window.menu.update({photo: null})")
+    up()
+    check('photo', 'update({photo: null}) is "not said" again: the picture comes back from the answer the page already has, no new request', len(HUB['cards']) == 2, HUB['cards'])
+    pg.evaluate(f"window.menu.update({{photo: '{AV_PATH2}'}})")
+    pg.wait_for_function(f"document.querySelector('#account img.gam-photo') && document.querySelector('#account img.gam-photo').getAttribute('src').endsWith('{AV_PATH2}')")
+    check('photo', 'update({photo: "<path>"}) puts the service\'s own picture over the hub one', [a['src'] for a in avs()] == [svc + AV_PATH2] * 2 and len(HUB['cards']) == 2, avs())
+
+    # --- no hub, no request
+    PAGES['p-nohub'] = page(f"GGAccountMenu.mount('#account', {{name: 'Лёв Авдошин', logoutUrl: '/logout', {MIN}}});")
+    goto(pg, 'p-nohub', PAGES['p-nohub'])
+    pg.wait_for_timeout(500)
+    check('photo', 'hubOrigin false and no photo: no request and no picture', len(HUB['cards']) == 0 and not any(a['hasImg'] for a in avs()), HUB['cards'])
+
+    # --- every refusal of the hub is silent: the initials stay, one request, the menu works
+    for mode, why in (('nologin', '401: no hub session'), ('forbidden', '403: no level'), ('notfound', '404: no card'), ('error', '503: the hub is down'),
+                      ('broken', 'broken JSON'), ('array', 'an answer of another shape'), ('no_cors', 'an answer without CORS headers (the browser blocks it)'),
+                      ('nophoto', 'a card with no `photo` key (the person has chosen no avatar)')):
+        HUB['card_mode'] = mode
+        goto(pg, 'p-' + mode, page(mount_js(base)))
+        pg.wait_for_timeout(600)
+        av = avs()
+        pg.click(CHIP)
+        s = state(pg)
+        pg.keyboard.press('Escape')
+        check('photo', f'{why}: silent, the initials stay, one request and no retry, the menu works',
+              not any(a['hasImg'] for a in av) and [a['text'] for a in av] == ['ЛА', 'ЛА'] and len(HUB['cards']) == 1 and s['open'], (av, len(HUB['cards']), s))
+    HUB['card_mode'] = 'custom'
+    for value in (None, '', '   ', 7, True, {}, [], ['a'], {'src': AV_PATH}):
+        HUB['card_body'] = {'photo': value}
+        goto(pg, 'p-photo-kinds', page(mount_js(base)))
+        pg.wait_for_timeout(350)
+        check('photo', f'`photo` in the answer is {json.dumps(value)}: no picture, no error', not any(a['hasImg'] for a in avs()) and len(HUB['cards']) == 1, avs())
+    # slower than 4 seconds is no answer: the request is cut off, the late picture never comes
+    HUB['card_mode'], HUB['card_delay'] = 'ok', 6.0
+    goto(pg, 'p-slow', page(mount_js(base)))
+    pg.wait_for_timeout(6600)
+    check('photo', 'an answer that takes longer than 4 seconds is dropped (the request is cut off at 4 s, the picture that would come at 6 s never shows), one request',
+          not any(a['hasImg'] for a in avs()) and len(HUB['cards']) == 1, (avs(), HUB['cards']))
+    HUB['card_delay'] = 0
+    check('photo', 'no page error in all the refusals', not errs, errs[:3])
+
+    # --- addresses that are no photos, in the option and in the answer of the hub: dropped, nothing runs, nothing leaves the machine
+    goto(pg, 'p-bad', page(''))
+    mount_with = MOUNT_WITH % hub
+    problems_opt = []
+    for label, value in BAD_PHOTOS:
+        warns.clear()
+        n = len(reqs)
+        pg.evaluate(mount_with, {'photo': value})
+        pg.evaluate('window.menu.update({}); window.menu.update({name: "Лёв Авдошин"})')
+        pg.wait_for_timeout(250)
+        ours = [w for w in warns if 'GGAccountMenu: photo' in w]
+        foreign = [u for u in reqs[n:] if not u.startswith(('http://localhost:', 'data:', 'about:'))]
+        imgs = pg.evaluate("document.querySelectorAll('#account img').length")
+        if imgs or foreign or pg.evaluate('window.__pwned || 0') or len(ours) != 1 or len(HUB['cards']):
+            problems_opt.append((label, imgs, foreign[:1], len(ours), len(HUB['cards'])))
+    check('photo', f'the option: {len(BAD_PHOTOS)} kinds of address that are no photo (data:, javascript:, http:, //host, /\\host, a tab, a space, quotes, < >, a backslash, a control character, over 500 characters, a word, '
+          'a relative address, ftp:, blob:) draw nothing, run nothing, request nothing, ask nothing of the hub, and say so once in the console', not problems_opt, problems_opt[:3])
+    HUB['card_mode'] = 'custom'
+    problems_ans = []
+    for i, (label, value) in enumerate(BAD_PHOTOS):
+        HUB['card_body'] = {'photo': value}
+        n, cn = len(reqs), len(HUB['cards'])
+        pg.evaluate(mount_with, {'email': f'bad{i}@global-generations.com'})
+        pg.wait_for_timeout(250)
+        foreign = [u for u in reqs[n:] if not u.startswith(('http://localhost:', 'data:', 'about:'))]
+        imgs = pg.evaluate("document.querySelectorAll('#account img').length")
+        if imgs or foreign or pg.evaluate('window.__pwned || 0') or len(HUB['cards']) != cn + 1:
+            problems_ans.append((label, imgs, foreign[:1], len(HUB['cards']) - cn))
+    check('photo', f'the answer of the hub: the same {len(BAD_PHOTOS)} kinds of address are dropped the same way (silent: the hub is not blamed in the console), the initials stay', not problems_ans, problems_ans[:3])
+    HUB['card_mode'], HUB['card_body'] = 'ok', None
+    cn = len(HUB['cards'])
+    pg.evaluate(mount_with, {'photo': '   ', 'email': 'blank@global-generations.com'})
+    up()
+    check('photo', 'a blank string in the option is "not said" (an unset setting, as with hubOrigin): the hub is asked once and its picture is drawn', len(HUB['cards']) == cn + 1, (cn, len(HUB['cards'])))
+    check('photo', 'no page error with the bad addresses', not errs, errs[:3])
+
+    # --- a full https address (what the hub really sends) is drawn, with no Referer
+    seen_h = []
+
+    def serve(route):
+        seen_h.append({'url': route.request.url, 'referer': route.request.headers.get('referer')})
+        route.fulfill(status=200, content_type='image/png', body=PNG)
+    pg.route(re.compile(r'^https://id\.global-generations-edu\.com/api/auth/avatars/'), serve)
+    HUB['card_mode'] = 'ok'
+    goto(pg, 'p-https', page(mount_js(f"photo: '{AV_HTTPS}', {base}")))
+    up()
+    check('photo', 'an https address in the option is drawn as it is, requested without a Referer', [a['src'] for a in avs()] == [AV_HTTPS] * 2 and seen_h and all(s['referer'] is None for s in seen_h) and not HUB['cards'], (avs(), seen_h))
+    HUB['card_mode'], HUB['card_body'] = 'custom', {'photo': AV_HTTPS}
+    goto(pg, 'p-https2', page(mount_js(base)))
+    up()
+    check('photo', 'an https address in the answer of the hub (what the hub really sends) is drawn as it is', [a['src'] for a in avs()] == [AV_HTTPS] * 2 and len(HUB['cards']) == 1, (avs(), HUB['cards']))
+    pg.unroute(re.compile(r'^https://id\.global-generations-edu\.com/api/auth/avatars/'))
+
+    # --- a picture that does not load gives the initials back, once, and is not tried again on every redraw
+    for label, path in (('a missing file (404)', AV_MISSING), ('a file that is not a picture (200, text)', AV_BROKEN)):
+        goto(pg, 'p-err', page(mount_js(f"photo: '{path}', {base}") + 'menu.open();'))
+        gone()
+        av = avs()
+        check('photo', f'{label} in the option: the picture is taken out, the letters are back (navy, not transparent), no leftover class', not any(a['hasImg'] for a in av) and [a['text'] for a in av] == ['ЛА', 'ЛА']
+              and all(a['color'] == 'rgb(19, 68, 93)' and 'gam-av--' not in a['cls'] and a['after'] in ('normal', 'none') for a in av), av)
+        pg.wait_for_timeout(300)
+        n = len(AVATARS)
+        pg.evaluate("window.menu.update({}); window.menu.update({name: 'Лёв Авдошин'}); window.menu.update({theme: 'dark'}); window.menu.update({theme: 'light'});")
+        pg.wait_for_timeout(500)
+        check('photo', f'{label}: a redraw (update without a new photo) does not ask for the same picture again', len(AVATARS) == n and not any(a['hasImg'] for a in avs()), (n, len(AVATARS)))
+        pg.evaluate(f"window.menu.update({{photo: '{path}'}})")
+        pg.wait_for_timeout(600)
+        check('photo', f'{label}: the service saying photo again is a new try (one more request), and it fails the same way back to the initials', len(AVATARS) > n and not any(a['hasImg'] for a in avs()), (n, len(AVATARS)))
+    HUB['card_mode'], HUB['card_body'] = 'custom', {'photo': AV_MISSING}
+    goto(pg, 'p-err2', page(mount_js(base)))
+    gone()
+    pg.wait_for_timeout(300)
+    n = len(AVATARS)
+    pg.evaluate("window.menu.update({}); window.menu.update({name: 'Лёв Авдошин'})")
+    pg.wait_for_timeout(500)
+    check('photo', 'a picture of the hub that is gone: initials, one card request, no second try on a redraw', len(HUB['cards']) == 1 and len(AVATARS) == n and not any(a['hasImg'] for a in avs()), (len(HUB['cards']), n, len(AVATARS)))
+
+    # --- the picture arrives while the card is open: nothing jumps
+    HUB['card_mode'], HUB['card_delay'], HUB['card_body'] = 'ok', 1.0, None
+    goto(pg, 'p-late', page(mount_js(base)))
+    pg.click(CHIP)
+    pg.keyboard.press('ArrowDown')
+    pg.evaluate("window.__item = document.querySelector('#account [role=menuitem]');")
+    s0 = state(pg)
+    up()
+    s1 = state(pg)
+    check('photo', 'the picture arrives after the card was opened: the card stays open, the focus does not move, the rows are not redrawn',
+          s0['open'] and s1 == s0 and s1['focus'] == 0 and pg.evaluate("document.querySelector('#account [role=menuitem]') === window.__item"), (s0, s1))
+    pg.keyboard.press('Escape')
+    # a menu that is destroyed before the answer comes: the answer is dropped, nothing breaks
+    HUB['card_delay'] = 0.8
+    goto(pg, 'p-destroy', page(mount_js(base) + 'menu.destroy();'))
+    pg.wait_for_timeout(1400)
+    check('photo', 'destroy() before the answer: the late answer is dropped, nothing is drawn back, no error', pg.evaluate("document.getElementById('account').children.length") == 0 and not errs, errs[:3])
+    HUB['card_delay'] = 0
+    check('photo', 'no page error in the photo runs', not errs, errs[:3])
+    ctx.close()
+
+    # --- the screenshots: a picture and the initials back, 1440 and 390, light and dark
+    dark_head = '<style>body{background:#06141d}header{background:#0a1f2c;border-color:#17384a;color:#fff}</style>'
+    for width, height, clip in ((1440, 640, {'x': 1040, 'y': 0, 'width': 400, 'height': 620}), (390, 700, None)):
+        for theme in ('light', 'dark'):
+            for fallback in (False, True):
+                ctx = b.new_context(viewport={'width': width, 'height': height}, device_scale_factor=2)
+                ctx.add_cookies([{'name': 'gg_portal_session', 'value': 'test-session', 'url': svc + '/'}])
+                p2 = ctx.new_page()
+                src = AV_MISSING if fallback else DEMO_AVATAR
+                goto(p2, 'p-shot', page(mount_js(f"photo: '{src}', theme: '{theme}', wallet: true, {base}") + 'menu.open();', head=dark_head if theme == 'dark' else ''))
+                if fallback:
+                    p2.wait_for_function("document.querySelectorAll('#account img.gam-photo').length === 0")
+                else:
+                    p2.wait_for_function("document.querySelectorAll('#account .gid-avatar.gam-av--photo').length === 2")
+                p2.evaluate('document.fonts.ready.then(() => 1)')
+                p2.mouse.move(2, 2)
+                p2.wait_for_timeout(450)
+                name = f'photo-{"fallback-" if fallback else ""}{"desktop" if width == 1440 else "390"}-{theme}.png'
+                p2.screenshot(path=os.path.join(OUT, name), **({'clip': clip} if clip else {}))
+                ctx.close()
 
 
 # ---------------------------------------------------------------------------------------------------------------- the demo page
@@ -1665,7 +2102,8 @@ def demo_page(b):
     ctx = b.new_context(viewport={'width': 1440, 'height': 1000}, device_scale_factor=2)
     pg = ctx.new_page()
     errs = []
-    pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type == 'error' else None)
+    missing_ok = [False]      # the avatar mode "the picture does not load" asks for a file that is not there: the 404 line of the browser is the point of that state, not an error of the page
+    pg.on('console', lambda m: errs.append(f'{m.type}: {m.text}') if m.type == 'error' and not (missing_ok[0] and m.text.startswith('Failed to load resource')) else None)
     pg.on('pageerror', lambda e: errs.append(f'pageerror: {e}'))
     for state in ('ok', 'slow', 'nologin', 'error', 'empty', 'offline'):
         pg.goto(f'{svc}/gg-id/account-menu/demo.html?state={state}')
@@ -1700,6 +2138,35 @@ def demo_page(b):
             t = fr.evaluate("document.querySelector('#imp .gimp-l1').textContent")
             check('demo', f'imp={mode}: the bar is in the frame with the right words', t == ('Вы смотрите как Иван Образцов' if mode == 'on' else 'Вход от имени закончился'), t)
     check('demo', 'the second row of switches of the demo page has three links (own session, on, ended)', pg.evaluate("document.querySelectorAll('#imps a').length") == 3)
+    # the third row (?avatar=photo | initials | broken): the demo names its own picture in the option photo, so it asks the hub for nothing (the stub of the page counts a card call)
+    check('demo', 'the third row of switches of the demo page has three links (the photo, the initials, the picture that does not load)', pg.evaluate("document.querySelectorAll('#avatars a').length") == 3)
+    HUB['cards'].clear()
+    for mode in ('photo', 'initials', 'broken'):
+        missing_ok[0] = mode == 'broken'
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?state=ok&avatar={mode}')
+        pg.wait_for_function("[...document.querySelectorAll('iframe')].every(f => f.contentDocument && f.contentDocument.querySelector('#account .gid-chip'))", timeout=15000)
+        for k in ('desktop', 'phone'):
+            fr = next(f for f in pg.frames if f'embed={k}' in f.url)
+            if mode == 'photo':
+                fr.wait_for_function("document.querySelectorAll('#account .gid-avatar.gam-av--photo').length === 2", timeout=8000)
+            elif mode == 'broken':
+                fr.wait_for_function("document.querySelectorAll('#account img.gam-photo').length === 0", timeout=8000)
+            else:
+                pg.wait_for_timeout(400)
+            av = fr.evaluate(AVS, '#account')
+            srcs = [a['src'] for a in av]
+            if mode == 'photo':
+                ok = len(av) == 2 and all(a['hasImg'] for a in av) and all(s and s.endswith('/gg-id/account-menu/demo-avatar.svg') for s in srcs) and all(a['color'] == 'rgba(0, 0, 0, 0)' for a in av)
+            else:
+                ok = len(av) == 2 and not any(a['hasImg'] for a in av) and all(a['color'] == 'rgb(19, 68, 93)' for a in av) and [a['text'] for a in av] == ['ЛА', 'ЛА']
+            check('demo', f'avatar={mode} / {k}: ' + {'photo': 'the picture of the demo is in both circles', 'initials': 'the initials only', 'broken': 'the file is not there, the picture is taken out and the initials are back'}[mode],
+                  ok and [round(a['w']) for a in av] == [28, 44], av)
+            check('demo', f'avatar={mode} / {k}: the demo asks the hub for no card (the option photo is given)', fr.evaluate('window.__demoCardCalls || 0') == 0 and not HUB['cards'], (fr.evaluate('window.__demoCardCalls || 0'), HUB['cards']))
+        if mode != 'photo':
+            pg.wait_for_timeout(300)
+            hrefs = pg.evaluate("[...document.querySelectorAll('#states a, #imps a')].map(a => a.getAttribute('href'))")
+            check('demo', f'avatar={mode}: the other two rows of switches keep the avatar mode in their links', all(f'avatar={mode}' in h for h in hrefs), hrefs[:2])
+        missing_ok[0] = False
     check('demo', 'the demo page and its frames print no console errors', not errs, errs[:3])
     ctx.close()
 
@@ -1707,16 +2174,25 @@ def demo_page(b):
 def pictures(b):
     """The pictures of the README: the demo frames, opened as a person sees them."""
     svc = ORIGINS['svc']
-    shots = (('menu-desktop.png', 'desktop', 'ok', False, (1440, 640), {'x': 1040, 'y': 0, 'width': 400, 'height': 600}),
-             ('services-desktop.png', 'desktop', 'ok', True, (1440, 1160), {'x': 1040, 'y': 0, 'width': 400, 'height': 1140}),
-             ('services-390.png', 'phone', 'ok', True, (390, 1160), None),
-             ('services-fallback.png', 'phone', 'nologin', False, (390, 700), None))
-    for name, embed, state, expand, (w, h), clip in shots:
+    desk = {'x': 1040, 'y': 0, 'width': 400, 'height': 600}
+    # the last field is the avatar of the demo: the first six pictures keep the initials (they are about the list and the bar, and they stay as they were), the last three are about the photo
+    shots = (('menu-desktop.png', 'desktop', 'ok', False, (1440, 640), desk, 'initials'),
+             ('services-desktop.png', 'desktop', 'ok', True, (1440, 1160), {'x': 1040, 'y': 0, 'width': 400, 'height': 1140}, 'initials'),
+             ('services-390.png', 'phone', 'ok', True, (390, 1160), None, 'initials'),
+             ('services-fallback.png', 'phone', 'nologin', False, (390, 700), None, 'initials'),
+             ('photo-desktop.png', 'desktop', 'ok', False, (1440, 640), desk, 'photo'),
+             ('photo-390.png', 'phone', 'ok', False, (390, 700), None, 'photo'),
+             ('photo-fallback.png', 'desktop', 'ok', False, (1440, 640), desk, 'broken'))
+    for name, embed, state, expand, (w, h), clip, avatar in shots:
         ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
         pg = ctx.new_page()
-        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state={state}&open=1')
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state={state}&open=1&avatar={avatar}')
         pg.wait_for_function('window.GGAccountMenu !== undefined')
         pg.evaluate('document.fonts.ready.then(() => 1)')
+        if avatar == 'photo':
+            pg.wait_for_function("document.querySelectorAll('#account .gid-avatar.gam-av--photo').length === 2", timeout=8000)
+        elif avatar == 'broken':
+            pg.wait_for_function("document.querySelectorAll('#account img.gam-photo').length === 0", timeout=8000)
         if expand:
             pg.click('#account button[data-gam-id="services"]')
             pg.wait_for_selector('#account .gam-svc')
@@ -1729,7 +2205,7 @@ def pictures(b):
     for name, embed, (w, h) in (('imp-desktop.png', 'desktop', (1440, 300)), ('imp-390.png', 'phone', (390, 330))):
         ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
         pg = ctx.new_page()
-        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state=ok&imp=on')
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state=ok&imp=on&avatar=initials')
         pg.wait_for_function('window.GGAccountMenu !== undefined')
         pg.evaluate('document.fonts.ready.then(() => 1)')
         pg.wait_for_selector('#imp .gimp-btn')
@@ -1745,6 +2221,7 @@ def main():
     sources()
     svc, hub, evil = Server(site_handler()), Server(hub_handler()), Server(site_handler())
     ORIGINS.update(svc=f'http://localhost:{svc.port}', hub=f'http://localhost:{hub.port}', evil=f'http://localhost:{evil.port}')
+    HUB['allowed'] = {ORIGINS['svc']}          # the hub knows the service page; a card request of a menu with no cookie, or of a foreign page, is a quiet 401 or 403
     # every page is also served by the "evil" server (same files): a page of a stranger that asks the hub
     try:
         with sync_playwright() as p:
@@ -1760,13 +2237,15 @@ def main():
                 return c
             b.new_context = new_context
             for name, fn, args in (('look', look, ()), ('avatar_variant', avatar_variant, ()), ('behaviour', behaviour, ()), ('focus_rings', focus_rings, ()),
-                                   ('wallet_badge', wallet_badge, ()), ('hub_defaults', hub_defaults, ()),
+                                   ('wallet_badge', wallet_badge, ()), ('hub_defaults', hub_defaults, ()), ('photo', photo, ()),
                                    ('listing', listing, ()), ('imp_bar', imp_bar, ()), ('phone', phone, (ENGINE,)), ('narrow_edges', narrow_edges, ()), ('demo_page', demo_page, ()),
                                    ('pictures', pictures, ())):
                 try:
                     fn(b, *args)
                 except Exception as e:   # a step that cannot finish is a failure of the check, the others still run
                     problems.append(f'{name}: the run stopped: {type(e).__name__}: {str(e).splitlines()[0][:300]}')
+                finally:
+                    HUB['card_mode'], HUB['card_delay'], HUB['card_body'] = 'nophoto', 0, None     # the card answer of one group (a picture, a refusal) is never the answer of the next
             b.close()
     finally:
         for s in (svc, hub, evil):
@@ -1782,7 +2261,7 @@ def main():
         pdir = os.path.join(DIR, 'preview')
         os.makedirs(pdir, exist_ok=True)
         import shutil
-        for name in ('menu-desktop.png', 'services-desktop.png', 'services-390.png', 'services-fallback.png', 'imp-desktop.png', 'imp-390.png'):
+        for name in ('menu-desktop.png', 'services-desktop.png', 'services-390.png', 'services-fallback.png', 'imp-desktop.png', 'imp-390.png', 'photo-desktop.png', 'photo-390.png', 'photo-fallback.png'):
             shutil.copyfile(os.path.join(OUT, 'picture-' + name), os.path.join(pdir, name))
         print('preview pictures refreshed in', pdir)
 

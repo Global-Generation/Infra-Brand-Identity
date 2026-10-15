@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- The picture of the demo page of the account menu (demo.html): a flat sample, not a real person. In a service the picture is the avatar the person chose in GG ID. -->
+  <rect width="256" height="256" fill="#d6e9f7"/>
+  <rect x="106" y="132" width="44" height="52" rx="16" fill="#e3b999"/>
+  <path d="M18 256C18 200 64 170 128 170S238 200 238 256Z" fill="#13445d"/>
+  <ellipse cx="128" cy="108" rx="43" ry="49" fill="#f0cdb2"/>
+  <path d="M83 108C78 66 102 48 130 48C160 48 180 68 173 108C167 90 156 80 130 80C106 80 92 91 83 108Z" fill="#3a2a22"/>
+</svg>
