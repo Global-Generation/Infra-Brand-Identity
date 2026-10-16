@@ -2186,7 +2186,8 @@ def pictures(b):
     for name, embed, state, expand, (w, h), clip, avatar in shots:
         ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
         pg = ctx.new_page()
-        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state={state}&open=1&avatar={avatar}')
+        # an open list adds the sample service of Маркетинг (?groups=4): the pictures show all four captions, as the README says
+        pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state={state}&open=1&avatar={avatar}' + ('&groups=4' if expand else ''))
         pg.wait_for_function('window.GGAccountMenu !== undefined')
         pg.evaluate('document.fonts.ready.then(() => 1)')
         if avatar == 'photo':
@@ -2203,8 +2204,11 @@ def pictures(b):
         pg.screenshot(path=os.path.join(OUT, 'picture-' + name), **({'clip': clip} if clip else {}))
         ctx.close()
     for name, embed, (w, h) in (('imp-desktop.png', 'desktop', (1440, 300)), ('imp-390.png', 'phone', (390, 330))):
-        ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2)
+        # the demo ends the session 47 minutes from now: a fixed clock and zone make the bar say «до 12:30» in every run,
+        # so a new shot of an unchanged bar is the same picture
+        ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, timezone_id='UTC')
         pg = ctx.new_page()
+        pg.clock.set_fixed_time(datetime.datetime(2026, 10, 15, 11, 43, tzinfo=datetime.timezone.utc))
         pg.goto(f'{svc}/gg-id/account-menu/demo.html?embed={embed}&state=ok&imp=on&avatar=initials')
         pg.wait_for_function('window.GGAccountMenu !== undefined')
         pg.evaluate('document.fonts.ready.then(() => 1)')
