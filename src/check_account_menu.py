@@ -1396,9 +1396,9 @@ def hub_defaults(b):
     pg.wait_for_function('document.querySelector("#account a[data-gam-id=services]") && document.querySelector("#account a[data-gam-id=services]").getClientRects().length > 0', timeout=6000)
     links = pg.evaluate('''() => ({services: document.querySelector('#account a[data-gam-id="services"]').getAttribute('href'), profile: document.querySelector('#account a[data-gam-id="profile"]').getAttribute('href'),
       wallet: (document.querySelector('#account a.gam-wallet') || {getAttribute: () => null}).getAttribute('href'), title: document.querySelector('#account a[data-gam-id="profile"]').getAttribute('title')})''')
-    check('defaults', 'no hubOrigin: «Мои сервисы» is <hub>/cabinet/, «Профиль GG ID» is <hub>/cabinet/#profile, the badge is <hub>/api/auth/wallet/apple.pkpass',
+    check('defaults', 'no hubOrigin: «Мои сервисы» is <hub>/cabinet/, «Профиль GG ID» is <hub>/cabinet/#profile (the cabinet page «Профиль», kit 2026-10-16.1), the badge is <hub>/api/auth/wallet/apple.pkpass',
           links['services'] == HUB_URL + '/cabinet/' and links['profile'] == HUB_URL + '/cabinet/#profile' and links['wallet'] == HUB_URL + WALLET_PATH, links)
-    check('defaults', 'the profile row says in its tooltip what is behind it: «Face ID / Touch ID (passkey)», with the slash', 'Face ID / Touch ID (passkey)' in (links['title'] or ''), links)
+    check('defaults', 'the profile row says in its tooltip what is behind it: «Фото, имя, контакты и о себе» (the page «Профиль», not sign-in and security)', (links['title'] or '') == 'Фото, имя, контакты и о себе', links)
     check('defaults', 'the photo is asked once at the mount (the card) and the services list once on the first open, both at the canonical address, by GET, in that order',
           seen == [{'url': HUB_URL + CARD_PATH, 'method': 'GET'}, {'url': HUB_URL + '/api/auth/service-links', 'method': 'GET'}], seen)
     pg.keyboard.press('Escape')
