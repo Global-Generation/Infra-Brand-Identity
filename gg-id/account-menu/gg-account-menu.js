@@ -52,7 +52,7 @@
   var HUB = {
     origin: 'https://id.global-generations-edu.com',
     services: '/cabinet/',                     // "Мои сервисы": the cabinet of the hub, the whole list of the person
-    profile: '/cabinet/#face',                 // "Профиль GG ID": the cabinet panel with Face ID / Touch ID (passkey) and the password
+    profile: '/cabinet/#profile',              // "Профиль GG ID": the profile page of the cabinet (#face is the security page, not the profile)
     servicesApi: '/api/auth/service-links',    // GET with the hub cookie: {services: [{key, title, url, icon}]}; CORS only for the origins of the registered clients
     wallet: '/api/auth/wallet/apple.pkpass',   // GET with the hub cookie: the signed GG ID card as an Apple Wallet pass (an attachment)
     card: '/api/auth/card',                    // GET with the hub cookie, once per person and page: the card of the person; only `photo` is read (the avatar chosen in GG ID). CORS as the services list

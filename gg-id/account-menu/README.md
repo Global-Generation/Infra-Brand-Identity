@@ -317,7 +317,7 @@ bar.notice('Здесь только просмотр: изменения не с
 | Что | Адрес по умолчанию | Опция |
 |---|---|---|
 | Мои сервисы (кабинет хаба) | `https://id.global-generations-edu.com/cabinet/` | `servicesUrl` |
-| Профиль GG ID (профиль, Face ID / Touch ID, пароль) | `https://id.global-generations-edu.com/cabinet/#face` | `profileUrl` |
+| Профиль GG ID (страница профиля кабинета) | `https://id.global-generations-edu.com/cabinet/#profile` | `profileUrl` |
 | Список сервисов человека | `GET https://id.global-generations-edu.com/api/auth/service-links` | `servicesApi` |
 | Карта человека (фото аватара) | `GET https://id.global-generations-edu.com/api/auth/card` | `photo` (картинка или `false` вместо запроса, раздел «Фото аватара») |
 | Карта GG ID для Apple Wallet | `https://id.global-generations-edu.com/api/auth/wallet/apple.pkpass` | `walletUrl` |
