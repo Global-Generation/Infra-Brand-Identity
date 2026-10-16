@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-15.3 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-16.1 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -14,7 +14,7 @@
    Look: the same classes as the kit chip and menu (.gid-chip, .gid-menu, .gid-menu-item ...), so it is the AKB menu pixel for pixel;
    gg-account-menu.css carries those blocks verbatim (generated from gg-id.css by src/build_account_menu.py).
 
-   The addresses of the hub are the kit defaults (HUB below): "Мои сервисы" = the cabinet, "Профиль GG ID" = its Face ID / Touch ID panel, the
+   The addresses of the hub are the kit defaults (HUB below): "Мои сервисы" = the cabinet, "Профиль GG ID" = its page "Профиль", the
    services list = GET /api/auth/service-links, the Apple Wallet badge = the pass of the GG ID card. A service passes only what is its own:
 
    <div id="account"></div>
@@ -44,7 +44,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-15.3';
+  var VERSION = '2026-10-16.1';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -52,7 +52,8 @@
   var HUB = {
     origin: 'https://id.global-generations-edu.com',
     services: '/cabinet/',                     // "Мои сервисы": the cabinet of the hub, the whole list of the person
-    profile: '/cabinet/#face',                 // "Профиль GG ID": the cabinet panel with Face ID / Touch ID (passkey) and the password
+    profile: '/cabinet/#profile',              // "Профиль GG ID": the cabinet page "Профиль" (photo, name, contacts, about). Before kit 2026-10-16.1 it was
+                                               // /cabinet/#face, the sign-in and security panel; the hub keeps that address alive for pinned older copies
     servicesApi: '/api/auth/service-links',    // GET with the hub cookie: {services: [{key, title, url, icon}]}; CORS only for the origins of the registered clients
     wallet: '/api/auth/wallet/apple.pkpass',   // GET with the hub cookie: the signed GG ID card as an Apple Wallet pass (an attachment)
     card: '/api/auth/card',                    // GET with the hub cookie, once per person and page: the card of the person; only `photo` is read (the avatar chosen in GG ID). CORS as the services list
@@ -118,7 +119,7 @@
     account: 'Аккаунт',
     services: 'Мои сервисы',
     profile: 'Профиль GG ID',
-    profileTitle: 'Профиль, Face ID / Touch ID (passkey) и пароль',
+    profileTitle: 'Фото, имя, контакты и о себе',
     logout: 'Выйти',
     loading: 'Загружаем сервисы…',
     failed: 'Не удалось загрузить',
