@@ -1,0 +1,12 @@
+{
+ "title": "Скаутинг",
+ "tagline": "Робот на Pixel 11 круглосуточно ищет креаторов в Instagram и TikTok по нишам Ауры и GG, борд с вочлистом и ростом за месяц.",
+ "body": "replace",
+ "body_md": "## Что это\n\nСервис Ауры для поиска будущих партнёров, конкурентов и идей роликов. Телефон Pixel 11 дома у Лёва ведётся с сервера: скаут-аккаунты ищут по темам (поступление в США, Францию, Италию, Германию, SAT, IELTS, гранты, эссе, карьера и другие продукты), заходят в профили, делают скриншот, снимают цифры и идут по «Похожим аккаунтам». Всё складывается в базу, борд показывает аккаунты от 10 тыс. до 1 млн подписчиков. Лёв решает «в вочлист / нет», по итогам месяца видно, кто вырос.\n\n## Как устроено\n\n| Часть | Где |\n|---|---|\n| Робот (сеансы как у человека, таймер) | `scout/scout.py`, `deploy/scout-session.*` |\n| Борд (вход через GG ID) | `board/app.py`, `board/static/index.html` |\n| Канал до телефона | приложение SIM Relay, релей `sim-tunnel-pixel` на EC2 |\n| Данные | SQLite `/opt/scout/scout.db`, скриншоты `/opt/scout/shots` |\n\nПодробно для агентов: [docs/OPERATIONS.md](docs/OPERATIONS.md).\n\n## Выкатка\n\n`deploy/deploy.sh [ref]`: код из git в `/opt/scout/app` на EC2, перезапуск борда и таймера.\n",
+ "badges": [
+  {"label": "Python", "message": "3.10", "color": "3776AB", "logo": "python"},
+  {"label": "Android", "message": "uiautomator2", "color": "3DDC84", "logo": "android"},
+  {"label": "SQLite", "message": "WAL", "color": "003B57", "logo": "sqlite"},
+  {"label": "AWS", "message": "EC2", "color": "FF9900", "logo": "amazonwebservices"}
+ ]
+}
