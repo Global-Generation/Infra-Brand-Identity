@@ -344,6 +344,11 @@
 .gid-fb > summary .gid-ic{width:16px;height:16px;transition:transform .16s var(--g-ease)}
 .gid-fb[open] > summary .gid-ic{transform:rotate(180deg)}
 .gid-fb > summary ~ *{margin-top:10px}
+/* Раскрытый «Резервный вход» занимает всю ширину карточки: .gid-alt это flex-ряд по центру, без этого раскрытый блок сжимался бы по содержимому и форма вставала уже кнопки «Войти через GG ID» (Лёв 17.10: ровная геометрия правой части входа). */
+.gid-alt > .gid-fb[open]{flex:1 1 100%}
+/* Строка состояния «Старый вход закрыт. Войдите через GG ID.» (.gid-msg--info): стоит НА МЕСТЕ «Резервного входа», то есть ПОД кнопкой «Войти через GG ID», в том же ряду
+   <div class="gid-alt"><div class="gid-msg gid-msg--info">...</div></div>, на всю ширину карточки. Над кнопкой её не ставим: кнопка у всех сервисов на одной высоте. */
+.gid-alt > .gid-msg{flex:1 1 100%}
 
 /* ---------- поля ---------- */
 .gid-field{display:flex;flex-direction:column;gap:8px;min-width:0}

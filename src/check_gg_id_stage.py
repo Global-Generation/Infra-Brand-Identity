@@ -164,6 +164,8 @@ def static(problems, counts):
     readme = open(os.path.join(KIT, 'README.md'), encoding='utf-8').read()
     ok('gg-id/README.md names the file and its sha256 in «Сцена экрана входа»', '## Сцена экрана входа' in readme and STAGE_SHA256 in readme)
     kit_css = open(os.path.join(KIT, 'gg-id.css'), encoding='utf-8').read()
+    ok('gg-id.css: the opened «Резервный вход» and the closed-login line take the full width of the card (.gid-alt row)',
+       '.gid-alt > .gid-fb[open]{flex:1 1 100%}' in kit_css and '.gid-alt > .gid-msg{flex:1 1 100%}' in kit_css)
     ok('gg-id.css does not know the scene: the pinned copies of the kit in the services stay as they are', 'gidStageFade' not in kit_css and 'scrollbar-gutter' not in kit_css)
     # the numbers of the contract follow the formulas (a typo in a constant would pass the browser part on one machine and fail on another)
     for (w, h), c in CONTRACT.items():
