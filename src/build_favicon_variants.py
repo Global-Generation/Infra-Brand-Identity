@@ -699,7 +699,7 @@ SITES = [
     ("portal", "Студенческий портал + демо США", "students.*, demo.*", "client", "GG-Product-Mentorship-Portal", "ok: выкачен 08.10"),
     ("apply", "Анкета", "apply.*", "client", "GG-LeadGen-Consultation-Prep", "ok в админке, проверить публичную страницу"),
     ("deck", "Презентация клиенту", "apply.*/d/", "client", "GG-LeadGen-Consultation-Prep", "ok: выкачен 08.10"),
-    ("notetaker", "Notetaker (запись к ментору)", "notetaker.global-generations.com", "client", "GG-Product-Notetaker", "фавикон сайта без своего фона"),
+    ("notetaker", "Слоты (Availability)", "slots.global-generations.com", "client", "Infra-Availability", "фавикон сайта без своего фона"),
     ("careers", "Вакансии", "careers.*", "client", "GG-Ops-HR", "нет фавикона (битая ссылка)"),
     ("covers", "Конкурс обложек", "covers.*", "client", "найти (CloudFront)", "нет фавикона"),
     ("merch", "Мерч", "merch.*", "client", "Web-Merch-Store", "фавикон сайта без своего фона"),
@@ -742,7 +742,7 @@ def all_cards(v):
               ("root", "Страницы входа", "фавикон сайта как есть, без иконок над заголовком")]
     out = []
     pinned = ["root", "akb", "legal"]
-    tabs = [("site", "Global Generation"), ("notetaker", "Запись к ментору"), ("production", "Продакшн"),
+    tabs = [("site", "Global Generation"), ("notetaker", "Слоты"), ("production", "Продакшн"),
             ("studio", "Фабрика роликов"), ("youtube", "YouTube-трекер"), ("careers", "Вакансии"), ("paid", "Paid")]
     out.append(f'<div class="card"><h3>Во вкладках Chrome <span>новые сайты вперемешку с уже выкаченными, 16 px</span></h3>'
                f'{chrome(v, False, pinned, tabs)}{chrome(v, True, pinned, tabs)}</div>')

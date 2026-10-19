@@ -86,9 +86,9 @@
  },
  {
   "key": "notetaker",
-  "name": "Notetaker (запись к ментору)",
-  "host": "notetaker.global-generations.com",
-  "repo": "GG-Product-Notetaker",
+  "name": "Слоты (Availability)",
+  "host": "slots.global-generations.com",
+  "repo": "Infra-Availability",
   "family": "client",
   "favicon": "assets/favicons/notetaker.svg",
   "png": {
