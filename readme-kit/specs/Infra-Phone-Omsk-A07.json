@@ -1,9 +1,0 @@
-{
- "title": "Телефон Омск · A07",
- "tagline": "Паспорт телефона фермы: Samsung A07 с российской SIM в Омске (Госуслуги, банки РФ).",
- "badges": [
-  {"label": "Android", "message": "Samsung A07", "color": "3DDC84", "logo": "android"},
-  {"label": "Ферма", "message": "Infra-Phone-Farm", "color": "13445d", "href": "https://github.com/Global-Generation/Infra-Phone-Farm"}
- ],
- "body": "keep"
-}
