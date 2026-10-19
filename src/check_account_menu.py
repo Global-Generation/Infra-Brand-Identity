@@ -181,7 +181,7 @@ PNG = make_png()
 # the services of GG ID with the titles and icons of the cabinet «Мои сервисы» (the hub: cabinet/catalog.js), in the four groups of 15.10.2026
 SERVICE_BASE = [
     ('akb', 'АКБ', 'briefcase'), ('mentor-cabinet', 'Кабинет ментора', 'graduation-cap'), ('mentor-report', 'Квартальный отчёт', 'clipboard-list'),
-    ('consultation-intake', 'Консультации', 'messages-square'), ('gg-notetaker', 'Notetaker', 'mic'), ('merch-store', 'Мерч', 'shopping-bag'),
+    ('consultation-intake', 'Консультации', 'messages-square'), ('gg-notetaker', 'Слоты (Availability)', 'mic'), ('merch-store', 'Мерч', 'shopping-bag'),
     ('hr', 'Найм', 'user-plus'), ('onboarding-hub', 'Онбординг', 'map'),
     ('production', 'Production', 'clapperboard'), ('video-factory', 'Видеофабрика', 'film'), ('ai-teleprompter', 'Телесуфлёр', 'scroll-text'), ('yt', 'YouTube-трекер', 'youtube'),
 ]
