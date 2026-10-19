@@ -1,0 +1,11 @@
+{
+ "title": "Ферма телефонов",
+ "tagline": "Телефоны как серверы: пульт на EC2, приложение SIM Relay, группа «Телефоны» в Telegram и панель.",
+ "badges": [
+  {"label": "Kotlin", "message": "Android", "color": "7F52FF", "logo": "kotlin"},
+  {"label": "Python", "message": "3", "color": "3776AB", "logo": "python"},
+  {"label": "AWS", "message": "EC2", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "id.global-generations-edu.com", "color": "13445d", "href": "https://id.global-generations-edu.com/phones/"}
+ ],
+ "body": "keep"
+}
