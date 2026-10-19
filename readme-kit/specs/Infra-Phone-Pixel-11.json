@@ -1,0 +1,9 @@
+{
+ "title": "Телефон Pixel 11",
+ "tagline": "Паспорт телефона фермы: Google Pixel 11 дома в NY, робот скаутинга Ауры.",
+ "badges": [
+  {"label": "Android", "message": "Pixel 11", "color": "3DDC84", "logo": "android"},
+  {"label": "Ферма", "message": "Infra-Phone-Farm", "color": "13445d", "href": "https://github.com/Global-Generation/Infra-Phone-Farm"}
+ ],
+ "body": "keep"
+}
