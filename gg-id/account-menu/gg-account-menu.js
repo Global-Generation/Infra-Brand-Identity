@@ -1,4 +1,4 @@
-/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-16.1 (gg-id/VERSION).
+/* GG account menu: the account chip and its dropdown, the same in every Global Generation staff service. Kit version 2026-10-20.1 (gg-id/VERSION).
    Source of truth: Global-Generation/Infra-Brand-Identity, gg-id/account-menu/ (options, rules, snippets: gg-id/account-menu/README.md).
    The copy in a service is not edited by hand: a change of the look or behaviour is a PR to the kit and a new copy.
 
@@ -44,7 +44,7 @@
 (function (win) {
   'use strict';
   var doc = win.document;
-  var VERSION = '2026-10-16.1';
+  var VERSION = '2026-10-20.1';
   var NS = 'http://www.w3.org/2000/svg';
 
   /* ---------- the GG ID hub: the canonical addresses, the kit defaults. hubOrigin moves all of them to another origin (staging, a moved hub),
@@ -52,7 +52,7 @@
   var HUB = {
     origin: 'https://id.global-generations-edu.com',
     services: '/cabinet/',                     // "Мои сервисы": the cabinet of the hub, the whole list of the person
-    profile: '/cabinet/#profile',              // "Профиль GG ID": the cabinet page "Профиль" (photo, name, contacts, about). Before kit 2026-10-16.1 it was
+    profile: '/cabinet/#profile',              // "Профиль GG ID": the cabinet page "Профиль" (photo, name, contacts, about). Before kit 2026-10-20.1 it was
                                                // /cabinet/#face, the sign-in and security panel; the hub keeps that address alive for pinned older copies
     servicesApi: '/api/auth/service-links',    // GET with the hub cookie: {services: [{key, title, url, icon}]}; CORS only for the origins of the registered clients
     wallet: '/api/auth/wallet/apple.pkpass',   // GET with the hub cookie: the signed GG ID card as an Apple Wallet pass (an attachment)
@@ -106,6 +106,8 @@
     'scroll-text': [['path', 'M15 12h-5'], ['path', 'M15 8h-5'], ['path', 'M19 17V5a2 2 0 0 0-2-2H4'], ['path', 'M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3']],
     'youtube': [['path', 'M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17'], ['path', 'm10 15 5-3-5-3z']],
     'user-plus': [['path', 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'], ['circle', 9, 7, 4], ['line', 19, 8, 19, 14], ['line', 22, 11, 16, 11]],
+    'smartphone': [['rect', 5, 2, 14, 20, 2], ['path', 'M12 18h.01']],   /* Ферма телефонов (вид карточки «Мобильная ферма», 20.10) */
+    'search': [['path', 'm21 21-4.34-4.34'], ['circle', 11, 11, 8]],         /* Скаутинг */
     'map': [['path', 'M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z'], ['path', 'M15 5.764v15'], ['path', 'M9 3.236v15']],
     /* the icons of the four groups of "Мои сервисы": the same four the sections of the board carry (Product, Маркетинг, YouTube, Infrastructure) */
     'box': [['path', 'M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z'], ['path', 'm3.3 7 8.7 5 8.7-5'], ['path', 'M12 22V12']],
