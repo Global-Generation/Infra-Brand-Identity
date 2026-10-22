@@ -1,0 +1,12 @@
+{
+ "title": "Карта квиза",
+ "tagline": "Квиз Sales Engine целиком: вопросы, что на что влияет (продукт, температура, кто берёт лид), прохождение в каждом боте и все карточки.",
+ "body": "replace",
+ "body_md": "Страница для команды: как устроен квиз ботов Sales Engine (Global Generation, Saxon Portal, «я к вам пишу.», SportWay USA). Всё на ней собрано из кода квиза в Infra-Core, руками ничего не переписывается.\n\n## Режимы\n\n| Режим | Что внутри |\n|---|---|\n| Играть | Квиз как в Telegram с настоящими карточками выбранного бота. Справа прогноз «если закончить сейчас»: продукт, температура, кто берёт лид и по какому правилу. «Случайный ученик» проходит квиз сам |\n| Схема | Вопросы по 4 этапам, кому каждый показываем, и на что влияет каждый ответ. Внизу правила по порядку: куда уходит лид, температура, кто берёт лид |\n| Карточки | Все 13 карточек выбранного бота |\n\nСверху переключатели: бот и подсказки под ответами (куда уведёт этот ответ).\n\n## Откуда данные\n\n- Вопросы, условия показа, каталог продуктов, лестница температур и маршруты: `services/sales-engine` в [Infra-Core](https://github.com/Global-Generation/Infra-Core) (`quizgraph.load`, `quizgraph.products`, `scoring.yaml`).\n- Названия вопросов и этапов, карточки: тот же код карточек (`static/cards/cards.js`, `presentation/cards.py`), отрисовка в Chromium.\n- Описания ботов («Что умеет этот бот?»): [`bots.json`](bots.json).\n\n## Пересобрать после правок квиза\n\n```bash\npython build.py --infra-core ../Infra-Core      # граф E, все карточки (нужны playwright и Pillow)\npython build.py --no-cards                      # только вопросы и правила\n```\n\nГотовый сайт лежит в `site/` и коммитится вместе с правкой.\n\n## Деплой\n\n- Прод: [quiz-map.aura-ecosystem.com](https://quiz-map.aura-ecosystem.com), статика на EC2 за PIN Ауры.\n- Выкатка из смерженного main: `deploy/deploy.sh` (rsync `site/`, nginx-конфиг [`deploy/nginx-quiz-map.conf`](deploy/nginx-quiz-map.conf) ставится один раз).\n",
+ "badges": [
+  {"label": "Python", "message": "3.11", "color": "3776AB", "logo": "python"},
+  {"label": "Playwright", "message": "Chromium", "color": "2EAD33", "logo": "playwright"},
+  {"label": "AWS", "message": "EC2 nginx", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "quiz-map.aura-ecosystem.com", "color": "13445d", "href": "https://quiz-map.aura-ecosystem.com"}
+ ]
+}
