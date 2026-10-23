@@ -1,0 +1,11 @@
+{
+ "title": "Duolingo English Test",
+ "tagline": "Платформа подготовки к Duolingo English Test на движке Aura.",
+ "badges": [
+  {"label": "Next.js", "message": "App", "color": "000000", "logo": "nextdotjs"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "product.aura-ecosystem.com", "color": "13445d", "href": "https://product.aura-ecosystem.com"}
+ ],
+ "body": "replace",
+ "body_md": "## Что это\n\nПродукт Aura для подготовки к Duolingo English Test. Прод: https://product.aura-ecosystem.com (вход Ауры).\n\n## Статус\n\nКод переезжает сюда из личного репо разработчика. Пока его нет, здесь только этот README.\n"
+}
