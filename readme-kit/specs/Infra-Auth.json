@@ -1,0 +1,38 @@
+{
+ "title": "Единый вход GG",
+ "tagline": "Единый вход сотрудников Global Generation: хаб levauth и все сервисы GG, роли и должности, Face ID, бэкап и восстановление базы входа.",
+ "body": "replace",
+ "body_md": "Единый вход сотрудников Global Generation (Global Generation ID): вход в хаб `levauth` и во все сервисы GG с ролями и должностями, Face ID, команды оператора, бэкап и восстановление базы входа. Работает как AWS Lambda `gg-portal-auth` (Python 3.13) над PostgreSQL на Neon. Перенесён из Infra-AWS вместе с историей коммитов, подробности в [документе о переносе](docs/migration-from-infra-aws.md).\n\n## Что внутри\n\n| Часть | Что делает | Где |\n|---|---|---|\n| Вход в хаб | пароль, Face ID / Touch ID, вход через Aura, сессии, блокировки, сброс пароля письмом | `handler.py`, `passkeys.py`, `gg_auth/auth.py`, `gg_auth/web.py` |\n| Единый вход для сервисов | `authorize`, `exchange`, `verify`, `revoke`; роль и должности человека в каждом сервисе (`entitlements`) | `gg_auth/clients.py`, [контракт](docs/gg-auth-api.md) |\n| Уровни доступа хаба | решение ворот nginx по странице: admin, team, services | `gg_auth/levels.py` |\n| Люди, роли, должности | админ-API, каталог сервисов, команды оператора | `gg_auth/user_admin.py`, `gg_auth/operator.py`, `scripts/operator.py`, [команды](docs/operator.md) |\n| Бэкап и восстановление | ежедневная копия базы в S3, часовая проверка здоровья, ежемесячная проверка восстановления, 16 алармов | `gg_auth/backup.py`, `gg_auth/watch.py`, `scripts/restore_backup.py`, `ops/`, [бэкапы](docs/enterprise-backups.md) |\n| Карта доступов | сборщик на EC2 раз в час собирает, кто в каком сервисе с какой ролью | `collectors/access-map/` |\n| Наследие хаба | общий стейт борда и GitHub-прокси хаба (работают как раньше) | `handler.py` |\n\n## Как устроено\n\n```\nБраузер, сервис GG -> nginx на EC2 (хаб levauth) -> API Gateway -> Lambda gg-portal-auth -> Neon PostgreSQL\n                                                                         |-> Secrets Manager (DSN, секрет хаба)\n                                                                         `-> S3 gg-portal-state (passkey, борд, бэкапы, карта доступов)\n```\n\nСтраницы хаба и ворота nginx живут в репо Infra-Services-Portal, мобильный хаб в Infra-Mobile-Hub, платформа входа Aura в Infra-Core. Здесь только сам вход и его защиты. Схема целиком: [architecture.md](docs/architecture.md).\n\n## Тесты и CI\n\nНабор идёт на настоящем PostgreSQL (временный кластер) и эмуляторе AWS (moto), без обращений к проду. Тот же запуск гоняет CI на каждый pull request ([`tests.yml`](.github/workflows/tests.yml)).\n\n```bash\nPOSTGRES_BIN=/opt/homebrew/opt/postgresql@17/bin AUTH_REQUIRE_DB=1 \\\n  uv run --python 3.13 --with pytest --with webauthn==3.0.1 --with boto3 \\\n  --with \"psycopg[binary]==3.3.6\" --with argon2-cffi==25.1.0 --with \"moto[server]>=5\" pytest tests -q\npython3 -m unittest discover -s collectors/access-map/tests\n```\n\n## Выкатка\n\n- Код Lambda: Actions > Deploy portal-auth > Run workflow из `main` ([`deploy-portal-auth.yml`](.github/workflows/deploy-portal-auth.yml)): тесты, сборка, снимок текущего кода, обновление, проверка схемы и входа по HTTP, откат при провале.\n- Конфигурация, IAM, API Gateway и секреты: `bash deploy.sh` из чистого клона `main`.\n- Порядок строгий: сначала миграции (`scripts/migrate.py`), потом код. Слияние в `main` само ничего не выкатывает.\n- Ежемесячная проверка восстановления бэкапа: [`auth-restore-drill.yml`](.github/workflows/auth-restore-drill.yml).\n\n## Документация\n\nИндекс по задачам: [docs/README.md](docs/README.md). Основное: [runbook](docs/runbook.md), [контракт единого входа](docs/gg-auth-api.md), [увольнение сотрудника](docs/offboarding.md), [защита main (предложение)](docs/branch-protection-proposal.md).\n",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.13",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "AWS",
+   "message": "Lambda",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon 17",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "GitHub Actions",
+   "message": "tests",
+   "color": "2088FF",
+   "logo": "githubactions"
+  },
+  {
+   "label": "Prod",
+   "message": "levauth.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://levauth.global-generations-edu.com"
+  }
+ ]
+}
