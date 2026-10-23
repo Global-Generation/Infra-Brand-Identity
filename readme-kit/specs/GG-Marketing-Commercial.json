@@ -1,0 +1,26 @@
+{
+ "title": "Коммерческие страницы",
+ "tagline": "Коммерческие лонгриды global-generations.com строго по ТЗ агентства: нормы C1-C18 и машинные ТЗ страниц.",
+ "body": "replace",
+ "body_md": "Репо коммерческих страниц сайта Global Generation (дерево `/services/usa/*`, Италия по ТЗ, коммерческие страницы стран). Задача направления: рост. Часть сервиса «SEO»: хаб [GG-Marketing-SEO](https://github.com/Global-Generation/GG-Marketing-SEO) держит библию, общие проверки и гейт, здесь нормы и содержание коммерческих.\n\n## Что внутри\n\n| Папка | Что |\n|---|---|\n| [`norms/`](norms/RULES.md) | Нормы коммерческих: правила и чек-лист C1-C18 |\n| [`norms/specs/`](norms/specs/README.md) | Машинные ТЗ 14 страниц (объём, H2, ключи), собирает `parse_tz.py` из ТЗ агентства |\n| [`CLAUDE.md`](CLAUDE.md) | Правила работы агентов и очередь |\n\nСтраницы переезжают сюда из Web-Main-Site на этапе 3в плана пересборки SEO.\n",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "static export",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Сайт",
+   "message": "global-generations.com",
+   "color": "13445d",
+   "href": "https://global-generations.com"
+  },
+  {
+   "label": "Хаб",
+   "message": "GG-Marketing-SEO",
+   "color": "009CDC",
+   "href": "https://github.com/Global-Generation/GG-Marketing-SEO"
+  }
+ ]
+}
