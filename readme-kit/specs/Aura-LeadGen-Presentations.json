@@ -1,0 +1,37 @@
+{
+ "title": "Aura Presentations",
+ "tagline": "Презентации продаж Ауры: персональные деки по ответам квиза для 4 партнёров, варианты слайдов на выбор, дев и прод за входом Ауры.",
+ "body": "replace",
+ "body_md": "Слайд-деки для продаж партнёрских продуктов Ауры. Лид проходит квиз, по его ответам собирается персональная дека: профиль, план, вузы, гранты, сроки, тариф. Здесь деки правят, адаптируют под экраны, проверяют на деве и выкатывают.\n\n## Что собирается\n\n| Что | Сколько | Где |\n|---|---|---|\n| Партнёры (продукт) | GG, Saxon, Essay, SportWay | `decks/<партнёр>.py`, факты в `briefs/` |\n| Дизайны | 4, лид видит дизайн того партнёра, к которому пришёл | `assets/themes/` |\n| Деки | 160: 4 продукта x 4 дизайна x персоны (роль, температура) | `out/<дизайн>/<дека>/index.html` |\n| Варианты слайдов | страница выбора A/B/C на двух персонах | `out/_variants/index.html` |\n\nКонтракт пакета (`lead.json`, `manifest.json`, подстановка лида): [`SCHEMA.md`](SCHEMA.md).\n\n## Адреса\n\n- Прод: [preza.aura-ecosystem.com](https://preza.aura-ecosystem.com), только из `main`.\n- Дев: [preza-dev.aura-ecosystem.com](https://preza-dev.aura-ecosystem.com), последний PR.\n- Оба за входом Ауры (auth.aura-ecosystem.com) через гейт `gate/gate.py`, снаружи без входа не открываются. Пока у Ауры нет клиента preza, временный PIN.\n\n## Работа\n\n```bash\nmake serve   # сборка + http://127.0.0.1:8765\nmake qa      # переполнение, скролл, битые картинки\nmake audit   # адаптив: 6 дек x 7 экранов\n```\n\nПравка = PR. CI собирает пакет, сразу выкатывает его на дев и параллельно гоняет `tools/qa.py` и `tools/audit_rwd.py`. Мерж в `main` выкатывает прод (Actions > Deploy, `deploy/deploy.sh`): каждая выкатка в своей папке релиза на EC2, переключение симлинком, 5 последних релизов для отката.\n\n## Устройство\n\n- `build.py` собирает всё: профиль лида (`deck/profile.py`), деку партнёра (`decks/`), перекрёстную деку (`deck/compose.py`), шаблон `templates/deck.html.j2`.\n- Движок слайдов: `assets/deck/stage.css` + `stage.js` (листание, точки прогресса, модалки, подгон по высоте экрана).\n- Хостинг: nginx на EC2, конфиг [`deploy/nginx-preza.conf`](deploy/nginx-preza.conf).\n- Оболочка (каталог, варианты, вход) в каноне Ауры: `assets/aura/` (токены и шрифты из Aura-Marketing-Ecosystem).\n- Правила для агентов: [`CLAUDE.md`](CLAUDE.md).\n",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.11 + Jinja2",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "QA",
+   "message": "Playwright",
+   "color": "2EAD33",
+   "logo": "playwright"
+  },
+  {
+   "label": "Host",
+   "message": "EC2 nginx",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Вход",
+   "message": "Aura",
+   "color": "1c1f27"
+  },
+  {
+   "label": "Prod",
+   "message": "preza.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://preza.aura-ecosystem.com"
+  }
+ ]
+}
