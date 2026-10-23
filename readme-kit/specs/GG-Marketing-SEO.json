@@ -1,0 +1,31 @@
+{
+ "title": "SEO",
+ "tagline": "SEO-сервис Global Generation: аналитика поиска по сайтам GG и карта сайта с балансом страниц, вход через GG ID.",
+ "body": "replace",
+ "body_md": "Один сервис для всего SEO сайта Global Generation. Открывается по адресу [analytics.global-generations-edu.com](https://analytics.global-generations-edu.com), вход через GG ID (команда, право `staff.internal`).\n\n## Что внутри\n\n| Раздел | Что показывает | Путь | Где исходник |\n|---|---|---|---|\n| SEO-аналитика | Визиты из поиска, заявки, запросы и страницы по Яндекс Метрике и Google Search Console: сайт GG, Италия, Saxon, SAT | `/` | `dashboard/gen_dashboard.py` (этот репо) |\n| Карта сайта | Баланс страниц по странам и темам, отложка блога, качество страниц, дерево сайта | `/site-map/` | Web-Main-Site, `site/root/site-map.html` |\n\n## Как устроено\n\n- EC2 18.211.149.64, nginx (снимок конфига в [`nginx/`](nginx)), файлы в `/var/www/gg-seo-dashboard`.\n- Крон ubuntu каждые 6 часов собирает страницу аналитики; [`dashboard/check_dash.py`](dashboard/check_dash.py) не даёт выложить пустую выгрузку.\n- Секреты (Метрика, GSC) только в `.env` на сервере.\n\n## Выкладка\n\n```bash\nbash scripts/deploy.sh --check   # собрать и проверить, прод не трогать\nbash scripts/deploy.sh           # из смерженного main\n```\n\nКарта сайта выкладывается из Web-Main-Site: `bash source/scripts/lib/publish-site-map.sh site/root/site-map.html`.\n",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "nginx",
+   "message": "EC2",
+   "color": "009639",
+   "logo": "nginx"
+  },
+  {
+   "label": "Вход",
+   "message": "GG ID",
+   "color": "009CDC"
+  },
+  {
+   "label": "Prod",
+   "message": "analytics.global-generations-edu.com",
+   "color": "13445d",
+   "href": "https://analytics.global-generations-edu.com"
+  }
+ ]
+}
