@@ -1,0 +1,11 @@
+{
+ "title": "TOEFL Portal",
+ "tagline": "Подготовка к TOEFL iBT 2026 на движке Aura: 12 заданий, пробники с баллом 1-6, AI-разбор письма и речи.",
+ "badges": [
+  {"label": "Next.js", "message": "15", "color": "000000", "logo": "nextdotjs"},
+  {"label": "PostgreSQL", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "toefl.aura-ecosystem.com", "color": "13445d", "href": "https://toefl.aura-ecosystem.com"}
+ ],
+ "body": "keep"
+}
