@@ -1,0 +1,31 @@
+{
+ "title": "GMAT Portal",
+ "tagline": "GMAT Portal (Aura): подготовка к GMAT Focus на русском, теория, банк вопросов, AI-ментор и пробники в формате экзамена.",
+ "body": "replace",
+ "body_md": "Продукт Aura: подготовка к GMAT Focus на русском. Портал по образцу SAT Portal (product.satportalprep.com) один в один, собран на эталоне [Aura-Product-Starter](https://github.com/Global-Generation/Aura-Product-Starter): оплаты, доступ, уроки, админка из эталона, экзаменный модуль свой.\n\n## Статус\n\nДемо-стадия: все страницы согласованного макета работают на моках, контент (уроки, видео, банк вопросов) наполняется следующим этапом. Домен `mbaportalprep.com` не куплен, демо живёт только на поддомене стенда, не на боевом домене.\n\n## Страницы\n\n| Зона | Что внутри | Пути |\n|---|---|---|\n| Сайт | Лендинг, блог, экспертный совет, обновления, документы | `/`, `/blog`, `/experts`, `/updates`, `/dokumenty` |\n| Вход | Вход по почте и паролю (свой вход Aura) | `/login` |\n| Старт | Онбординг, диагностика и её результат | `/onboarding`, `/assessment` |\n| Кабинет | Главная, теория, видео, режимы тренировок, журнал ошибок, AI-ментор | `/main`, `/learn`, `/video`, `/practice`, `/errors`, `/mentor` |\n| Экзамен | Пробник в формате экзамена и разбор результата | `/mock`, `/mock/run`, `/mock/results` |\n| Прогресс | Прогресс, план, вузы, сообщество, лига | `/progress`, `/plan`, `/schools`, `/community`, `/league` |\n| Деньги | Тарифы, оплата, истёкший доступ | `/pricing`, `/buy`, `/payment/success`, `/expired` |\n\n## Экзаменный модуль\n\n`src/modules/exam/`: конфиг формата (`config.ts`), банк вопросов (`bank.ts`), движок пробника и шкалы (`engine.ts`), экраны и компоненты (`ui/`). Цвета только токенами из `src/app/theme.partner.css`, все стили под `.xp`.\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev\n```\n\nГейт перед показом и деплоем: `bash scripts/stamp-dry-run.sh` (28 проверок, должен быть зелёным). Переменные окружения по `.env.example`, `.env` не коммитится.\n\n## Документация\n\n- [`docs/RESEARCH.md`](docs/RESEARCH.md) - досье: формат экзамена, конкуренты, открытые вопросы\n- [`docs/ORDER-PREFIXES.md`](docs/ORDER-PREFIXES.md) - реестр префиксов заказов\n",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "15",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Drizzle",
+   "message": "ORM",
+   "color": "C5F74F",
+   "logo": "drizzle"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Статус",
+   "message": "демо",
+   "color": "13445d"
+  }
+ ]
+}
