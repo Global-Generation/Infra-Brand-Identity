@@ -1,0 +1,32 @@
+{
+ "title": "PD Gateway",
+ "tagline": "Шлюз ПДн: первая запись персональных данных граждан РФ в базу на территории РФ (152-ФЗ), для ООО «ГЛОБАЛ ДЖЕНЕРЕЙШН» и ООО «АУРА».",
+ "body": "replace",
+ "body_md": "Шлюз персональных данных. Любая запись ПДн граждан РФ из систем ООО «ГЛОБАЛ ДЖЕНЕРЕЙШН» (оператор `gg`) и ООО «АУРА» (оператор `aura`) сначала попадает сюда, в базу на территории РФ (Yandex Cloud, Москва), и только после ответа 201 система пишет у себя. Основание: ч.5 ст.18 152-ФЗ.\n\n## Как это работает\n\n- **Серверные системы:** `POST /v1/records` с ключом источника (`X-PD-Key`). Каждая запись - новая версия (append-only), поле `data` шифруется AES-GCM на уровне приложения, файлы лежат в Object Storage РФ.\n- **Браузерные формы:** `POST /v1/public/{operator}/{route}` без ключа. Шлюз сохраняет тело, затем проксирует запрос на upstream из конфигурации и возвращает его ответ как есть. CORS по allowlist, лимит 20 запросов в минуту с IP.\n- **Удаление:** `POST /v1/records/erase` (право на удаление по 152-ФЗ).\n- **Fail-closed:** шлюз не ответил 201 - система не пишет у себя, операция падает с ошибкой.\n\nПолный контракт: [`docs/API.md`](docs/API.md).\n\n## Что внутри\n\n| Путь | Назначение |\n|---|---|\n| `gateway/` | Сервис (FastAPI, asyncpg), SQL-миграции применяются при старте |\n| `gateway/keys.py` | CLI ключей источников: `python -m gateway.keys create --operator gg --source ggid-profile` |\n| `clients/python/pd_client.py` | Клиентская обёртка `pd_record` для Python-репо |\n| `clients/node/pdClient.ts` | Клиентская обёртка `pdRecord` для Node-репо (рядом готовый `.js`) |\n| `deploy/` | Развёртывание в Yandex Cloud: `yc-bootstrap.sh`, `deploy.sh`, [`deploy/README.md`](deploy/README.md) |\n| `scripts/e2e.py` | Сквозная проверка: сервис, Postgres, мок upstream |\n| `tests/` | pytest: схема, ключи, версии, erase, fail БД, прокси, CORS, лимит, шифрование |\n\n## Подключение системы\n\n1. Выпустить ключ источника: `python -m gateway.keys create --operator <gg|aura> --source <kebab-case>`.\n2. Скопировать клиентскую обёртку в репо, задать `PD_GATEWAY_URL` и `PD_GATEWAY_KEY` (пустой URL = выключено).\n3. Вызывать `pd_record(...)` ДО записи в свою БД, S3 или CRM, в том же обработчике.\n\n## Локальный запуск и тесты\n\n```bash\ndocker run -d --name pdgw-pg -e POSTGRES_PASSWORD=pdgw -e POSTGRES_DB=pdgw -p 54329:5432 postgres:16\nuv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -r requirements-dev.txt\n.venv/bin/python -m pytest\n.venv/bin/python scripts/e2e.py\n```\n\nПеременные окружения: [`.env.example`](.env.example). Секреты в репо не коммитятся, на проде лежат в Lockbox.\n",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.12",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "FastAPI",
+   "message": "0.115",
+   "color": "009688",
+   "logo": "fastapi"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "16",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Yandex Cloud",
+   "message": "Москва",
+   "color": "FC3F1D",
+   "logo": "yandexcloud"
+  }
+ ]
+}
