@@ -178,7 +178,7 @@ export function AccountMenu({ onSelect, ...options }: Options & { onSelect?: (id
 | Поле | Что |
 |---|---|
 | `label` | текст (только текст, разметка не работает) |
-| `icon` | имя иконки lucide из набора кита: `GGAccountMenu.icons` (user, pencil, settings, eye, clock, key-round, scan-face, shield-check, circle-help, book-open, bell, mail, file-text, calendar, languages, users, graduation-cap, activity, message-square, video, scale, megaphone, globe, server, layout-grid, external-link, wallet, check, а для сервисов кабинета ещё briefcase, id-card, clipboard-list, messages-square, mic, shopping-bag, clapperboard, film, scroll-text, youtube, user-plus, map, а для заголовков групп box, trending-up, play ...). Нет в наборе: добавить в кит PR-ом или передать `iconPaths: ['M...']` (путь `d` на сетке 24 x 24) |
+| `icon` | имя иконки lucide из набора кита: `GGAccountMenu.icons` (user, pencil, settings, eye, clock, key-round, scan-face, shield-check, circle-help, book-open, bell, mail, file-text, calendar, languages, users, graduation-cap, activity, message-square, video, scale, megaphone, globe, server, layout-grid, external-link, wallet, check, а для сервисов кабинета ещё briefcase, id-card, clipboard-list, messages-square, mic, shopping-bag, clapperboard, film, scroll-text, youtube, user-plus, map, compass, monitor, а для заголовков групп box, trending-up, play ...). Нет в наборе: добавить в кит PR-ом или передать `iconPaths: ['M...']` (путь `d` на сетке 24 x 24) |
 | `href`, `target` | ссылка (https, адрес своей страницы, http только localhost); другие схемы отбрасываются, пункт становится кнопкой |
 | `onClick` | `onClick(event, handle)`; после клика меню закрывается |
 | `id` | идентификатор для события `gam:select` |
