@@ -1,0 +1,10 @@
+{
+ "title": "EJU Portal",
+ "tagline": "Платформа подготовки к EJU (日本留学試験) на движке Aura.",
+ "badges": [
+  {"label": "Next.js", "message": "App", "color": "000000", "logo": "nextdotjs"},
+  {"label": "PostgreSQL", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"}
+ ],
+ "body": "keep"
+}
