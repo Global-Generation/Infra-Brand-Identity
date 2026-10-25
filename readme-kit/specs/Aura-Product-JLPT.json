@@ -1,0 +1,11 @@
+{
+ "title": "JLPT Portal",
+ "tagline": "Платформа подготовки к JLPT N5/N4 на движке Aura.",
+ "badges": [
+  {"label": "Next.js", "message": "App", "color": "000000", "logo": "nextdotjs"},
+  {"label": "PostgreSQL", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"}
+ ],
+ "body": "replace",
+ "body_md": "## Что это\n\nПродукт Aura для подготовки к японскому экзамену JLPT, старт с уровней N5 и N4: теория, банк заданий по секциям, кандзи и лексика, аудирование, пробники с баллом 0-180. Разработчик Захар (Dek0rta). Собран из эталона Aura-Product-Starter.\n\n## Статус\n\nВ разработке, прода нет. Код переехал из личного репо разработчика `Dek0rta/Product-JLPT` 25.10.2026.\n\n## Где что\n\n- Параметры продукта (имя, цена, срок доступа, модель оплаты): `src/modules/core/setup/product.ts`.\n- Досье рынка и конкурентов: `docs/RESEARCH.md`, полная версия `docs/RESEARCH-full.md`.\n- Префикс заказов `jlpt-`: `docs/ORDER-PREFIXES.md`.\n- Секреты и переменные: `.env.example`, `docs/SECRETS.md`.\n"
+}
