@@ -1,0 +1,38 @@
+{
+ "title": "AmerikaStep",
+ "tagline": "AmerikaStep (Aura): грин-карта США для людей из СНГ по шагам, подбор пути, мастер регистрации DV-2027 с проверкой фото, документы под страну, интервью.",
+ "body": "replace",
+ "body_md": "## Что это\n\nПродукт Aura: отдельный бренд AmerikaStep (не Global Generation), продаёт\nООО «АУРА». Своя БД, свой вход и своя админка; инфраструктура общая\n(App Runner, Neon, касса). Форк эталона\n`Aura-Product-Starter` (`.gg-modules.json`, `stackVersion`), сверка с эталоном\n`scripts/etalon-sync.sh`, гейт `scripts/stamp-dry-run.sh`.\n\nЮр. рамка: сервис даёт информацию, чек-листы и инструменты. Не юридическая\nконсультация, заявления человек подаёт сам на официальных сайтах. Тексты\nпишем через «признаки» и «ориентир», никогда «ты подходишь». Ресёрч и\nисточники: [docs/RESEARCH.md](docs/RESEARCH.md).\n\n## Статус\n\nНа проде с 24.10.2026: сайт `amerikastep.com` (лендинг, квиз, гайд DV-2027, стоимость, документы; открыт для индекса) и кабинет `product.amerikastep.com` (вход, мастер DV, документы по 12 странам, DS-260, интервью, оплата, админка; noindex). Работает путь DV: тарифы DV Старт и DV Победитель; NIW/EB-1A и брак в листе ожидания, NIW + юрист скрыт до партнёра-адвоката США. Юр-документы ООО «АУРА» (`/oferta`, `/privacy`, `/terms`, `/dokumenty`). Касса и письмо с доступом после оплаты подключаются отдельно.\n\n## Карта страниц\n\n| Хост | Путь | Что |\n|------|------|-----|\n| сайт | `/` | лендинг: пути, как работает, сравнение, цены, FAQ (JSON-LD) |\n| сайт | `/quiz` | подбор пути, 8 вопросов, без регистрации |\n| сайт | `/dv-2027` | гайд DV-2027 + бесплатная проверка фото |\n| сайт | `/stoimost` | калькулятор госсборов |\n| кабинет | `/main` `/roadmap` `/costs` `/plans` | бесплатно после входа |\n| кабинет | `/dv` `/status` | DV Старт: мастер из 8 шагов, подгонка фото, номер подтверждения |\n| кабинет | `/documents` `/forms` `/interview` | DV Победитель: документы по 12 странам, гид DS-260, тренажёр |\n| кабинет | `/buy?tariff=` | оплата тарифа |\n\nКод продукта: `src/modules/greencard/` (данные: `dv.ts`, `countries.ts`,\n`costs.ts`, `quiz.ts`, `tariffs.ts`; интерфейс: `ui/`).\n\n## Тарифы и доступ\n\nЕдинственная точка правды по ценам: `src/modules/greencard/tariffs.ts`.\n`/api/buy` берёт сумму по `tariff`, заказ хранит `orders.tariff`, кабинет\nоткрывает разделы по оплаченным заказам (`entitlements.ts`). Статусы: `sale`\nпродаётся, `soon` лист ожидания, `hidden` не показываем (NIW + юрист ждёт\nпартнёра-адвоката США). Префикс заказов `amst-` (`docs/ORDER-PREFIXES.md`).\n\n## Данные\n\nАнкета DV, паспорт и фото живут только в браузере (localStorage, ключи\n`amst-*`), на сервер не уходят. В БД: учётка, заказы, лиды листа ожидания.\nДаты DV-2027 задал суд и они могут сдвинуться: правим `dv.ts` и `DV_UPDATED`.\n\n## Хосты и инфраструктура\n\n- `amerikastep.com` - сайт, индексируется; `product.amerikastep.com` - кабинет,\n  `noindex` и `Disallow: /`. Один сервис, хосты разводит `src/middleware.ts`\n  (`APP_PUBLIC_URL=https://product.amerikastep.com`).\n- Neon: проект `amerikastep` (`icy-glade-95182445`), ветки `main` и `dev`.\n- Секреты: AWS Secrets Manager `gg/amerikastep/*`.\n\n## Локально\n\n```bash\nnpm ci\ncp .env.example .env.local   # DATABASE_URL = ветка dev из gg/amerikastep/database-url-dev\nnpm run db:migrate && npm run seed:admin\nnpm run dev\n```\n\nТесты `npx vitest run`, гейт `bash scripts/stamp-dry-run.sh`. Техническое\nописание каркаса эталона: [docs/ETALON-README.md](docs/ETALON-README.md).\n",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "15",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "Drizzle",
+   "message": "ORM",
+   "color": "C5F74F",
+   "logo": "drizzle"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "AWS",
+   "message": "App Runner",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "amerikastep.com",
+   "color": "13445d",
+   "href": "https://amerikastep.com"
+  }
+ ]
+}
