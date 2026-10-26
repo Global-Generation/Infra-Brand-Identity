@@ -1,0 +1,11 @@
+{
+ "title": "Портал поступления на MBA",
+ "tagline": "Личный портал поступления в бизнес-школы США и Европы для клиентов GG: путь по шагам, сроки раундов, каталог школ, окупаемость, виза и Джи-джи.",
+ "body": "replace",
+ "body_md": "Продукт Global Generation из категории «Магистратура». Работающий специалист 25-32 лет идёт на full-time MBA: портал ведёт его от цели и GMAT до визы.\n\n## Как устроен\n\nПортал = движок порталов стран GG (копия [GG-Product-Japan-Portal](https://github.com/Global-Generation/GG-Product-Japan-Portal)) + пакет `mba` вместо пакета страны. Код движка здесь не правится: правка движка идёт PR в эталон и переносится сюда.\n\n- Путь из 10 шагов: цель и окупаемость, GMAT или GRE, выбор школ, резюме, эссе, рекомендации, подача по раундам, интервью, деньги, виза.\n- Каталог около 40 школ: топ-25 США и около 15 школ Европы, у каждой цифры class profile, стоимость, сроки раундов и зарплаты выпускников с источником и датой проверки.\n- Экзамен: переход в GMAT Portal (mbaportalprep.com).\n\n## Данные\n\nСобранное досье лежит в [`dossier/`](dossier): `content.part*.json` (шаги, сроки, экзамены, деньги, виза) и `universities-*.json` (школы). Из него заполняется пакет `src/country/`.\n\n## Статус\n\nВ работе: пакет MBA и демо на demo.mba.global-generations-edu.com. Прод mba.global-generations-edu.com поднимается после показа демо.\n",
+ "badges": [
+  {"label": "Next.js", "message": "16", "color": "000000", "logo": "nextdotjs"},
+  {"label": "PostgreSQL", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
+  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"}
+ ]
+}
