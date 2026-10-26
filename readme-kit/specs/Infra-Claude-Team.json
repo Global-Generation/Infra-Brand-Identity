@@ -1,0 +1,11 @@
+{
+ "title": "Claude Team (GG)",
+ "tagline": "Командная версия настройки Claude Code для Global Generation: правила, скиллы, хуки и установка на мак тиммейта.",
+ "body": "replace",
+ "body_md": "Командная конфигурация Claude Code для разработчиков продуктовых линий GG. Выводится из корпоративной конфигурации (`Infra-Claude-Config`), без личных скиллов и секретов.\n\n## Что внутри\n\n| Папка | Что |\n|---|---|\n| `global/CLAUDE.md` | Командные правила: модели и бюджет, хвост Кемпа, стиль GG, git и деплой, ключи, счёт PR, линии |\n| `skills/` | Рабочие скиллы GG: деплой с проверкой прода, стандарт README, релизы продуктов |\n| `hooks/` | `gh-account-guard` (свой аккаунт, только орговые репо), `openrouter-key-guard` (только свой ключ), `tool-audit-log`, `rules-autopull` |\n| `settings/settings.json` | Командные настройки по умолчанию: сабагенты Sonnet, effort high, хуки |\n| `install.sh` | Идемпотентная установка на мак: симлинки и аккуратный слив настроек |\n| `docs/SETUP.md` | Инструкция на одну страницу |\n\n## Установка\n\n```bash\n./install.sh --name <имя> --gh <логин GitHub>\n```\n\nУзел Кемпа ставится отдельно: `Ops-Dev-Camp`, README, раздел «Установка на мак». Подробно: [docs/SETUP.md](docs/SETUP.md).\n\n## Правила\n\n- Правки только через PR, клон на `main` читается `~/.claude` вживую.\n- У каждого скилла `model:` и `effort:` во frontmatter.\n- Секретов в репо нет: ключ OpenRouter лежит в `~/.gg_or_key` на маке.\n",
+ "badges": [
+  {"label": "Claude Code", "message": "skills + hooks", "color": "D97757", "logo": "anthropic"},
+  {"label": "Shell", "message": "install.sh", "color": "2F6DB0"},
+  {"label": "Скиллов", "message": "5", "color": "2F6DB0"}
+ ]
+}
