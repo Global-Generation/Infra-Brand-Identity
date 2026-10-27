@@ -1,0 +1,38 @@
+{
+  "title": "LawSchool",
+  "tagline": "LawSchool (Aura): поступление в LL.M. (США, UK) и JD с подготовкой к LSAT: каталог программ, шорт-лист и дедлайны, мотивационное письмо, банк LSAT и пробник.",
+  "body": "replace",
+  "body_md": "Продукт Aura: поступление в магистратуру по праву. Два трека в одном кабинете: LL.M. (США, Великобритания) и JD с подготовкой к LSAT. Собран Сашей на эталоне [Aura-Product-Starter](https://github.com/Global-Generation/Aura-Product-Starter) с движком экзамена GRE Portal как донором.\n\n## Статус\n\nИнфра поднята 27.10.2026: сайт `lawportalprep.com` (лендинг, документы; открыт для индекса) и кабинет `product.lawportalprep.com` (вход, программы, письмо, тренировки LSAT, оплата, админка; закрыт от индекса). Продажи до запуска закрыты предзаписью.\n\n## Где крутится\n\n- AWS App Runner `aura-product-lawschool`, ECR `aura-product-lawschool`, роль `lawschool-instance-role` читает только `gg/lawschool/*` и терминал Aura Exams.\n- Neon-проект `aura-product-lawschool`, ветки `main` (прод) и `dev`, автоскейл 0.25-1.\n- Почта: Resend, домен `lawportalprep.com`, свой ключ только на отправку.\n- Деплой: Actions > Deploy, окружение `prod` (только `main`), OIDC-роль `github-actions-aura-lawschool-deploy`, автооткат при провале проверки `/api/health`.\n\n## Страницы\n\n| Зона | Что внутри | Пути |\n|---|---|---|\n| Сайт | Лендинг под два трека, диагностика, блог, предзапись, документы | `/`, `/diagnostika`, `/blog`, `/predzapis`, `/dokumenty` |\n| Вход | Вход по почте и паролю (свой вход Aura) | `/login` |\n| Поступление | Главная, каталог 20 программ, шорт-лист, дедлайны, чек-лист документов, конструктор мотивационного письма | `/main`, `/schools`, `/deadlines`, `/statement` |\n| LSAT | Теория, банк вопросов (LR, RC, Argumentative Writing), пробник 3x35 минут, журнал ошибок | `/learn`, `/practice`, `/mock`, `/errors` |\n| Деньги | Тарифы, оплата, истёкший доступ | `/pricing`, `/buy`, `/expired` |\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev\n```\n\nГейт перед показом и деплоем: `bash scripts/stamp-dry-run.sh`. Переменные окружения по `.env.example`, `.env` не коммитится.\n\n## Документация\n\n- [`docs/RESEARCH.md`](docs/RESEARCH.md) - досье: аудитория, программы, LSAT, открытые вопросы\n- [`docs/SECRETS.md`](docs/SECRETS.md) - секреты продукта\n- [`docs/ORDER-PREFIXES.md`](docs/ORDER-PREFIXES.md) - реестр префиксов заказов\n",
+  "badges": [
+    {
+      "label": "Next.js",
+      "message": "15",
+      "color": "000000",
+      "logo": "nextdotjs"
+    },
+    {
+      "label": "Drizzle",
+      "message": "ORM",
+      "color": "C5F74F",
+      "logo": "drizzle"
+    },
+    {
+      "label": "PostgreSQL",
+      "message": "Neon",
+      "color": "4169E1",
+      "logo": "postgresql"
+    },
+    {
+      "label": "AWS",
+      "message": "App Runner",
+      "color": "FF9900",
+      "logo": "amazonwebservices"
+    },
+    {
+      "label": "Prod",
+      "message": "lawportalprep.com",
+      "color": "13445d",
+      "href": "https://lawportalprep.com"
+    }
+  ]
+}
