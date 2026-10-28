@@ -1,0 +1,31 @@
+{
+  "title": "MedRoute",
+  "tagline": "MedRoute (Aura): врачам за рубеж. USMLE и резидентура в США, PLAB и GMC в Великобритании, Approbation в Германии, магистратура MPH и MSc.",
+  "body": "keep",
+  "badges": [
+    {
+      "label": "Next.js",
+      "message": "15",
+      "color": "000000",
+      "logo": "nextdotjs"
+    },
+    {
+      "label": "Drizzle",
+      "message": "ORM",
+      "color": "C5F74F",
+      "logo": "drizzle"
+    },
+    {
+      "label": "PostgreSQL",
+      "message": "Neon",
+      "color": "4169E1",
+      "logo": "postgresql"
+    },
+    {
+      "label": "AWS",
+      "message": "App Runner",
+      "color": "FF9900",
+      "logo": "amazonwebservices"
+    }
+  ]
+}
