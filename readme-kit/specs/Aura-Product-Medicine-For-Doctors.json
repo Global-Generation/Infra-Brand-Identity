@@ -26,6 +26,12 @@
       "message": "App Runner",
       "color": "FF9900",
       "logo": "amazonwebservices"
+    },
+    {
+      "label": "Prod",
+      "message": "medportalprep.com",
+      "color": "13445d",
+      "href": "https://medportalprep.com"
     }
   ]
 }
