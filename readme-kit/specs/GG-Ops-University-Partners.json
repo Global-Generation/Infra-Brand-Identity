@@ -1,0 +1,10 @@
+{
+ "title": "Вузы-партнёры",
+ "tagline": "Агентские партнёрства с вузами и языковыми школами: адреса, письма, пакет агента, лог ответов. Статусы ведёт Lev CRM.",
+ "badges": [
+  {"label": "Python", "message": "генератор писем", "color": "3776AB", "logo": "python"},
+  {"label": "Почта", "message": "lev@global-generations.com", "color": "1d4ed8", "logo": "gmail"}
+ ],
+ "body": "replace",
+ "body_md": "## Что здесь\n\nПереписка с вузами и языковыми школами, которые берут агентов по набору студентов и платят комиссию. Вынесено из [GG-Ops-Exam-Partners](https://github.com/Global-Generation/GG-Ops-Exam-Partners) 30.10.2026 вместе с историей.\n\n| Файл | Что |\n|---|---|\n| [`BRIEF.md`](BRIEF.md) | Правила отправки, волны, этапы в CRM |\n| [`LOG.md`](LOG.md) | Кому и когда ушло, что ответили, что дальше |\n| [`outreach/universities.jsonl`](outreach/universities.jsonl) | Вузы: адреса с официальных страниц, страна, волна |\n| [`outreach/universities.py`](outreach/universities.py) | Письма, страница на ок и цепочка для Lev CRM |\n| [`outreach/agent-pack/`](outreach/agent-pack) | Пакет агента: профиль, LoI, доверенность, ответы для форм |\n\n## Как работать\n\n1. Новый вуз или правка: строка в `outreach/universities.jsonl`, текст в `outreach/universities.py`.\n2. Страница на ок Лёва: `python3 -I outreach/universities.py html > ~/Artifacts/<папка>/universities.html`.\n3. В CRM: `python3 -I outreach/universities.py chain > chain.json`, затем `ssh ubuntu@18.211.149.64 sudo docker exec -i lev_crm_worker python -m lev_crm.email_chains import < chain.json`. Волна уходит по кнопке на странице «Email», через Spark на MacBook.\n4. Studienkolleg идут в цепочку экзаменов: `python3 -I outreach/universities.py stk` (нужен клон GG-Ops-Exam-Partners рядом или `EXAM_REPO`).\n\n## Статусы\n\nЖивые статусы и этапы (на подпись, встреча, анкета, проигнорировали, отказ) видны в Lev CRM, раздел «Email», вкладка «Университеты». `LOG.md` дублирует ключевые события.\n"
+}
