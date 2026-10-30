@@ -2,9 +2,19 @@
  "title": "Партнёры по экзаменам",
  "tagline": "Партнёрки с владельцами экзаменов (IELTS, Duolingo, HSK, TOEFL и др.): письма, адреса, лог ответов.",
  "badges": [
-  {"label": "Python", "message": "генератор писем", "color": "3776AB", "logo": "python"},
-  {"label": "Почта", "message": "lev@global-generations.com", "color": "1d4ed8", "logo": "gmail"}
+  {
+   "label": "Python",
+   "message": "генератор писем",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "Почта",
+   "message": "lev@global-generations.com",
+   "color": "1d4ed8",
+   "logo": "gmail"
+  }
  ],
  "body": "replace",
- "body_md": "## Что здесь\n\nПереписка с владельцами экзаменов о реферальных и партнёрских программах: ученики GG идут на официальную регистрацию по нашей ссылке или коду, мы получаем комиссию, ваучеры или статус партнёра.\n\n| Файл | Что |\n|---|---|\n| [`BRIEF.md`](BRIEF.md) | Правила отправки, решения Лёва, волны, план повторных писем |\n| [`LOG.md`](LOG.md) | Кому и когда ушло, что ответили |\n| [`outreach/build.py`](outreach/build.py) | Источник всех текстов писем, собирает `letters.json` и страницу на ок |\n| [`outreach/letters.json`](outreach/letters.json) | Готовые письма: адрес, Cc, тема, текст, сверен ли адрес |\n| [`outreach/wave1.html`](outreach/wave1.html) | Страница первой волны на ок Лёва |\n\n## Как работать\n\n1. Правка текста или адреса: в `outreach/build.py`, потом `python3 -I outreach/build.py`.\n2. Волна уходит только после ок Лёва, письма с `lev@global-generations.com` через Spark на MacBook, каждое отдельно.\n3. После отправки и на каждый ответ: строка в `LOG.md`.\n\n## Экзамены\n\nHSK, IELTS (IDP, British Council), Duolingo English Test, TOEFL, GRE, GMAT, TCF, DELF/DALF, TestDaF, JLPT, EJU, TR-YOS, TOPIK, Studienkolleg, DSH, telc. SAT не пишем.\n"
+ "body_md": "## Что здесь\n\nПереписка с владельцами экзаменов о реферальных и партнёрских программах: ученики GG идут на официальную регистрацию по нашей ссылке или коду, мы получаем комиссию, ваучеры или статус партнёра.\n\nВузы-партнёры (письма вузам, пакет агента, их лог) с 30.10.2026 в отдельном репо [GG-Ops-University-Partners](https://github.com/Global-Generation/GG-Ops-University-Partners).\n\n| Файл | Что |\n|---|---|\n| [`BRIEF.md`](BRIEF.md) | Правила отправки, решения Лёва, волны, план повторных писем |\n| [`LOG.md`](LOG.md) | Кому и когда ушло, что ответили |\n| [`outreach/build.py`](outreach/build.py) | Источник всех текстов писем, собирает `letters.json` и страницу на ок |\n| [`outreach/letters.json`](outreach/letters.json) | Готовые письма: адрес, Cc, тема, текст, сверен ли адрес |\n| [`outreach/wave1.html`](outreach/wave1.html) | Страница первой волны на ок Лёва |\n\n## Как работать\n\n1. Правка текста или адреса: в `outreach/build.py`, потом `python3 -I outreach/build.py`.\n2. Волна уходит только после ок Лёва, письма с `lev@global-generations.com` через Spark на MacBook, каждое отдельно.\n3. После отправки и на каждый ответ: строка в `LOG.md`.\n\n## Экзамены\n\nHSK, IELTS (IDP, British Council), Duolingo English Test, TOEFL, GRE, GMAT, TCF, DELF/DALF, TestDaF, JLPT, EJU, TR-YOS, TOPIK, Studienkolleg, DSH, telc. SAT не пишем.\n"
 }
