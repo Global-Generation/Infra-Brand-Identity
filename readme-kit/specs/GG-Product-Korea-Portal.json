@@ -1,0 +1,25 @@
+{
+ "title": "Портал поступления в Южную Корею",
+ "tagline": "Личный портал поступления в Южную Корею для учеников GG: путь по шагам, сроки, вузы, стоимость, виза и Джи-джи.",
+ "body": "replace",
+ "body_md": "Продукт Global Generation для поступления на бакалавриат в Южной Корее. Работает на общем движке порталов стран ([GG-Product-Country-Portals](https://github.com/Global-Generation/GG-Product-Country-Portals)) по модели портала Италии.\n\n## Что здесь лежит\n\n| Файл | Что внутри |\n|---|---|\n| `country/content.json` | Шаги, сроки, экзамены, документы, стипендии, стоимость, виза, тексты Джи-джи |\n| `country/universities.json` | Вузы: рейтинг QS, город и адрес, цена, требования, страница приёма |\n| `product.json` | Настройки продукта: домены, префикс заказов, валюта, права доступа |\n| `docs/RESEARCH.md` | Источники и что ещё проверить |\n| `docs/SIGNOFF.md` | Согласование экранов с Лёвом |\n\n## Решения\n\n- Домены: `korea.global-generations-edu.com` и `demo.korea.global-generations-edu.com` (пока не заведены).\n- Аккаунты учеников в АКБ, право `portal-korea`; команда входит через GG ID.\n- Касса: ООО «Глобал Дженерейшн», Т-Банк. Оплата и лендинг делаются отдельно.\n- Один проект Neon на страну, общий бот и рабочий чат порталов.\n\nВсе решения: [`docs/DECISIONS.md`](https://github.com/Global-Generation/GG-Product-Country-Portals/blob/main/docs/DECISIONS.md) в зонтичном репо.\n",
+ "badges": [
+  {
+   "label": "Next.js",
+   "message": "16",
+   "color": "000000",
+   "logo": "nextdotjs"
+  },
+  {
+   "label": "PostgreSQL",
+   "message": "Neon",
+   "color": "4169E1",
+   "logo": "postgresql"
+  },
+  {
+   "label": "Статус",
+   "message": "прототип",
+   "color": "2f6bb0"
+  }
+ ]
+}
