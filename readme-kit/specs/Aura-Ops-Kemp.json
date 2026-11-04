@@ -1,0 +1,37 @@
+{
+ "title": "Кемп",
+ "tagline": "Пульт агентов Claude Code на маках команды и стена живых экранов кемпа программистов. Сервис Ауры, вход через Aura ID.",
+ "body": "keep",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.10 stdlib",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "WebRTC",
+   "message": "screen share",
+   "color": "333333",
+   "logo": "webrtc"
+  },
+  {
+   "label": "SQLite",
+   "message": "WAL",
+   "color": "003B57",
+   "logo": "sqlite"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "kemp.aura-ecosystem.com",
+   "color": "111111",
+   "href": "https://kemp.aura-ecosystem.com"
+  }
+ ]
+}
