@@ -1,0 +1,12 @@
+{
+ "title": "Bilimforall",
+ "tagline": "Подготовка к ЕНТ, IELTS и SAT в стиле Duolingo: учебный план от Джи-джи, уроки, разговорная практика, достижения и таблица лидеров.",
+ "body": "replace",
+ "body_md": "Приложение для подготовки к ЕНТ, IELTS и SAT. Ученик проходит настройку плана, получает учебный путь из модулей, занимается короткими уроками, тренирует речь и письмо с Джи-джи и соревнуется с друзьями. Перенесено из `affewag/globalrahatraha` 05.11.2026 (собрано в Google AI Studio).\n\n## Разделы приложения\n\n| Раздел | Что внутри | Файл |\n|---|---|---|\n| План | Настройка цели и мастер-план подготовки | `src/views/SetupPlanView.tsx` |\n| Учебный путь | Модули и уроки по шагам | `src/views/LearningPathView.tsx` |\n| Урок | Интерактивные упражнения | `src/views/LessonView.tsx` |\n| Речь | Разговорная практика с голосом | `src/views/SpeakingView.tsx` |\n| Ошибки | Разбор ошибок ученика | `src/views/ErrorLogView.tsx` |\n| Взаимопомощь и друзья | Поиск партнёров по учёбе | `src/views/MutualHelpView.tsx`, `src/views/FriendsView.tsx` |\n| Достижения и лидеры | Награды, ежедневные задания, рейтинг | `src/views/AchievementsView.tsx`, `src/views/LeaderboardView.tsx` |\n| Аналитика и профиль | Статистика прогресса | `src/views/AnalyticsView.tsx`, `src/views/ProfileView.tsx` |\n\n## Сервер\n\n`server.ts` (Express): генерация учебного плана и модулей, ассистент, проверка эссе, разговорная практика (`/api/generate-*`, `/api/ask-companion`, `/api/analyze-essay`, `/api/speaking/turn`), оплата подписки через FreedomPay / PayBox KZ (`/api/payment/*`), sitemap и robots.\n\n## Стек и данные\n\n- React 19, Vite 6, TypeScript, Tailwind 4.\n- Firebase: вход и Firestore (`src/firebase.ts`, `firestore.rules`, `firebase-blueprint.json`).\n- ИИ: Gemini API (`src/services/gemini.ts`).\n\n## Локальный запуск\n\n```bash\nnpm install\nnpm run dev\n```\n\nПеременные окружения по образцу `.env.example` в `.env` (не коммитится): `GEMINI_API_KEY`, `APP_URL`, `FREEDOMPAY_MERCHANT_ID`, `FREEDOMPAY_SECRET_KEY`.\n",
+ "badges": [
+  {"label": "React", "message": "19", "color": "20232A", "logo": "react"},
+  {"label": "Vite", "message": "6", "color": "646CFF", "logo": "vite"},
+  {"label": "Firebase", "message": "Firestore", "color": "FFCA28", "logo": "firebase"},
+  {"label": "Gemini", "message": "API", "color": "4285F4", "logo": "googlegemini"}
+ ]
+}
