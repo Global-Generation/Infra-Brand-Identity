@@ -1,0 +1,32 @@
+{
+ "title": "Касса Aura",
+ "tagline": "Единая витрина оплаты Aura Ecosystem: экзамены, визы, новые направления и языковые курсы на pay.aura-ecosystem.com.",
+ "body": "replace",
+ "body_md": "Единая касса Aura Ecosystem: одна страница, где покупатель выбирает направление (Экзамены, Визы, Новые направления, Языковые курсы), продукт и тариф. Курсы авторов (Саксон, «Я к вам пишу», SportWay и другие) сюда не входят: у каждого автора своя платёжная страница и свой магазин.\n\n## Как работает\n\n| Состояние продукта | Что видит покупатель | Куда уходит |\n|---|---|---|\n| Продаётся | Тарифы, способы оплаты, кнопка «Перейти к оплате» | Касса продукта: IELTS и SAT `/pricing` (вход по почте), DET и TOEFL `/buy`, AmerikaStep `/buy?tariff=` |\n| Предзапись | Цена и кнопка «Записаться в предзапись» | `/predzapis` на сайте GRE и GMAT |\n| Скоро | Форма «Узнать первым» | `POST /api/lead` -> лямбда `aura-kassa-lead` -> Aura CRM `/api/leads` (project Aura, source pay.aura-ecosystem.com) |\n\nКаталог и цены живут в `site/index.html` (массив `P`), цены сверены с кодом продуктов 25.10.2026. Ссылка на продукт: `https://pay.aura-ecosystem.com/#<сфера>/<продукт>`, например `#exams/sat`.\n\n## Инфраструктура\n\n- CloudFront `E3CBTPKNY173GC` с алиасом `pay.aura-ecosystem.com` (ACM us-east-1), OAC на приватный S3 `aura-kassa-818034793268`.\n- `/api/*` проксируется на Function URL лямбды `aura-kassa-lead` (python3.12). CloudFront добавляет заголовок `x-kassa-edge`, без него лямбда отвечает 403.\n- Секреты только в Secrets Manager: `aura/kassa/edge-secret`, `aura/kassa/crm-ingest-token`. Список ресурсов в [`infra.env`](infra.env).\n- Шлюз ПДн: перед CRM вызывается `pd_record` (оператор `aura`, source `kassa-lead`). Пока шлюз не включён, `PD_GATEWAY_URL` пуст.\n\n## Деплой\n\n```bash\nbash scripts/deploy.sh          # лямбда + сайт\nbash scripts/deploy.sh site     # только страница\n```\n\nСкрипт запускается из чистого `main`, берёт env лямбды из Secrets Manager и сбрасывает кэш CloudFront.\n\n## Что дальше\n\nСвоя оплата в кассе (без перехода на сайт продукта) появится, когда в Т-Бизнесе ООО «АУРА» будут заведены магазины по сферам: Aura Exams, Aura Visas, Aura Careers, Aura Languages.\n",
+ "badges": [
+  {
+   "label": "HTML",
+   "message": "static",
+   "color": "E34F26",
+   "logo": "html5"
+  },
+  {
+   "label": "Lambda",
+   "message": "python3.12",
+   "color": "FF9900",
+   "logo": "awslambda"
+  },
+  {
+   "label": "AWS",
+   "message": "CloudFront + S3",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "pay.aura-ecosystem.com",
+   "color": "13445d",
+   "href": "https://pay.aura-ecosystem.com"
+  }
+ ]
+}
