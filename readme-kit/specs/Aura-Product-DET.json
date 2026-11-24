@@ -1,11 +1,10 @@
 {
  "title": "Duolingo English Test",
- "tagline": "Платформа подготовки к Duolingo English Test на движке Aura.",
+ "tagline": "Портал подготовки к Duolingo English Test и оплаты теста в рублях.",
  "badges": [
-  {"label": "Next.js", "message": "15", "color": "000000", "logo": "nextdotjs"},
-  {"label": "PostgreSQL", "message": "Neon", "color": "4169E1", "logo": "postgresql"},
-  {"label": "AWS", "message": "App Runner", "color": "FF9900", "logo": "amazonwebservices"},
-  {"label": "Prod", "message": "det.aura-ecosystem.com", "color": "13445d", "href": "https://det.aura-ecosystem.com"}
+  {"label": "HTML/JS", "message": "без сборки", "color": "F7DF1E", "logo": "javascript"},
+  {"label": "AWS", "message": "Lambda + DynamoDB", "color": "FF9900", "logo": "amazonwebservices"},
+  {"label": "Prod", "message": "det.global-generations.com", "color": "13445d", "href": "https://det.global-generations.com"}
  ],
  "body": "keep"
 }
