@@ -1,0 +1,32 @@
+{
+ "title": "Бухгалтерия GG",
+ "tagline": "Дела бухгалтера по месяцам и сферам, часы и пакет 20 часов, сроки всех юрлиц и вопросы стратегии денег группы.",
+ "body": "replace",
+ "body_md": "Сервис для бухгалтера и CFO группы GG: план работ по месяцам (декабрь 2026 - апрель 2027) по девяти сферам, учёт часов по делам, пакет 20 часов в месяц и сумма к оплате, сроки всех юрлиц, вопросы стратегии денег.\n\n## Разделы\n\n| Раздел | Что внутри | Адрес |\n|---|---|---|\n| Дела | Месяц, плитки сфер в один экран, дела со сроком, статусом и чек-листом; карточка дела с текстом, часами и комментариями | `/` |\n| Часы | Итог месяца, пакет и сверх пакета, сумма, по делам и по сферам, журнал; владелец закрывает месяц и меняет ставку | `/#/hours` |\n| Сроки | Сроки ООО «Глобал дженерейшн», ООО «Аура», ИП и ТОО, ежемесячные платежи | `/#/dates` |\n| Стратегия денег | Вопросы CFO: что сейчас, что нужно, ответ бухгалтера | `/#/cfo` |\n| С нашей стороны | Что даёт команда GG | `/#/ours` |\n\n## Вход и роли\n\nВход через GG ID: nginx-ворота `sso-gate` (Infra-Services-Portal). Приложение верит заголовкам `X-GG-User` и `X-GG-Role` только с верным `X-GG-Edge`.\n\n- `admin`: владелец хаба, всё, плюс ставка, пакет и закрытие месяца.\n- `accountant`: держатель права `accounting.access` (роль «Бухгалтер» в «Доступах» хаба): часы, статусы, чек-листы, комментарии, ответы CFO.\n- Без роли: 403.\n\n## Стек и данные\n\n- Python 3.10 stdlib (`http.server`) и SQLite, без зависимостей. `app/server.py` API и страницы, `app/store.py` база, `app/panel/` интерфейс.\n- Наполнение `seed/seed.json` грузится один раз в пустую базу.\n- Деньги: сумма месяца = цена пакета + (часы сверх пакета) x ставка.\n\n## Деплой\n\nEC2 GG, `127.0.0.1:8086`, systemd `gg-accounting`, nginx `deploy/nginx-accounting.conf`, база `/opt/accounting/accounting.db` (бэкап при каждой выкатке и ночью в S3).\n\n```bash\ndeploy/deploy.sh            # из чистого origin/main\n```\n\nСекрет края: `Infra-Services-Portal/sso-gate/deploy.sh --edge-secret accounting.global-generations-edu.com /opt/accounting/env GG_EDGE_SECRET`.\n\n## Локально и тесты\n\n```bash\nACC_DB=/tmp/acc.db ACC_DEV_USER=you@global-generations.com ACC_DEV_ROLE=admin python3 app/server.py   # http://127.0.0.1:8086\npython3 -m unittest discover -s tests\n```\n\nКоманды на сервере: `python3 manage.py tasks|add|report|date|name` (см. шапку `manage.py`).\n",
+ "badges": [
+  {
+   "label": "Python",
+   "message": "3.10 stdlib",
+   "color": "3776AB",
+   "logo": "python"
+  },
+  {
+   "label": "SQLite",
+   "message": "WAL",
+   "color": "003B57",
+   "logo": "sqlite"
+  },
+  {
+   "label": "AWS",
+   "message": "EC2",
+   "color": "FF9900",
+   "logo": "amazonwebservices"
+  },
+  {
+   "label": "Prod",
+   "message": "accounting.global-generations-edu.com",
+   "color": "1F5BFF",
+   "href": "https://accounting.global-generations-edu.com"
+  }
+ ]
+}
